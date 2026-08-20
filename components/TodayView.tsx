@@ -71,11 +71,6 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
         </>
       )}
 
-      <div className="mt-8 flex justify-end">
-        <Link href="/profile" className="text-sm text-ink-muted">
-          Profile
-        </Link>
-      </div>
     </div>
   );
 }

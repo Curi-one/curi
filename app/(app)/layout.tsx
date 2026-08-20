@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AppTopBar } from "@/components/AppTopBar";
 import { TabBar } from "@/components/TabBar";
 import { getMe, type UserSession } from "@/lib/api/client";
 
@@ -19,6 +20,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      {showTabs && <AppTopBar />}
       <div className={showTabs ? "pb-20" : ""}>{children}</div>
       {showTabs && <TabBar />}
     </>

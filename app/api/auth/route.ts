@@ -7,10 +7,13 @@ import {
 } from "@/lib/api/handler-utils";
 import {
   classifyAuthError,
+  isStagingOtpBypass,
   loadMemberSession,
   migratePending,
   OTP_RATE_LIMIT_NOTICE,
   requestOtp,
+  signInWithStagingOtp,
+  STAGING_OTP_CODE,
   updateUserName,
   verifyOtp,
 } from "@/lib/auth/otp";
@@ -75,6 +78,9 @@ export async function POST(request: Request) {
           ok: true as const,
           step: "code" as const,
           emailSent: otp.sent,
+          ...(getEnv().APP_ENV === "staging"
+            ? { stagingOtpHint: STAGING_OTP_CODE }
+            : {}),
           ...(otp.rateLimited ? { notice: OTP_RATE_LIMIT_NOTICE } : {}),
         },
         sessionId,
@@ -95,7 +101,9 @@ export async function POST(request: Request) {
 
     // OTP is single-use — only verify when we do not already have a session.
     if (code && !userId) {
-      const verified = await verifyOtp({ email, token: code });
+      const verified = isStagingOtpBypass(code)
+        ? await signInWithStagingOtp(email)
+        : await verifyOtp({ email, token: code });
       userId = verified.userId;
       userEmail = verified.email;
     }

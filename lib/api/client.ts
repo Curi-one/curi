@@ -123,6 +123,8 @@ export type AuthCodeStepResponse = {
   emailSent?: boolean;
   /** Present only when USE_MOCK_API — never set for real Supabase OTP. */
   devHint?: string;
+  /** Staging-only bypass code (APP_ENV=staging). */
+  stagingOtpHint?: string;
   /** New email was not sent (provider rate limit). User can still enter a prior code. */
   notice?: string;
 };

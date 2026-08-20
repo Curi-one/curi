@@ -6,6 +6,7 @@ import {
   clarificationsToMap,
   normalizeTopic,
 } from "@/lib/courses/outline";
+import { getEnv } from "@/lib/env";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -172,6 +173,55 @@ export async function requestOtp(
 }
 
 const OTP_TYPES = ["email", "magiclink", "signup"] as const;
+
+/** Fixed OTP for stage.curi.one when Supabase mail is rate-limited. Never enabled in production. */
+export const STAGING_OTP_CODE = "118833";
+
+export function isStagingOtpBypass(code: string | undefined): boolean {
+  return getEnv().APP_ENV === "staging" && code?.trim() === STAGING_OTP_CODE;
+}
+
+export async function signInWithStagingOtp(
+  email: string,
+  deps?: OtpDeps,
+): Promise<VerifyOtpResult> {
+  if (getEnv().APP_ENV !== "staging") {
+    throw new Error("Invalid code");
+  }
+
+  const admin = deps?.createAdminClient?.() ?? createAdminClient();
+  const createServer = deps?.createServerClient ?? createClient;
+  const supabase = await createServer();
+
+  await admin.auth.admin.createUser({
+    email,
+    email_confirm: true,
+  });
+
+  const { data: link, error: linkError } = await admin.auth.admin.generateLink({
+    type: "magiclink",
+    email,
+    options: { redirectTo: authEmailRedirectTo() },
+  });
+
+  const tokenHash = link?.properties?.hashed_token;
+  if (linkError || !tokenHash) {
+    throw new Error(linkError?.message ?? "Staging sign-in failed");
+  }
+
+  const { data, error } = await supabase.auth.verifyOtp({
+    token_hash: tokenHash,
+    type: "magiclink",
+  });
+  if (error || !data.user) {
+    throw new Error(error?.message ?? "Staging sign-in failed");
+  }
+
+  return {
+    userId: data.user.id,
+    email: data.user.email ?? email,
+  };
+}
 
 export async function verifyOtp(
   params: { email: string; token: string },

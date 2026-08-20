@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CompleteSheet } from "@/components/CompleteSheet";
 import { LessonFeel, LessonFeelDock } from "@/components/LessonFeel";
+import { PageShell } from "@/components/PageShell";
 import { QuizFlow } from "@/components/QuizFlow";
 import type { LessonFeel as LessonFeelType } from "@/lib/api/schemas";
 import { getMe, getQuiz, postQuiz } from "@/lib/api/client";
@@ -57,22 +59,42 @@ export default function QuizPage() {
 
   if (error) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-10">
-        <p className="text-ink-muted">{error}</p>
-      </main>
+      <PageShell
+        back={{
+          href: `/courses/${params.courseId}/lessons/${params.lessonIndex}`,
+          label: "Lesson",
+        }}
+        withTabPad={false}
+      >
+        <p className="mt-6 text-ink-muted">{error}</p>
+      </PageShell>
     );
   }
 
   if (!questions) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-10">
-        <p className="text-ink-muted">Loading quiz…</p>
-      </main>
+      <PageShell
+        back={{
+          href: `/courses/${params.courseId}/lessons/${params.lessonIndex}`,
+          label: "Lesson",
+        }}
+        withTabPad={false}
+      >
+        <p className="mt-6 text-ink-muted">Loading quiz…</p>
+      </PageShell>
     );
   }
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-10">
+    <PageShell
+      back={{
+        href: `/courses/${params.courseId}/lessons/${params.lessonIndex}`,
+        label: "Lesson",
+      }}
+      title={phase === "feel" ? "How did that land?" : undefined}
+      withTabPad={false}
+      className="pt-4"
+    >
       {phase === "quiz" && (
         <QuizFlow
           questions={questions}
@@ -91,11 +113,19 @@ export default function QuizPage() {
           />
         </>
       )}
+      {phase === "done" && (
+        <p className="mt-6 text-ink-muted">
+          Lesson complete.{" "}
+          <Link href="/today" className="underline hover:text-ink">
+            Back to Today
+          </Link>
+        </p>
+      )}
       <CompleteSheet
         open={sheet.open}
         allPathsDoneToday={sheet.allDone}
         onClose={() => setSheet({ open: false, allDone: false })}
       />
-    </main>
+    </PageShell>
   );
 }

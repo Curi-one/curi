@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PageShell } from "@/components/PageShell";
 import { TodayView } from "@/components/TodayView";
 import { getFeed, getProgress } from "@/lib/api/client";
 import type { FeedResponse } from "@/lib/api/schemas";
@@ -20,7 +21,7 @@ export default function TodayPage() {
   }, []);
 
   return (
-    <main className="app-shell py-10">
+    <PageShell withTabPad={false} className="pt-4">
       {error && <p className="text-ink-muted">{error}</p>}
       {!feed && !error && <p className="text-ink-muted">Loading…</p>}
       {feed && (
@@ -30,6 +31,6 @@ export default function TodayPage() {
           streakAtRisk={streak > 0 && feed.due.length > 0}
         />
       )}
-    </main>
+    </PageShell>
   );
 }

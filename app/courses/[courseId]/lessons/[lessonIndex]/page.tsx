@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { PageShell } from "@/components/PageShell";
 import { LessonReader } from "@/components/LessonReader";
 import { getLesson } from "@/lib/api/client";
 import type { LessonResponse } from "@/lib/api/schemas";
@@ -20,22 +22,29 @@ export default function LessonPage() {
 
   if (error) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-10">
-        <p className="text-ink-muted">{error}</p>
-      </main>
+      <PageShell back={{ href: "/today", label: "Today" }} withTabPad={false}>
+        <p className="mt-6 text-ink-muted">{error}</p>
+        <Link href={`/library/${params.courseId}`} className="mt-4 inline-block text-sm underline">
+          View path map
+        </Link>
+      </PageShell>
     );
   }
 
   if (!lesson) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-10">
-        <p className="text-ink-muted">Loading lesson…</p>
-      </main>
+      <PageShell back={{ href: "/today", label: "Today" }} withTabPad={false}>
+        <p className="mt-6 text-ink-muted">Loading lesson…</p>
+      </PageShell>
     );
   }
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-10">
+    <PageShell
+      back={{ href: `/library/${params.courseId}`, label: "Path map" }}
+      withTabPad={false}
+      className="pt-4"
+    >
       <LessonReader
         lesson={lesson}
         onStartQuiz={() =>
@@ -44,6 +53,6 @@ export default function LessonPage() {
           )
         }
       />
-    </main>
+    </PageShell>
   );
 }

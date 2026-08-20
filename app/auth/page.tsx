@@ -19,6 +19,7 @@ function AuthContent() {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [devHint, setDevHint] = useState<string | null>(null);
+  const [stagingHint, setStagingHint] = useState<string | null>(null);
   const [emailSent, setEmailSent] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -71,10 +72,15 @@ function AuthContent() {
         } else {
           setDevHint(null);
         }
+        if ("stagingOtpHint" in res && typeof res.stagingOtpHint === "string") {
+          setStagingHint(res.stagingOtpHint);
+        } else {
+          setStagingHint(null);
+        }
         if ("notice" in res && typeof res.notice === "string") {
           setError(res.notice);
         }
-        setEmailSent(res.emailSent !== false);
+        setEmailSent("emailSent" in res ? res.emailSent !== false : true);
         setStep("code");
         return;
       }
@@ -136,9 +142,11 @@ function AuthContent() {
         {step === "code" &&
           (devHint
             ? `We sent a code to ${email}. Dev code: ${devHint}`
-            : emailSent
-              ? `Check your inbox for a 6-digit code sent to ${email}. You can also tap the link in the email.`
-              : `Nothing new was sent to ${email}. If you already have a code from an earlier try, enter it below. Otherwise wait about an hour (Supabase free mailer limit) or ask us to enable custom SMTP.`)}
+            : stagingHint
+              ? `Enter the staging code ${stagingHint}, or check your inbox for ${email}.`
+              : emailSent
+                ? `Check your inbox for a 6-digit code sent to ${email}. You can also tap the link in the email.`
+                : `Nothing new was sent to ${email}. If you already have a code from an earlier try, enter it below. Otherwise wait about an hour (Supabase free mailer limit) or use the staging code if shown.`)}
         {step === "name" && "Just a first name is fine."}
       </p>
 

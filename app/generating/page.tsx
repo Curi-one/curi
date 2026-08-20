@@ -1,7 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { PageShell } from "@/components/PageShell";
+import { Wordmark } from "@/components/Wordmark";
 import { postCourse } from "@/lib/api/client";
 import { loadClarifySession, saveClarifySession } from "@/lib/clarify-store";
 
@@ -42,33 +45,36 @@ export default function GeneratingPage() {
 
   if (error) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-10">
-        <p className="text-ink-muted">{error}</p>
-        <button
-          type="button"
-          className="btn-primary mt-4"
-          onClick={() => router.push("/clarify")}
-        >
+      <PageShell withTabPad={false}>
+        <Wordmark href="/" />
+        <p className="mt-8 text-ink-muted">{error}</p>
+        <Link href="/clarify" className="btn-primary mt-4 inline-block">
           Back to clarify
-        </button>
-      </main>
+        </Link>
+      </PageShell>
     );
   }
 
   const ready = visible >= outline.length && courseId;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col px-6 py-10">
-      <h1 className="font-display text-2xl text-ink">Building your path</h1>
+    <PageShell withTabPad={false} className="flex min-h-[80vh] flex-col pt-6">
+      <Wordmark href="/" />
+      <h1
+        className="mt-10 font-display text-[1.75rem] font-light text-ink"
+        style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
+      >
+        Building your path
+      </h1>
       <p className="mt-2 text-ink-muted">Streaming lesson titles…</p>
       <ol className="mt-8 space-y-2">
         {outline.slice(0, visible).map((item) => (
           <li
             key={item.index}
-            className="rounded-lg border border-border bg-paper-secondary px-4 py-3 text-ink animate-fade-in"
+            className="surface-card px-4 py-3 animate-fade-in"
           >
-            <span className="text-xs text-ink-muted">Lesson {item.index + 1}</span>
-            <p className="mt-1">{item.title}</p>
+            <span className="font-meta">Lesson {item.index + 1}</span>
+            <p className="mt-1 text-ink">{item.title}</p>
           </li>
         ))}
       </ol>
@@ -83,6 +89,6 @@ export default function GeneratingPage() {
           </button>
         </div>
       )}
-    </main>
+    </PageShell>
   );
 }

@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   classifyAuthError,
+  isStagingOtpBypass,
   migratePending,
   requestOtp,
+  signInWithStagingOtp,
   updateUserName,
   verifyOtp,
 } from "@/lib/auth/otp";
@@ -77,6 +79,52 @@ describe("requestOtp", () => {
       requestOtp("learner@example.com", { createServerClient }),
     ).resolves.toEqual({ sent: true, rateLimited: false });
     expect(signInWithOtp).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("staging OTP bypass", () => {
+  it("only accepts the fixed code on staging", () => {
+    vi.stubEnv("APP_ENV", "staging");
+    expect(isStagingOtpBypass("118833")).toBe(true);
+    expect(isStagingOtpBypass("000000")).toBe(false);
+    vi.unstubAllEnvs();
+    vi.stubEnv("APP_ENV", "production");
+    expect(isStagingOtpBypass("118833")).toBe(false);
+  });
+
+  it("signs in via admin magic link on staging", async () => {
+    vi.stubEnv("APP_ENV", "staging");
+    const createUser = vi.fn().mockResolvedValue({ data: { user: {} }, error: null });
+    const generateLink = vi.fn().mockResolvedValue({
+      data: { properties: { hashed_token: "hash-token" } },
+      error: null,
+    });
+    const verifyOtpFn = vi.fn().mockResolvedValue({
+      data: { user: { id: "user-staging", email: "learner@example.com" } },
+      error: null,
+    });
+    const createAdminClient = vi.fn().mockReturnValue({
+      auth: { admin: { createUser, generateLink } },
+    });
+    const createServerClient = vi.fn().mockResolvedValue({
+      auth: { verifyOtp: verifyOtpFn },
+    });
+
+    const result = await signInWithStagingOtp("learner@example.com", {
+      createAdminClient,
+      createServerClient,
+    });
+
+    expect(result).toEqual({
+      userId: "user-staging",
+      email: "learner@example.com",
+    });
+    expect(generateLink).toHaveBeenCalled();
+    expect(verifyOtpFn).toHaveBeenCalledWith({
+      token_hash: "hash-token",
+      type: "magiclink",
+    });
+    vi.unstubAllEnvs();
   });
 });
 

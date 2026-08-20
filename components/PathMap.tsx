@@ -16,7 +16,8 @@ export function PathMap({ courseId, nodes, readOnly }: Props) {
   return (
     <ol className="space-y-2">
       {nodes.map((node) => {
-        const clickable = node.status === "today" && !readOnly;
+        const clickable =
+          (node.status === "today" || node.status === "read") && !readOnly;
         const content = (
           <>
             <span

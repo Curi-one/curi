@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { PageShell } from "@/components/PageShell";
 import { postCheckout } from "@/lib/api/client";
 
 export default function UpgradePage() {
@@ -16,16 +18,20 @@ export default function UpgradePage() {
       setMessage(res.message);
       if (res.url) router.push(res.url);
     } catch {
-      setMessage("Checkout unavailable in mock mode.");
+      setMessage("Checkout unavailable until Stripe is wired.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-10 pb-24">
-      <h1 className="font-display text-3xl text-ink">Academy</h1>
-      <p className="mt-4 text-ink-muted">
+    <PageShell
+      back={{ href: "/profile", label: "Profile" }}
+      title="Academy"
+      kicker="Upgrade"
+      withTabPad={false}
+    >
+      <p className="mt-4 text-[15px] font-light leading-relaxed text-ink-muted">
         Same lesson quality. More active paths — $10/month when billing ships.
       </p>
       <ul className="mt-8 space-y-2 text-ink/90">
@@ -34,7 +40,7 @@ export default function UpgradePage() {
         <li>No ads, no upsells on lesson body</li>
       </ul>
       {message && <p className="mt-4 text-sm text-ink-muted">{message}</p>}
-      <div className="mt-10">
+      <div className="mt-10 space-y-3">
         <button
           type="button"
           disabled={loading}
@@ -43,7 +49,10 @@ export default function UpgradePage() {
         >
           {loading ? "Starting checkout…" : "Subscribe — $10/mo"}
         </button>
+        <Link href="/today" className="btn-secondary block w-full text-center">
+          Back to Today
+        </Link>
       </div>
-    </main>
+    </PageShell>
   );
 }

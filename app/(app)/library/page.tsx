@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { EmptyState } from "@/components/EmptyState";
+import { PageShell } from "@/components/PageShell";
 import type { LibraryResponse } from "@/lib/api/schemas";
 import { getLibrary } from "@/lib/api/client";
 import { depthLabel } from "@/lib/ui/constants";
@@ -27,8 +29,7 @@ export default function LibraryPage() {
   const paths = lib?.[tab] ?? [];
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-10 pb-24">
-      <h1 className="font-display text-3xl text-ink">Library</h1>
+    <PageShell title="Library" kicker="Your paths" withTabPad={false} className="pt-4">
       <div className="mt-6 flex gap-2">
         {TABS.map((t) => (
           <button
@@ -46,13 +47,17 @@ export default function LibraryPage() {
       <div className="mt-6">
         {!lib && <p className="text-ink-muted">Loading…</p>}
         {lib && paths.length === 0 && (
-          <p className="text-ink-muted">
-            {tab === "exploring"
-              ? "No active paths. Start one from Explore."
-              : tab === "mastered"
-                ? "Nothing mastered yet."
-                : "No shelved paths."}
-          </p>
+          <EmptyState
+            message={
+              tab === "exploring"
+                ? "No active paths yet. Start one from Explore or the landing page."
+                : tab === "mastered"
+                  ? "Nothing mastered yet. Finish a path to see it here."
+                  : "No shelved paths."
+            }
+            actionHref={tab === "exploring" ? "/explore" : undefined}
+            actionLabel={tab === "exploring" ? "Explore paths" : undefined}
+          />
         )}
         {paths.length > 0 && (
           <ul className="space-y-3">
@@ -60,10 +65,12 @@ export default function LibraryPage() {
               <li key={p.id}>
                 <Link
                   href={`/library/${p.id}`}
-                  className="block rounded-xl border border-border bg-paper-secondary px-4 py-4 hover:border-ink/20"
+                  className="surface-card block px-4 py-4 hover:border-ink/30"
                 >
-                  <p className="font-display text-lg text-ink">{p.topic}</p>
-                  <p className="mt-1 text-sm text-ink-muted">
+                  <p className="font-display text-[22px] leading-snug text-ink">
+                    {p.topic}
+                  </p>
+                  <p className="mt-2 font-meta">
                     {depthLabel(p.depth)} · {p.progress} of {p.totalLessons}{" "}
                     lessons
                   </p>
@@ -73,6 +80,6 @@ export default function LibraryPage() {
           </ul>
         )}
       </div>
-    </main>
+    </PageShell>
   );
 }

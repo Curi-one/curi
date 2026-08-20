@@ -1,10 +1,12 @@
 "use client";
 
-import type { DepthSlug } from "@/lib/api/schemas";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ClarifyStep } from "@/components/ClarifyStep";
 import { DepthPicker } from "@/components/DepthPicker";
+import { PageShell } from "@/components/PageShell";
+import { Wordmark } from "@/components/Wordmark";
+import type { DepthSlug } from "@/lib/api/schemas";
 import { postClarify } from "@/lib/api/client";
 import {
   loadClarifySession,
@@ -148,10 +150,13 @@ function ClarifyContent() {
 
 export default function ClarifyPage() {
   return (
-    <main className="mx-auto min-h-screen max-w-lg px-6 py-10">
-      <Suspense fallback={<p className="text-ink-muted">Loading…</p>}>
-        <ClarifyContent />
-      </Suspense>
-    </main>
+    <PageShell withTabPad={false} className="pt-6">
+      <Wordmark href="/" />
+      <div className="mt-8">
+        <Suspense fallback={<p className="text-ink-muted">Loading…</p>}>
+          <ClarifyContent />
+        </Suspense>
+      </div>
+    </PageShell>
   );
 }

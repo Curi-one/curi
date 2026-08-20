@@ -3,6 +3,8 @@
 import type { CatalogueBook, CataloguePath } from "@/lib/mock/fixtures";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { EmptyState } from "@/components/EmptyState";
+import { PageShell } from "@/components/PageShell";
 import { PreviewSheet } from "@/components/PreviewSheet";
 import { getExplore, getLibrary, getMe } from "@/lib/api/client";
 
@@ -15,14 +17,17 @@ export default function ExplorePage() {
   const [previewBook, setPreviewBook] = useState<CatalogueBook | null>(null);
   const [activeCount, setActiveCount] = useState(0);
   const [plan, setPlan] = useState<"free" | "academy">("free");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getExplore().then((d) => {
-      setPaths(d.paths);
-      setBooks(d.books);
-    });
-    getLibrary().then((lib) => setActiveCount(lib.exploring.length));
-    getMe().then((m) => setPlan(m.session.plan));
+    Promise.all([getExplore(), getLibrary(), getMe()])
+      .then(([explore, lib, me]) => {
+        setPaths(explore.paths);
+        setBooks(explore.books);
+        setActiveCount(lib.exploring.length);
+        setPlan(me.session.plan);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const atLimit = plan === "free" && activeCount >= 2;
@@ -41,8 +46,7 @@ export default function ExplorePage() {
   const items = tab === "paths" ? paths : books;
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-10 pb-24">
-      <h1 className="font-display text-3xl text-ink">Explore</h1>
+    <PageShell title="Explore" kicker="Catalogue" withTabPad={false} className="pt-4">
       <div className="mt-6 flex gap-2">
         {(["paths", "books"] as const).map((t) => (
           <button
@@ -57,43 +61,62 @@ export default function ExplorePage() {
           </button>
         ))}
       </div>
-      <ul className="mt-6 space-y-3">
-        {tab === "paths"
-          ? paths.map((item) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  onClick={() => setPreviewPath(item)}
-                  className="w-full rounded-xl border border-border bg-paper-secondary px-4 py-4 text-left hover:border-ink/20"
-                >
-                  <p className="font-display text-lg text-ink">{item.topic}</p>
-                  <p className="mt-1 text-sm text-ink-muted">{item.description}</p>
-                </button>
-              </li>
-            ))
-          : books.map((item) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  onClick={() => setPreviewBook(item)}
-                  className="w-full rounded-xl border border-border bg-paper-secondary px-4 py-4 text-left hover:border-ink/20"
-                >
-                  <p className="font-display text-lg text-ink">{item.title}</p>
-                  <p className="mt-1 text-sm text-ink-muted">{item.description}</p>
-                </button>
-              </li>
-            ))}
-      </ul>
-      {items.length === 0 && <p className="mt-6 text-ink-muted">Loading catalogue…</p>}
-      <div className="mt-8">
+      <div className="mt-6">
+        {loading && <p className="text-ink-muted">Loading catalogue…</p>}
+        {!loading && items.length === 0 && (
+          <EmptyState
+            message="Nothing in the catalogue yet."
+            actionHref="/"
+            actionLabel="Start a custom topic"
+          />
+        )}
+        {!loading && items.length > 0 && (
+          <ul className="space-y-3">
+            {tab === "paths"
+              ? paths.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewPath(item)}
+                      className="surface-card w-full px-4 py-4 text-left hover:border-ink/30"
+                    >
+                      <p className="font-display text-[22px] leading-snug text-ink">
+                        {item.topic}
+                      </p>
+                      <p className="mt-1 text-sm text-ink-muted">
+                        {item.description}
+                      </p>
+                    </button>
+                  </li>
+                ))
+              : books.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewBook(item)}
+                      className="surface-card w-full px-4 py-4 text-left hover:border-ink/30"
+                    >
+                      <p className="font-display text-[22px] leading-snug text-ink">
+                        {item.title}
+                      </p>
+                      <p className="mt-1 text-sm text-ink-muted">
+                        {item.description}
+                      </p>
+                    </button>
+                  </li>
+                ))}
+          </ul>
+        )}
+      </div>
+      <p className="mt-10 text-center">
         <button
           type="button"
           onClick={() => router.push("/")}
-          className="text-sm text-ink-muted underline"
+          className="text-sm text-ink-muted underline hover:text-ink"
         >
-          Or enter a custom topic
+          Or enter a custom topic on the landing page
         </button>
-      </div>
+      </p>
       <PreviewSheet
         item={previewPath ?? previewBook}
         itemType={previewPath ? "path" : "book"}
@@ -105,6 +128,6 @@ export default function ExplorePage() {
         onStart={handleStart}
         atLimit={atLimit}
       />
-    </main>
+    </PageShell>
   );
 }
