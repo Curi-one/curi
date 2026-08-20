@@ -36,10 +36,20 @@ const SUCCESS_FIXTURE = {
 };
 
 describe("model helpers", () => {
-  it("maps tasks to AI.md models", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("uses cheap sonar for every task outside production", () => {
+    vi.stubEnv("APP_ENV", "staging");
     expect(clarifyModel()).toBe("sonar");
     expect(outlineModel()).toBe("sonar");
     expect(quizModel()).toBe("sonar");
+    expect(lessonBodyModel()).toBe("sonar");
+  });
+
+  it("uses sonar-pro for lesson bodies in production", () => {
+    vi.stubEnv("APP_ENV", "production");
     expect(lessonBodyModel()).toBe("sonar-pro");
   });
 });

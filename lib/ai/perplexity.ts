@@ -63,9 +63,9 @@ export function outlineModel(): PerplexityModel {
   return "sonar";
 }
 
-/** Lesson body — higher-quality model. */
+/** Lesson body — sonar-pro in production; sonar on staging/local to limit spend. */
 export function lessonBodyModel(): PerplexityModel {
-  return "sonar-pro";
+  return getEnv().APP_ENV === "production" ? "sonar-pro" : "sonar";
 }
 
 /** Quiz MCQ generation. */

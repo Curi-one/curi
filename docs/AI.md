@@ -93,12 +93,12 @@ Read previous lesson’s `lesson_feel` when fetching/generating lesson N+1.
 
 ## Models
 
-| Task | Model |
-|---|---|
-| Clarify | `sonar` |
-| Outline | `sonar` |
-| Quiz | `sonar` |
-| Lesson body | `sonar-pro` |
+| Task | Staging / local | Production |
+|---|---|---|
+| Clarify | `sonar` | `sonar` |
+| Outline | `sonar` | `sonar` |
+| Quiz | `sonar` | `sonar` |
+| Lesson body | `sonar` | `sonar-pro` |
 
 Env: `PERPLEXITY_API_KEY`, `PERPLEXITY_MODEL_*` — server only.
 
