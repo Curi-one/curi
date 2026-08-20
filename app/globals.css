@@ -189,3 +189,145 @@ body {
 .animate-slide-up {
   animation: slide-up 0.35s var(--ease-spring) both;
 }
+
+@keyframes landing-pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 hsl(354 89% 44% / 0.4);
+  }
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 4px hsl(354 89% 44% / 0);
+  }
+}
+
+.landing-pulse-dot {
+  animation: landing-pulse-dot 2.4s ease-in-out infinite;
+}
+
+/* ─── Generation warmup ─────────────────────────────────────────────────── */
+
+@keyframes gen-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.6;
+  }
+}
+
+.generating-pulse {
+  animation: gen-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes gen-sparkle {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(8deg) scale(1.08);
+  }
+  50% {
+    transform: rotate(0deg) scale(1);
+  }
+  75% {
+    transform: rotate(-8deg) scale(1.08);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+.generating-sparkle {
+  animation: gen-sparkle 2.4s ease-in-out infinite;
+}
+
+@keyframes gen-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.generating-msg {
+  animation: gen-msg-in 0.35s var(--ease-spring) both;
+}
+
+@keyframes gen-bar-breathe {
+  0% {
+    transform: translateX(-100%) scaleX(0.4);
+  }
+  50% {
+    transform: translateX(60%) scaleX(1.2);
+  }
+  100% {
+    transform: translateX(200%) scaleX(0.4);
+  }
+}
+
+.generating-bar-breathe {
+  width: 50%;
+  animation: gen-bar-breathe 1.6s ease-in-out infinite;
+  transform-origin: left;
+}
+
+@keyframes lesson-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.lesson-reveal {
+  animation: lesson-pop 0.32s var(--ease-spring) both;
+}
+
+.lesson-blurb {
+  animation: lesson-pop 0.36s var(--ease-spring) 0.08s both;
+}
+
+.lesson-row-live {
+  position: relative;
+}
+
+.lesson-row-live::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+}
+
+@keyframes streak-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.92);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.streak-toast {
+  animation: streak-pop 0.45s var(--ease-spring) both;
+}
