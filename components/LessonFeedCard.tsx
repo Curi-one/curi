@@ -68,21 +68,28 @@ export function LessonFeedCard({ item, lockedCopy = "Unlocks tomorrow" }: Props)
   return (
     <Link
       href={href}
-      className={`group interactive-card focus-ring flex w-full gap-3.5 rounded-lg border border-border/50 bg-paper-secondary p-4 sm:gap-4 sm:p-5 ${
+      className={`group interactive-card focus-ring relative flex w-full gap-3.5 overflow-hidden rounded-lg border border-border/50 bg-paper-secondary p-4 sm:gap-4 sm:p-5 ${
         dimmed
           ? "opacity-55 hover:opacity-70"
           : "hover:border-accent/25"
       }`}
     >
+      {!dimmed && (
+        <span
+          className="absolute bottom-4 left-0 top-4 w-0.5 rounded-full bg-accent/70"
+          aria-hidden
+        />
+      )}
       <TopicThumbnail topic={item.topic} />
 
       <div className="min-w-0 flex-1">
         <h3
-          className={`text-[14px] font-semibold leading-snug tracking-tight transition-colors sm:text-[15px] ${
+          className={`font-display text-[17px] font-light leading-[1.15] tracking-[-0.02em] transition-colors sm:text-[18px] ${
             dimmed
               ? "text-ink/55 group-hover:text-ink/70"
               : "text-ink group-hover:text-ink"
           }`}
+          style={{ fontVariationSettings: "'SOFT' 55, 'WONK' 1" }}
         >
           {item.title}
         </h3>

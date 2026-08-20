@@ -168,7 +168,7 @@ describe("TodayView", () => {
     expect(screen.queryByRole("link", { name: /control/ })).not.toBeNull();
   });
 
-  it("shows an all-caught-up note when nothing is due but paths exist", () => {
+  it("does not show an all-caught-up card when nothing is due", () => {
     const groups: FeedDayGroup[] = [
       {
         daysAgo: -1,
@@ -193,7 +193,7 @@ describe("TodayView", () => {
       />,
     );
 
-    expect(screen.getByText(/all caught up/i)).toBeInTheDocument();
+    expect(screen.queryByText(/all caught up/i)).not.toBeInTheDocument();
     expect(screen.getByText("Unlocks tomorrow")).toBeInTheDocument();
   });
 

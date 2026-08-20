@@ -13,7 +13,6 @@ import {
   OTP_RATE_LIMIT_NOTICE,
   requestOtp,
   signInWithStagingOtp,
-  STAGING_OTP_CODE,
   updateUserName,
   verifyOtp,
 } from "@/lib/auth/otp";
@@ -46,12 +45,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Email-only: request step (mock OTP). Expose devHint only in mock mode.
+    // Email-only: request step (mock OTP). devHint kept for local tests only — never shown in UI.
     if (!code) {
       return jsonWithSession(
         {
           ok: true as const,
-          step: "code" as const,
+          step: "link" as const,
           session: result.data.session,
           devHint: MOCK_AUTH_CODE,
         },
@@ -76,11 +75,8 @@ export async function POST(request: Request) {
       const response = jsonWithSession(
         {
           ok: true as const,
-          step: "code" as const,
+          step: "link" as const,
           emailSent: otp.sent,
-          ...(getEnv().APP_ENV === "staging"
-            ? { stagingOtpHint: STAGING_OTP_CODE }
-            : {}),
           ...(otp.rateLimited ? { notice: OTP_RATE_LIMIT_NOTICE } : {}),
         },
         sessionId,

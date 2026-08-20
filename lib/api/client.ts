@@ -125,17 +125,15 @@ export function getExplore() {
   return apiFetch<ExploreResponse>("/api/explore");
 }
 
-export type AuthCodeStepResponse = {
+export type AuthLinkStepResponse = {
   ok: true;
-  step: "code";
+  step: "link";
   session?: UserSession;
   /** False when Supabase rejected the send (e.g. rate limit). */
   emailSent?: boolean;
-  /** Present only when USE_MOCK_API — never set for real Supabase OTP. */
+  /** Present only when USE_MOCK_API — never shown in UI. */
   devHint?: string;
-  /** Staging-only bypass code (APP_ENV=staging). */
-  stagingOtpHint?: string;
-  /** New email was not sent (provider rate limit). User can still enter a prior code. */
+  /** New email was not sent (provider rate limit). User can still use a prior link/code. */
   notice?: string;
 };
 
@@ -144,7 +142,7 @@ export type AuthSessionResponse = {
   migratedPathId?: string;
 };
 
-export type AuthResponse = AuthCodeStepResponse | AuthSessionResponse;
+export type AuthResponse = AuthLinkStepResponse | AuthSessionResponse;
 
 export function postAuth(body: AuthRequest) {
   return apiFetch<AuthResponse>("/api/auth", {

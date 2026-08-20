@@ -93,6 +93,45 @@ body {
     @apply font-meta;
   }
 
+  /** Editorial display — tight leading, playful Fraunces axis. */
+  .type-display {
+    @apply font-display font-light leading-[0.95] tracking-[-0.04em];
+    font-variation-settings: "SOFT" 60, "WONK" 1;
+  }
+
+  .type-display-xl {
+    @apply type-display text-[2.75rem] sm:text-[3.25rem];
+  }
+
+  .type-lede {
+    @apply text-[15px] font-light leading-[1.7] text-ink-muted;
+  }
+
+  /** Section kickers with accent mark — one accent per cluster. */
+  .type-kicker-accent {
+    @apply font-meta flex items-center gap-2;
+  }
+
+  .type-kicker-accent::before {
+    content: "";
+    display: block;
+    width: 5px;
+    height: 5px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+
+  .editorial-rule {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-accent) 55%, transparent) 0%,
+      var(--color-border-subtle) 28%,
+      transparent 100%
+    );
+  }
+
   .input-field {
     @apply w-full border bg-paper-secondary px-4 py-4 text-[16px] text-ink outline-none;
     border-color: var(--color-border-subtle);

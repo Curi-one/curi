@@ -17,7 +17,7 @@ describe("POST /api/auth", () => {
     }
   });
 
-  it("email-only returns step code with mock devHint", async () => {
+  it("email-only returns link step with mock devHint (not for UI)", async () => {
     const res = await POST(
       new Request("http://localhost/api/auth", {
         method: "POST",
@@ -34,7 +34,7 @@ describe("POST /api/auth", () => {
     };
     expect(body).toMatchObject({
       ok: true,
-      step: "code",
+      step: "link",
       devHint: MOCK_AUTH_CODE,
     });
   });

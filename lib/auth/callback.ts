@@ -1,7 +1,7 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 
 const LINK_ERROR_MESSAGE =
-  "That email link didn't sign you in. Enter the 6-digit code from the email instead.";
+  "That sign-in link didn't work. Request a new link or enter a code from your email.";
 
 export type AuthLanding =
   | { action: "consume-link"; callbackPath: string }
