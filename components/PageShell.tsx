@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -26,9 +27,10 @@ export function PageShell({
       {back && (
         <Link
           href={back.href}
-          className="text-sm text-ink-muted transition-colors hover:text-ink"
+          className="inline-flex min-h-11 items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
         >
-          ← {back.label}
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          {back.label}
         </Link>
       )}
       {kicker && (

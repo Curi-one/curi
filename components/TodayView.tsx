@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import type { FeedResponse } from "@/lib/api/schemas";
 import { PathRow } from "@/components/PathRow";
 
@@ -29,9 +30,10 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
         </div>
         <Link
           href="/progress"
-          className={`shrink-0 font-meta ${streakAtRisk ? "text-accent" : ""}`}
+          className={`inline-flex shrink-0 items-center gap-1 font-meta ${streakAtRisk ? "text-accent" : ""}`}
         >
-          {streak} day streak →
+          {streak} day streak
+          <ArrowRight className="h-3 w-3" aria-hidden />
         </Link>
       </header>
 

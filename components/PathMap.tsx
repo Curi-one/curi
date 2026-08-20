@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Check, Lock } from "lucide-react";
 
 type PathMapNode = {
   index: number;
@@ -29,7 +30,13 @@ export function PathMap({ courseId, nodes, readOnly }: Props) {
                     : "bg-paper-tertiary text-ink-muted"
               }`}
             >
-              {node.index + 1}
+              {node.status === "read" ? (
+                <Check className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+              ) : node.status === "locked" ? (
+                <Lock className="h-3.5 w-3.5" aria-hidden />
+              ) : (
+                node.index + 1
+              )}
             </span>
             <span
               className={`flex-1 py-2 text-[15px] leading-snug ${

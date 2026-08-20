@@ -3,13 +3,20 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import {
+  ArrowUp,
+  BookOpen,
+  Clock3,
+  Compass,
+  SlidersHorizontal,
+} from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { getLibrary, getMe } from "@/lib/api/client";
 
 const DEPTH_TEASERS = [
-  { label: "3 min/day", hint: "clock" },
-  { label: "Any topic", hint: "book" },
-  { label: "Adaptive depth", hint: "sliders" },
+  { label: "3 min/day", icon: Clock3 },
+  { label: "Any topic", icon: BookOpen },
+  { label: "Adaptive depth", icon: SlidersHorizontal },
 ] as const;
 
 /**
@@ -109,19 +116,18 @@ export default function NewPathPage() {
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-paper transition-opacity disabled:opacity-20"
               aria-label="Create path"
             >
-              <span aria-hidden className="text-lg leading-none">
-                ↑
-              </span>
+              <ArrowUp className="h-4 w-4" aria-hidden />
             </button>
           </div>
         </form>
 
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 pl-1">
-          {DEPTH_TEASERS.map(({ label }) => (
+          {DEPTH_TEASERS.map(({ label, icon: Icon }) => (
             <span
               key={label}
-              className="font-meta text-[11px] text-ink-muted/80"
+              className="flex items-center gap-1.5 text-[12px] text-ink-muted/80"
             >
+              <Icon className="h-3 w-3 shrink-0 opacity-50" aria-hidden />
               {label}
             </span>
           ))}
@@ -132,6 +138,7 @@ export default function NewPathPage() {
             href="/explore"
             className="inline-flex items-center gap-2 text-sm text-ink-muted transition hover:text-ink"
           >
+            <Compass className="h-4 w-4 opacity-60" aria-hidden />
             Prefer a curated path? Browse Explore
           </Link>
         </div>

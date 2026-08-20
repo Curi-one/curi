@@ -3,15 +3,23 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Check } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { postCheckout } from "@/lib/api/client";
 
 const FEATURES = [
   { label: "Active paths", free: "2", academy: "Unlimited" },
-  { label: "Daily lessons", free: "✓", academy: "✓" },
-  { label: "Lesson feel tuning", free: "✓", academy: "✓" },
+  { label: "Daily lessons", free: true, academy: true },
+  { label: "Lesson feel tuning", free: true, academy: true },
   { label: "Shelve & restore", free: "Shelve only", academy: "Full" },
-];
+] as const;
+
+function Cell({ value }: { value: string | true }) {
+  if (value === true) {
+    return <Check className="h-4 w-4 text-ink" strokeWidth={2.5} aria-label="Included" />;
+  }
+  return <span>{value}</span>;
+}
 
 export default function UpgradePage() {
   const router = useRouter();
@@ -58,8 +66,12 @@ export default function UpgradePage() {
             {FEATURES.map((row) => (
               <tr key={row.label} className="border-b border-border last:border-0">
                 <td className="px-4 py-3 text-ink">{row.label}</td>
-                <td className="px-4 py-3 text-ink-muted">{row.free}</td>
-                <td className="px-4 py-3 text-ink">{row.academy}</td>
+                <td className="px-4 py-3 text-ink-muted">
+                  <Cell value={row.free} />
+                </td>
+                <td className="px-4 py-3 text-ink">
+                  <Cell value={row.academy} />
+                </td>
               </tr>
             ))}
           </tbody>

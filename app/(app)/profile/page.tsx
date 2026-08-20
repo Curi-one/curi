@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ArrowLeft, Check, Minus } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import {
   getLibrary,
@@ -159,9 +160,10 @@ export default function ProfilePage() {
       <div className="mb-8 flex items-center justify-between gap-3">
         <Link
           href="/today"
-          className="text-sm text-ink-muted transition-colors hover:text-ink"
+          className="inline-flex min-h-11 items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
         >
-          ← Today
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Today
         </Link>
         <button
           type="button"
@@ -324,10 +326,10 @@ export default function ProfilePage() {
                 return (
                   <li key={row} className="flex items-center gap-2.5 text-sm">
                     <span
-                      className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-ink/10 text-[10px]"
+                      className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-ink/10"
                       aria-hidden
                     >
-                      ✓
+                      <Check className="h-2.5 w-2.5 stroke-[2.5] text-ink/70" />
                     </span>
                     <span className="text-ink">{row}</span>
                   </li>
@@ -336,12 +338,16 @@ export default function ProfilePage() {
               return (
                 <li key={row.label} className="flex items-center gap-2.5 text-sm">
                   <span
-                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] ${
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${
                       row.on ? "bg-ink/10" : "bg-paper-secondary"
                     }`}
                     aria-hidden
                   >
-                    {row.on ? "✓" : "–"}
+                    {row.on ? (
+                      <Check className="h-2.5 w-2.5 stroke-[2.5] text-ink/70" />
+                    ) : (
+                      <Minus className="h-2.5 w-2.5 text-ink-muted/40" />
+                    )}
                   </span>
                   <span className={row.on ? "text-ink" : "text-ink-muted"}>
                     {row.label}

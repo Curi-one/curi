@@ -1,4 +1,5 @@
 import type { ClarifyQuestion } from "@/lib/api/schemas";
+import { ArrowLeft } from "lucide-react";
 import { StepProgress } from "@/components/StepProgress";
 
 type Props = {
@@ -27,9 +28,10 @@ export function ClarifyStep({
           <button
             type="button"
             onClick={onBack}
-            className="min-h-11 text-sm text-ink-muted hover:text-ink"
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm text-ink-muted hover:text-ink"
           >
-            ← Back
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            Back
           </button>
         ) : (
           <span />
