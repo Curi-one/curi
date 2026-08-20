@@ -1,8 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import type { NextRequest, NextResponse } from "next/server";
 
-/** Server Supabase client with cookie session (Next.js App Router). */
-export async function createClient() {
+function requirePublicSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -12,6 +12,12 @@ export async function createClient() {
     );
   }
 
+  return { url, anonKey };
+}
+
+/** Server Supabase client with cookie session (Next.js App Router). */
+export async function createClient() {
+  const { url, anonKey } = requirePublicSupabase();
   const cookieStore = await cookies();
 
   return createServerClient(url, anonKey, {
@@ -28,6 +34,27 @@ export async function createClient() {
           // Called from a Server Component where cookies are read-only.
           // Middleware can refresh the session instead.
         }
+      },
+    },
+  });
+}
+
+/** Writes session cookies onto a redirect/JSON response (auth callback). */
+export function createClientForResponse(
+  request: NextRequest,
+  response: NextResponse,
+) {
+  const { url, anonKey } = requirePublicSupabase();
+
+  return createServerClient(url, anonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
       },
     },
   });

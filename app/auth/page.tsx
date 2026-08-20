@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
-import { postAuth } from "@/lib/api/client";
+import { Suspense, useEffect, useState } from "react";
+import { getMe, postAuth } from "@/lib/api/client";
+import { resolveAuthLanding } from "@/lib/auth/callback";
 
 type Step = "email" | "code" | "name";
 
@@ -17,6 +18,43 @@ function AuthContent() {
   const [devHint, setDevHint] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const landing = resolveAuthLanding(params);
+    if (landing.action === "consume-link") {
+      window.location.replace(landing.callbackPath);
+      return;
+    }
+    if (landing.action === "error") {
+      setError(landing.message);
+      return;
+    }
+    if (landing.action === "named-step") {
+      void (async () => {
+        try {
+          const { session } = await getMe();
+          if (session.kind !== "member") {
+            setError(
+              "That email link didn't sign you in. Enter the 6-digit code from the email instead.",
+            );
+            return;
+          }
+          if (session.email) {
+            setEmail(session.email);
+          }
+          if (session.name) {
+            router.replace(returnTo);
+            return;
+          }
+          setStep("name");
+        } catch {
+          setError(
+            "That email link didn't sign you in. Enter the 6-digit code from the email instead.",
+          );
+        }
+      })();
+    }
+  }, [params, returnTo, router]);
 
   async function submit() {
     setLoading(true);
@@ -37,7 +75,11 @@ function AuthContent() {
         setStep("name");
         return;
       }
-      const res = await postAuth({ email, code, name: name || undefined });
+      const res = await postAuth({
+        email,
+        ...(code ? { code } : {}),
+        name: name || undefined,
+      });
       if ("session" in res && res.session?.kind === "member") {
         router.push(returnTo);
       }
@@ -64,7 +106,7 @@ function AuthContent() {
         {step === "code" &&
           (devHint
             ? `We sent a code to ${email}. Dev code: ${devHint}`
-            : `Check your inbox for a 6-digit code sent to ${email}.`)}
+            : `Check your inbox for a 6-digit code sent to ${email}. You can also tap the link in the email.`)}
         {step === "name" && "Just a first name is fine."}
       </p>
 

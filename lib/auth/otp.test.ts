@@ -19,7 +19,7 @@ describe("requestOtp", () => {
       email: "learner@example.com",
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: expect.stringContaining("/auth"),
+        emailRedirectTo: expect.stringContaining("/auth/callback"),
       },
     });
   });

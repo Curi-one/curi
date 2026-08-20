@@ -13,9 +13,10 @@ import { createClient } from "@/lib/supabase/server";
  * Supabase Auth OTP helpers (email 6-digit code + optional magic link).
  *
  * Ops (staging):
- * - Site URL + Additional Redirect URLs: https://stage.curi.one/**
- * - Email templates → Magic Link: include {{ .Token }} (the 6-digit code).
- *   Default template is only a clickable link — codes will not appear in the dashboard.
+ * - Site URL: https://stage.curi.one
+ * - Redirect URLs: https://stage.curi.one/**
+ * - Email templates → Magic Link: include {{ .Token }} (6-digit code).
+ *   ConfirmationURL must land on /auth/callback so the session cookie is set.
  */
 
 export type OtpDeps = {
@@ -124,12 +125,12 @@ function progressFromFeels(feels: Record<number, LessonFeel>): number {
 function authEmailRedirectTo(): string {
   const appEnv = process.env.APP_ENV;
   if (appEnv === "production") {
-    return "https://www.curi.one/auth";
+    return "https://www.curi.one/auth/callback";
   }
   if (appEnv === "staging") {
-    return "https://stage.curi.one/auth";
+    return "https://stage.curi.one/auth/callback";
   }
-  return "http://localhost:3000/auth";
+  return "http://localhost:3000/auth/callback";
 }
 
 export async function requestOtp(

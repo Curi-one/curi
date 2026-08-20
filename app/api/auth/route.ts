@@ -13,7 +13,11 @@ import {
 } from "@/lib/auth/otp";
 import { getEnv } from "@/lib/env";
 import { getMockStore, MOCK_AUTH_CODE } from "@/lib/mock/store";
-import { createClient } from "@/lib/supabase/server";
+import {
+  createClient,
+  createClientForResponse,
+} from "@/lib/supabase/server";
+import { NextRequest } from "next/server";
 
 export async function POST(request: Request) {
   const { sessionId } = resolveSession(request);
@@ -55,11 +59,15 @@ export async function POST(request: Request) {
   try {
     // Email only → send OTP
     if (!code && !name) {
-      await requestOtp(email);
-      return jsonWithSession(
+      const response = jsonWithSession(
         { ok: true as const, step: "code" as const },
         sessionId,
       );
+      await requestOtp(email, {
+        createServerClient: async () =>
+          createClientForResponse(new NextRequest(request.url, request), response),
+      });
+      return response;
     }
 
     const supabase = await createClient();
