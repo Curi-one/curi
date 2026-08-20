@@ -105,14 +105,49 @@ function applyBionic(text: string): ReactNode[] {
   });
 }
 
-function renderParagraph(text: string, bionic: boolean) {
+const CITATION_REGEX = /(\[\d+\])/g;
+
+/** Splits plain text on `[n]` citation markers and renders each as a tappable button. */
+function renderTextWithCitations(
+  text: string,
+  bionic: boolean,
+  onCitationClick?: (sourceIndex: number) => void,
+): ReactNode[] {
+  const segments = text.split(CITATION_REGEX);
+  return segments.map((segment, i) => {
+    const match = /^\[(\d+)\]$/.exec(segment);
+    if (match) {
+      const n = Number(match[1]);
+      return (
+        <button
+          key={`citation-${i}`}
+          type="button"
+          onClick={() => onCitationClick?.(n - 1)}
+          aria-label={`View source ${n}`}
+          className="citation-ref relative mx-0.5 inline-flex align-baseline text-[0.7em] font-medium text-accent hover:text-accent/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent before:absolute before:-inset-3 before:content-['']"
+        >
+          [{n}]
+        </button>
+      );
+    }
+    return (
+      <span key={i}>{bionic ? applyBionic(segment) : segment}</span>
+    );
+  });
+}
+
+function renderParagraph(
+  text: string,
+  bionic: boolean,
+  onCitationClick?: (sourceIndex: number) => void,
+) {
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       const inner = part.slice(2, -2);
       return (
         <strong key={i} className="font-medium text-ink">
-          {bionic ? applyBionic(inner) : inner}
+          {renderTextWithCitations(inner, bionic, onCitationClick)}
         </strong>
       );
     }
@@ -120,11 +155,13 @@ function renderParagraph(text: string, bionic: boolean) {
       const inner = part.slice(1, -1);
       return (
         <em key={i} className="italic text-ink/90">
-          {bionic ? applyBionic(inner) : inner}
+          {renderTextWithCitations(inner, bionic, onCitationClick)}
         </em>
       );
     }
-    return <span key={i}>{bionic ? applyBionic(part) : part}</span>;
+    return (
+      <span key={i}>{renderTextWithCitations(part, bionic, onCitationClick)}</span>
+    );
   });
 }
 
@@ -160,10 +197,14 @@ export function LessonReader({
   const [readProgress, setReadProgress] = useState(0);
   const [takeawaysOpen, setTakeawaysOpen] = useState(true);
   const [showSources, setShowSources] = useState(false);
+  const [activeSourceIndex, setActiveSourceIndex] = useState<number | null>(
+    null,
+  );
   const [showReaderSettings, setShowReaderSettings] = useState(false);
   const [settings, setSettings] = useState<ReaderSettings>(
     DEFAULT_READER_SETTINGS,
   );
+  const sourceRowRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   const topicLabel = topic?.trim() || "";
   const takeaways =
@@ -242,14 +283,30 @@ export function LessonReader({
   useEffect(() => {
     if (!showSources) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setShowSources(false);
+      if (e.key === "Escape") closeSources();
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [showSources]);
 
+  useEffect(() => {
+    if (!showSources || activeSourceIndex == null) return;
+    const row = sourceRowRefs.current[activeSourceIndex];
+    row?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+  }, [showSources, activeSourceIndex]);
+
   function updateSettings(patch: Partial<ReaderSettings>) {
     setSettings((prev) => ({ ...prev, ...patch }));
+  }
+
+  function closeSources() {
+    setShowSources(false);
+    setActiveSourceIndex(null);
+  }
+
+  function handleCitationClick(sourceIndex: number) {
+    setActiveSourceIndex(sourceIndex);
+    setShowSources(true);
   }
 
   const bodyParas = lesson.body;
@@ -303,16 +360,17 @@ export function LessonReader({
                 {firstLetter}
               </span>
               {settings.bionic
-                ? applyBionic(rest)
+                ? renderTextWithCitations(rest, true, handleCitationClick)
                 : renderParagraph(
                     para.startsWith(firstLetter)
                       ? para.slice(firstLetter.length)
                       : rest,
                     false,
+                    handleCitationClick,
                   )}
             </>
           ) : (
-            renderParagraph(para, settings.bionic)
+            renderParagraph(para, settings.bionic, handleCitationClick)
           )}
         </p>,
       );
@@ -755,7 +813,13 @@ export function LessonReader({
                 <h3 className="mb-3 text-sm uppercase tracking-[0.28em] text-ink-muted">
                   So what?
                 </h3>
-                <p>{renderParagraph(soWhatPara, settings.bionic)}</p>
+                <p>
+                  {renderParagraph(
+                    soWhatPara,
+                    settings.bionic,
+                    handleCitationClick,
+                  )}
+                </p>
               </div>
             )}
           </div>
@@ -778,7 +842,7 @@ export function LessonReader({
         <>
           <div
             className="fixed inset-0 z-40 bg-ink/10 backdrop-blur-[1px]"
-            onClick={() => setShowSources(false)}
+            onClick={closeSources}
             aria-hidden
           />
           <div
@@ -797,7 +861,7 @@ export function LessonReader({
               </div>
               <button
                 type="button"
-                onClick={() => setShowSources(false)}
+                onClick={closeSources}
                 className="mt-0.5 flex min-h-11 min-w-11 items-center justify-center rounded-lg text-ink-muted transition hover:bg-paper-secondary hover:text-ink"
                 aria-label="Close sources"
               >
@@ -820,20 +884,28 @@ export function LessonReader({
                 </p>
               ) : (
                 <div className="space-y-2">
-                  {lesson.sources.map((source) => {
+                  {lesson.sources.map((source, i) => {
                     let host = source.url;
                     try {
                       host = new URL(source.url).hostname.replace(/^www\./, "");
                     } catch {
                       /* keep url */
                     }
+                    const isActive = activeSourceIndex === i;
                     return (
                       <a
                         key={source.url}
+                        ref={(el) => {
+                          sourceRowRefs.current[i] = el;
+                        }}
                         href={source.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group flex items-start gap-3.5 rounded-xl border border-border bg-paper-secondary/40 p-4 transition-all hover:border-ink/20 hover:bg-paper"
+                        className={`group flex items-start gap-3.5 rounded-xl border p-4 transition-all ${
+                          isActive
+                            ? "border-accent bg-accent/5"
+                            : "border-border bg-paper-secondary/40 hover:border-ink/20 hover:bg-paper"
+                        }`}
                       >
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-paper-tertiary text-[10px] font-semibold text-ink-muted">
                           {domainInitials(source.title, source.url)}
