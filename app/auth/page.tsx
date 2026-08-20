@@ -4,10 +4,21 @@ import Link from "next/link";
 import { LoadingState } from "@/components/LoadingState";
 import { Wordmark } from "@/components/Wordmark";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { Mail } from "lucide-react";
 import { getMe, postAuth } from "@/lib/api/client";
+import {
+  clearAuthContext,
+  loadAuthContext,
+  saveAuthContext,
+} from "@/lib/auth/context";
 import { resolveAuthLanding, shouldCollectName } from "@/lib/auth/callback";
+import {
+  authEmailHeadline,
+  authEmailSubcopy,
+  resolveAuthIntent,
+  sanitizeReturnTo,
+} from "@/lib/auth/intent";
 import { loadClarifySession } from "@/lib/clarify-store";
 
 type Step = "email" | "link" | "code" | "name";
@@ -15,17 +26,33 @@ type Step = "email" | "link" | "code" | "name";
 function AuthContent() {
   const router = useRouter();
   const params = useSearchParams();
-  const returnTo = params.get("returnTo") ?? "/today";
-  const intent = params.get("intent");
   const fromQuiz = params.get("from") === "quiz";
+  const pendingTopic = loadClarifySession()?.topic;
+  const storedCtx = loadAuthContext();
+
+  const returnTo = sanitizeReturnTo(
+    params.get("returnTo") ?? storedCtx?.returnTo,
+  );
+  const intent = useMemo(
+    () =>
+      resolveAuthIntent(params, {
+        fromQuiz,
+        hasPendingPath: !!pendingTopic,
+      }),
+    [params, fromQuiz, pendingTopic],
+  );
+
+  const showPendingBanner =
+    (fromQuiz || intent === "save") && !!pendingTopic;
+
   const [step, setStep] = useState<Step>("email");
+  const [booting, setBooting] = useState(true);
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [emailSent, setEmailSent] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const pendingTopic = loadClarifySession()?.topic;
 
   const lessonBackHref =
     returnTo.startsWith("/courses/") || returnTo === "/today"
@@ -33,49 +60,84 @@ function AuthContent() {
       : "/today";
 
   useEffect(() => {
-    const landing = resolveAuthLanding(params);
-    if (landing.action === "consume-link") {
-      window.location.replace(landing.callbackPath);
-      return;
-    }
-    if (landing.action === "error") {
-      setError(landing.message);
-      return;
-    }
-    if (landing.action === "named-step") {
-      void (async () => {
-        try {
-          const { session } = await getMe();
-          if (session.kind !== "member") {
+    saveAuthContext({ returnTo, intent });
+  }, [returnTo, intent]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function bootstrap() {
+      const landing = resolveAuthLanding(params);
+
+      if (landing.action === "consume-link") {
+        window.location.replace(landing.callbackPath);
+        return;
+      }
+
+      if (landing.action === "error") {
+        if (!cancelled) {
+          setError(landing.message);
+          setBooting(false);
+        }
+        return;
+      }
+
+      try {
+        const { session } = await getMe();
+
+        if (session.kind === "member") {
+          if (session.email) {
+            setEmail(session.email);
+          }
+          if (!shouldCollectName(session)) {
+            clearAuthContext();
+            router.replace(
+              landing.action === "named-step" ? landing.returnTo : returnTo,
+            );
+            return;
+          }
+          if (!cancelled) {
+            setStep("name");
+            setBooting(false);
+          }
+          return;
+        }
+
+        if (landing.action === "named-step") {
+          if (!cancelled) {
             setError(
               "That sign-in link didn't work. Request a new link or enter a code from your email.",
             );
             setStep("link");
-            return;
+            setBooting(false);
           }
-          if (session.email) {
-            setEmail(session.email);
-          }
-          if (session.name) {
-            router.replace(returnTo);
-            return;
-          }
-          setStep("name");
-        } catch {
+          return;
+        }
+      } catch {
+        if (landing.action === "named-step" && !cancelled) {
           setError(
             "That sign-in link didn't work. Request a new link or enter a code from your email.",
           );
           setStep("link");
         }
-      })();
+      }
+
+      if (!cancelled) {
+        setBooting(false);
+      }
     }
+
+    void bootstrap();
+    return () => {
+      cancelled = true;
+    };
   }, [params, returnTo, router]);
 
   async function sendLink() {
     setLoading(true);
     setError(null);
     try {
-      const res = await postAuth({ email });
+      const res = await postAuth({ email, returnTo });
       if ("notice" in res && typeof res.notice === "string") {
         setError(res.notice);
       }
@@ -102,12 +164,13 @@ function AuthContent() {
         return;
       }
       if (step === "code") {
-        const res = await postAuth({ email, code });
+        const res = await postAuth({ email, code, returnTo });
         if (
           "session" in res &&
           res.session?.kind === "member" &&
           !shouldCollectName(res.session)
         ) {
+          clearAuthContext();
           router.push(returnTo);
           return;
         }
@@ -118,8 +181,10 @@ function AuthContent() {
         email,
         ...(code ? { code } : {}),
         name: name || undefined,
+        returnTo,
       });
       if ("session" in res && res.session?.kind === "member") {
+        clearAuthContext();
         router.push(returnTo);
       }
     } catch (err) {
@@ -135,10 +200,17 @@ function AuthContent() {
     }
   }
 
+  if (booting) {
+    return <LoadingState label="Checking session…" minHeight="min-h-[50vh]" />;
+  }
+
+  const headline = authEmailHeadline(intent, step);
+  const subcopy = authEmailSubcopy(intent, step, email, emailSent);
+
   return (
     <div className="flex min-h-[70vh] flex-col animate-fade-in">
       <Wordmark />
-      {(fromQuiz || pendingTopic) && (
+      {showPendingBanner && (
         <div className="mt-8 rounded-xl border border-border bg-paper-secondary px-4 py-3">
           <p className="font-meta">Pending path</p>
           <p className="mt-1 text-sm text-ink">
@@ -150,32 +222,12 @@ function AuthContent() {
       )}
       <h1
         className={`type-display text-[2rem] sm:text-[2.25rem] text-ink ${
-          fromQuiz || pendingTopic ? "mt-8" : "mt-12"
+          showPendingBanner ? "mt-8" : "mt-12"
         }`}
       >
-        {step === "email" &&
-          (intent === "signin"
-            ? "Welcome back"
-            : intent === "signup"
-              ? "Create your account"
-              : "Save your progress")}
-        {step === "link" && (emailSent ? "Check your email" : "No new email sent")}
-        {step === "code" && "Enter your code"}
-        {step === "name" && "What should we call you?"}
+        {headline}
       </h1>
-      <p className="type-lede mt-4 max-w-md">
-        {step === "email" &&
-          (intent === "signin"
-            ? "Enter your email. We'll send a sign-in link, no password."
-            : "Enter your email. No password needed.")}
-        {step === "link" &&
-          (emailSent
-            ? `Open the sign-in link we sent to ${email}. It works on this device.`
-            : `Nothing new was sent to ${email}. Use a link from an earlier email, or wait about an hour and try again.`)}
-        {step === "code" &&
-          `If your email includes a 6-digit code, enter it below for ${email}.`}
-        {step === "name" && "Just a first name is fine."}
-      </p>
+      <p className="type-lede mt-4 max-w-md">{subcopy}</p>
 
       {step === "email" && (
         <input
@@ -185,6 +237,7 @@ function AuthContent() {
           onChange={(e) => setEmail(e.target.value)}
           className="input-field mt-8"
           placeholder="you@example.com"
+          autoComplete="email"
         />
       )}
 
@@ -196,8 +249,8 @@ function AuthContent() {
           <div className="min-w-0">
             <p className="text-sm font-medium text-ink">Waiting for your tap</p>
             <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-              The link signs you in automatically. You can close this tab after
-              you open it.
+              The link signs you in automatically. Return here if you use a code
+              instead.
             </p>
           </div>
         </div>
@@ -207,11 +260,12 @@ function AuthContent() {
         <input
           autoFocus
           value={code}
-          onChange={(e) => setCode(e.target.value)}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
           className="input-field mt-8 tracking-[0.35em]"
           placeholder="000000"
           inputMode="numeric"
           autoComplete="one-time-code"
+          maxLength={6}
         />
       )}
 
@@ -222,22 +276,30 @@ function AuthContent() {
           onChange={(e) => setName(e.target.value)}
           className="input-field mt-8"
           placeholder="Alex"
+          autoComplete="given-name"
         />
       )}
 
       {error && (
-        <p className="mt-4 text-[13px] leading-relaxed text-ink-muted">{error}</p>
+        <p className="mt-4 text-[13px] leading-relaxed text-accent" role="alert">
+          {error}
+        </p>
       )}
 
       <div className="mt-auto pt-8">
         {(step === "email" || step === "code" || step === "name") && (
           <button
             type="button"
-            disabled={loading || (step === "email" && !email.trim())}
+            disabled={
+              loading ||
+              (step === "email" && !email.trim()) ||
+              (step === "code" && code.length < 6) ||
+              (step === "name" && !name.trim())
+            }
             onClick={() => void submit()}
             className="btn-primary w-full disabled:opacity-40"
           >
-            Continue
+            {step === "name" ? "Finish" : "Continue"}
           </button>
         )}
 
@@ -295,13 +357,41 @@ function AuthContent() {
             Back to lesson
           </Link>
         ) : (
-          (intent === "signin" || intent === "signup") &&
-          step !== "link" && (
+          intent !== "save" &&
+          step === "email" && (
+            <p className="mt-4 text-center text-sm text-ink-muted">
+              {intent === "signup" ? (
+                <>
+                  Already have an account?{" "}
+                  <Link
+                    href={`/auth?intent=signin&returnTo=${encodeURIComponent(returnTo)}`}
+                    className="link-subtle inline"
+                  >
+                    Sign in
+                  </Link>
+                </>
+              ) : (
+                <>
+                  New here?{" "}
+                  <Link
+                    href={`/auth?intent=signup&returnTo=${encodeURIComponent(returnTo)}`}
+                    className="link-subtle inline"
+                  >
+                    Create an account
+                  </Link>
+                </>
+              )}
+            </p>
+          )
+        )}
+
+        {(intent === "signin" || intent === "signup") &&
+          step !== "link" &&
+          !fromQuiz && (
             <Link href="/" className="link-subtle mt-4 block text-center">
               Back to start
             </Link>
-          )
-        )}
+          )}
       </div>
     </div>
   );

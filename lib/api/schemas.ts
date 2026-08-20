@@ -200,6 +200,8 @@ export const AuthRequestSchema = z.object({
   email: z.string().email(),
   code: z.string().optional(),
   name: z.string().optional(),
+  /** Post-auth destination — embedded in magic-link callback when not /today. */
+  returnTo: z.string().optional(),
 });
 export type AuthRequest = z.infer<typeof AuthRequestSchema>;
 

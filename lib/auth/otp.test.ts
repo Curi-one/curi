@@ -27,6 +27,23 @@ describe("requestOtp", () => {
     });
   });
 
+  it("embeds returnTo in callback URL when provided", async () => {
+    const signInWithOtp = vi.fn().mockResolvedValue({ error: null });
+    const createServerClient = vi.fn().mockResolvedValue({
+      auth: { signInWithOtp },
+    });
+
+    await requestOtp("learner@example.com", { createServerClient }, "/profile");
+
+    expect(signInWithOtp).toHaveBeenCalledWith({
+      email: "learner@example.com",
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: expect.stringContaining("next=%2Fprofile"),
+      },
+    });
+  });
+
   it("throws when supabase returns an error", async () => {
     const createServerClient = vi.fn().mockResolvedValue({
       auth: {

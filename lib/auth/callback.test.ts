@@ -1,8 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   completeEmailLink,
+  failureRedirectPath,
+  postSignInRedirectPath,
   resolveAuthLanding,
   shouldCollectName,
+  successRedirectPath,
 } from "@/lib/auth/callback";
 
 describe("resolveAuthLanding", () => {
@@ -27,6 +30,18 @@ describe("resolveAuthLanding", () => {
   it("shows the name step after a successful link exchange", () => {
     expect(resolveAuthLanding(new URLSearchParams("from=link"))).toEqual({
       action: "named-step",
+      returnTo: "/today",
+    });
+  });
+
+  it("preserves returnTo after link exchange", () => {
+    expect(
+      resolveAuthLanding(
+        new URLSearchParams("from=link&returnTo=%2Fprofile"),
+      ),
+    ).toEqual({
+      action: "named-step",
+      returnTo: "/profile",
     });
   });
 
@@ -62,6 +77,21 @@ describe("completeEmailLink", () => {
     await expect(
       completeEmailLink({}, { exchangeCodeForSession: vi.fn(), verifyOtp: vi.fn() }),
     ).rejects.toThrow(/missing/i);
+  });
+});
+
+describe("redirect paths", () => {
+  it("success path includes signin intent for name collection", () => {
+    expect(successRedirectPath("/profile")).toContain("intent=signin");
+    expect(successRedirectPath("/profile")).toContain("returnTo=%2Fprofile");
+  });
+
+  it("postSignIn sends returning users straight to destination", () => {
+    expect(postSignInRedirectPath("/profile", false)).toBe("/profile");
+  });
+
+  it("failure path preserves returnTo", () => {
+    expect(failureRedirectPath("/library")).toContain("returnTo=%2Flibrary");
   });
 });
 

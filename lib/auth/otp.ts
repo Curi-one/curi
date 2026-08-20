@@ -120,15 +120,23 @@ function progressFromFeels(feels: Record<number, LessonFeel>): number {
   return Math.max(...indices) + 1;
 }
 
-function authEmailRedirectTo(): string {
+function authEmailRedirectTo(returnTo?: string): string {
   const appEnv = process.env.APP_ENV;
+  let base: string;
   if (appEnv === "production") {
-    return "https://www.curi.one/auth/callback";
+    base = "https://www.curi.one/auth/callback";
+  } else if (appEnv === "staging") {
+    base = "https://stage.curi.one/auth/callback";
+  } else {
+    base = "http://localhost:3000/auth/callback";
   }
-  if (appEnv === "staging") {
-    return "https://stage.curi.one/auth/callback";
+  const safe = returnTo?.trim();
+  if (safe && safe.startsWith("/") && !safe.startsWith("//") && safe !== "/today") {
+    const url = new URL(base);
+    url.searchParams.set("next", safe);
+    return url.toString();
   }
-  return "http://localhost:3000/auth/callback";
+  return base;
 }
 
 export type RequestOtpResult = {
@@ -150,6 +158,7 @@ function isRateLimitedAuthError(error: { message?: string; status?: number }): b
 export async function requestOtp(
   email: string,
   deps?: OtpDeps,
+  returnTo?: string,
 ): Promise<RequestOtpResult> {
   const createServer = deps?.createServerClient ?? createClient;
   const supabase = await createServer();
@@ -157,7 +166,7 @@ export async function requestOtp(
     email,
     options: {
       shouldCreateUser: true,
-      emailRedirectTo: authEmailRedirectTo(),
+      emailRedirectTo: authEmailRedirectTo(returnTo),
     },
   });
   if (error) {

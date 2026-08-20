@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     return invalidBodyResponse();
   }
 
-  const { email, code, name } = parsed.data;
+  const { email, code, name, returnTo } = parsed.data;
 
   if (getEnv().USE_MOCK_API) {
     const store = getMockStore();
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
             requestFromIncoming(request),
             cookieCarrier,
           ),
-      });
+      }, returnTo);
       const response = jsonWithSession(
         {
           ok: true as const,
