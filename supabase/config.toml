@@ -52,7 +52,12 @@ enabled = true
 # in emails.
 site_url = "http://127.0.0.1:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["http://127.0.0.1:3000"]
+additional_redirect_urls = [
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:3000/auth/callback",
+  "https://stage.curi.one/**",
+  "https://www.curi.one/**",
+]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 enable_signup = true
@@ -62,6 +67,11 @@ enable_anonymous_sign_ins = false
 enable_signup = true
 double_confirm_changes = true
 enable_confirmations = false
+
+# Magic link email includes BOTH {{ .ConfirmationURL }} and {{ .Token }} — see supabase/templates/magic_link.html
+[auth.email.template.magic_link]
+subject = "Your Curi sign-in link and code"
+content_path = "./supabase/templates/magic_link.html"
 
 [analytics]
 enabled = false

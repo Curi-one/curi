@@ -58,8 +58,8 @@ export function authEmailSubcopy(
 ): string {
   if (step === "link") {
     return emailSent
-      ? `Open the sign-in link we sent to ${email}. It works on this device.`
-      : `Nothing new was sent to ${email}. Use a link from an earlier email, or wait about an hour and try again.`;
+      ? `We sent a sign-in link and 6-digit code to ${email}. Open the link on this device, or enter the code in the app.`
+      : `Nothing new was sent to ${email}. Use a link or code from an earlier email, or wait about an hour and try again.`;
   }
   if (step === "code") {
     return `If your email includes a 6-digit code, enter it below for ${email}.`;
@@ -69,7 +69,7 @@ export function authEmailSubcopy(
   }
   switch (intent) {
     case "signin":
-      return "Enter your email. We'll send a sign-in link, no password.";
+      return "Enter your email. We'll send a sign-in link and code — no password.";
     case "signup":
       return "Enter your email to create your account. No password needed.";
     case "save":

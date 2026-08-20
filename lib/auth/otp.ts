@@ -12,13 +12,20 @@ import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
 
 /**
- * Supabase Auth OTP helpers (email 6-digit code + optional magic link).
+ * Supabase Auth OTP helpers (email 6-digit code + magic link in one email).
  *
- * Ops (staging):
- * - Site URL: https://stage.curi.one
- * - Redirect URLs: https://stage.curi.one/**
- * - Email templates → Magic Link: include {{ .Token }} (6-digit code).
- *   ConfirmationURL must land on /auth/callback so the session cookie is set.
+ * The app calls signInWithOtp once. Supabase uses the **Magic link** template;
+ * include BOTH {{ .ConfirmationURL }} and {{ .Token }} in that template.
+ *
+ * Repo template: supabase/templates/magic_link.html
+ * Local: supabase/config.toml [auth.email.template.magic_link]
+ * Hosted: Dashboard → Auth → Email Templates → Magic link, or:
+ *   SUPABASE_ACCESS_TOKEN=... SUPABASE_PROJECT_REF=... ./scripts/apply-supabase-auth-email-template.sh
+ *
+ * Ops (staging/production):
+ * - Site URL: https://stage.curi.one (staging) / https://www.curi.one (prod)
+ * - Redirect URLs: https://stage.curi.one/** (and prod equivalent)
+ * - emailRedirectTo lands on /auth/callback (see authEmailRedirectTo below)
  */
 
 export type OtpDeps = {
