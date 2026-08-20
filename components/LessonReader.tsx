@@ -356,6 +356,18 @@ export function LessonReader({
       : {
           background: theme.bg,
           color: theme.fg,
+          // Local token remap — keeps app chrome untouched
+          ["--color-ink" as string]: theme.fg,
+          ["--color-ink-muted" as string]: theme.muted,
+          ["--color-border" as string]: theme.border,
+          ["--color-paper" as string]: theme.bg,
+          ["--color-paper-secondary" as string]: theme.card,
+          ["--color-paper-tertiary" as string]: theme.border,
+          ["--color-bg-primary" as string]: theme.bg,
+          ["--color-bg-secondary" as string]: theme.card,
+          ["--color-text-primary" as string]: theme.fg,
+          ["--color-text-secondary" as string]: theme.muted,
+          ["--color-border-subtle" as string]: theme.border,
         };
 
   return (
