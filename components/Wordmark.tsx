@@ -32,7 +32,7 @@ export function Wordmark({ href = "/", size = "sm" }: Props) {
   }
 
   return (
-    <Link href={href} className="inline-block transition-opacity hover:opacity-75" aria-label="Curi">
+    <Link href={href} className="inline-block transition-opacity hover:opacity-80 focus-ring rounded-sm" aria-label="Curi">
       {mark}
     </Link>
   );

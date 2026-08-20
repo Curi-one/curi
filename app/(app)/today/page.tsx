@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
+import { LoadingState } from "@/components/LoadingState";
 import { TodayView } from "@/components/TodayView";
 import { getFeed, getProgress } from "@/lib/api/client";
 import type { FeedResponse } from "@/lib/api/schemas";
@@ -34,7 +35,7 @@ export default function TodayPage() {
   return (
     <PageShell withTabPad={false} className="pt-4">
       {error && <p className="text-ink-muted">{error}</p>}
-      {!feed && !error && <p className="text-ink-muted">Loading…</p>}
+      {!feed && !error && <LoadingState label="Loading your feed…" />}
       {feed && (
         <TodayView
           {...feed}

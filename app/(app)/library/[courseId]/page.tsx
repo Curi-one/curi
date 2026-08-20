@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
+import { LoadingState } from "@/components/LoadingState";
 import { PathMap } from "@/components/PathMap";
 import { PathProgressBar } from "@/components/PathProgressBar";
 import { ProgressRing } from "@/components/ProgressRing";
@@ -64,7 +65,7 @@ export default function LibraryCoursePage() {
   if (!course) {
     return (
       <PageShell back={{ href: "/library", label: "Library" }} withTabPad={false}>
-        <p className="mt-6 text-ink-muted">Loading path…</p>
+        <LoadingState label="Loading path…" />
       </PageShell>
     );
   }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Heatmap } from "@/components/Heatmap";
+import { LoadingState } from "@/components/LoadingState";
 import { PageShell } from "@/components/PageShell";
 import { PathProgressBar } from "@/components/PathProgressBar";
 import { getLibrary, getProgress } from "@/lib/api/client";
@@ -14,18 +15,29 @@ export default function ProgressPage() {
   const [dates, setDates] = useState<string[]>([]);
   const [paths, setPaths] = useState<PathSummary[]>([]);
   const [stats, setStats] = useState({ active: 0, mastered: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getProgress(), getLibrary()]).then(([p, lib]) => {
-      setStreak(p.streak);
-      setDates(p.heatmap);
-      setPaths([...lib.exploring, ...lib.mastered]);
-      setStats({
-        active: p.activePaths ?? lib.exploring.length,
-        mastered: p.masteredPaths ?? lib.mastered.length,
-      });
-    });
+    Promise.all([getProgress(), getLibrary()])
+      .then(([p, lib]) => {
+        setStreak(p.streak);
+        setDates(p.heatmap);
+        setPaths([...lib.exploring, ...lib.mastered]);
+        setStats({
+          active: p.activePaths ?? lib.exploring.length,
+          mastered: p.masteredPaths ?? lib.mastered.length,
+        });
+      })
+      .finally(() => setLoading(false));
   }, []);
+
+  if (loading) {
+    return (
+      <PageShell title="Progress" withTabPad={false} className="pt-4">
+        <LoadingState label="Loading progress…" />
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell
@@ -55,7 +67,7 @@ export default function ProgressPage() {
         {paths.length === 0 ? (
           <p className="mt-4 text-ink-muted">
             No paths yet.{" "}
-            <Link href="/explore" className="underline hover:text-ink">
+            <Link href="/explore" className="link-subtle focus-ring inline-block rounded-sm">
               Explore founder paths
             </Link>
           </p>
@@ -65,9 +77,9 @@ export default function ProgressPage() {
               <li key={p.id}>
                 <Link
                   href={`/library/${p.id}`}
-                  className="surface-card block px-4 py-3 hover:border-accent/30"
+                  className="surface-card surface-card-interactive interactive-card focus-ring group block px-4 py-3"
                 >
-                  <p className="font-medium text-ink">{p.topic}</p>
+                  <p className="font-medium text-ink transition-colors group-hover:text-ink">{p.topic}</p>
                   <p className="mt-1 font-meta">
                     {p.progress} / {p.totalLessons} · {depthLabel(p.depth)}
                   </p>

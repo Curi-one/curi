@@ -34,7 +34,7 @@ function SidebarNavBtn({
       href={href}
       aria-label={label}
       aria-current={active ? "page" : undefined}
-      className={`flex w-full flex-col items-center gap-1.5 rounded-xl px-1.5 py-2.5 transition-colors ${
+      className={`focus-ring flex w-full flex-col items-center gap-1.5 rounded-xl px-1.5 py-2.5 transition-colors ${
         active
           ? "bg-ink/[0.08] text-ink"
           : "text-ink-muted/60 hover:bg-ink/[0.05] hover:text-ink/80"

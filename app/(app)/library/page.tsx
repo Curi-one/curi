@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { LibraryPathCard } from "@/components/LibraryPathCard";
+import { LoadingState } from "@/components/LoadingState";
 import { PageShell } from "@/components/PageShell";
 import { TabPills } from "@/components/TabPills";
 import type { LibraryResponse } from "@/lib/api/schemas";
@@ -81,7 +82,7 @@ function LibraryContent() {
         />
       </div>
       <div className="mt-6">
-        {!lib && <p className="text-ink-muted">Loading…</p>}
+        {!lib && <LoadingState label="Loading library…" minHeight="min-h-[24vh]" />}
         {lib && paths.length === 0 && (
           <EmptyState
             message={
@@ -123,7 +124,7 @@ function LibraryContent() {
 export default function LibraryPage() {
   return (
     <PageShell title="Library" withTabPad={false} className="pt-4">
-      <Suspense fallback={<p className="mt-6 text-ink-muted">Loading…</p>}>
+      <Suspense fallback={<LoadingState label="Loading library…" minHeight="min-h-[24vh]" />}>
         <LibraryContent />
       </Suspense>
     </PageShell>

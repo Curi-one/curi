@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LoadingState } from "@/components/LoadingState";
 import { Wordmark } from "@/components/Wordmark";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -237,7 +238,7 @@ function AuthContent() {
 export default function AuthPage() {
   return (
     <main className="app-shell py-8">
-      <Suspense fallback={<p className="text-ink-muted">Loading…</p>}>
+      <Suspense fallback={<LoadingState minHeight="min-h-[50vh]" />}>
         <AuthContent />
       </Suspense>
     </main>

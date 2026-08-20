@@ -45,7 +45,7 @@ export function TodayView({
         <div className="space-y-2">
           <Link
             href="/explore"
-            className="group flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left transition hover:bg-paper-tertiary/60"
+            className="group interactive-card focus-ring flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left hover:border-accent/20"
           >
             <div>
               <div className="flex items-center gap-2 font-medium text-ink">
@@ -65,7 +65,7 @@ export function TodayView({
 
           <Link
             href="/new"
-            className="group flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left transition hover:bg-paper-tertiary/60"
+            className="group interactive-card focus-ring flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left hover:border-accent/20"
           >
             <div>
               <div className="flex items-center gap-2 font-medium text-ink">
@@ -105,7 +105,9 @@ export function TodayView({
         </div>
         <Link
           href="/progress"
-          className={`inline-flex min-h-11 shrink-0 items-center gap-1 font-meta ${streakAtRisk ? "text-accent" : ""}`}
+          className={`focus-ring inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full px-2 font-meta transition-colors hover:bg-ink/[0.04] ${
+            streakAtRisk ? "text-accent hover:text-accent-dark" : "hover:text-ink"
+          }`}
         >
           {streak} day streak
           <ArrowRight className="h-3 w-3" aria-hidden />
@@ -113,9 +115,20 @@ export function TodayView({
       </header>
 
       {due.length === 0 && done.length > 0 && (
-        <p className="mb-6 text-sm text-ink-muted">
-          All caught up for today — next lessons unlock tomorrow.
-        </p>
+        <div className="surface-card mb-8 p-8 text-center">
+          <p className="font-display text-xl text-ink">All caught up</p>
+          <p className="mt-2 text-sm text-ink-muted">
+            Next lessons unlock tomorrow. Or start another path.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link href="/progress" className="btn-secondary inline-block">
+              View progress
+            </Link>
+            <Link href="/new" className="btn-ghost inline-block text-sm">
+              New path
+            </Link>
+          </div>
+        </div>
       )}
 
       {groups.map((group) => (
@@ -140,10 +153,7 @@ export function TodayView({
       ))}
 
       <div className="mt-10 text-center">
-        <Link
-          href="/new"
-          className="text-sm text-ink-muted underline hover:text-ink"
-        >
+        <Link href="/new" className="link-subtle focus-ring inline-block rounded-sm">
           Create a new path
         </Link>
       </div>

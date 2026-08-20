@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
+import { LoadingState } from "@/components/LoadingState";
 import { LessonReader } from "@/components/LessonReader";
 import {
   getCourseMap,
@@ -71,7 +72,7 @@ function LessonContent() {
   if (!lesson) {
     return (
       <PageShell back={back} withTabPad={false}>
-        <p className="mt-6 text-ink-muted">Loading lesson…</p>
+        <LoadingState label="Loading lesson…" />
       </PageShell>
     );
   }
@@ -100,7 +101,7 @@ export default function LessonPage() {
     <Suspense
       fallback={
         <PageShell withTabPad={false}>
-          <p className="mt-6 text-ink-muted">Loading lesson…</p>
+          <LoadingState label="Loading lesson…" />
         </PageShell>
       }
     >

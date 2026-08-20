@@ -68,16 +68,20 @@ export function LessonFeedCard({ item, lockedCopy = "Unlocks tomorrow" }: Props)
   return (
     <Link
       href={href}
-      className={`group flex w-full gap-3.5 rounded-lg border border-border/50 bg-paper-secondary p-4 transition-[border-color,opacity,box-shadow] duration-200 hover:border-border sm:gap-4 sm:p-5 ${
-        dimmed ? "opacity-55" : ""
+      className={`group interactive-card focus-ring flex w-full gap-3.5 rounded-lg border border-border/50 bg-paper-secondary p-4 sm:gap-4 sm:p-5 ${
+        dimmed
+          ? "opacity-55 hover:opacity-70"
+          : "hover:border-accent/25"
       }`}
     >
       <TopicThumbnail topic={item.topic} />
 
       <div className="min-w-0 flex-1">
         <h3
-          className={`text-[14px] font-semibold leading-snug tracking-tight sm:text-[15px] ${
-            dimmed ? "text-ink/55" : "text-ink"
+          className={`text-[14px] font-semibold leading-snug tracking-tight transition-colors sm:text-[15px] ${
+            dimmed
+              ? "text-ink/55 group-hover:text-ink/70"
+              : "text-ink group-hover:text-ink"
           }`}
         >
           {item.title}
@@ -91,8 +95,10 @@ export function LessonFeedCard({ item, lockedCopy = "Unlocks tomorrow" }: Props)
 
         <div className="mt-2 flex items-center justify-end">
           <span
-            className={`text-[10px] font-semibold uppercase tracking-wider ${
-              dimmed ? "text-ink-muted/45" : "text-accent"
+            className={`text-[10px] font-semibold uppercase tracking-wider transition-colors ${
+              dimmed
+                ? "text-ink-muted/45 group-hover:text-ink-muted/70"
+                : "text-accent group-hover:text-accent-dark"
             }`}
           >
             {actionLabel(item.status)}

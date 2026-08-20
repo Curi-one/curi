@@ -16,7 +16,7 @@ export function LibraryPathCard({ path, tab }: Props) {
     return (
       <Link
         href={`/library/${path.id}`}
-        className="group relative flex min-h-[200px] flex-col justify-between overflow-hidden rounded-2xl p-5 text-left text-paper transition hover:-translate-y-0.5 sm:min-h-[220px] sm:p-6"
+        className="group focus-ring relative flex min-h-[200px] flex-col justify-between overflow-hidden rounded-2xl p-5 text-left text-paper transition hover:-translate-y-0.5 hover:brightness-[1.03] sm:min-h-[220px] sm:p-6"
         style={{ background: bg }}
       >
         <div
@@ -46,10 +46,10 @@ export function LibraryPathCard({ path, tab }: Props) {
   return (
     <Link
       href={`/library/${path.id}`}
-      className="surface-card block px-4 py-4 transition-colors hover:border-accent/30"
+      className="surface-card surface-card-interactive interactive-card focus-ring block px-4 py-4 group"
     >
       <div className="flex items-start justify-between gap-3">
-        <p className="font-display text-[22px] leading-snug text-ink">
+        <p className="font-display text-[22px] leading-snug text-ink transition-colors group-hover:text-ink">
           {path.topic}
         </p>
         {tab === "shelved" && (

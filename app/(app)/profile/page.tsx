@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, Minus } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
+import { LoadingState } from "@/components/LoadingState";
 import { SettingChips } from "@/components/SettingChips";
 import { SettingToggle } from "@/components/SettingToggle";
 import {
@@ -211,7 +212,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <PageShell back={{ href: "/today", label: "Today" }} withTabPad={false}>
-        <p className="mt-6 text-ink-muted">Loading…</p>
+        <LoadingState label="Loading profile…" />
       </PageShell>
     );
   }

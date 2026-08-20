@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CompleteSheet } from "@/components/CompleteSheet";
 import { LessonFeel, LessonFeelDock } from "@/components/LessonFeel";
+import { LoadingState } from "@/components/LoadingState";
 import { PageShell } from "@/components/PageShell";
 import { QuizFlow } from "@/components/QuizFlow";
 import { StreakMoment } from "@/components/StreakMoment";
@@ -167,7 +168,7 @@ export default function QuizPage() {
         }}
         withTabPad={false}
       >
-        <p className="mt-6 text-ink-muted">Loading quiz…</p>
+        <LoadingState label="Loading quiz…" />
       </PageShell>
     );
   }

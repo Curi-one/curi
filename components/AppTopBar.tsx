@@ -40,13 +40,13 @@ export function AppTopBar({
           <>
             <Link
               href="/progress"
-              className="inline-flex h-9 items-center rounded-full px-2.5 text-xs text-ink-muted transition-colors hover:text-ink"
+              className="inline-flex h-9 items-center rounded-full px-2.5 text-xs text-ink-muted transition-colors hover:bg-ink/[0.04] hover:text-ink focus-ring"
             >
               Progress
             </Link>
             <Link
               href="/new"
-              className="inline-flex h-9 items-center rounded-full px-2.5 text-xs text-ink-muted transition-colors hover:text-ink"
+              className="inline-flex h-9 items-center rounded-full px-2.5 text-xs text-ink-muted transition-colors hover:bg-ink/[0.04] hover:text-ink focus-ring"
               aria-label="Create a new path"
             >
               New
@@ -55,7 +55,7 @@ export function AppTopBar({
         )}
         <Link
           href={profileHref}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-paper-secondary text-xs font-medium text-ink"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-paper-secondary text-xs font-medium text-ink transition-colors hover:border-ink/30 hover:bg-paper-tertiary focus-ring"
           aria-label="Open profile"
         >
           {initial}

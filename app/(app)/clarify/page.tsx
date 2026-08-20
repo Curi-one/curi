@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ClarifyStep } from "@/components/ClarifyStep";
 import { DepthPicker } from "@/components/DepthPicker";
+import { LoadingState } from "@/components/LoadingState";
 import { PageShell } from "@/components/PageShell";
 import { Wordmark } from "@/components/Wordmark";
 import type { DepthSlug } from "@/lib/api/schemas";
@@ -103,7 +104,7 @@ function ClarifyContent() {
   }
 
   if (loading) {
-    return <p className="text-ink-muted">Loading questions…</p>;
+    return <LoadingState label="Loading questions…" minHeight="min-h-[50vh]" />;
   }
 
   if (error) {
@@ -154,7 +155,7 @@ export default function ClarifyPage() {
     <PageShell withTabPad={false} className="pt-6">
       <Wordmark href="/" />
       <div className="mt-8">
-        <Suspense fallback={<p className="text-ink-muted">Loading…</p>}>
+        <Suspense fallback={<LoadingState minHeight="min-h-[50vh]" />}>
           <ClarifyContent />
         </Suspense>
       </div>
