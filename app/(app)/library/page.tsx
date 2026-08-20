@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { PageShell } from "@/components/PageShell";
@@ -17,7 +18,13 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 export default function LibraryPage() {
-  const [tab, setTab] = useState<Tab>("exploring");
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab");
+  const [tab, setTab] = useState<Tab>(
+    initialTab === "mastered" || initialTab === "shelved"
+      ? initialTab
+      : "exploring",
+  );
   const [lib, setLib] = useState<LibraryResponse | null>(null);
 
   useEffect(() => {

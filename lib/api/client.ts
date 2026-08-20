@@ -95,6 +95,13 @@ export function getLibrary() {
   return apiFetch<LibraryResponse>("/api/library");
 }
 
+export function patchShelveCourse(courseId: string) {
+  return apiFetch<{ ok: true; courseId: string }>(`/api/courses/${courseId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ action: "shelve" }),
+  });
+}
+
 export type CourseMapResponse = {
   id: string;
   topic: string;

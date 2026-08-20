@@ -391,6 +391,7 @@ class MockStore {
     id: string;
     topic: string;
     depth: MockPath["depth"];
+    status: "active" | "completed" | "shelved";
     nodes: { index: number; title: string; status: "read" | "today" | "locked" }[];
   }> {
     const data = this.getOrCreateSession(sessionId);
@@ -398,6 +399,12 @@ class MockStore {
     if (!path) {
       return { ok: false, code: "not_found", message: "Path not found" };
     }
+    const dbStatus: "active" | "completed" | "shelved" =
+      path.status === "mastered"
+        ? "completed"
+        : path.status === "shelved"
+          ? "shelved"
+          : "active";
     const nodes = path.lessonTitles.map((title, index) => {
       let status: "read" | "today" | "locked" = "locked";
       if (index < path.progress) status = "read";
@@ -412,9 +419,30 @@ class MockStore {
         id: path.id,
         topic: path.topic,
         depth: path.depth,
+        status: dbStatus,
         nodes,
       },
     };
+  }
+
+  shelvePath(
+    sessionId: string,
+    courseId: string,
+  ): StoreResult<{ courseId: string }> {
+    const data = this.getOrCreateSession(sessionId);
+    const path = data.paths.find((p) => p.id === courseId);
+    if (!path) {
+      return { ok: false, code: "not_found", message: "Path not found" };
+    }
+    if (path.status !== "active") {
+      return {
+        ok: false,
+        code: "invalid_state",
+        message: "Only active paths can be shelved",
+      };
+    }
+    path.status = "shelved";
+    return { ok: true, data: { courseId } };
   }
 
   signIn(
