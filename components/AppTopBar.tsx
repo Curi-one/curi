@@ -11,6 +11,10 @@ type Props = {
   compact?: boolean;
 };
 
+/**
+ * Mobile-only top chrome — compact app bar (not app-shell / min-h-screen).
+ * Matches prototypes/web Header: sticky, wordmark + avatar.
+ */
 export function AppTopBar({
   profileHref = "/profile",
   compact = false,
@@ -29,20 +33,20 @@ export function AppTopBar({
   }, []);
 
   return (
-    <header className="app-shell flex items-center justify-between border-b border-border py-3">
-      <Wordmark href="/today" />
-      <nav className="flex items-center gap-2" aria-label="Account">
+    <header className="sticky top-0 z-30 flex shrink-0 items-center justify-between border-b border-border/70 bg-paper/90 px-4 backdrop-blur-md sm:px-5 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
+      <Wordmark href="/today" size="sm" />
+      <nav className="flex items-center gap-1.5" aria-label="Account">
         {!compact && (
           <>
             <Link
               href="/progress"
-              className="btn-ghost min-h-11 px-3 text-xs"
+              className="inline-flex h-9 items-center rounded-full px-2.5 text-xs text-ink-muted transition-colors hover:text-ink"
             >
               Progress
             </Link>
             <Link
               href="/new"
-              className="btn-ghost min-h-11 px-3 text-xs"
+              className="inline-flex h-9 items-center rounded-full px-2.5 text-xs text-ink-muted transition-colors hover:text-ink"
               aria-label="Create a new path"
             >
               New
@@ -51,7 +55,7 @@ export function AppTopBar({
         )}
         <Link
           href={profileHref}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-paper-secondary text-sm font-medium text-ink"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-paper-secondary text-xs font-medium text-ink"
           aria-label="Open profile"
         >
           {initial}

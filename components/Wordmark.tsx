@@ -13,15 +13,15 @@ export function Wordmark({ href = "/", size = "sm" }: Props) {
       : "text-[19px] tracking-tight";
 
   const mark = (
-    <span className="relative inline-block px-0.5 py-1">
+    <span className="relative inline-block px-0.5 py-0.5 leading-none">
       <span
-        className={`font-display font-light text-ink ${type}`}
+        className={`font-display font-light leading-none text-ink ${type}`}
         style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
       >
         Cu<em className="italic">ri</em>
       </span>
       <span
-        className="absolute inset-x-0.5 bottom-0 h-[3px] bg-accent"
+        className="absolute inset-x-0.5 bottom-0 h-[2.5px] bg-accent"
         aria-hidden
       />
     </span>
