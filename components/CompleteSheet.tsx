@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Flame, Lock } from "lucide-react";
+import type { ShareableFactPayload } from "@/lib/api/schemas";
 import { getShareableFact } from "@/lib/lessons/shareable-facts";
 import {
   buildShareText,
@@ -46,6 +47,8 @@ export type CompleteSheetProps = {
   lessonNumber?: number;
   totalLessons?: number;
   nextLessonTitle?: string;
+  /** Prefer lesson API / Perplexity shareable fact when present. */
+  shareableFact?: ShareableFactPayload;
 };
 
 export function CompleteSheet({
@@ -59,12 +62,14 @@ export function CompleteSheet({
   lessonNumber,
   totalLessons,
   nextLessonTitle,
+  shareableFact,
 }: CompleteSheetProps) {
   const [copied, setCopied] = useState(false);
   const insight = useMemo(() => {
     if (!open) return null;
+    if (shareableFact) return shareableFact;
     return courseTopic ? getShareableFact(courseTopic) : pickInsight();
-  }, [open, courseTopic]);
+  }, [open, courseTopic, shareableFact]);
 
   if (!open || !insight) return null;
 

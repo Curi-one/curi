@@ -8,14 +8,18 @@ import { LessonFeel, LessonFeelDock } from "@/components/LessonFeel";
 import { PageShell } from "@/components/PageShell";
 import { QuizFlow } from "@/components/QuizFlow";
 import { StreakMoment } from "@/components/StreakMoment";
-import type { LessonFeel as LessonFeelType } from "@/lib/api/schemas";
 import {
   getCourseMap,
+  getLesson,
   getMe,
   getProgress,
   getQuiz,
   postQuiz,
 } from "@/lib/api/client";
+import type {
+  LessonFeel as LessonFeelType,
+  ShareableFactPayload,
+} from "@/lib/api/schemas";
 
 type Phase = "quiz" | "feel" | "done";
 
@@ -29,6 +33,7 @@ type SheetState = {
   lessonNumber?: number;
   totalLessons?: number;
   nextLessonTitle?: string;
+  shareableFact?: ShareableFactPayload;
 };
 
 export default function QuizPage() {
@@ -53,6 +58,7 @@ export default function QuizPage() {
     lessonTitle?: string;
     totalLessons?: number;
     nextLessonTitle?: string;
+    shareableFact?: ShareableFactPayload;
   }>({});
   const [toastStreak, setToastStreak] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -65,15 +71,19 @@ export default function QuizPage() {
   }, [params.courseId, lessonIndex]);
 
   useEffect(() => {
-    getCourseMap(params.courseId)
-      .then((map) => {
+    Promise.all([
+      getCourseMap(params.courseId),
+      getLesson(params.courseId, lessonIndex).catch(() => null),
+    ])
+      .then(([map, lesson]) => {
         const node = map.nodes.find((n) => n.index === lessonIndex);
         const next = map.nodes.find((n) => n.index === lessonIndex + 1);
         setCourseMeta({
           topic: map.topic,
-          lessonTitle: node?.title,
+          lessonTitle: node?.title ?? lesson?.title,
           totalLessons: map.nodes.length,
           nextLessonTitle: next?.title,
+          shareableFact: lesson?.shareableFact,
         });
       })
       .catch(() => {
@@ -124,6 +134,7 @@ export default function QuizPage() {
           result.pathMastered === true
             ? undefined
             : courseMeta.nextLessonTitle,
+        shareableFact: courseMeta.shareableFact,
       });
       setPhase("done");
     } catch {
@@ -207,6 +218,7 @@ export default function QuizPage() {
         lessonNumber={sheet.lessonNumber}
         totalLessons={sheet.totalLessons}
         nextLessonTitle={sheet.nextLessonTitle}
+        shareableFact={sheet.shareableFact}
         onClose={() =>
           setSheet({ open: false, allDone: false, pathMastered: false })
         }

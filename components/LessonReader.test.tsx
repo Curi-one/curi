@@ -133,6 +133,44 @@ describe("LessonReader", () => {
     expect(screen.queryByText("Working equation")).not.toBeInTheDocument();
   });
 
+  it("prefers API takeaways, shareable fact, and visuals from the lesson payload", () => {
+    render(
+      <LessonReader
+        lesson={{
+          ...lesson,
+          takeaways: [
+            "API takeaway one",
+            "API takeaway two",
+            "API takeaway three",
+          ],
+          shareableFact: {
+            fact: "API shareable fact about this lesson",
+            reflection: "API reflection tied to the path",
+          },
+          visuals: [
+            {
+              title: "API visual title",
+              caption: "API visual caption",
+              equation: "API = Visual × Equation",
+            },
+          ],
+        }}
+        lessonIndex={0}
+        topic="Some Random Topic"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("API takeaway one")).toBeInTheDocument();
+    expect(screen.getByText("API takeaway two")).toBeInTheDocument();
+    expect(screen.getByText("API takeaway three")).toBeInTheDocument();
+    expect(
+      screen.getByText(/API shareable fact about this lesson/),
+    ).toBeInTheDocument();
+    expect(screen.getByText("API visual title")).toBeInTheDocument();
+    expect(screen.getByText("API = Visual × Equation")).toBeInTheDocument();
+  });
+
   it("clears the citation highlight when the sources drawer is closed", () => {
     render(
       <LessonReader

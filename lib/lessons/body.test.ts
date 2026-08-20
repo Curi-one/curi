@@ -48,6 +48,30 @@ function fingerprintFor(
   });
 }
 
+function sampleLessonJson(overrides?: Record<string, unknown>): string {
+  return JSON.stringify({
+    body: "Para one.\n\nPara two.",
+    sources: [{ title: "JSON", url: "https://example.com/json" }],
+    takeaways: [
+      "Takeaway one about term sheets.",
+      "Takeaway two about negotiation.",
+      "Takeaway three about ownership.",
+    ],
+    shareableFact: {
+      fact: "The option pool is often cut from the pre-money.",
+      reflection: "Headline valuation is not the whole deal.",
+    },
+    visuals: [
+      {
+        title: "Deal stack",
+        caption: "Economics, control, and future flexibility trade off.",
+        equation: "Deal = Economics + Control",
+      },
+    ],
+    ...overrides,
+  });
+}
+
 describe("feelToDifficultyModifier", () => {
   it("maps lesson feel to next-lesson cache modifier", () => {
     expect(feelToDifficultyModifier("too_easy")).toBe("deeper");
@@ -102,12 +126,7 @@ describe("getLessonBody", () => {
     });
     lookup.mockResolvedValueOnce(null);
     vi.mocked(chatCompletion).mockResolvedValueOnce(
-      completion(
-        JSON.stringify({
-          body: "Para one.\n\nPara two.",
-          sources: [{ title: "JSON", url: "https://example.com/json" }],
-        }),
-      ),
+      completion(sampleLessonJson()),
     );
 
     const result = await getLessonBody(
@@ -127,6 +146,22 @@ describe("getLessonBody", () => {
         { title: "JSON", url: "https://example.com/json" },
         { title: "API Source", url: "https://example.com/api" },
       ]),
+      takeaways: [
+        "Takeaway one about term sheets.",
+        "Takeaway two about negotiation.",
+        "Takeaway three about ownership.",
+      ],
+      shareableFact: {
+        fact: "The option pool is often cut from the pre-money.",
+        reflection: "Headline valuation is not the whole deal.",
+      },
+      visuals: [
+        {
+          title: "Deal stack",
+          caption: "Economics, control, and future flexibility trade off.",
+          equation: "Deal = Economics + Control",
+        },
+      ],
     });
     expect(chatCompletion).toHaveBeenCalledWith(
       expect.objectContaining({ model: "sonar-pro" }),
@@ -137,11 +172,18 @@ describe("getLessonBody", () => {
         difficultyModifier: "baseline",
         lessonIndex: 0,
         topicNormalized: "term sheets",
+        payload: expect.objectContaining({
+          body: ["Para one.", "Para two."],
+          takeaways: expect.any(Array),
+          shareableFact: expect.objectContaining({
+            fact: expect.any(String),
+          }),
+        }),
       }),
     );
   });
 
-  it("returns cached body on hit and skips Perplexity", async () => {
+  it("returns cached body with enrichment on hit and skips Perplexity", async () => {
     loadCourse.mockResolvedValueOnce({
       kind: "pending",
       topic: TOPIC,
@@ -150,7 +192,12 @@ describe("getLessonBody", () => {
       lessons: LESSONS,
     });
     lookup.mockResolvedValueOnce({
-      payload: { body: ["Cached paragraph."] },
+      payload: {
+        body: ["Cached paragraph."],
+        takeaways: ["A", "B", "C"],
+        shareableFact: { fact: "Cached fact", reflection: "Cached note" },
+        visuals: [{ title: "V", caption: "C" }],
+      },
       sources: [{ title: "Cached", url: "https://example.com/cached" }],
     });
 
@@ -165,10 +212,39 @@ describe("getLessonBody", () => {
         title: "What is a term sheet?",
         body: ["Cached paragraph."],
         sources: [{ title: "Cached", url: "https://example.com/cached" }],
+        takeaways: ["A", "B", "C"],
+        shareableFact: { fact: "Cached fact", reflection: "Cached note" },
+        visuals: [{ title: "V", caption: "C" }],
       },
     });
     expect(chatCompletion).not.toHaveBeenCalled();
     expect(store).not.toHaveBeenCalled();
+  });
+
+  it("rejects Perplexity JSON missing takeaways or shareableFact", async () => {
+    loadCourse.mockResolvedValueOnce({
+      kind: "pending",
+      topic: TOPIC,
+      depth: DEPTH,
+      clarifications: CLARIFICATIONS,
+      lessons: LESSONS,
+    });
+    lookup.mockResolvedValueOnce(null);
+    vi.mocked(chatCompletion).mockResolvedValueOnce(
+      completion(
+        JSON.stringify({
+          body: "Only body.",
+          sources: [],
+        }),
+      ),
+    );
+
+    await expect(
+      getLessonBody(
+        { courseId: "c1", lessonIndex: 0, sessionId: "anon-1" },
+        baseDeps,
+      ),
+    ).rejects.toThrow(/Failed to generate lesson body/);
   });
 
   it("maps prior too_hard feel to easier modifier for lesson 2", async () => {

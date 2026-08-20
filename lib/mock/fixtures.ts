@@ -27,6 +27,15 @@ export type MockLessonContent = {
   title: string;
   body: string[];
   sources: Source[];
+  takeaways?: string[];
+  shareableFact?: { fact: string; reflection: string };
+  visuals?: {
+    title: string;
+    caption: string;
+    equation?: string;
+    formulaNote?: string;
+    imageUrl?: string;
+  }[];
   quiz: {
     id: string;
     prompt: string;
@@ -190,6 +199,26 @@ export const MOCK_PATH_1_LESSONS: Record<number, MockLessonContent> = {
       "Enrico Fermi reportedly posed the question over lunch in 1950: *Where is everybody?* The scale of the Milky Way suggests many opportunities for life to arise and spread. [2]",
       "Possible explanations range from the **Rare Earth hypothesis** (complex life is uncommon) to the **Great Filter** (civilizations tend to destroy themselves before becoming interstellar).",
     ],
+    takeaways: [
+      "The Fermi paradox is the tension between high odds of life and zero confirmed contact.",
+      "Explanations span Rare Earth (life is rare) to Great Filter (something stops civilizations).",
+      "The question forces you to separate speculation from evidence when talking about life beyond Earth.",
+    ],
+    shareableFact: {
+      fact: "Fermi’s lunch-table question still frames the search for life: if the galaxy should be busy, why is it silent?",
+      reflection:
+        "A good paradox isn’t trivia — it tells you which assumption in your model is doing the real work.",
+    },
+    visuals: [
+      {
+        title: "Silence vs scale",
+        caption:
+          "Billions of stars suggest many chances for life; the empty sky suggests a bottleneck somewhere.",
+        equation: "Expectation ≫ Evidence",
+        formulaNote:
+          "The paradox is not that life is impossible — it is that our priors and observations disagree.",
+      },
+    ],
     sources: [
       {
         title: "NASA — Astrobiology",
@@ -231,6 +260,26 @@ export const MOCK_PATH_1_LESSONS: Record<number, MockLessonContent> = {
       "It multiplies factors like star formation rate, fraction of stars with planets, habitable planets per star, and the fraction that develop intelligent life.",
       "Each term carries enormous uncertainty — the equation is useful for structuring debate rather than producing a precise number.",
     ],
+    takeaways: [
+      "The Drake equation estimates communicative civilizations, not just planets.",
+      "Every factor multiplies uncertainty — the value is framing, not a precise N.",
+      "Use it to name assumptions before arguing about aliens or SETI strategy.",
+    ],
+    shareableFact: {
+      fact: "The Drake equation is less a calculator than a checklist of assumptions about life in the galaxy.",
+      reflection:
+        "When someone quotes a huge N, ask which factors they treated as near-certain.",
+    },
+    visuals: [
+      {
+        title: "N as a product",
+        caption:
+          "Change one factor and the whole estimate swings by orders of magnitude.",
+        equation: "N = R* × fp × ne × fl × fi × fc × L",
+        formulaNote:
+          "The equation’s power is making each assumption visible — not pretending the product is known.",
+      },
+    ],
     sources: [
       {
         title: "Frank Drake — SETI",
@@ -266,6 +315,23 @@ function defaultLessonContent(
       `Welcome to lesson ${lessonIndex + 1} of **${pathTopic}**.`,
       "This is mock content for frontend-first development. Real lesson bodies will come from Perplexity on cache miss.",
       "Focus on one clear idea per paragraph — Curi lessons are meant to be read in a few minutes.",
+    ],
+    takeaways: [
+      `${pathTopic} has a surface definition and a decision underneath.`,
+      `Lesson ${lessonIndex + 1} should change what you notice before you act.`,
+      "Ask who benefits if you misunderstand the concept.",
+    ],
+    shareableFact: {
+      fact: `The expensive mistakes in ${pathTopic} usually come from misunderstood incentives, not missing definitions.`,
+      reflection:
+        "A good lesson should make the next decision less reactive.",
+    },
+    visuals: [
+      {
+        title: `A decision map for ${pathTopic}`,
+        caption:
+          "Every concept has a definition on the surface and a trade-off underneath.",
+      },
     ],
     sources: [
       {

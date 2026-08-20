@@ -210,13 +210,18 @@ export function LessonReader({
 
   const topicLabel = topic?.trim() || "";
   const takeaways =
-    topicLabel.length > 0
-      ? getLessonTakeaways(topicLabel)
-      : extractTakeaways(lesson.body);
+    lesson.takeaways && lesson.takeaways.length > 0
+      ? lesson.takeaways
+      : topicLabel.length > 0
+        ? getLessonTakeaways(topicLabel)
+        : extractTakeaways(lesson.body);
   const keyIdea = pickKeyIdea(lesson.body);
   const readMins = estimateReadMinutes(lesson.body);
   const total = totalLessons ?? Math.max(lessonIndex + 1, 1);
   const showEditorial = lesson.body.length >= 3;
+  const apiVisuals = lesson.visuals ?? [];
+  const useApiVisuals = apiVisuals.length > 0;
+  const shareable = lesson.shareableFact;
 
   const theme =
     READER_THEMES.find((t) => t.id === settings.theme) ?? READER_THEMES[0];
@@ -377,9 +382,32 @@ export function LessonReader({
         </p>,
       );
 
-      if (i === imageAfter && topicLabel && hasLessonVisual(topicLabel)) {
-        nodes.push(<LessonImage key="lesson-image" topic={topicLabel} />);
-        nodes.push(<EquationBlock key="equation-block" topic={topicLabel} />);
+      if (i === imageAfter) {
+        if (useApiVisuals) {
+          apiVisuals.forEach((visual, vi) => {
+            nodes.push(
+              <LessonImage
+                key={`lesson-image-${vi}`}
+                topic={topicLabel}
+                visual={visual}
+              />,
+            );
+            if (visual.equation) {
+              nodes.push(
+                <EquationBlock
+                  key={`equation-block-${vi}`}
+                  topic={topicLabel}
+                  visual={visual}
+                />,
+              );
+            }
+          });
+        } else if (topicLabel && hasLessonVisual(topicLabel)) {
+          nodes.push(<LessonImage key="lesson-image" topic={topicLabel} />);
+          nodes.push(
+            <EquationBlock key="equation-block" topic={topicLabel} />,
+          );
+        }
       }
       if (i === keyIdeaAfter && keyIdea) {
         nodes.push(
@@ -397,12 +425,13 @@ export function LessonReader({
       if (i === diagramAfter && topicLabel) {
         nodes.push(<IdeaDiagram key="idea-diagram" topic={topicLabel} />);
       }
-      if (i === shareAfter && topicLabel) {
+      if (i === shareAfter && (shareable || topicLabel)) {
         nodes.push(
           <ShareableFact
             key="shareable"
-            topic={topicLabel}
+            topic={topicLabel || lesson.title}
             title={lesson.title}
+            fact={shareable}
           />,
         );
       }

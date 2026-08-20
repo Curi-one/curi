@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { ShareableFactPayload } from "@/lib/api/schemas";
 import { getShareableFact } from "@/lib/lessons/shareable-facts";
 import {
   buildShareText,
@@ -9,10 +10,15 @@ import {
   twitterIntentUrl,
 } from "@/lib/share/lesson-share";
 
-type Props = { topic: string; title: string };
+type Props = {
+  topic: string;
+  title: string;
+  /** Prefer Perplexity / API fact when provided. */
+  fact?: ShareableFactPayload;
+};
 
-export function ShareableFact({ topic, title }: Props) {
-  const item = getShareableFact(topic);
+export function ShareableFact({ topic, title, fact }: Props) {
+  const item = fact ?? getShareableFact(topic);
   const shareText = buildShareText({
     fact: item.fact,
     topic,

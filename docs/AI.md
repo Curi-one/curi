@@ -59,9 +59,19 @@ Cache type: `path_outline`.
 
 ## Lesson body
 
-Input: outline context + `lesson_index` + **`difficulty_modifier`** from prior lesson feel (baseline on L1).
+Input: outline context + `lesson_index` + **`difficulty_modifier`** from prior lesson feel (baseline on L1) + path topic.
 
-Output: markdown body + sources. Cache type: `lesson_body`.
+Output JSON (cache type: `lesson_body`):
+
+| Field | Required | Notes |
+|---|---|---|
+| `body` | Yes | Markdown string; shown as-is after blank-line paragraph split |
+| `sources` | Yes | `{ title, url }[]` — also merge `search_results` |
+| `takeaways` | Yes | Exactly **3** key takeaways for “things from this lesson” |
+| `shareableFact` | Yes | `{ fact, reflection }` tied to lesson + broader path topic |
+| `visuals` | When helpful | 0–3 `{ title, caption, equation?, formulaNote?, imageUrl? }` |
+
+Reader uses API takeaways / shareable fact / visuals when present; curated fallbacks only for older cache rows missing those fields.
 
 Modifier mapping: see CONTENT-CACHE.md.
 

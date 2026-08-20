@@ -24,6 +24,23 @@ describe("ShareableFact", () => {
     expect(liLink).toHaveAttribute("href", linkedinShareUrl());
   });
 
+  it("prefers an API-provided fact over the curated topic map", () => {
+    render(
+      <ShareableFact
+        topic="Venture Capital"
+        title="Fund basics"
+        fact={{
+          fact: "Override fact from Perplexity",
+          reflection: "Override reflection",
+        }}
+      />,
+    );
+    expect(
+      screen.getByText(/Override fact from Perplexity/),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Override reflection")).toBeInTheDocument();
+  });
+
   it("copies text and opens LinkedIn when Share on LinkedIn is clicked", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.assign(navigator, { clipboard: { writeText } });

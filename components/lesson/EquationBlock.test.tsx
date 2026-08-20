@@ -13,4 +13,19 @@ describe("EquationBlock", () => {
     const { container } = render(<EquationBlock topic="Some Unknown Topic" />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it("renders an API visual equation when provided", () => {
+    render(
+      <EquationBlock
+        visual={{
+          title: "API",
+          caption: "cap",
+          equation: "API Equation = 1",
+          formulaNote: "From payload",
+        }}
+      />,
+    );
+    expect(screen.getByText("API Equation = 1")).toBeInTheDocument();
+    expect(screen.getByText("From payload")).toBeInTheDocument();
+  });
 });

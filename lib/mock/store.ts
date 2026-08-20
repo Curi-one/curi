@@ -309,6 +309,11 @@ class MockStore {
           title: content.title,
           body: content.body,
           sources: content.sources,
+          ...(content.takeaways ? { takeaways: content.takeaways } : {}),
+          ...(content.shareableFact
+            ? { shareableFact: content.shareableFact }
+            : {}),
+          ...(content.visuals ? { visuals: content.visuals } : {}),
         },
         modifier,
       ),

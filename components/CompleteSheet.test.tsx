@@ -93,6 +93,25 @@ describe("CompleteSheet", () => {
     expect(screen.getByText(`“${fact.fact}”`)).toBeInTheDocument();
   });
 
+  it("prefers the lesson API shareable fact over curated topic copy", () => {
+    render(
+      <CompleteSheet
+        open
+        allPathsDoneToday={false}
+        onClose={vi.fn()}
+        courseTopic="Venture Capital"
+        shareableFact={{
+          fact: "Generated fact from this lesson",
+          reflection: "Generated reflection",
+        }}
+      />,
+    );
+    expect(
+      screen.getByText(/Generated fact from this lesson/),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Generated reflection")).toBeInTheDocument();
+  });
+
   describe("Share on LinkedIn", () => {
     afterEach(() => {
       vi.restoreAllMocks();
