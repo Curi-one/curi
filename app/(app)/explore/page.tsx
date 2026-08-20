@@ -445,7 +445,7 @@ function BookSearchRow({
         {item.pathCount} paths
       </span>
       <ArrowRight
-        className="h-4 w-4 shrink-0 text-ink-muted/40 group-hover:text-ink-muted"
+        className="h-4 w-4 shrink-0 text-ink-muted/40 transition-colors group-hover:text-accent"
         aria-hidden
       />
     </button>
