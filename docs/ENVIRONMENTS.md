@@ -9,8 +9,8 @@ Three environments with **identical architecture** and **isolated data and secre
 | | Local | Staging | Production |
 |---|---|---|---|
 | **Purpose** | Development | Pre-release verification | Live users |
-| **URL** | `http://localhost:3000` | `https://staging.curi.one` | `https://curi.one` |
-| **Deploy** | Developer machine | Auto from `staging` branch | Auto from `main` after CI |
+| **URL** | `http://localhost:3000` | `https://stage.curi.one` | `https://curi.one` (apex → www) |
+| **Deploy** | Developer machine | Auto from `staging` branch | Auto from `main` after CI — **domains off until launch** |
 | **Database** | Supabase local or dedicated dev project | Dedicated Supabase project | Dedicated Supabase project |
 | **Stripe** | Test mode | Test mode | Live mode |
 | **Perplexity** | Real key, low usage | Real key | Real key |
