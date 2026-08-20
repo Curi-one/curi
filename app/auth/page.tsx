@@ -14,6 +14,7 @@ function AuthContent() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
+  const [devHint, setDevHint] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -22,22 +23,28 @@ function AuthContent() {
     setError(null);
     try {
       if (step === "email") {
-        await postAuth({ email });
+        const res = await postAuth({ email });
+        if ("devHint" in res && typeof res.devHint === "string") {
+          setDevHint(res.devHint);
+        } else {
+          setDevHint(null);
+        }
         setStep("code");
         return;
       }
       if (step === "code") {
+        await postAuth({ email, code });
         setStep("name");
         return;
       }
       const res = await postAuth({ email, code, name: name || undefined });
-      if (res.session.kind === "member") {
+      if ("session" in res && res.session?.kind === "member") {
         router.push(returnTo);
       }
     } catch {
       setError(
-        step === "name"
-          ? "Invalid code. Try 123456 in dev."
+        step === "code" || step === "name"
+          ? "Invalid code. Check your email and try again."
           : "Something went wrong.",
       );
     } finally {
@@ -54,7 +61,10 @@ function AuthContent() {
       </h1>
       <p className="mt-2 text-ink-muted">
         {step === "email" && "Enter your email — no password needed."}
-        {step === "code" && `We sent a code to ${email}. Dev code: 123456`}
+        {step === "code" &&
+          (devHint
+            ? `We sent a code to ${email}. Dev code: ${devHint}`
+            : `Check your inbox for a 6-digit code sent to ${email}.`)}
         {step === "name" && "Just a first name is fine."}
       </p>
 
@@ -74,7 +84,7 @@ function AuthContent() {
           value={code}
           onChange={(e) => setCode(e.target.value)}
           className="mt-8 w-full rounded-xl border border-border bg-paper-secondary px-4 py-4 tracking-widest"
-          placeholder="123456"
+          placeholder="000000"
         />
       )}
       {step === "name" && (

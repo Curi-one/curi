@@ -1,9 +1,26 @@
 import { jsonWithSession, resolveSession } from "@/lib/api/handler-utils";
+import { getEnv } from "@/lib/env";
 import { getMockStore } from "@/lib/mock/store";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   const { sessionId } = resolveSession(request);
-  const store = getMockStore();
-  const session = store.signOut(sessionId);
-  return jsonWithSession({ session }, sessionId);
+
+  if (getEnv().USE_MOCK_API) {
+    const store = getMockStore();
+    const session = store.signOut(sessionId);
+    return jsonWithSession({ session }, sessionId);
+  }
+
+  try {
+    const supabase = await createClient();
+    await supabase.auth.signOut();
+  } catch {
+    // Cookie/session may already be cleared; still return guest.
+  }
+
+  return jsonWithSession(
+    { session: { kind: "guest" as const, plan: "free" as const } },
+    sessionId,
+  );
 }

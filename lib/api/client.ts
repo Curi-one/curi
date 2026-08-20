@@ -101,14 +101,26 @@ export function getExplore() {
   return apiFetch<ExploreResponse>("/api/explore");
 }
 
+export type AuthCodeStepResponse = {
+  ok: true;
+  step: "code";
+  session?: UserSession;
+  /** Present only when USE_MOCK_API — never set for real Supabase OTP. */
+  devHint?: string;
+};
+
+export type AuthSessionResponse = {
+  session: UserSession;
+  migratedPathId?: string;
+};
+
+export type AuthResponse = AuthCodeStepResponse | AuthSessionResponse;
+
 export function postAuth(body: AuthRequest) {
-  return apiFetch<{ session: UserSession; migratedPathId?: string }>(
-    "/api/auth",
-    {
-      method: "POST",
-      body: JSON.stringify(body),
-    },
-  );
+  return apiFetch<AuthResponse>("/api/auth", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }
 
 export function postSignOut() {
