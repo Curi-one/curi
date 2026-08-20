@@ -138,8 +138,27 @@ body {
   }
 
   .app-shell {
-    @apply mx-auto min-h-screen w-full max-w-lg px-6;
+    @apply mx-auto min-h-screen w-full max-w-lg px-5;
     background: var(--color-bg-primary);
+  }
+
+  /* Desktop / web prototype content pane */
+  @media (min-width: 768px) {
+    .app-shell {
+      @apply max-w-3xl px-8 py-6;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .app-shell {
+      @apply max-w-4xl px-12;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .app-shell {
+      @apply px-14;
+    }
   }
 }
 

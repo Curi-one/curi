@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { AppSidebar } from "@/components/AppSidebar";
 import { AppTopBar } from "@/components/AppTopBar";
 import { TabBar } from "@/components/TabBar";
 import { getMe, type UserSession } from "@/lib/api/client";
 
-/** Bottom tabs only on primary member destinations (FLOWS + mobile prototype). */
+/** Bottom tabs only on primary member destinations (mobile). */
 function showMemberTabBar(pathname: string): boolean {
   return (
     pathname === "/today" ||
@@ -15,6 +16,11 @@ function showMemberTabBar(pathname: string): boolean {
   );
 }
 
+/**
+ * Member chrome:
+ * - md+: web prototype sidebar + wide scrollable pane
+ * - <md: mobile top bar + bottom tabs
+ */
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [session, setSession] = useState<UserSession | null | undefined>(
@@ -30,17 +36,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isMember = session?.kind === "member";
   const showTabBar = isMember && showMemberTabBar(pathname);
 
+  if (!isMember) {
+    return <>{children}</>;
+  }
+
   return (
-    <>
-      {isMember && <AppTopBar compact={!showTabBar} />}
-      <div
-        className={
-          showTabBar ? "pb-[calc(4.5rem+env(safe-area-inset-bottom))]" : ""
-        }
-      >
-        {children}
+    <div className="relative flex h-svh w-full overflow-hidden bg-paper">
+      <AppSidebar />
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
+        <div className="md:hidden">
+          <AppTopBar compact={!showTabBar} />
+        </div>
+        <div
+          className={
+            showTabBar
+              ? "pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0"
+              : ""
+          }
+        >
+          {children}
+        </div>
+        <div className="md:hidden">{showTabBar ? <TabBar /> : null}</div>
       </div>
-      {showTabBar && <TabBar />}
-    </>
+    </div>
   );
 }

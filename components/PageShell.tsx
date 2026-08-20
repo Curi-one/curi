@@ -21,7 +21,7 @@ export function PageShell({
 }: Props) {
   return (
     <main
-      className={`app-shell py-8 ${withTabPad ? "pb-24" : "pb-12"} ${className}`}
+      className={`app-shell py-6 md:py-8 ${withTabPad ? "pb-24 md:pb-12" : "pb-12"} ${className}`}
     >
       {back && (
         <Link
