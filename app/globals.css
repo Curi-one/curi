@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-paper: #faf9f5;
+  --color-paper-secondary: #f4f1e8;
+  --color-paper-tertiary: #e8e5dc;
+  --color-ink: #0a0908;
+  --color-ink-muted: #6b6760;
+  --color-border: #d4d0c8;
+  --color-accent: #c1121f;
+  --color-streak: #e85d04;
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+  color: var(--color-ink);
+  background: var(--color-paper);
+}
+
+@layer components {
+  .btn-primary {
+    @apply min-h-[52px] rounded-xl bg-ink px-6 py-3 text-center font-medium text-paper transition-opacity hover:opacity-90;
+  }
+
+  .btn-secondary {
+    @apply min-h-[52px] rounded-xl border border-border bg-paper-secondary px-6 py-3 text-center font-medium text-ink transition-colors hover:border-ink-muted;
+  }
+
+  .font-display {
+    font-family: var(--font-fraunces), Georgia, serif;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s var(--ease-spring) both;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.35s var(--ease-spring) both;
+}

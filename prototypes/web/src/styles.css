@@ -1,0 +1,1297 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* White-first palette */
+    /* #FFFFFF pure white   */ --background: 0 0% 100%;
+    /* #0D0D0D near black   */ --foreground: 0 0% 5%;
+    /* #FAFAFA near white   */ --card: 0 0% 98%;
+    --card-foreground: 0 0% 5%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 5%;
+    /* #0D0D0D near black   */ --primary: 0 0% 5%;
+    /* #FFFFFF pure white   */ --primary-foreground: 0 0% 100%;
+    /* #F2F2F2 section gray */ --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 5%;
+    /* #F2F2F2 muted bg     */ --muted: 0 0% 95%;
+    /* #666666 mid gray     */ --muted-foreground: 0 0% 40%;
+    --accent: 0 0% 95%;
+    --accent-foreground: 0 0% 5%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    /* #D8D8D8 neutral line */ --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    /* Vermilion #C1121F   */ --ring: 357 83% 41%;
+    --radius: 10px;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 93%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 93%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 93%;
+    --primary: 0 0% 93%;
+    --primary-foreground: 0 0% 7%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 93%;
+    --muted: 0 0% 17%;
+    --muted-foreground: 0 0% 58%;
+    --accent: 0 0% 17%;
+    --accent-foreground: 0 0% 93%;
+    --destructive: 357 83% 41%;
+    --destructive-foreground: 0 0% 93%;
+    --border: 0 0% 22%;
+    --input: 0 0% 22%;
+    --ring: 357 83% 41%;
+  }
+
+  * {
+    @apply border-border;
+  }
+}
+
+/* ─── Design Tokens — Curi Brand v2 ─────────────────────────────────────── */
+:root {
+  /* White-first · neutral gray · vermilion */
+  --c-bg:             #FFFFFF;
+  --c-bg-elevated:    #FFFFFF;
+  --c-sidebar:        #F5F5F5;
+  --c-sidebar-hover:  #EBEBEB;
+  --c-sidebar-active: #E0E0E0;
+  --c-sidebar-accent: #C1121F;
+  --c-surface:        #FAFAFA;
+  --c-surface-soft:   #F5F5F5;
+  --c-ink:            #0D0D0D;
+  --c-ink-2:          #2A2A2A;
+  --c-ink-3:          #666666;
+  --c-ink-4:          #A3A3A3;
+  --c-line:           #E2E2E2;
+  --c-line-strong:    #D0D0D0;
+  --c-tint:           #F5F5F5;
+  --c-accent:         #0D0D0D;
+  --c-accent-fg:      #FFFFFF;
+  --c-cta:            #0D0D0D;
+  --c-cta-hover:      #1F1F1F;
+  /* Vermilion — single accent */
+  --c-vermilion:      #C1121F;
+  --c-vermilion-dark: #A30F1B;
+  --c-blue:           #C1121F;
+  --c-blue-soft:      #FFFFFF;
+  --c-blue-muted:     rgba(193, 18, 31, 0.08);
+
+  /* Type system */
+  --font-sans:  “Inter”, system-ui, -apple-system, sans-serif;
+  --font-serif: “Fraunces”, Georgia, ui-serif, serif;
+  --font-mono:  “JetBrains Mono”, “SFMono-Regular”, monospace;
+
+  /* Radii — minimalist rounded */
+  --r-sm:   4px;
+  --r-md:   8px;
+  --r-lg:   12px;
+  --r-xl:   16px;
+  --r-2xl:  20px;
+  --r-pill: 9999px;
+
+  /* Easing — from brand spec §7.2 */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);   /* --ease-out in brand */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);    /* --ease-standard */
+  --dur-fast:    120ms;
+  --dur-base:    300ms;   /* brand: 300–400ms for component entrances */
+  --dur-slow:    380ms;
+
+  /* Shadows */
+  --shadow-xs:  0 1px 2px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.03);
+  --shadow-sm:  0 2px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md:  0 4px 14px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-lg:  0 8px 28px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+
+  /* Inset (sunken) shadows — inputs, toggle tracks, tab lists */
+  --shadow-inset-xs: inset 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-inset-sm: inset 0 1px 4px rgba(0,0,0,0.08), inset 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-inset-md: inset 0 2px 6px rgba(0,0,0,0.12);
+
+  /* Lift shadows — raised surfaces on hover */
+  --shadow-lift-xs: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lift-sm: 0 3px 10px rgba(0,0,0,0.09), 0 1px 3px rgba(0,0,0,0.05);
+
+  /* Button depth — primary (dark/brand bg) */
+  --shadow-btn-primary:        inset 0 1px 0 rgba(255,255,255,0.08), 0 1px 2px rgba(0,0,0,0.14);
+  --shadow-btn-primary-hover:  inset 0 1px 0 rgba(255,255,255,0.11), 0 4px 12px rgba(0,0,0,0.18);
+  --shadow-btn-primary-active: inset 0 2px 5px rgba(0,0,0,0.28), inset 0 1px 2px rgba(0,0,0,0.16);
+
+  /* Button depth — light (outline, secondary) */
+  --shadow-btn-light:          0 1px 2px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.03);
+  --shadow-btn-light-hover:    0 3px 10px rgba(0,0,0,0.09), 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-btn-light-active:   inset 0 1px 4px rgba(0,0,0,0.10), 0 0 0 0.5px rgba(0,0,0,0.03);
+
+  /* Spacing rhythm */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+}
+
+/* Dark mode depth token overrides */
+.dark {
+  --shadow-xs:  0 1px 3px rgba(0,0,0,0.25), 0 1px 4px rgba(0,0,0,0.20);
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.25);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.30);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.55), 0 4px 16px rgba(0,0,0,0.40);
+
+  --shadow-inset-xs: inset 0 1px 3px rgba(0,0,0,0.30);
+  --shadow-inset-sm: inset 0 1px 5px rgba(0,0,0,0.42), inset 0 1px 2px rgba(0,0,0,0.28);
+  --shadow-inset-md: inset 0 2px 8px rgba(0,0,0,0.55);
+
+  --shadow-lift-xs: 0 1px 4px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.25);
+  --shadow-lift-sm: 0 3px 12px rgba(0,0,0,0.48), 0 1px 4px rgba(0,0,0,0.34);
+
+  --shadow-btn-primary:        inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 3px rgba(0,0,0,0.50);
+  --shadow-btn-primary-hover:  inset 0 1px 0 rgba(255,255,255,0.07), 0 4px 14px rgba(0,0,0,0.60);
+  --shadow-btn-primary-active: inset 0 2px 6px rgba(0,0,0,0.65), inset 0 1px 2px rgba(0,0,0,0.45);
+
+  --shadow-btn-light:          0 1px 3px rgba(0,0,0,0.38), 0 0 0 0.5px rgba(255,255,255,0.04);
+  --shadow-btn-light-hover:    0 3px 12px rgba(0,0,0,0.52), 0 1px 4px rgba(0,0,0,0.34);
+  --shadow-btn-light-active:   inset 0 1px 5px rgba(0,0,0,0.48), 0 0 0 0.5px rgba(255,255,255,0.04);
+}
+
+/* ─── Reset & Base ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--c-ink);
+  background: var(--c-bg);
+  letter-spacing: -0.013em;
+}
+
+.dark body {
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+}
+
+::selection {
+  background: rgba(193, 18, 31, 0.12);
+  color: var(--c-ink);
+}
+
+.dark ::selection {
+  background: rgba(193, 18, 31, 0.25);
+  color: hsl(var(--foreground));
+}
+
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+
+/* ─── Typography ─────────────────────────────────────────────────────────── */
+
+/* ── Type scale — 5 sizes, applied consistently across all screens ───────── */
+/* label   11px  eyebrows, metadata, badges                                   */
+/* caption 12px  secondary info, timestamps                                   */
+/* ui      13px  card text, controls, list rows                               */
+/* body    15px  primary prose (use text-[15px] directly)                     */
+/* display serif var — headlines only (h1 / .display-heading)                 */
+.curi .text-label   { font-size: 11px !important; line-height: 1.45; }
+.curi .text-caption { font-size: 12px !important; line-height: 1.5;  }
+.curi .text-ui      { font-size: 13px !important; line-height: 1.5;  }
+
+/* Eyebrow — the canonical metadata label above headings */
+.curi .eyebrow {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.09em !important;
+  color: var(--c-ink-4) !important;
+}
+
+/* Display headings — serif by default, weight 300 for editorial elegance */
+.curi h1 {
+  font-family: var(--font-serif) !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.08 !important;
+  color: var(--c-ink);
+}
+
+.curi h2, .curi h3 {
+  color: var(--c-ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.curi .font-mono {
+  font-family: var(--font-mono) !important;
+}
+
+/* Display type scale */
+.curi [class*="text-9xl"],
+.curi [class*="text-8xl"] {
+  font-size: clamp(2.5rem, 6vw, 4.5rem) !important;
+  line-height: 0.95 !important;
+  letter-spacing: -0.03em !important;
+}
+
+.curi [class*="text-7xl"],
+.curi [class*="text-6xl"] {
+  font-size: clamp(2rem, 4.5vw, 3.5rem) !important;
+  line-height: 1.0 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.curi [class*="text-5xl"] {
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.curi [class*="text-4xl"] {
+  font-size: clamp(1.5rem, 2.5vw, 2rem) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.018em !important;
+}
+
+.curi [class*="text-3xl"] {
+  font-size: 1.375rem !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.014em !important;
+}
+
+.curi [class*="text-2xl"] {
+  font-size: 1.125rem !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.curi [class*="text-xl"] {
+  font-size: 1rem !important;
+  line-height: 1.4 !important;
+}
+
+/* Eyebrow / label text */
+.curi [class*="uppercase"][class*="tracking-"] {
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+/* ─── Color Overrides ────────────────────────────────────────────────────── */
+
+/* Backgrounds */
+.curi { background: var(--c-bg) !important; }
+
+.curi [class*="bg-[#FFFFFF]"],
+.curi [class*="bg-white"]:not([class*="bg-white/"]),
+.curi [class*="bg-white/"] { background-color: var(--c-surface) !important; }
+
+.curi [class*="bg-[#F7F7F8]"],
+.curi [class*="bg-[#F8FAFC]"],
+.curi [class*="bg-[#F9FAFB]"],
+.curi [class*="bg-[#F3F4F6]"] { background-color: var(--c-surface-soft) !important; }
+
+.curi [class*="bg-[#F0F7FF]"] { background-color: var(--c-blue-soft) !important; }
+
+.curi [class*="border-[#E8E4DC]"] { border-color: var(--c-line) !important; }
+
+.curi [class*="border-blue-200"] { border-color: color-mix(in srgb, var(--c-blue) 22%, var(--c-line)) !important; }
+
+/* Primary actions on buttons (legacy iOS blue #007AFF) → near-black */
+.curi button[class*="bg-[#007AFF]"],
+.curi button[class*="bg-[#0F172A]"],
+.curi button[class*="hover:bg-[#006EE6]"]:hover,
+.curi button[class*="hover:bg-[#1F2937]"]:hover {
+  background-color: var(--c-cta) !important;
+  color: var(--c-accent-fg) !important;
+}
+
+/* Text colors */
+.curi [class*="text-[#64748B]"],
+.curi [class*="text-[#94A3B8]"],
+.curi [class*="text-[#334155]"],
+.curi [class*="text-[#475569]"] { color: var(--c-ink-2) !important; }
+
+.curi [class*="text-[#007AFF]"],
+.curi [class*="hover:text-[#007AFF]"]:hover { color: var(--c-blue) !important; }
+
+.curi [class*="hover:border-[#007AFF]"]:hover { border-color: var(--c-blue) !important; }
+
+.curi [class*="text-[#0F172A]"],
+.curi [class*="text-[#1F2937]"],
+.curi [class*="text-[#111827]"],
+.curi [class*="text-[#202123]"] { color: var(--c-ink) !important; }
+
+.curi [class*="text-white"] { color: #FFFFFF !important; }
+
+/* Borders */
+.curi [class*="border-[#E5E7EB]"],
+.curi [class*="border-[#DDE3EA]"],
+.curi [class*="border-[#D1D5DB]"],
+.curi [class*="border-white"],
+.curi [class*="border-y"],
+.curi [class*="border-b"],
+.curi [class*="border-t"],
+.curi [class*="border-l"],
+.curi [class*="border-r"],
+.curi [class*="border-x"] { border-color: var(--c-line) !important; }
+
+.curi [class*="border-[#007AFF]"] { border-color: var(--c-blue) !important; }
+
+.curi [class*="border-[#007AFF]/25"] {
+  border-color: color-mix(in srgb, var(--c-blue) 25%, transparent) !important;
+}
+
+.curi [class*="border-[#007AFF]/40"] {
+  border-color: color-mix(in srgb, var(--c-blue) 40%, transparent) !important;
+}
+
+.curi [class*="border-[#007AFF]/45"] {
+  border-color: color-mix(in srgb, var(--c-blue) 45%, transparent) !important;
+}
+
+.curi [class*="text-[#1C1917]"] { color: var(--c-ink) !important; }
+
+.curi [class*="bg-[#1C1917]"] {
+  background-color: var(--c-cta) !important;
+  color: var(--c-accent-fg) !important;
+}
+
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+.curi {
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+}
+
+.dark .curi {
+  color: hsl(var(--foreground));
+}
+
+.curi .app-frame {
+  background: var(--c-bg) !important;
+  animation: page-enter var(--dur-slow) var(--ease-spring) both;
+}
+
+/* ─── Sidebar ────────────────────────────────────────────────────────────── */
+/* ─── Sidebar ────────────────────────────────────────────────────────────── */
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.curi aside.sidebar {
+  background: var(--c-sidebar) !important;
+  border-right: 1px solid var(--c-line) !important;
+  width: 84px !important;
+  min-width: 84px !important;
+  max-width: 84px !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.curi aside.sidebar .sidebar-brand-mark {
+  background: transparent !important;
+  color: var(--c-ink) !important;
+  border-radius: var(--r-md) !important;
+  box-shadow: none !important;
+}
+
+/* Let JSX control padding/layout — only reset cosmetics */
+.curi aside.sidebar button {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition:
+    background var(--dur-fast) ease,
+    color var(--dur-fast) ease !important;
+}
+
+.curi aside.sidebar button:hover {
+  transform: none !important;
+}
+
+.curi aside.sidebar button:active {
+  transform: scale(0.97) !important;
+}
+
+/* ─── Header (mobile) ────────────────────────────────────────────────────── */
+.curi header {
+  background: color-mix(in srgb, var(--c-bg) 82%, transparent) !important;
+  border-bottom: 1px solid var(--c-line) !important;
+  backdrop-filter: saturate(1.2) blur(10px) !important;
+  -webkit-backdrop-filter: saturate(1.2) blur(10px) !important;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+}
+
+/* Landing page — fully transparent, no border, no blur */
+.curi header.header-landing {
+  background: transparent !important;
+  border-bottom: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* ─── Buttons (legacy non–shadcn controls only) ──────────────────────────── */
+.curi button:not([data-slot="button"]) {
+  box-shadow: none !important;
+  font-weight: 500;
+  transition:
+    background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
+    color var(--dur-fast) ease,
+    opacity var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease,
+    transform var(--dur-fast) var(--ease-spring) !important;
+}
+
+.curi button:not([data-slot="button"]):hover:not(:disabled):not(.no-lift) {
+  transform: none !important;
+  box-shadow: var(--shadow-xs) !important;
+}
+
+.curi button:not([data-slot="button"]):active:not(:disabled) {
+  transform: translateY(0) scale(0.985) !important;
+}
+
+/* Primary button (dark bg) */
+.curi button[class*="bg-[#007AFF]"],
+.curi button[class*="bg-[#0F172A]"] {
+  background: var(--c-cta) !important;
+  color: var(--c-accent-fg) !important;
+  border: none !important;
+}
+
+.curi button[class*="bg-[#007AFF]"]:hover,
+.curi button[class*="bg-[#0F172A]"]:hover {
+  background: var(--c-cta-hover) !important;
+}
+
+/* Accent fills on non-buttons (progress, stepper, badges) */
+.curi [class*="bg-[#007AFF]"]:not(button) {
+  background-color: var(--c-blue) !important;
+}
+
+/* ─── Focus Rings ────────────────────────────────────────────────────────── */
+.curi button:not([data-slot="button"]):focus-visible,
+.curi input:not([data-slot="input"]):focus-visible,
+.curi textarea:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--c-bg), 0 0 0 4px var(--c-blue) !important;
+}
+
+/* ─── Inputs ─────────────────────────────────────────────────────────────── */
+.curi input:not([data-slot="input"]),
+.curi textarea {
+  font-family: var(--font-sans) !important;
+  background: var(--c-surface) !important;
+  border: 1px solid var(--c-line) !important;
+  border-radius: var(--r-lg) !important;
+  color: var(--c-ink) !important;
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease !important;
+}
+
+.curi input:not([data-slot="input"]):hover,
+.curi textarea:hover {
+  border-color: var(--c-line-strong) !important;
+}
+
+.curi input:not([data-slot="input"]):focus,
+.curi textarea:focus {
+  border-color: var(--c-blue) !important;
+  box-shadow: 0 0 0 3px var(--c-blue-muted) !important;
+}
+
+.curi input:not([data-slot="input"])::placeholder,
+.curi textarea::placeholder {
+  color: var(--c-ink-4) !important;
+}
+
+.curi .modern-input {
+  background: var(--c-surface) !important;
+  border-color: var(--c-line) !important;
+}
+
+.curi .modern-input:focus {
+  border-color: var(--c-blue) !important;
+  box-shadow: 0 0 0 3px var(--c-blue-muted) !important;
+}
+
+/* Streak toast */
+.curi .streak-toast {
+  box-shadow: var(--shadow-lg) !important;
+  border-color: var(--c-line) !important;
+}
+
+/* ─── Cards & Surfaces ───────────────────────────────────────────────────── */
+
+/* Cards — subtle lift depth */
+.curi [data-slot="card"] {
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow 200ms var(--ease-out);
+}
+
+/* Tighten default Card padding */
+.curi [data-slot="card-header"] {
+  padding-top: 1.25rem;
+  padding-bottom: 0.5rem;
+}
+
+.curi [data-slot="card-content"] {
+  padding-bottom: 1.25rem;
+}
+
+/* Hover rows — consistent flat-list hover used in sidebar and list screens */
+.curi .hover-row {
+  transition: background-color var(--dur-fast) ease;
+}
+.curi .hover-row:hover {
+  background-color: hsl(var(--muted));
+}
+
+/* Rounded values pass through from Tailwind — no override needed */
+
+/* ─── Icons ──────────────────────────────────────────────────────────────── */
+.curi svg {
+  stroke-width: 1.5;
+}
+
+/* ─── Section spacing ────────────────────────────────────────────────────── */
+.curi section[class*="py-20"],
+.curi section[class*="py-14"],
+.curi section[class*="py-12"],
+.curi section[class*="py-10"] {
+  padding-top: 2.5rem !important;
+  padding-bottom: 2.5rem !important;
+}
+
+.curi [class*="gap-20"] { gap: 2.5rem !important; }
+.curi [class*="gap-16"] { gap: 2rem !important; }
+.curi [class*="mb-20"], .curi [class*="mb-16"] { margin-bottom: 2rem !important; }
+.curi [class*="pb-16"], .curi [class*="pb-14"] { padding-bottom: 2rem !important; }
+
+/* ─── Progress bars ──────────────────────────────────────────────────────── */
+.curi [class*="bg-[#111827]"][class*="h-full"] {
+  background: var(--c-ink) !important;
+  border-radius: var(--r-pill) !important;
+  transition: width 600ms var(--ease-spring) !important;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+.curi ::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.curi ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.curi ::-webkit-scrollbar-thumb {
+  background: var(--c-line-strong);
+  border-radius: var(--r-pill);
+}
+
+.curi ::-webkit-scrollbar-thumb:hover {
+  background: var(--c-ink-3);
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+
+/* Page enter */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Screen/section enter */
+@keyframes section-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    /* No transform here — fill-mode:both would retain translateY(0) which
+       still creates a fixed-positioning containing block. Omitting it lets
+       the element settle to transform:none so position:fixed children work. */
+  }
+}
+
+/* Stagger list items */
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sidebar slide in */
+@keyframes sidebar-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Subtle pulse for loading states */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* Streak moment pop */
+@keyframes streak-pop {
+  0% { opacity: 0; transform: translateY(12px) scale(0.92); }
+  60% { opacity: 1; transform: translateY(-4px) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Screen content enter — opt-in to avoid animating every nested block */
+.curi .curi-animate-in {
+  animation: section-enter var(--dur-base) var(--ease-spring) both;
+}
+
+/* Landing topic field — borderless; exempt from global input chrome via data-slot="input" */
+.curi .landing-page .landing-topic-input {
+  width: 100%;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.curi .landing-page .landing-topic-input:hover,
+.curi .landing-page .landing-topic-input:focus,
+.curi .landing-page .landing-topic-input:focus-visible {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Landing — soft ambient + staggered copy */
+.curi .landing-page .landing-ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.curi .landing-ambient-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  opacity: 0.38;
+  will-change: transform;
+}
+
+.curi .landing-ambient-blob-a {
+  width: min(440px, 75vw);
+  height: min(440px, 75vw);
+  top: -14%;
+  right: -10%;
+  background: hsl(var(--primary) / 0.2);
+  animation: landing-drift-a 22s ease-in-out infinite;
+}
+
+.curi .landing-ambient-blob-b {
+  width: min(380px, 65vw);
+  height: min(380px, 65vw);
+  bottom: -12%;
+  left: -14%;
+  background: hsl(0 0% 72% / 0.35);
+  animation: landing-drift-b 28s ease-in-out infinite;
+}
+
+@keyframes landing-drift-a {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  40% {
+    transform: translate(-5%, 6%) scale(1.07);
+  }
+  72% {
+    transform: translate(3%, -4%) scale(0.98);
+  }
+}
+
+@keyframes landing-drift-b {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  48% {
+    transform: translate(6%, -5%) scale(1.06);
+  }
+  78% {
+    transform: translate(-4%, 4%) scale(0.96);
+  }
+}
+
+.curi .landing-stack > * {
+  animation: stagger-in 0.58s var(--ease-spring) both;
+}
+
+.curi .landing-stack > *:nth-child(1) {
+  animation-delay: 0.04s;
+}
+
+.curi .landing-stack > *:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.curi .landing-stack > *:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.curi .landing-stack > *:nth-child(4) {
+  animation-delay: 0.22s;
+}
+
+/* Onboarding — light stagger */
+.curi .onboarding-page .onboarding-stack > * {
+  animation: stagger-in 0.52s var(--ease-spring) both;
+}
+
+.curi .onboarding-page .onboarding-stack > *:nth-child(1) {
+  animation-delay: 0.02s;
+}
+
+.curi .onboarding-page .onboarding-stack > *:nth-child(2) {
+  animation-delay: 0.06s;
+}
+
+.curi .onboarding-page .onboarding-stack > *:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.curi .onboarding-page .onboarding-stack > *:nth-child(4) {
+  animation-delay: 0.14s;
+}
+
+.curi .onboarding-page .onboarding-stack > *:nth-child(5) {
+  animation-delay: 0.18s;
+}
+
+.curi .landing-stack > *:nth-child(5) {
+  animation-delay: 0.28s;
+}
+
+.curi .landing-stack > *:nth-child(6) {
+  animation-delay: 0.34s;
+}
+
+@keyframes landing-idea-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.curi .landing-headline-cycle {
+  display: inline-block;
+  min-width: 0.25em;
+  animation: landing-idea-in 0.55s var(--ease-spring) both;
+}
+
+.curi .landing-idea-rotator {
+  animation: landing-idea-in 0.48s var(--ease-spring) both;
+}
+
+@keyframes landing-chip-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes landing-chip-hover-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.curi .landing-chip-suggest {
+  animation:
+    landing-chip-enter 0.45s var(--ease-spring) both,
+    landing-chip-hover-drift 4s ease-in-out infinite;
+  animation-delay: 0s, var(--landing-chip-drift, 0s);
+}
+
+@keyframes landing-pill-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.curi .landing-pill-enter {
+  opacity: 0;
+  animation: landing-pill-in 0.52s var(--ease-spring) forwards;
+}
+
+@keyframes landing-icon-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.curi .landing-icon-float {
+  animation: landing-icon-float 5s ease-in-out infinite;
+}
+
+/* Sidebar enter — single smooth slide-in */
+.curi aside.sidebar {
+  animation: sidebar-enter 320ms var(--ease-spring) both;
+}
+
+/* Course detail — current lesson node pulse */
+@keyframes lesson-node-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--foreground) / 0.18); }
+  50%       { box-shadow: 0 0 0 5px hsl(var(--foreground) / 0); }
+}
+.curi .lesson-node-current {
+  animation: lesson-node-pulse 2.2s ease-in-out infinite;
+}
+
+/* Dashboard — today's lesson card (magazine / ruled paper; not a stat tile) */
+.curi .lesson-read-card {
+  position: relative;
+  isolation: isolate;
+  border-width: 2px;
+  border-color: hsl(218 72% 46% / 0.22);
+  box-shadow:
+    inset 5px 0 0 0 hsl(218 72% 46% / 0.32),
+    0 4px 28px rgba(42, 36, 30, 0.08);
+  background-color: hsl(var(--card));
+  background-image:
+    linear-gradient(168deg, hsl(218 72% 46% / 0.08) 0%, transparent 38%),
+    repeating-linear-gradient(
+      180deg,
+      hsl(var(--card)) 0,
+      hsl(var(--card)) 26px,
+      hsl(var(--foreground) / 0.045) 26px,
+      hsl(var(--foreground) / 0.045) 27px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 13px,
+      hsl(var(--foreground) / 0.028) 13px,
+      hsl(var(--foreground) / 0.028) 14px
+    );
+}
+
+.curi .lesson-read-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.curi .lesson-read-card .lesson-read-card__footer {
+  background: hsl(var(--muted) / 0.35);
+  backdrop-filter: blur(6px);
+}
+
+/* ─── Miscellaneous ──────────────────────────────────────────────────────── */
+
+/* Strip uppercase transforms from non-eyebrow contexts */
+.curi [class*="uppercase"]:not([class*="tracking-"]) {
+  text-transform: none !important;
+}
+
+/* Disabled state */
+.curi [disabled],
+.curi button:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+}
+
+/* ─── Landing eyebrow pulse dot ─────────────────────────────────────────── */
+@keyframes landing-pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 hsl(354 89% 44% / 0.4); }
+  50% { opacity: 0.55; box-shadow: 0 0 0 4px hsl(354 89% 44% / 0); }
+}
+
+.curi .landing-pulse-dot {
+  animation: landing-pulse-dot 2.4s ease-in-out infinite;
+}
+
+/* ─── Landing value-prop strip stagger ───────────────────────────────────── */
+.curi .landing-trust > * {
+  animation: stagger-in 0.55s var(--ease-spring) both;
+}
+.curi .landing-trust > *:nth-child(1) { animation-delay: 0.26s; }
+.curi .landing-trust > *:nth-child(2) { animation-delay: 0.32s; }
+.curi .landing-trust > *:nth-child(3) { animation-delay: 0.38s; }
+
+/* ─── Library accordion (grid-template-rows height animation) ────────────── */
+.curi .lib-accordion {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition:
+    grid-template-rows 240ms var(--ease-spring),
+    opacity 160ms ease;
+  opacity: 0;
+}
+
+.curi .lib-accordion.open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.curi .lib-accordion > * {
+  overflow: hidden;
+}
+
+
+/* ─── Dot-grid ambient texture (landing + onboarding pages) ─────────────── */
+.curi .dot-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle, hsl(var(--foreground) / 0.05) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: radial-gradient(ellipse 80% 85% at 50% 50%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 85% at 50% 50%, black 40%, transparent 100%);
+}
+
+/* App-wide subtle dot texture (test) */
+.curi .app-frame > .curi-animate-in {
+  background-color: transparent;
+  background-image: radial-gradient(circle, hsl(0 0% 5% / 0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* ─── Onboarding step slide-in ──────────────────────────────────────────── */
+@keyframes step-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.curi .onboarding-step-enter {
+  animation: step-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ─── Generation warmup animations ─────────────────────────────────────── */
+
+/* Radial pulse ring */
+@keyframes gen-pulse {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.1); opacity: 0.6; }
+}
+.curi .generating-pulse {
+  animation: gen-pulse 1.8s ease-in-out infinite;
+}
+
+/* Sparkle icon slow spin + breathe */
+@keyframes gen-sparkle {
+  0%   { transform: rotate(0deg)   scale(1); }
+  25%  { transform: rotate(8deg)   scale(1.08); }
+  50%  { transform: rotate(0deg)   scale(1); }
+  75%  { transform: rotate(-8deg)  scale(1.08); }
+  100% { transform: rotate(0deg)   scale(1); }
+}
+.curi .generating-sparkle {
+  animation: gen-sparkle 2.4s ease-in-out infinite;
+}
+
+/* Status message fade-swap */
+@keyframes gen-msg-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.curi .generating-msg {
+  animation: gen-msg-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Indeterminate bar slide */
+@keyframes gen-bar-breathe {
+  0%   { transform: translateX(-100%) scaleX(0.4); }
+  50%  { transform: translateX(60%)  scaleX(1.2); }
+  100% { transform: translateX(200%) scaleX(0.4); }
+}
+.curi .generating-bar-breathe {
+  width: 50%;
+  animation: gen-bar-breathe 1.6s ease-in-out infinite;
+  transform-origin: left;
+}
+
+/* Lesson row pop-in as it arrives */
+@keyframes lesson-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+.curi .lesson-reveal {
+  animation: lesson-pop 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Blurb fades in just after the title */
+.curi .lesson-blurb {
+  animation: lesson-pop 0.36s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+}
+
+/* Outline container: subtle left accent on the active/just-revealed row */
+.curi .lesson-row-live {
+  position: relative;
+}
+.curi .lesson-row-live::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 99px;
+  background: hsl(var(--foreground) / 0.18);
+}
+
+/* ─── Course preview modal ───────────────────────────────────────────────── */
+@keyframes preview-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.curi .course-preview-backdrop {
+  animation: preview-backdrop-in 0.22s ease both;
+}
+
+@keyframes preview-sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.curi .course-preview-panel {
+  animation: preview-sheet-up 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (min-width: 640px) {
+  @keyframes preview-scale-in {
+    from { opacity: 0; transform: scale(0.96) translateY(6px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0); }
+  }
+  .curi .course-preview-panel {
+    animation: preview-scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+/* ─── Audio player bar ───────────────────────────────────────────────────── */
+@keyframes audio-player-in {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.curi .audio-player {
+  animation: audio-player-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ─── Lesson complete modal ──────────────────────────────────────────────── */
+@keyframes lesson-complete-in {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.curi .lesson-complete-modal {
+  animation: lesson-complete-in 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ─── Sources panel slide-in ─────────────────────────────────────────────── */
+@keyframes sources-panel-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+.curi .sources-panel {
+  animation: sources-panel-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ─── Landing suggestion gallery progress bar ───────────────────────────── */
+@keyframes landing-card-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.curi .landing-card-progress {
+  transform-origin: left;
+  animation: landing-card-progress 5.2s linear forwards;
+}
+
+/* ─── Flash Card Flip ────────────────────────────────────────────────────── */
+.card-scene {
+  perspective: 900px;
+}
+.card-inner {
+  position: relative;
+  width: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.card-inner.flipped {
+  transform: rotateY(180deg);
+}
+.card-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.card-back-face {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* ─── Fraunces variable-font settings ───────────────────────────────────── */
+/* Brand §5.2: SOFT controls optical roundness, WONK enables optical quirks   */
+.curi .font-serif {
+  font-variation-settings: 'SOFT' 40, 'WONK' 1;
+  font-weight: 400;
+}
+/* Hero / section headlines — weight 300, SOFT 60-80 */
+.curi h1.font-serif,
+.curi .display-heading {
+  font-weight: 300;
+  font-variation-settings: 'opsz' 52, 'SOFT' 60, 'WONK' 1;
+}
+/* Card titles and sub-heads — weight 400, SOFT 40 */
+.curi h2.font-serif,
+.curi h3.font-serif {
+  font-weight: 400;
+  font-variation-settings: 'SOFT' 40, 'WONK' 1;
+}
+
+/* ─── Sidebar wordmark colour fix ────────────────────────────────────────── */
+.curi aside.sidebar {
+  background: var(--c-sidebar) !important;
+}
+
+/* Border-radius uses Tailwind values — no global override */
+
+/* ─── Audio waveform bars (LessonFeedCard listen button) ────────────────── */
+@keyframes audioBar {
+  0%, 100% { transform: scaleY(0.4); }
+  50%       { transform: scaleY(1);   }
+}
+
+/* ─── Depth Utilities ────────────────────────────────────────────────────── */
+/* These classes encode multi-state depth (rest → hover → active) using the   */
+/* shadow tokens above. Apply them on top of Tailwind variant classes.         */
+
+/* Primary button — dark/brand bg */
+.depth-btn-primary {
+  box-shadow: var(--shadow-btn-primary);
+}
+.depth-btn-primary:hover:not(:disabled) {
+  box-shadow: var(--shadow-btn-primary-hover);
+  transform: translateY(-0.5px);
+}
+.depth-btn-primary:active:not(:disabled) {
+  box-shadow: var(--shadow-btn-primary-active);
+  transform: translateY(0.5px) scale(0.985);
+}
+.depth-btn-primary:disabled {
+  box-shadow: none !important;
+}
+
+/* Light button — outline, secondary */
+.depth-btn-light {
+  box-shadow: var(--shadow-btn-light);
+}
+.depth-btn-light:hover:not(:disabled) {
+  box-shadow: var(--shadow-btn-light-hover);
+  transform: translateY(-0.5px);
+}
+.depth-btn-light:active:not(:disabled) {
+  box-shadow: var(--shadow-btn-light-active);
+  transform: translateY(0.5px) scale(0.985);
+}
+.depth-btn-light:disabled {
+  box-shadow: none !important;
+}
+
+/* Input — sunken well effect */
+.depth-input {
+  box-shadow: var(--shadow-inset-xs);
+}
+.depth-input:hover:not(:disabled):not(:focus):not(:focus-visible) {
+  box-shadow: var(--shadow-inset-sm);
+}
+.depth-input:focus,
+.depth-input:focus-visible {
+  box-shadow: var(--shadow-inset-xs), 0 0 0 3px hsl(var(--ring) / 0.14);
+}
+
+/* Surface — subtle card lift */
+.depth-surface {
+  box-shadow: var(--shadow-lift-xs);
+}
+
+/* Track — sunken container (tab lists, toggle tracks) */
+.depth-track {
+  box-shadow: var(--shadow-inset-sm);
+}
+
+/* ─── Reduced Motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .curi *,
+  .curi *::before,
+  .curi *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

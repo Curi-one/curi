@@ -1,0 +1,17 @@
+---
+description: TDD workflow for Curi — tests before implementation
+globs: "**/*.{ts,tsx,test.ts,spec.ts}"
+alwaysApply: false
+---
+
+# Curi TDD
+
+Follow `docs/TDD.md`.
+
+1. Write failing test describing behaviour (domain, API, or component).
+2. Implement minimum code to pass.
+3. Refactor; keep green.
+
+Mock Perplexity and Supabase in unit tests. Every bugfix adds a regression test. PR must pass `pnpm test`.
+
+Domain priorities: streak, due/done today, plan limits, clarify depth bands, idempotent quiz completion.

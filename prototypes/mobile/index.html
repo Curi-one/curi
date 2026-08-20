@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Curi · phone mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #FFFFFF;
+      --ink: #0D0D0D;
+      --ink-2: #2A2A2A;
+      --ink-3: #666666;
+      --ink-4: #A3A3A3;
+      --surface: #FAFAFA;
+      --soft: #F5F5F5;
+      --line: #E2E2E2;
+      --vermilion: #C1121F;
+      --amber: #D97706;
+      --font-serif: "Fraunces", Georgia, serif;
+      --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --r: 16px;
+      --tab-h: 80px;
+      --bar-h: 44px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background: #EBEBEB;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, textarea { font-family: inherit; }
+    button { cursor: pointer; border: 0; background: none; color: inherit; touch-action: manipulation; }
+    button:disabled { cursor: default; }
+    ::selection { background: rgba(193,18,31,.12); }
+
+    .stage {
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+      gap: 32px;
+      padding: 28px 36px;
+      align-items: center;
+    }
+    .rail {
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 4px 16px;
+    }
+    .wordmark { position: relative; display: inline-block; font-family: var(--font-serif); font-weight: 300; font-size: 28px; letter-spacing: -0.03em; line-height: 1; }
+    .wordmark em { font-style: italic; }
+    .wordmark::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 3px; background: var(--vermilion); }
+    .rail h2 { margin: 28px 0 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-4); }
+    .rail p.lede { margin: 14px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--ink-3); max-width: 26ch; }
+    .flow-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+    .flow-list button {
+      width: 100%; text-align: left; padding: 8px 10px; border-radius: 10px;
+      font-size: 13px; color: var(--ink-2);
+    }
+    .flow-list button:hover { background: #fff; }
+    .flow-list button b { display: block; font-weight: 600; }
+    .flow-list button span { color: var(--ink-4); font-size: 11.5px; }
+    .rail-foot { margin-top: auto; display: grid; gap: 8px; }
+    .ghost {
+      border: 1px solid var(--line); background: #fff; border-radius: 999px;
+      padding: 10px 14px; font-size: 13px; font-weight: 500;
+    }
+    .phone-wrap { display: flex; justify-content: center; }
+
+    .phone {
+      width: 390px; height: 844px; background: #111; border-radius: 54px;
+      padding: 10px; box-shadow: 0 40px 80px rgba(0,0,0,.18), 0 2px 0 rgba(255,255,255,.4) inset;
+      position: relative;
+    }
+    .bezel {
+      height: 100%; background: var(--bg); border-radius: 44px; overflow: hidden;
+      position: relative; display: flex; flex-direction: column;
+    }
+    .island {
+      position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+      width: 118px; height: 34px; background: #0D0D0D; border-radius: 20px; z-index: 40;
+    }
+    .status {
+      height: 54px; padding: 16px 22px 0; display: flex; justify-content: space-between; align-items: flex-start;
+      font-size: 12px; font-weight: 600; letter-spacing: -0.02em; flex-shrink: 0; z-index: 30;
+    }
+    .status .sig { display: flex; gap: 6px; align-items: center; opacity: .7; }
+    .status svg { display: block; }
+
+    .app { flex: 1; min-height: 0; position: relative; background: var(--bg); }
+    .view {
+      position: absolute; inset: 0; display: none; flex-direction: column;
+      overflow: hidden; background: var(--bg);
+    }
+    .view.on { display: flex; }
+    .view.push { animation: push-in .42s var(--ease); }
+    .view.pop { animation: pop-in .38s var(--ease); }
+    .view.fade { animation: fade-in .28s ease; }
+    .scroll { flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; }
+    .scroll::-webkit-scrollbar { display: none; }
+    .pad { padding: 4px 22px 32px; }
+    .pad-tab { padding-bottom: calc(var(--tab-h) + 12px); }
+
+    @keyframes push-in { from { transform: translateX(18%); opacity: .35; } to { transform: none; opacity: 1; } }
+    @keyframes pop-in { from { transform: translateX(-10%); opacity: .5; } to { transform: none; opacity: 1; } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      .view.push, .view.pop, .view.fade, .toast, .sheet-card { animation: none !important; }
+    }
+
+    .topbar {
+      flex-shrink: 0; height: var(--bar-h); display: grid;
+      grid-template-columns: 1fr auto 1fr; align-items: center;
+      padding: 0 8px; background: var(--bg);
+    }
+    .topbar.lined { border-bottom: 1px solid var(--line); }
+    .back-hit {
+      justify-self: start; display: flex; align-items: center; gap: 2px;
+      min-height: 44px; padding: 0 8px 0 4px; font-size: 15px; color: var(--ink);
+    }
+    .back-hit svg { width: 22px; height: 22px; }
+    .back-hit span { font-weight: 400; color: var(--ink-3); font-size: 15px; }
+    .top-title {
+      font-size: 15px; font-weight: 600; letter-spacing: -0.02em;
+      text-align: center; max-width: 58vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .top-trail { justify-self: end; display: flex; align-items: center; gap: 4px; min-height: 44px; padding-right: 6px; }
+    .icon-btn {
+      width: 36px; height: 36px; display: grid; place-items: center; color: var(--ink-3); border-radius: 50%;
+    }
+
+    .mast { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 6px 0 18px; }
+    .mast h1 { font-size: 34px; }
+
+    .tabbar {
+      position: absolute; left: 0; right: 0; bottom: 0; height: var(--tab-h);
+      background: rgba(255,255,255,.94); backdrop-filter: blur(20px);
+      border-top: 1px solid var(--line); display: none; z-index: 20;
+      padding: 8px 28px 22px; grid-template-columns: repeat(3, 1fr);
+    }
+    .tabbar.show { display: grid; }
+    .tab {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 500; letter-spacing: 0.02em; color: var(--ink-4); position: relative;
+    }
+    .tab svg, .go svg, .back svg, .listen svg, .pulse-ring svg, .toast svg, .ico svg, .icon-btn svg, .row svg, .chev {
+      width: 18px; height: 18px; display: block;
+    }
+    .tab svg { width: 22px; height: 22px; }
+    .pulse-ring svg { width: 28px; height: 28px; }
+    .tab.on { color: var(--ink); }
+    .tab.on::after {
+      content: ""; position: absolute; bottom: -7px; width: 18px; height: 2px;
+      background: var(--vermilion);
+    }
+
+    .dock {
+      flex-shrink: 0; padding: 12px 22px 18px;
+      background: var(--bg); border-top: 1px solid var(--line);
+    }
+
+    .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-4); }
+    .serif { font-family: var(--font-serif); font-weight: 300; letter-spacing: -0.03em; }
+    h1.serif { font-size: 34px; line-height: 1.08; margin: 0; font-variation-settings: "SOFT" 50, "WONK" 1; }
+    h2.serif { font-size: 26px; line-height: 1.12; margin: 0; font-weight: 300; }
+    .muted { color: var(--ink-3); }
+    .tiny { font-size: 12px; color: var(--ink-4); }
+    .body { font-size: 15px; line-height: 1.65; color: var(--ink-2); }
+    .cursor { display: inline-block; width: 2px; height: .82em; background: var(--vermilion); vertical-align: middle; margin-left: 1px; }
+
+    .topic-box {
+      display: flex; align-items: center; gap: 10px; background: var(--surface);
+      border-radius: 18px; padding: 12px 12px 12px 18px;
+    }
+    .topic-box input {
+      flex: 1; border: 0; background: transparent; font-size: 16px; outline: none; min-width: 0;
+    }
+    .topic-box input::placeholder { color: #C4C4C4; }
+    .go {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: #fff;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .go:disabled { opacity: .18; }
+
+    .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 6px; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0; padding: 8px 14px; border-radius: 999px; background: rgba(13,13,13,.04);
+      font-size: 13px; color: var(--ink-3);
+    }
+    .chip:active { transform: scale(.97); }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px 14px; }
+    .pill-row span { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-4); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--vermilion); display: inline-block; }
+
+    .steps { display: flex; align-items: center; gap: 6px; }
+    .steps i { display: block; height: 6px; width: 12px; border-radius: 99px; background: var(--line); }
+    .steps i.on { width: 32px; background: var(--ink); }
+    .steps i.done { background: rgba(13,13,13,.28); }
+
+    .choice {
+      border: 0; background: transparent; border-bottom: 1px solid var(--line);
+      padding: 16px 4px; text-align: left; font-size: 16px; font-weight: 500; line-height: 1.35;
+      width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .choice.on { color: var(--ink); }
+    .choice .ck {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--ink); color: #fff; display: none; place-items: center; font-size: 11px; flex-shrink: 0;
+    }
+    .choice.on .ck { display: grid; }
+    .choice.block { display: block; }
+    .choice.block .ck { float: right; margin-top: 2px; }
+    .grid2 { display: grid; grid-template-columns: 1fr; gap: 0; }
+    .stack { display: grid; gap: 0; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--ink); color: #fff; border-radius: 999px; padding: 15px 20px;
+      font-size: 15px; font-weight: 600; width: 100%;
+    }
+    .btn:disabled { opacity: .28; }
+    .btn.light { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .btn.ghost { background: transparent; color: var(--ink-3); width: auto; padding: 8px 0; font-weight: 500; }
+    .row-btns { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: auto; padding-top: 18px; }
+
+    .nav-mini { display: flex; align-items: center; justify-content: space-between; min-height: 36px; margin-bottom: 8px; }
+    .back { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-3); }
+
+    .u-tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+    .u-tabs button {
+      padding: 8px 0 12px; font-size: 15px; font-weight: 500; color: var(--ink-4); position: relative;
+    }
+    .u-tabs button.on { color: var(--ink); }
+    .u-tabs button.on::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--vermilion);
+    }
+
+    .row {
+      display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+      padding: 16px 0; border-bottom: 1px solid var(--line);
+    }
+    .row .grow { flex: 1; min-width: 0; }
+    .row b { font-weight: 600; font-size: 15px; }
+    .chev { color: var(--ink-4); flex-shrink: 0; width: 16px; height: 16px; }
+
+    .path-kicker { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-4); margin: 22px 0 0; }
+    .path-kicker:first-of-type { margin-top: 4px; }
+    .done-row { opacity: .55; }
+
+    .pulse-ring {
+      width: 88px; height: 88px; border-radius: 50%; border: 1px solid rgba(13,13,13,.12);
+      background: rgba(13,13,13,.04); display: grid; place-items: center; margin: 0 auto;
+      animation: breathe 1.6s ease-in-out infinite;
+    }
+    @keyframes breathe { 50% { transform: scale(1.04); } }
+    .breathe-bar { height: 3px; width: 140px; border-radius: 99px; background: var(--soft); overflow: hidden; margin: 0 auto; }
+    .breathe-bar span { display: block; height: 100%; width: 40%; background: var(--ink); animation: slide 1.2s ease-in-out infinite; }
+    @keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(280%); } }
+
+    .path-card { overflow: hidden; background: #fff; }
+    .lesson-row {
+      display: flex; gap: 12px; padding: 16px 0; border-top: 1px solid var(--line); text-align: left; width: 100%;
+    }
+    .lesson-row .n { font-family: var(--font-serif); width: 22px; color: var(--ink-4); font-size: 13px; padding-top: 2px; }
+    .lesson-row .t { font-family: var(--font-serif); font-size: 16px; line-height: 1.25; }
+    .lesson-row .b { font-size: 12px; color: var(--ink-3); margin-top: 4px; line-height: 1.4; }
+    .lesson-row.dim { opacity: .32; }
+    .lesson-row.live { background: var(--surface); }
+    .skel { height: 12px; background: var(--soft); border-radius: 4px; }
+
+    .guest-steps { margin: 4px 0 22px; }
+    .guest-track { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+    .guest-track i { height: 2px; background: var(--line); display: block; }
+    .guest-track i.on { background: var(--ink); }
+    .guest-labs { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--ink-4); letter-spacing: 0.04em; }
+    .guest-labs .on { color: var(--ink); font-weight: 600; }
+
+    .read-bar { position: absolute; top: 54px; left: 0; height: 2px; background: var(--vermilion); width: 0; z-index: 25; }
+    .drop { float: left; font-family: var(--font-serif); font-size: 62px; line-height: .78; margin: 6px 10px 0 0; }
+    .pull { border-left: 2px solid var(--vermilion); background: var(--surface); padding: 14px 16px; margin: 20px 0; }
+    .eq {
+      background: var(--ink); color: #fff; border-radius: 16px; padding: 18px 16px; margin: 18px 0;
+      font-family: var(--font-mono); font-size: 13px; letter-spacing: -0.02em;
+    }
+    .take { display: flex; gap: 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2); margin-top: 14px; }
+    .take b { font-family: var(--font-serif); font-size: 20px; color: var(--vermilion); font-weight: 400; line-height: 1; }
+
+    .sticky-cta { display: none; }
+
+    .q-opt {
+      width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line);
+      padding: 16px 2px; font-size: 16px; display: flex; gap: 14px; align-items: center; min-height: 56px;
+    }
+    .q-opt.on { color: var(--ink); }
+    .q-opt .ltr { font-family: var(--font-mono); font-size: 12px; color: var(--ink-4); width: 18px; }
+    .q-opt.on .ltr { color: var(--vermilion); }
+
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: 13px; font-weight: 500; }
+    .field input {
+      height: 48px; border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; font-size: 16px; outline: none;
+      background: var(--surface);
+    }
+    .field input:focus { border-color: rgba(13,13,13,.35); background: #fff; }
+    .otp { display: flex; gap: 6px; justify-content: space-between; }
+    .otp input {
+      width: 44px; height: 52px; text-align: center; font-size: 20px; font-family: var(--font-mono);
+      border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+    }
+
+    .ritual { padding: 0 0 18px; }
+    .hero-lesson { width: 100%; text-align: left; padding: 0; background: transparent; }
+    .bar { height: 2px; background: var(--soft); overflow: hidden; }
+    .bar > i { display: block; height: 100%; background: var(--ink); }
+    .card { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 16px 0; background: transparent; text-align: left; width: 100%; }
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .stat-row div { padding: 16px 8px 16px 0; }
+    .stat-row div + div { border-left: 1px solid var(--line); padding-left: 18px; }
+    .stat-row .n { font-family: var(--font-serif); font-size: 36px; letter-spacing: -0.04em; line-height: 1; }
+
+    .seg { display: flex; gap: 6px; }
+    .seg button { padding: 7px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; background: var(--soft); color: var(--ink-3); }
+    .seg button.on { background: var(--ink); color: #fff; }
+
+    .search {
+      height: 44px; width: 100%; border-radius: 16px; background: var(--soft); border: 1px solid transparent;
+      padding: 0 14px 0 40px; font-size: 14px; outline: none;
+    }
+    .search-wrap { position: relative; }
+    .search-wrap svg { position: absolute; left: 14px; top: 14px; color: var(--ink-4); width: 16px; height: 16px; }
+
+    .path-tile { text-align: left; width: 100%; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .path-tile .tag { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-4); font-weight: 600; }
+
+    .node { display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left; padding: 10px 0; }
+    .node .dotn {
+      width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--line); margin-top: 2px; flex-shrink: 0;
+    }
+    .node.cleared .dotn { background: var(--ink); border-color: var(--ink); }
+    .node.current .dotn { border-color: var(--vermilion); box-shadow: 0 0 0 3px rgba(193,18,31,.15); background: #fff; }
+    .node.locked { opacity: .38; }
+    .chapter { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-4); font-weight: 600; margin: 16px 0 4px; }
+
+    .heat { display: grid; grid-template-columns: repeat(18, 1fr); gap: 3px; }
+    .heat i { display: block; aspect-ratio: 1; border-radius: 2px; background: #F0F0F0; }
+    .heat i.l1 { background: #FDE68A; }
+    .heat i.l2 { background: #FBBF24; }
+    .heat i.l3 { background: #D97706; }
+    .heat i.l4 { background: #92400E; }
+
+    .flash { min-height: 220px; width: 100%; }
+    .flash-inner {
+      height: 220px; border: 1px solid var(--line); border-radius: 20px; background: #fff;
+      display: grid; place-items: center; padding: 24px; text-align: center;
+    }
+    .rate { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .sheet {
+      position: absolute; inset: 0; background: rgba(13,13,13,.62); display: none; z-index: 50;
+      align-items: flex-end;
+    }
+    .sheet.on { display: flex; }
+    .sheet-card {
+      width: 100%; background: #fff; border-radius: 22px 22px 0 0; max-height: 86%;
+      overflow: auto; animation: up .4s var(--ease); padding: 8px 20px 28px;
+    }
+    .sheet-card.center { border-radius: 22px; margin: auto 16px; max-height: 80%; }
+    @keyframes up { from { transform: translateY(24px); } }
+    .grab { width: 36px; height: 4px; border-radius: 99px; background: var(--line); margin: 8px auto 14px; }
+    .ver-rule { height: 4px; background: var(--vermilion); margin: -8px -20px 16px; }
+
+    .toast {
+      position: absolute; left: 16px; right: 16px; bottom: 88px; z-index: 60; display: none;
+      background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px;
+      box-shadow: 0 12px 32px rgba(0,0,0,.12); animation: in .4s var(--ease);
+    }
+    .toast.on { display: flex; gap: 12px; align-items: center; }
+    .toast .ico { width: 36px; height: 36px; border-radius: 12px; background: var(--ink); color: #fff; display: grid; place-items: center; }
+
+    .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 600; }
+    .listen { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; font-size: 12px; font-weight: 500; color: var(--ink-3); }
+
+    .home-ind { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 128px; height: 5px; background: #0D0D0D; border-radius: 99px; opacity: .9; z-index: 35; pointer-events: none; }
+
+    .err { font-size: 12px; color: var(--vermilion); }
+    .hint { font-size: 11.5px; color: var(--ink-4); }
+    .mono { font-family: var(--font-mono); }
+
+    .cert { border: 1px solid var(--line); }
+    .price { font-family: var(--font-serif); font-size: 64px; letter-spacing: -0.05em; line-height: .9; }
+
+    .settings {
+      position: absolute; right: 12px; top: 48px; width: 240px; background: #fff;
+      border: 1px solid var(--line); box-shadow: 0 16px 40px rgba(0,0,0,.12);
+      z-index: 40; display: none; padding: 14px 16px;
+    }
+    .settings.on { display: block; }
+    .swatch { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--line); }
+
+    @media (max-width: 860px) {
+      .stage { grid-template-columns: 1fr; padding: 16px; }
+      .rail { display: none; }
+    }
+    @media (max-width: 430px) {
+      .stage { padding: 0; min-height: 100dvh; }
+      .phone { width: 100vw; height: 100dvh; border-radius: 0; padding: 0; box-shadow: none; }
+      .bezel { border-radius: 0; }
+      .island { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+    <defs>
+      <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+      <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+      <symbol id="i-lib" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></symbol>
+      <symbol id="i-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></symbol>
+      <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/></symbol>
+      <symbol id="i-flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c2 4-3 5-3 9a3 3 0 0 0 6 0c0-3 4-4 3-8 3 3 4 6 4 9a7 7 0 1 1-14 0c0-4 2-7 4-10z"/></symbol>
+      <symbol id="i-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></symbol>
+      <symbol id="i-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></symbol>
+      <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 20 12 8 19 8 5"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="stage">
+    <aside class="rail">
+      <div class="wordmark">Cu<em>ri</em></div>
+            <p class="lede">Three tabs. Screens slide in. Back always returns you. Tap through the phone, or jump from here.</p>
+      <h2>Flows</h2>
+      <ul class="flow-list">
+        <li><button type="button" onclick="jumpGuest()"><b>First visit</b><span>Topic → path → lesson 1 → quiz → save</span></button></li>
+        <li><button type="button" onclick="jumpHome()"><b>Daily return</b><span>Three paths in parallel, two still due</span></button></li>
+        <li><button type="button" onclick="jump('browse')"><b>Explore</b><span>Founder catalogue + preview</span></button></li>
+        <li><button type="button" onclick="jump('library')"><b>Library</b><span>Exploring, mastered, shelved</span></button></li>
+        <li><button type="button" onclick="jump('review')"><b>Review</b><span>Spaced flashcards</span></button></li>
+        <li><button type="button" onclick="jump('progress')"><b>Progress</b><span>Streak, heat, metrics</span></button></li>
+        <li><button type="button" onclick="jump('upgrade')"><b>Academy</b><span>Upgrade from free</span></button></li>
+        <li><button type="button" onclick="jump('complete')"><b>Path complete</b><span>Certificate + next path</span></button></li>
+      </ul>
+      <div class="rail-foot">
+        <button class="ghost" type="button" onclick="jumpGuest()">Reset to landing</button>
+      </div>
+    </aside>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="bezel">
+          <div class="island" aria-hidden="true"></div>
+          <div class="status">
+            <span>9:41</span>
+            <span class="sig">
+              <svg width="16" height="10" viewBox="0 0 16 10"><rect x="0" y="6" width="3" height="4" rx="0.5" fill="currentColor"/><rect x="4.5" y="4" width="3" height="6" rx="0.5" fill="currentColor"/><rect x="9" y="2" width="3" height="8" rx="0.5" fill="currentColor"/><rect x="13.5" y="0" width="2.5" height="10" rx="0.5" fill="currentColor" opacity=".35"/></svg>
+              <svg width="24" height="12" viewBox="0 0 24 12"><rect x="0.5" y="1.5" width="20" height="9" rx="2" stroke="currentColor" fill="none"/><rect x="2" y="3" width="14" height="6" rx="1" fill="currentColor"/><rect x="21.5" y="4" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="app" id="app">
+            <div class="read-bar" id="readBar"></div>
+
+            <!-- LANDING -->
+            <section class="view on" id="v-landing">
+              <div class="scroll pad">
+                <div style="padding-top:12px">
+                  <div class="wordmark" style="font-size:22px">Cu<em>ri</em></div>
+                </div>
+                <p class="eyebrow" style="margin:28px 0 12px; display:flex; align-items:center; gap:8px"><span class="dot"></span> Personalized learning paths</p>
+                <h1 class="serif">Explore<br /><em id="headline">term sheets</em><span class="cursor" id="cursor"></span></h1>
+                <p class="body muted" style="margin:18px 0 24px">Type any topic and get a path built for you. You choose the depth — one lesson a day.</p>
+                <form class="topic-box" onsubmit="return submitTopic(event)">
+                  <input id="topicInput" type="text" placeholder="What do you want to learn..." autocomplete="off" />
+                  <button class="go" id="topicGo" type="submit" disabled aria-label="Start">
+                    <svg viewBox="0 0 24 24" width="16" height="16"><use href="#i-up"/></svg>
+                  </button>
+                </form>
+                <div class="pill-row" style="margin:12px 0 28px">
+                  <span>3 min/day</span><span>Any topic</span><span>Adaptive depth</span>
+                </div>
+                <p class="eyebrow" style="opacity:.55; margin-bottom:10px">Or try</p>
+                <div class="chips" id="quickChips"></div>
+                <p class="tiny" style="margin-top:22px">Free to start · No account needed</p>
+              </div>
+            </section>
+
+            <!-- ONBOARDING -->
+            <section class="view" id="v-onboarding"></section>
+            <section class="view" id="v-generating"></section>
+            <section class="view" id="v-lesson"></section>
+            <section class="view" id="v-quiz"></section>
+            <section class="view" id="v-auth"></section>
+            <section class="view" id="v-today"></section>
+            <section class="view" id="v-browse"></section>
+            <section class="view" id="v-library"></section>
+            <section class="view" id="v-path"></section>
+            <section class="view" id="v-review"></section>
+            <section class="view" id="v-practice"></section>
+            <section class="view" id="v-progress"></section>
+            <section class="view" id="v-newpath"></section>
+            <section class="view" id="v-profile"></section>
+            <section class="view" id="v-upgrade"></section>
+            <section class="view" id="v-complete"></section>
+
+            <!-- overlays -->
+            <div class="sheet" id="sheet" onclick="if(event.target===this) closeSheet()">
+              <div class="sheet-card" id="sheetCard"></div>
+            </div>
+            <div class="toast" id="toast"></div>
+
+            <nav class="tabbar" id="tabbar">
+              <button class="tab on" data-tab="today" type="button" onclick="tab('today')">
+                <svg viewBox="0 0 24 24"><use href="#i-book"/></svg> Today
+              </button>
+              <button class="tab" data-tab="library" type="button" onclick="tab('library')">
+                <svg viewBox="0 0 24 24"><use href="#i-lib"/></svg> Library
+              </button>
+              <button class="tab" data-tab="browse" type="button" onclick="tab('browse')">
+                <svg viewBox="0 0 24 24"><use href="#i-compass"/></svg> Explore
+              </button>
+            </nav>
+          </div>
+          <div class="home-ind" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const HEADLINES = ["term sheets","SAFE notes","cap tables","venture capital","unit economics","liquidation preferences","founder dilution","investor meetings"];
+    const QUICK = ["Venture Capital","Term Sheets","SAFE Notes","Cap Tables","Unit Economics","Fundraising"];
+    const REASONS = ["Pure curiosity","Preparing for something","For work or a project","Building foundations","To teach someone else"];
+    const ANGLES = {
+      "Term Sheets": ["Valuation and option pool mechanics","Liquidation preferences explained","Pro-rata and governance clauses","What moves in negotiation"],
+      default: ["Core concepts and mental models","What practitioners actually use","Where people commonly go wrong","How to apply this in practice"]
+    };
+    const STYLES = ["Through stories","With real examples","Build the model first","Show what breaks"];
+    const DEPTHS = [
+      { name: "Intro", n: 7, d: "The essentials, clearly explained." },
+      { name: "Standard", n: 14, d: "From foundations to nuance. The full mental model." },
+      { name: "Deep dive", n: 30, d: "Every angle, every edge case, every debate." }
+    ];
+    const LESSONS = [
+      "What a Term Sheet Actually Is — and What It Isn't",
+      "Pre-Money vs Post-Money: The Single Most Important Number",
+      "Option Pool Shuffles and Why They Matter More Than Valuation",
+      "Liquidation Preferences: Who Gets Paid First, and How Much",
+      "Participation Rights: When 1× Non-Participating Becomes Non-Negotiable",
+      "Anti-Dilution Provisions: Ratchets, Weighted Average, and When They Bite",
+      "Pro-Rata Rights: The Clause Every Founder Undervalues",
+      "Drag-Along and Co-Sale: Understanding Exit Governance",
+      "Information Rights, Board Composition, and Approval Rights",
+      "Protective Provisions: What You Can No Longer Do Alone",
+      "Founder Vesting on a Priced Round",
+      "What Moves in a Negotiation, and What Doesn't",
+      "Reading the Room: When a Term Sheet Is a Test",
+      "Negotiating a Term Sheet: What Moves, What Doesn't, and Why"
+    ];
+    const SAFE_LESSONS = [
+      "What a SAFE Is and Why It Replaced Convertible Notes",
+      "Post-Money vs Pre-Money: The Cap That Decides Dilution",
+      "Discounts, MFNs, and the Terms That Look Harmless",
+      "How Stacked SAFEs Appear Before the Priced Round",
+      "Conversion: What Happens When the Round Finally Closes",
+      "Valuation Caps: Protection That Cuts Both Ways",
+      "Pro-Rata on a SAFE: Usually Weaker Than It Sounds",
+      "Side Letters: The Terms That Never Make the Template",
+      "Modelling Dilution Before You Sign the Next One",
+      "When a SAFE Is the Wrong Instrument",
+      "Negotiating a SAFE Without a Lawyer in the Room",
+      "Reading a SAFE Cap Table Before You Have One",
+      "What Investors Assume You Already Know",
+      "The Conversion Meeting: Questions Worth Asking"
+    ];
+    const CAP_LESSONS = [
+      "What a Cap Table Is and Why It Matters From Day One",
+      "Founders, Employees, and Investors: Three Tables in One",
+      "Option Pool Mechanics: Grants, Vesting, and the Cliff",
+      "How SAFEs and Convertible Notes Appear on the Table",
+      "The Priced Round: How Ownership Changes at Close",
+      "Dilution Modelling: Your Ownership at Every Scenario",
+      "Liquidation Waterfalls: Who Gets What in an Exit",
+      "Secondary Sales, Transfers, and Table Hygiene",
+      "Red Flags: Structures That Signal Founder Disadvantage",
+      "Option Pool Shuffle: The Dilution You Didn't Model",
+      "Fully Diluted vs Issued: Two Numbers, Two Stories",
+      "Board, Information, and the Table You Can't See",
+      "Cap Table Hygiene Before Series A",
+      "Explaining Your Table in One Page"
+    ];
+    const CATALOG = {
+      "Term Sheets": LESSONS,
+      "SAFE Notes": SAFE_LESSONS,
+      "Cap Tables": CAP_LESSONS
+    };
+    const BLURBS = [
+      "The first foothold: the definition, pressure, and founder decision this path is built around.",
+      "A distinction worth holding: two terms that look alike until money or control is at stake.",
+      "The part founders often learn too late. Pay attention here.",
+      "The forces underneath: who benefits, who decides, and what it costs.",
+      "The live tension: where founders and investors can be right for different reasons.",
+      "The edge: where a clean definition stops being enough.",
+      "The clause every founder undervalues until the next round arrives.",
+      "The practical form: how this idea changes a real founder decision.",
+      "A frame you can carry into investor calls, diligence, and internal decisions.",
+      "The deeper layer: where incentives, ownership, and timing start to matter.",
+      "Where the abstract lands: the idea made visible in a real company situation.",
+      "The vocabulary that makes the rest of the raise, model, or negotiation legible.",
+      "The opening question: why this matters before investor pressure makes it expensive.",
+      "The synthesis: what you can now explain before a raise, negotiation, or board-level decision."
+    ];
+    const QUESTIONS = [
+      { q: "What is the lesson’s main distinction?", opts: ["Definition and trade-off","Speed and memory","Talent and luck"] },
+      { q: "What question turns this into founder judgment?", opts: ["Who benefits if I misunderstand this?","Who disagreed first?","How long did it take?"] },
+      { q: "What is Curi trying to reinforce?", opts: ["Founder decision-making","Loose startup content","Daily competition"] }
+    ];
+    const PATHS = [
+      { name: "Venture Capital", tag: "Fundraising", d: "How VC funds work, what investors optimize for, and when it actually makes sense." },
+      { name: "Term Sheets", tag: "Deals", d: "Valuation, option pools, liquidation preferences, and the clauses that shape ownership." },
+      { name: "SAFE Notes", tag: "Instruments", d: "Post-money caps, discounts, stacked SAFEs, and the dilution math before conversion." },
+      { name: "Cap Tables", tag: "Equity", d: "Read and model ownership across SAFEs, priced rounds, and option pools." },
+      { name: "Unit Economics", tag: "Metrics", d: "CAC, LTV, payback, and the customer-level math investors expect you to know." },
+      { name: "Fundraising", tag: "Process", d: "Investor fit, outreach, meetings, diligence, and closing without a YC network." }
+    ];
+    const BOOKS = [
+      { title: "Venture Deals", author: "Feld & Mendelson", hook: "The term sheet, decoded by people who have sat on both sides." },
+      { title: "The Hard Thing About Hard Things", author: "Ben Horowitz", hook: "Operating when there is no good option left." },
+      { title: "Zero to One", author: "Peter Thiel", hook: "Monopoly, secrets, and why competition is for losers." }
+    ];
+    const CARDS = [
+      { f: "Definition", b: "The literal meaning of the term — useful, but not enough to make a good founder decision." },
+      { f: "Incentive", b: "The investor motivation that makes term sheets matter in practice." },
+      { f: "The better question", b: "Not “what is this?” but “what decision does this change, and who benefits if I get it wrong?”" }
+    ];
+
+    const S = {
+      screen: "landing",
+      signedIn: false,
+      topic: "Term Sheets",
+      ob: 0,
+      why: REASONS[2],
+      angle: ANGLES["Term Sheets"][0],
+      style: STYLES[1],
+      depth: "Standard",
+      quizI: 0,
+      answers: {},
+      authStep: "email",
+      email: "",
+      code: "",
+      name: "Awais",
+      streak: 8,
+      progress: 3,
+      lessonDone: false,
+      reviewDone: false,
+      guest: true,
+      plan: "free",
+      browseTab: "paths",
+      searchOpen: false,
+      libTab: "active",
+      cardI: 0,
+      flipped: false,
+      listenOn: false,
+      takeawaysOpen: true,
+      courses: [],
+      completed: [],
+      shelved: [],
+      activeId: null
+    };
+
+    function lessonsOf(topic) { return CATALOG[topic] || LESSONS; }
+    function blurbAt(i) { return BLURBS[Math.min(i, BLURBS.length - 1)]; }
+    function course() { return (S.courses || []).find(c => c.id === S.activeId) || S.courses[0] || null; }
+    function syncFromCourse() {
+      const c = course();
+      if (!c) { S.topic = "Term Sheets"; S.progress = 0; return; }
+      S.topic = c.topic;
+      S.progress = c.progress;
+    }
+    function seedEmpty() {
+      S.courses = []; S.completed = []; S.shelved = []; S.activeId = null; S.plan = "free";
+    }
+    function seedMulti() {
+      S.courses = [
+        { id: "term", topic: "Term Sheets", progress: 3, total: 14, doneToday: false, cardsDue: 3 },
+        { id: "safe", topic: "SAFE Notes", progress: 1, total: 14, doneToday: false, cardsDue: 4 },
+        { id: "cap", topic: "Cap Tables", progress: 6, total: 14, doneToday: true, cardsDue: 0 }
+      ];
+      S.completed = [{ topic: "Unit Economics", total: 14 }];
+      S.shelved = [{ id: "price", topic: "Pricing Psychology", progress: 5, total: 14 }];
+      S.activeId = "term";
+      S.plan = "paid";
+      S.streak = 8;
+      S.reviewDone = false;
+      syncFromCourse();
+    }
+    function seedSingle(topic, progress, doneToday) {
+      S.courses = [{ id: "c1", topic, progress, total: 14, doneToday: !!doneToday, cardsDue: doneToday ? 3 : 0 }];
+      S.completed = []; S.shelved = []; S.activeId = "c1";
+      syncFromCourse();
+    }
+
+    const TABS = new Set(["today","browse","library"]);
+    const STACK = [];
+    function $(id) { return document.getElementById(id); }
+    function svg(id) { return `<svg viewBox="0 0 24 24" width="16" height="16"><use href="#${id}"/></svg>`; }
+    function chev() { return `<svg class="chev" viewBox="0 0 24 24"><use href="#i-right"/></svg>`; }
+    function bar(_backTo, backLabel, title, trail) {
+      return `<header class="topbar">
+        <button class="back-hit" type="button" onclick="back()">${svg("i-left")}${backLabel ? `<span>${backLabel}</span>` : ""}</button>
+        <div class="top-title">${title || ""}</div>
+        <div class="top-trail">${trail || ""}</div>
+      </header>`;
+    }
+
+    function go(name, how) {
+      const prev = S.screen;
+      const isTab = TABS.has(name);
+      const wasTab = TABS.has(prev);
+      let dir = how;
+      if (!dir) {
+        if (isTab && wasTab) dir = "tab";
+        else if (isTab) dir = "fade";
+        else dir = "push";
+      }
+      if (dir === "tab") STACK.length = 0;
+      else if (dir === "push" && prev && prev !== name) STACK.push(prev);
+      else if (dir === "pop") { /* stack already popped in back() */ }
+
+      S.screen = name;
+      document.querySelectorAll(".view").forEach(v => {
+        v.classList.remove("on", "push", "pop", "fade");
+      });
+      const el = $("v-" + name);
+      if (!el) return;
+      const anim = dir === "push" ? "push" : dir === "pop" ? "pop" : "fade";
+      el.classList.add("on", anim);
+      $("tabbar").classList.toggle("show", S.signedIn && isTab);
+      const tabName = isTab ? name : (STACK.filter(s => TABS.has(s)).slice(-1)[0] || "today");
+      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.tab === (isTab ? name : tabName)));
+      $("readBar").style.width = "0";
+      $("readerSettings")?.classList.remove("on");
+      closeSheet();
+      hideToast();
+      render(name);
+    }
+    function back() {
+      const prev = STACK.pop() || (S.signedIn ? "today" : "landing");
+      go(prev, "pop");
+    }
+    function tab(name) { S.signedIn = true; go(name, "tab"); }
+    function jump(name) {
+      STACK.length = 0;
+      S.signedIn = !["landing","onboarding","generating"].includes(name);
+      S.guest = !S.signedIn;
+      if (name === "landing") { S.signedIn = false; S.guest = true; S.lessonDone = false; }
+      if (["today","browse","library","review","progress","profile","upgrade","complete","path","newpath"].includes(name)) {
+        S.signedIn = true; S.guest = false;
+        if (!S.courses.length) seedMulti();
+      }
+      go(name, TABS.has(name) ? "tab" : "fade");
+    }
+    function jumpGuest() {
+      STACK.length = 0;
+      S.signedIn = false; S.guest = true; S.ob = 0; S.lessonDone = false; S.streak = 0;
+      S.topic = "Term Sheets"; seedEmpty(); go("landing", "fade");
+    }
+    function jumpHome() {
+      STACK.length = 0;
+      S.signedIn = true; S.guest = false; S.reviewDone = false;
+      seedMulti(); go("today", "tab");
+    }
+
+    /* landing typewriter */
+    let hIdx = 0, hText = "", hPhase = "type";
+    setInterval(() => { const c = $("cursor"); if (c) c.style.opacity = c.style.opacity === "0" ? "1" : "0"; }, 520);
+    function tickHeadline() {
+      const target = HEADLINES[hIdx];
+      if (hPhase === "type") {
+        if (hText.length < target.length) hText = target.slice(0, hText.length + 1);
+        else { hPhase = "hold"; setTimeout(() => { hPhase = "del"; tickHeadline(); }, 2200); return; }
+      } else if (hPhase === "del") {
+        if (hText.length) hText = hText.slice(0, -1);
+        else { hIdx = (hIdx + 1) % HEADLINES.length; hPhase = "type"; }
+      }
+      const el = $("headline"); if (el) el.textContent = hText;
+    }
+    setInterval(() => { if (hPhase !== "hold") tickHeadline(); }, 55);
+
+    let qOff = 0;
+    function renderChips() {
+      const box = $("quickChips");
+      if (!box) return;
+      const batch = QUICK.slice(qOff, qOff + 4);
+      box.innerHTML = batch.map(t => `<button class="chip" type="button" onclick="pickTopic('${t}')">${t}</button>`).join("");
+    }
+    renderChips();
+    setInterval(() => { qOff = (qOff + 4) % QUICK.length; renderChips(); }, 4000);
+
+    $("topicInput").addEventListener("input", e => { $("topicGo").disabled = !e.target.value.trim(); });
+
+    function pickTopic(t) { S.topic = t; S.angle = (ANGLES[t] || ANGLES.default)[0]; S.ob = 0; go("onboarding", "push"); }
+    function submitTopic(e) {
+      e.preventDefault();
+      const v = ($("topicInput").value || $("newTopicInput")?.value || "").trim() || S.topic;
+      pickTopic(v);
+      return false;
+    }
+
+    function render(name) {
+      if (name === "onboarding") renderOnboarding();
+      if (name === "generating") startGenerating();
+      if (name === "lesson") renderLesson();
+      if (name === "quiz") renderQuiz();
+      if (name === "auth") renderAuth();
+      if (name === "today") renderToday();
+      if (name === "browse") renderBrowse();
+      if (name === "library") renderLibrary();
+      if (name === "path") renderPath();
+      if (name === "review") renderReview();
+      if (name === "practice") renderPractice();
+      if (name === "progress") renderProgress();
+      if (name === "profile") renderProfile();
+      if (name === "upgrade") renderUpgrade();
+      if (name === "complete") renderComplete();
+      if (name === "newpath") renderNewPath();
+    }
+
+    function renderOnboarding() {
+      const steps = [
+        { eye: "Your motivation", title: "Why are you exploring this?", hint: "Helps Curi decide which details to surface first.", opts: REASONS, key: "why" },
+        { eye: "Your angle", title: "What angle should Curi take?", hint: "Shapes the lens every lesson is written through.", opts: ANGLES[S.topic] || ANGLES.default, key: "angle" },
+        { eye: "How you learn", title: "How do ideas click for you?", hint: "Affects how concepts are introduced.", opts: STYLES, key: "style" },
+        { eye: "How deep", title: "How far do you want to go?", hint: "Pick the length that fits your schedule.", depth: true }
+      ];
+      const st = steps[S.ob];
+      const pips = steps.map((_, i) => `<i class="${i===S.ob?"on":i<S.ob?"done":""}"></i>`).join("");
+      let opts = "";
+      let dock = "";
+      if (st.depth) {
+        opts = DEPTHS.map(d => `
+          <button class="choice block ${S.depth===d.name?"on":""}" type="button" onclick="S.depth='${d.name}'; renderOnboarding()">
+            <span class="ck">✓</span>
+            <b>${d.name}</b>
+            <div class="tiny" style="margin-top:4px">${d.n} lessons · ${d.d}</div>
+          </button>`).join("");
+        dock = `<button class="btn" type="button" onclick="go('generating','push')">Build my path</button>`;
+      } else {
+        opts = st.opts.map(o => `
+          <button class="choice ${S[st.key]===o?"on":""}" type="button" onclick="selectOb('${st.key}', this.dataset.v)" data-v="${o.replace(/"/g,'&quot;')}">
+            ${o}<span class="ck">✓</span>
+          </button>`).join("");
+      }
+      $("v-onboarding").innerHTML = `
+        <header class="topbar">
+          <button class="back-hit" type="button" onclick="obBack()">${svg("i-left")}</button>
+          <div class="top-title">${S.ob + 1} of 4</div>
+          <div class="top-trail"></div>
+        </header>
+        <div class="scroll pad">
+          <div class="steps" style="margin:8px 0 22px">${pips}</div>
+          <p class="eyebrow">${S.topic}</p>
+          <h2 class="serif" style="margin:8px 0 6px">${st.title}</h2>
+          <p class="tiny" style="margin:0 0 8px">${st.hint}</p>
+          <div>${opts}</div>
+        </div>
+        ${dock ? `<footer class="dock">${dock}</footer>` : ""}`;
+    }
+    function selectOb(key, val) {
+      S[key] = val; renderOnboarding();
+      setTimeout(() => { if (S.ob < 3) { S.ob++; renderOnboarding(); } }, 260);
+    }
+    function obBack() { if (S.ob > 0) { S.ob--; renderOnboarding(); } else back(); }
+
+    let genTimer;
+    function startGenerating() {
+      const n = DEPTHS.find(d => d.name === S.depth).n;
+      const titles = LESSONS.slice(0, n);
+      let i = 0;
+      $("v-generating").innerHTML = `
+        <header class="topbar">
+          <button class="back-hit" type="button" onclick="back()">${svg("i-left")}</button>
+          <div class="top-title"></div>
+          <div class="top-trail"></div>
+        </header>
+        <div class="scroll pad" id="genRoot">
+          <div style="padding:80px 12px; text-align:center">
+            <div class="pulse-ring">${svg("i-spark")}</div>
+            <p class="serif" style="font-size:22px; margin:22px 0 6px" id="warmMsg">Analysing your choices…</p>
+            <p class="tiny">${S.topic}</p>
+            <div class="breathe-bar" style="margin-top:22px"><span></span></div>
+          </div>
+        </div>`;
+      const msgs = ["Analysing your choices…","Mapping the territory…","Choosing your angle…","Sequencing the arc…"];
+      let m = 0;
+      const warm = setInterval(() => { const el = $("warmMsg"); if (el) el.textContent = msgs[++m % msgs.length]; }, 650);
+      clearTimeout(genTimer);
+      genTimer = setTimeout(() => {
+        clearInterval(warm);
+        paintGen(titles, 0, n, false);
+        const id = setInterval(() => {
+          i++;
+          paintGen(titles, i, n, i >= n);
+          if (i >= n) clearInterval(id);
+        }, 160);
+      }, 1600);
+    }
+    function paintGen(titles, count, n, done) {
+      const pct = Math.round((count / n) * 100);
+      const root = $("genRoot");
+      if (!root) return;
+      root.innerHTML = `
+        <p class="eyebrow">${n} lessons</p>
+        <h2 class="serif" style="margin:8px 0 16px">${S.topic}</h2>
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--ink-3); margin:0 0 8px">
+          <span>${done ? "Ready to read" : "Sequencing…"}</span>
+          <span class="mono">${count} / ${n}</span>
+        </div>
+        <div class="bar" style="margin-bottom:8px"><i style="width:${pct}%"></i></div>
+        ${Array.from({length:n}, (_,i) => {
+          const t = titles[i];
+          if (!t || i >= count) return `<div class="lesson-row"><span class="n">${String(i+1).padStart(2,"0")}</span><div style="flex:1"><div class="skel" style="width:80%"></div><div class="skel" style="width:46%;margin-top:8px"></div></div></div>`;
+          const live = i === count-1 && !done;
+          if (done && i === 0) return `<button class="lesson-row" type="button" onclick="openLesson(0)"><span class="n">01</span><div class="grow"><div class="t">${t}</div><div class="b">${BLURBS[i]}</div></div>${chev()}</button>`;
+          return `<div class="lesson-row ${done && i>0?"dim":""} ${live?"live":""}"><span class="n">${String(i+1).padStart(2,"0")}</span><div><div class="t">${t}</div><div class="b">${BLURBS[i]}</div></div></div>`;
+        }).join("")}`;
+      if (done) {
+        let dock = $("v-generating").querySelector(".dock");
+        if (!dock) {
+          dock = document.createElement("footer");
+          dock.className = "dock";
+          $("v-generating").appendChild(dock);
+        }
+        dock.innerHTML = `<button class="btn" type="button" onclick="openLesson(0)">${S.signedIn?"Start reading":"Read lesson 1"}</button>`;
+      }
+    }
+
+    function openCourse(id, idx) {
+      S.activeId = id;
+      syncFromCourse();
+      const c = course();
+      S.lessonIndex = idx ?? (c ? c.progress : 0);
+      S.listenOn = false;
+      go("lesson", "push");
+    }
+    function openLesson(idx) {
+      if (!course()) seedSingle(S.topic || "Term Sheets", 0, false);
+      openCourse(S.activeId || course().id, idx);
+    }
+    function renderLesson() {
+      const c = course();
+      const topic = c ? c.topic : S.topic;
+      const titles = lessonsOf(topic);
+      const i = Math.min(S.lessonIndex ?? (c ? c.progress : 0), titles.length - 1);
+      const title = titles[i];
+      $("v-lesson").innerHTML = `
+        ${bar(null, "", `${i+1} / ${titles.length}`, `<button class="icon-btn" type="button" onclick="toggleSettings()">Aa</button>`)}
+        <div class="scroll pad" id="lessonRoot" onscroll="onLessonScroll(event)">
+          ${S.guest ? `<div class="guest-steps">
+            <div class="guest-track"><i class="on"></i><i></i><i></i></div>
+            <div class="guest-labs"><span class="on">Read</span><span>Quiz</span><span>Save</span></div>
+          </div>` : ""}
+          <p class="eyebrow">${topic} · 5 min</p>
+          <h1 class="serif" style="font-size:28px; margin:10px 0 14px">${title}</h1>
+          <button class="listen" type="button" onclick="S.listenOn=!S.listenOn; renderLesson()" style="margin-bottom:18px">
+            ${svg("i-play")} ${S.listenOn ? "Playing" : "Listen"}
+          </button>
+          ${S.takeawaysOpen ? `<div class="stack" style="padding:4px 0 8px; border-top:1px solid var(--line)">
+            <p class="eyebrow" style="margin:14px 0 12px">Three things</p>
+            <div class="take"><b>1</b> Every founder concept has a definition on the surface and a trade-off underneath.</div>
+            <div class="take" style="margin-top:12px"><b>2</b> ${topic} becomes useful when it changes what you notice before you sign.</div>
+            <div class="take" style="margin-top:12px"><b>3</b> Ask not only “what does this mean?” but “who benefits if I misunderstand it?”</div>
+          </div>` : ""}
+          <div style="height:1px;background:var(--line);margin:18px 0"></div>
+          <p class="body"><span class="drop">T</span>he first useful thing to know about ${topic.toLowerCase()} is that it is not just a definition. It is a decision tool. Once you understand the incentive underneath the term, investor conversations become less mysterious and less reactive.</p>
+          <p class="body">Today’s idea is simple: every founder concept has a surface and a consequence. The surface is the acronym, the formula, the clause. The consequence is quieter. It is the ownership, runway, leverage, or control that changes if you misunderstand it.</p>
+          <div class="eq">Equity × Terms = Outcome<br /><span style="opacity:.55;font-size:11px">The clause is not the story. The payout is.</span></div>
+          <div class="pull">
+            <div class="eyebrow" style="margin-bottom:6px">Key idea</div>
+            <p class="body" style="margin:0">A founder concept becomes useful when you can name the trade-off before it costs you equity, runway, leverage, or control.</p>
+          </div>
+          <p class="body">Think of ${topic.toLowerCase()} as a room with two doors. One door is labelled explanation. The other is labelled judgment. Most startup content overfeeds the first door. Curi is trying to train the second.</p>
+          <p class="body">When someone says a term is standard, a valuation is good, or a metric is healthy, the better question is not whether they sound confident. Standard for whom? Good after which option pool?</p>
+          <h3 class="eyebrow" style="margin:22px 0 8px">So what?</h3>
+          <p class="body">Do not ask only, “What does this mean?” Ask, “What decision does this change, and who benefits if I get it wrong?”</p>
+        </div>
+        <footer class="dock"><button class="btn" type="button" onclick="startQuiz()">Take quiz</button></footer>
+        <div class="settings" id="readerSettings"></div>
+      `;
+    }
+    function onLessonScroll(e) {
+      const el = e.target;
+      const p = Math.min(1, el.scrollTop / Math.max(1, el.scrollHeight - el.clientHeight));
+      $("readBar").style.width = (p * 100) + "%";
+    }
+    function toggleSettings() {
+      const p = $("readerSettings");
+      if (!p) return;
+      p.classList.toggle("on");
+      p.innerHTML = `<p class="eyebrow">Reader</p>
+        <p class="tiny" style="margin:8px 0">Size · Font · Paper</p>
+        <div class="seg"><button class="on">Sans</button><button>Serif</button><button>Mono</button></div>
+        <p class="tiny" style="margin-top:12px">A display mock. Theme stays white-first.</p>`;
+    }
+
+    function startQuiz() { S.quizI = 0; S.answers = {}; go("quiz", "push"); }
+    function renderQuiz() {
+      const q = QUESTIONS[S.quizI];
+      const picked = S.answers[S.quizI];
+      $("v-quiz").innerHTML = `
+        ${bar("lesson", "Lesson", `${S.quizI+1} of 3`)}
+        <div class="scroll pad">
+          ${S.guest ? `<div class="guest-steps">
+            <div class="guest-track"><i class="on"></i><i class="on"></i><i></i></div>
+            <div class="guest-labs"><span>Read</span><span class="on">Quiz</span><span>Save</span></div>
+          </div>` : ""}
+          <p class="eyebrow">Reflection</p>
+          <h2 class="serif" style="margin:10px 0 8px">${q.q}</h2>
+          <div>${q.opts.map((o,i) => `
+            <button class="q-opt ${picked===o?"on":""}" type="button" onclick="pickAns('${o.replace(/'/g,"\\'")}')">
+              <span class="ltr">${"ABCD"[i]}</span>${o}
+            </button>`).join("")}</div>
+        </div>
+        <footer class="dock">
+          <p class="tiny" style="margin:0 0 10px">The point is not speed, but making the idea usable.</p>
+          <button class="btn" type="button" ${picked?"":"disabled"} onclick="quizNext()">${S.quizI===2?"Complete lesson":"Next"}</button>
+        </footer>`;
+    }
+    function pickAns(o) { S.answers[S.quizI] = o; renderQuiz(); }
+    function quizNext() {
+      if (S.quizI < 2) { S.quizI++; renderQuiz(); return; }
+      if (S.guest || !S.signedIn) { S.authStep = "email"; go("auth", "push"); return; }
+      openCompleteSheet();
+    }
+
+    function renderAuth() {
+      const post = S.guest;
+      let body = "";
+      if (S.authStep === "email") {
+        body = `
+          ${post ? `<p class="eyebrow">Lesson 1 complete</p>
+          <h1 class="serif" style="margin:8px 0 10px">Save your progress</h1>
+          <p class="body muted">Keep ${S.topic} and unlock lesson 2. No password.</p>` :
+          `<h1 class="serif">Welcome to Curi</h1><p class="body muted">Enter your email. We’ll send a code.</p>`}
+          <div class="field" style="margin:28px 0 16px"><label>Email</label>
+            <input id="emailIn" type="email" placeholder="you@example.com" value="${S.email}" oninput="S.email=this.value" /></div>`;
+      } else if (S.authStep === "otp") {
+        body = `<h1 class="serif">Check your inbox</h1>
+          <p class="body muted">Code sent to <b>${S.email || "you@example.com"}</b>.</p>
+          <div class="otp" style="margin:28px 0">${[0,1,2,3,4,5].map(i=>`<input maxlength="1" inputmode="numeric" oninput="otpType(this,${i})" />`).join("")}</div>
+          <p class="hint">Demo — code is <span class="mono">123456</span></p>
+          <p class="err" id="otpErr" style="display:none">That code doesn’t match. Use 123456.</p>`;
+      } else {
+        body = `<h1 class="serif">What should we call you?</h1>
+          <p class="body muted">You’re all set after this.</p>
+          <div class="field" style="margin:28px 0 16px"><label>Your name</label>
+            <input id="nameIn" placeholder="First name" value="${S.name}" /></div>`;
+      }
+      const cta = S.authStep === "email" ? `<button class="btn" type="button" onclick="S.authStep='otp'; renderAuth()">Send code</button>`
+        : S.authStep === "otp" ? `<button class="btn" type="button" onclick="verifyOtp()">Verify & save</button>`
+        : `<button class="btn" type="button" onclick="finishAuth()">Unlock lesson 2</button>`;
+      $("v-auth").innerHTML = `
+        <header class="topbar">
+          <button class="back-hit" type="button" onclick="authBack()">${svg("i-left")}</button>
+          <div class="top-title"></div>
+          <div class="top-trail"></div>
+        </header>
+        <div class="scroll pad">
+          ${S.guest ? `<div class="guest-steps">
+            <div class="guest-track"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+            <div class="guest-labs"><span>Read</span><span>Quiz</span><span class="on">Save</span></div>
+          </div>` : ""}
+          ${body}
+        </div>
+        <footer class="dock">${cta}</footer>`;
+    }
+    function otpType(el, i) {
+      S.code = (S.code || "").split("");
+      S.code[i] = el.value.replace(/\D/g,"").slice(-1);
+      S.code = S.code.join("").slice(0,6);
+      if (el.value && el.nextElementSibling) el.nextElementSibling.focus();
+    }
+    function verifyOtp() {
+      if ((S.code || "") !== "123456") { const e=$("otpErr"); if(e) e.style.display="block"; return; }
+      if (S.email.toLowerCase() === "awais@example.com") finishAuth();
+      else { S.authStep = "name"; renderAuth(); }
+    }
+    function finishAuth() {
+      STACK.length = 0;
+      seedSingle(S.topic || "Term Sheets", 1, true);
+      S.signedIn = true; S.guest = false; S.streak = 1;
+      go("today", "tab");
+      showToast("Lesson complete — 1-day streak.", "The point is not speed, but return.");
+    }
+    function authBack() {
+      if (S.authStep !== "email") { S.authStep = "email"; renderAuth(); }
+      else back();
+    }
+
+    function renderToday() {
+      const courses = S.courses || [];
+      const due = courses.filter(c => !c.doneToday);
+      const done = courses.filter(c => c.doneToday);
+      const allDone = courses.length > 0 && due.length === 0;
+      const cardsDue = courses.reduce((n, c) => n + (c.cardsDue || 0), 0);
+      const decksDue = courses.filter(c => c.cardsDue > 0).length;
+
+      function pathRow(c, finished) {
+        const titles = lessonsOf(c.topic);
+        const i = Math.min(c.progress, titles.length - 1);
+        const pct = Math.round((c.progress / c.total) * 100);
+        return `<button class="row ${finished ? "done-row" : ""}" type="button" onclick="openCourse('${c.id}')">
+          <div class="grow">
+            <b>${c.topic}</b>
+            <div class="tiny">${finished ? `Lesson ${c.progress} done today` : `Lesson ${c.progress + 1} of ${c.total} · ${titles[i]}`}</div>
+            <div class="bar" style="margin-top:10px"><i style="width:${pct}%"></i></div>
+          </div>
+          ${chev()}
+        </button>`;
+      }
+
+      $("v-today").innerHTML = `
+        <div class="scroll pad pad-tab">
+          <div class="mast">
+            <div>
+              <p class="tiny">Thursday 20 August</p>
+              <h1 class="serif">Today</h1>
+            </div>
+            <button class="avatar" type="button" onclick="go('profile','push')">A</button>
+          </div>
+          ${!courses.length ? `<p class="body muted">No paths yet. Explore a founder path to begin.</p>
+            <button class="btn" style="margin-top:18px" type="button" onclick="tab('browse')">Explore paths</button>` : `
+          <p class="tiny" style="margin:-6px 0 8px">${allDone ? "All paths read today" : `${due.length} of ${courses.length} still to read · one lesson each`}</p>
+          ${due.length ? `<p class="path-kicker">Still to read</p>${due.map(c => pathRow(c, false)).join("")}` : ""}
+          ${done.length ? `<p class="path-kicker">Already today</p>${done.map(c => pathRow(c, true)).join("")}` : ""}
+          ${allDone ? `<p class="tiny" style="margin:16px 0 0">${svg("i-check")} Daily paths complete</p>` : ""}
+          `}
+          ${courses.length ? `
+          <button class="row" type="button" onclick="go('progress','push')" style="margin-top:8px">
+            <div class="grow"><b>${S.streak}-day streak</b><div class="tiny">${allDone ? "See you tomorrow" : "Read any remaining path to keep it"}</div></div>
+            ${chev()}
+          </button>
+          <button class="row" type="button" onclick="go('review','push')">
+            <div class="grow"><b>${S.reviewDone ? "Review complete" : cardsDue ? `${cardsDue} cards across ${decksDue} path${decksDue===1?"":"s"}` : "No cards due"}</b><div class="tiny">${S.reviewDone ? "Next review tomorrow" : "After you read, or now if due"}</div></div>
+            ${chev()}
+          </button>` : ""}
+        </div>`;
+    }
+
+    function setBrowseTab(t) {
+      S.browseTab = t;
+      renderBrowse();
+    }
+    function renderBrowse() {
+      const q = S.browseQ || "";
+      const searching = S.searchOpen;
+      let list = "";
+      if (S.browseTab === "books") {
+        const rows = BOOKS.filter(b => !q || (b.title + b.author + b.hook).toLowerCase().includes(q));
+        list = rows.length ? rows.map(b => `
+          <button class="row" type="button" onclick="openPreview('${b.title}', '${b.hook.replace(/'/g,"\\'")}', true)">
+            <div class="grow"><div class="tiny">${b.author}</div><b>${b.title}</b><div class="tiny">${b.hook}</div></div>${chev()}
+          </button>`).join("") : `<p class="tiny" style="padding:28px 0">No books match.</p>`;
+      } else {
+        const rows = PATHS.filter(p => !q || (p.name + p.d + p.tag).toLowerCase().includes(q));
+        list = rows.length ? rows.map(p => `
+          <button class="row" type="button" onclick="openPreview('${p.name}', '${p.d.replace(/'/g,"\\'")}')">
+            <div class="grow"><div class="tiny">${p.tag}</div><b>${p.name}</b><div class="tiny">${p.d}</div></div>${chev()}
+          </button>`).join("") : `<p class="tiny" style="padding:28px 0">No paths match.</p><button class="btn" type="button" onclick="go('newpath','push')">Create a custom path</button>`;
+      }
+      $("v-browse").innerHTML = `
+        <div class="scroll pad pad-tab">
+          <div class="mast">
+            <h1 class="serif">Explore</h1>
+            <button class="icon-btn" type="button" onclick="S.searchOpen=!S.searchOpen; renderBrowse()">${svg("i-search")}</button>
+          </div>
+          ${searching ? `<div class="search-wrap" style="margin-bottom:12px">
+            <svg viewBox="0 0 24 24" width="16" height="16"><use href="#i-search"/></svg>
+            <input class="search" id="browseQ" placeholder="Term sheets, SAFEs…" oninput="filterBrowse(this.value)" value="${q}" />
+          </div>` : ""}
+          <div class="u-tabs">
+            <button type="button" class="${S.browseTab==="paths"?"on":""}" onclick="setBrowseTab('paths')">Paths</button>
+            <button type="button" class="${S.browseTab==="books"?"on":""}" onclick="setBrowseTab('books')">Books</button>
+          </div>
+          ${list}
+          <button class="row" type="button" onclick="go('newpath','push')">
+            <div class="grow"><b>Start a custom path</b><div class="tiny">Type any topic</div></div>${chev()}
+          </button>
+        </div>`;
+      if (searching) {
+        const inp = $("browseQ");
+        if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+      }
+    }
+    function filterBrowse(q) {
+      S.browseQ = (q || "").trim().toLowerCase();
+      renderBrowse();
+    }
+    function openPreview(name, d, book) {
+      openSheet(`
+        <div class="grab"></div>
+        <p class="eyebrow">${book ? "Book path" : "Founder path"}</p>
+        <h2 class="serif" style="margin:8px 0 10px">${name}</h2>
+        <p class="body muted">${d}</p>
+        <p class="tiny" style="margin:14px 0">14 lessons · ~3 min each</p>
+        <p class="tiny">Lesson 1</p>
+        <p class="serif" style="font-size:18px; margin:4px 0 18px">${(lessonsOf(name)[0] || LESSONS[0])}</p>
+        <button class="btn" type="button" onclick="startBrowse('${name}')">Start this path</button>
+        <p class="tiny" style="text-align:center;margin-top:10px">${S.plan === "paid" ? "Academy · add as many paths as you like" : "Free plan: 2 active paths at a time"}</p>
+      `);
+    }
+    function startBrowse(name) {
+      closeSheet();
+      if (S.signedIn && S.plan === "free" && S.courses.filter(c => !c.book).length >= 2) {
+        go("upgrade", "push");
+        return;
+      }
+      const id = "c" + Date.now();
+      S.topic = name;
+      S.courses = S.courses || [];
+      S.courses.push({ id, topic: name, progress: 0, total: 14, doneToday: false, cardsDue: 0 });
+      S.activeId = id;
+      S.guest = !S.signedIn;
+      openCourse(id, 0);
+    }
+
+    function renderLibrary() {
+      const tabs = [
+        { k:"active", l:"Exploring" },
+        { k:"completed", l:"Mastered" },
+        { k:"paused", l:"Shelved" }
+      ];
+      const active = (S.courses || []).map(c => ({
+        id: c.id, t: c.topic, sub: `Lesson ${Math.min(c.progress + (c.doneToday?0:1), c.total)} of ${c.total}${c.doneToday ? " · done today" : ""}`,
+        pct: Math.round((c.progress / c.total) * 100)
+      }));
+      const completed = (S.completed || []).map(c => ({ id: null, t: c.topic, sub: `${c.total} lessons`, pct: 100 }));
+      const paused = (S.shelved || []).map(c => ({ id: c.id, t: c.topic, sub: `Paused at lesson ${c.progress}`, pct: Math.round((c.progress / c.total) * 100) }));
+      const rows = { active, completed, paused }[S.libTab] || [];
+      const mastered = (S.completed || []).length;
+      const read = (S.courses || []).reduce((n,c) => n + c.progress, 0) + (S.completed || []).reduce((n,c) => n + (c.total||0), 0);
+      $("v-library").innerHTML = `
+        <div class="scroll pad pad-tab">
+          <div class="mast">
+            <h1 class="serif">Library</h1>
+          </div>
+          <p class="tiny" style="margin:-8px 0 16px">${mastered} mastered · ${read} lessons read · ${(S.courses||[]).length} active</p>
+          <div class="u-tabs">
+            ${tabs.map(t=>`<button type="button" class="${S.libTab===t.k?"on":""}" onclick="S.libTab='${t.k}'; renderLibrary()">${t.l}</button>`).join("")}
+          </div>
+          ${rows.length ? rows.map(r => `
+            <button class="row" type="button" onclick="${r.id ? `S.activeId='${r.id}'; syncFromCourse(); go('path','push')` : `go('complete','push')`}">
+              <div class="grow">
+                <b>${r.t}</b>
+                <div class="tiny">${r.sub}</div>
+                <div class="bar" style="margin-top:10px"><i style="width:${r.pct}%"></i></div>
+              </div>
+              ${chev()}
+            </button>`).join("") : `<p class="tiny" style="padding:24px 0">Nothing here yet.</p>`}
+        </div>`;
+    }
+
+    function renderPath() {
+      const c = course() || { topic: S.topic, progress: S.progress, total: 14 };
+      const titles = lessonsOf(c.topic);
+      const cleared = c.progress;
+      $("v-path").innerHTML = `
+        ${bar("library", "Library", c.topic)}
+        <div class="scroll pad">
+          <p class="eyebrow">${c.doneToday ? "Read today" : "Exploring"}</p>
+          <h1 class="serif" style="margin:6px 0 8px">${c.topic}</h1>
+          <p class="tiny">${cleared} of ${c.total} complete</p>
+          <div class="bar" style="margin:12px 0 8px"><i style="width:${Math.round(cleared/c.total*100)}%"></i></div>
+          ${titles.map((t,i) => {
+            const st = i < cleared ? "cleared" : i === cleared ? "current" : "locked";
+            return `<button class="node ${st}" type="button" ${i<=cleared?`onclick="openCourse('${c.id}', ${i})"`:"disabled"}>
+              <span class="dotn"></span>
+              <span class="grow"><b style="font-weight:500">${t}</b><div class="tiny">${i < cleared ? "Read" : i===cleared ? (c.doneToday ? "Done today" : "Today") : "Locked"}</div></span>
+              ${i<=cleared?chev():""}
+            </button>`;
+          }).join("")}
+        </div>`;
+    }
+
+    function renderReview() {
+      const decks = (S.courses || []).filter(c => c.cardsDue > 0);
+      const later = (S.courses || []).filter(c => !c.cardsDue);
+      $("v-review").innerHTML = `
+        ${bar("today", "Today", "Review")}
+        <div class="scroll pad">
+          <h1 class="serif" style="margin:8px 0 8px">Remember</h1>
+          <p class="body muted">${decks.length ? "Cards from more than one path. Review by deck." : "Nothing due right now."}</p>
+          ${decks.map(c => `
+            <button class="row" type="button" onclick="S.activeId='${c.id}'; S.cardI=0; S.flipped=false; go('practice','push')">
+              <div class="grow"><b>${c.topic}</b><div class="tiny">Due now · ${c.cardsDue} cards</div></div>${chev()}
+            </button>`).join("")}
+          ${later.map(c => `
+            <div class="row done-row">
+              <div class="grow"><b>${c.topic}</b><div class="tiny">Next cards tomorrow</div></div>
+            </div>`).join("")}
+        </div>`;
+    }
+    function renderPractice() {
+      if (S.cardI >= CARDS.length) {
+        $("v-practice").innerHTML = `
+          ${bar("today", "Today", "")}
+          <div class="scroll pad" style="display:flex;flex-direction:column;justify-content:center;text-align:center">
+            <p class="eyebrow">Session complete</p>
+            <h1 class="serif" style="margin:8px 0">Well done</h1>
+            <p class="body muted">${CARDS.length} cards from ${course()?.topic || S.topic}. ${ (S.courses||[]).filter(x=>x.cardsDue>0 && x.id!==S.activeId).length ? "Other decks still due." : "Next review tomorrow." }</p>
+            <button class="btn" style="margin-top:28px" type="button" onclick="const cur=course(); if(cur) cur.cardsDue=0; S.reviewDone = !(S.courses||[]).some(x=>x.cardsDue>0); STACK.length=0; go('today','tab')">Done</button>
+          </div>`;
+        return;
+      }
+      const c = CARDS[S.cardI];
+      $("v-practice").innerHTML = `
+        ${bar("review", "Review", `${S.cardI+1} / ${CARDS.length}`)}
+        <div class="scroll pad">
+          <div class="bar"><i style="width:${(S.cardI/CARDS.length)*100}%"></i></div>
+          <button class="flash" style="margin-top:28px" type="button" onclick="S.flipped=!S.flipped; renderPractice()">
+            <div class="flash-inner">
+              ${S.flipped
+                ? `<div><p class="eyebrow">Back</p><p class="body" style="margin-top:10px">${c.b}</p></div>`
+                : `<div><p class="eyebrow">Front</p><h2 class="serif" style="margin-top:10px">${c.f}</h2></div>`}
+            </div>
+          </button>
+        </div>
+        ${S.flipped ? `<footer class="dock"><div class="rate">
+          <button class="btn light" type="button" onclick="rateCard()">Again</button>
+          <button class="btn light" type="button" onclick="rateCard()">Hard</button>
+          <button class="btn light" type="button" onclick="rateCard()">Good</button>
+          <button class="btn" type="button" onclick="rateCard()">Easy</button>
+        </div></footer>` : `<footer class="dock"><p class="tiny" style="text-align:center;margin:0">Tap the card to reveal</p></footer>`}`;
+    }
+    function rateCard() { S.cardI++; S.flipped = false; renderPractice(); }
+
+    function renderProgress() {
+      const cells = Array.from({length: 18*7}, (_,i) => {
+        const r = (i * 7) % 11;
+        const l = r > 8 ? 4 : r > 6 ? 3 : r > 4 ? 2 : r > 2 ? 1 : 0;
+        return `<i class="${l?("l"+l):""}"></i>`;
+      }).join("");
+      $("v-progress").innerHTML = `
+        ${bar("today", "Today", "Progress")}
+        <div class="scroll pad">
+          <h1 class="serif">${S.streak}</h1>
+          <p class="eyebrow" style="margin:6px 0 18px">day streak</p>
+          <div class="heat">${cells}</div>
+          <p class="tiny" style="margin-top:8px">26 weeks</p>
+          <div class="stat-row" style="margin:24px 0">
+            <div><div class="n" style="font-size:28px">74%</div><p class="eyebrow">recall</p></div>
+            <div><div class="n" style="font-size:28px">5</div><p class="eyebrow">days / week</p></div>
+          </div>
+          ${(S.courses||[]).map(c => `
+          <button class="row" type="button" onclick="openCourse('${c.id}')">
+            <div class="grow"><b>${c.topic}</b><div class="tiny">${c.doneToday ? `Lesson ${c.progress} done today` : `Lesson ${c.progress + 1} of ${c.total} waiting`}</div></div>${chev()}
+          </button>`).join("")}
+          ${(S.completed||[]).map(c => `
+          <button class="row" type="button" onclick="go('complete','push')">
+            <div class="grow"><b>${c.topic}</b><div class="tiny">Mastered</div></div>${chev()}
+          </button>`).join("")}
+        </div>`;
+    }
+
+    function renderProfile() {
+      $("v-profile").innerHTML = `
+        ${bar("today", "Today", "You")}
+        <div class="scroll pad">
+          <div style="display:flex; gap:12px; align-items:center; margin:8px 0 8px">
+            <div class="avatar" style="width:48px;height:48px;border-radius:14px;font-size:18px">A</div>
+            <div><b>${S.name}</b><div class="tiny">awais@example.com</div></div>
+          </div>
+          <button class="row" type="button"><div class="grow"><b>Theme</b><div class="tiny">System</div></div>${chev()}</button>
+          <button class="row" type="button" onclick="go('upgrade','push')"><div class="grow"><b>Plan</b><div class="tiny">${S.plan==="paid" ? "Academy · unlimited paths" : "Free · 2 path limit"}</div></div>${chev()}</button>
+          <button class="row" type="button"><div class="grow"><b>Daily email</b><div class="tiny">Morning · 8 AM</div></div>${chev()}</button>
+          <button class="row" type="button" onclick="jumpGuest()"><div class="grow"><b>Sign out</b></div></button>
+        </div>`;
+    }
+
+    function renderUpgrade() {
+      $("v-upgrade").innerHTML = `
+        ${bar("profile", "You", "")}
+        <div class="scroll pad">
+          <p class="eyebrow">Curi Academy</p>
+          <h1 class="serif" style="margin:10px 0">Unlimited curiosity</h1>
+          <p class="body muted">One lesson per path, every day. Follow several at once.</p>
+          <div style="border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:18px 0; margin:18px 0">
+            <div style="display:flex; align-items:flex-end; gap:10px">
+              <span class="price">$2.50</span>
+              <span class="tiny">/ week<br/>billed $10 / month</span>
+            </div>
+          </div>
+          ${["Unlimited active paths","Full lesson archive","Learning analytics","Completion certificate"].map(f=>`
+            <div class="take" style="margin-bottom:12px"><b>✓</b> ${f}</div>`).join("")}
+        </div>
+        <footer class="dock">
+          <button class="btn" type="button" onclick="S.plan='paid'; STACK.length=0; go('today','tab')">Start Academy</button>
+          <p class="tiny" style="text-align:center;margin:10px 0 0">Cancel anytime</p>
+        </footer>`;
+    }
+
+    function renderComplete() {
+      $("v-complete").innerHTML = `
+        ${bar("progress", "Progress", "")}
+        <div class="scroll pad">
+          <p class="eyebrow">Path complete</p>
+          <h1 class="serif" style="font-size:36px; margin:12px 0 6px">Unit Economics</h1>
+          <p class="tiny">14 lessons · ${S.streak} day streak</p>
+          <div class="cert" style="margin:28px 0">
+            <div class="ver-rule" style="margin:0"></div>
+            <div style="padding:22px 8px; text-align:center">
+              <div class="wordmark" style="font-size:18px">Cu<em>ri</em></div>
+              <p class="eyebrow" style="margin:18px 0 8px">Certificate of Completion</p>
+              <h2 class="serif" style="margin:6px 0">${S.name}</h2>
+              <p class="tiny">has completed</p>
+              <h2 class="serif" style="margin-top:8px">Unit Economics</h2>
+            </div>
+          </div>
+          <button class="row" type="button" onclick="S.topic='Term Sheets'; openLesson(0)">
+            <div class="grow"><b>Next: Term Sheets</b><div class="tiny">Where the metrics become binding</div></div>${chev()}
+          </button>
+        </div>`;
+    }
+
+    function renderNewPath() {
+      $("v-newpath").innerHTML = `
+        ${bar("browse", "Explore", "")}
+        <div class="scroll pad">
+          <h1 class="serif">What do you want to learn?</h1>
+          <p class="body muted" style="margin:10px 0 22px">Type any topic. You pick the depth next.</p>
+          <form class="topic-box" onsubmit="return submitTopic(event)">
+            <input id="newTopicInput" type="text" placeholder="e.g. liquidation preferences…" />
+            <button class="go" type="submit" aria-label="Create path">${svg("i-up")}</button>
+          </form>
+        </div>`;
+      setTimeout(() => $("newTopicInput")?.focus(), 50);
+    }
+
+    function openCompleteSheet() {
+      if (!course()) seedSingle(S.topic || "Term Sheets", S.progress || 0, false);
+      const c = course();
+      const titles = lessonsOf(c.topic);
+      c.progress = Math.min((c.progress || 0) + 1, c.total);
+      c.doneToday = true;
+      if (!c.cardsDue) c.cardsDue = 3;
+      S.progress = c.progress;
+      S.topic = c.topic;
+      S.lessonDone = true;
+      S.streak += 1;
+      const just = titles[Math.min(Math.max(c.progress - 1, 0), titles.length - 1)];
+      const tomorrow = titles[Math.min(c.progress, titles.length - 1)];
+      const still = (S.courses || []).filter(x => !x.doneToday);
+      const toast = still.length
+        ? `${still.length} path${still.length === 1 ? "" : "s"} still due today`
+        : `Lesson complete — ${S.streak}-day streak.`;
+      const sub = still.length
+        ? still.map(x => x.topic).join(" · ")
+        : "The point is not speed, but return.";
+      const next = still.length
+        ? `<p class="eyebrow" style="margin-top:12px">Still today</p>
+        <p class="serif" style="font-size:16px; color:var(--ink-3)">${still.map(x => x.topic).join(" · ")}</p>
+        <p class="tiny">${still.length} lesson${still.length === 1 ? "" : "s"} waiting · one per path</p>`
+        : `<p class="eyebrow" style="margin-top:12px">Up next · Tomorrow</p>
+        <p class="serif" style="font-size:16px; color:var(--ink-3)">${tomorrow}</p>
+        <p class="tiny">Unlocks tomorrow · ~5 min</p>`;
+      openSheet(`
+        <div class="ver-rule"></div>
+        <p class="eyebrow">${c.topic} · Lesson ${c.progress} of ${c.total}</p>
+        <h2 class="serif" style="margin:8px 0">Lesson ${c.progress} complete.</h2>
+        <p class="serif" style="font-style:italic; color:var(--ink-3)">${just}</p>
+        <p class="tiny" style="color:var(--amber); margin-top:8px">${svg("i-flame")} ${S.streak}-day streak</p>
+        <div style="height:1px;background:var(--line);margin:16px 0"></div>
+        <p class="eyebrow">Share your progress</p>
+        <div class="card" style="margin:10px 0">
+          <div class="wordmark" style="font-size:14px">Cu<em>ri</em></div>
+          <p class="tiny" style="margin-top:8px">Lesson ${c.progress} of ${c.total} done. Just read “${just}” in my ${c.topic} path.</p>
+        </div>
+        ${next}
+        <button class="btn" style="margin-top:18px" type="button" onclick="closeSheet(); go('today'); showToast('${toast.replace(/'/g, "\\'")}','${sub.replace(/'/g, "\\'")}')">${still.length ? "Back to Today" : "Done"}</button>
+      `);
+    }
+
+    function openSheet(html) { $("sheetCard").innerHTML = html; $("sheet").classList.add("on"); }
+    function closeSheet() { $("sheet").classList.remove("on"); }
+    function showToast(t, s) {
+      $("toast").innerHTML = `<div class="ico">${svg("i-flame")}</div><div><b style="font-size:13px">${t}</b><div class="tiny">${s}</div></div>`;
+      $("toast").classList.add("on");
+      setTimeout(hideToast, 2400);
+    }
+    function hideToast() { $("toast").classList.remove("on"); }
+  </script>
+</body>
+</html>

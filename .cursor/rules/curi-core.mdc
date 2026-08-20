@@ -1,0 +1,16 @@
+---
+description: Curi core invariants, doc order, TDD and UX mandatory
+alwaysApply: true
+---
+
+# Curi core
+
+Read root `AGENTS.md` before substantive work. Multi-step work: use `curi-manager` skill.
+
+**Docs:** `docs/DECISIONS.md` → `FLOWS.md` → `PRD.md` → `ARCHITECTURE.md` / `DATA.md` / `AI.md`.
+
+**TDD:** `docs/TDD.md`. **UX:** `docs/UX-PRINCIPLES.md`.
+
+**Invariants:** Auth after first quiz · one lesson/path/day · multi-path Today · cache before Perplexity · lesson feel · free 2 paths.
+
+**Prototypes** live in `prototypes/` — visual only; `docs/` wins on behaviour.

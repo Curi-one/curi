@@ -1,0 +1,16 @@
+---
+description: Curi UX — mental models, behavioural psychology, brand calm
+globs: "app/**/*.{tsx,css},components/**/*.tsx"
+alwaysApply: false
+---
+
+# Curi UX
+
+Follow `docs/UX-PRINCIPLES.md` and `docs/FLOWS.md`.
+
+- One primary action per screen; Today shows all paths (due vs done today).
+- Auth after value; sources visible; streak supportive not punitive.
+- Brand: white-first, vermilion `#C1121F`, Fraunces + Plus Jakarta Sans.
+- No gamification, fake urgency, or signup walls before lesson 1.
+
+Before merge: run mental-model check — would a first-time founder predict this screen correctly?

@@ -1,0 +1,15 @@
+---
+description: Curi API routes — Zod, RLS, plan limits, server-only secrets
+globs: "app/api/**/*.ts,lib/**/*.ts"
+alwaysApply: false
+---
+
+# Curi API
+
+See `docs/ARCHITECTURE.md` and `docs/DATA.md`.
+
+- Validate request/response with Zod.
+- Enforce plan limits and auth in Route Handlers.
+- Lesson completion idempotent on `(user_id, course_id, lesson_index)`.
+- Never expose `SUPABASE_SERVICE_ROLE_KEY` or `PERPLEXITY_API_KEY` to client.
+- TDD: `*.test.ts` colocated with handler or domain module.

@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+prototypes/**/node_modules/
+
+# next.js
+.next/
+out/
+
+# env
+.env
+.env*.local
+prototypes/**/.env
+
+# debug
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# misc
+.DS_Store
+*.pem
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# testing
+coverage/
+
+# IDE
+.idea/
+.vscode/

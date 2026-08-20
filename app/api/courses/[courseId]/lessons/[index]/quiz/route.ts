@@ -1,0 +1,70 @@
+import { QuizSubmitRequestSchema } from "@/lib/api/schemas";
+import {
+  invalidBodyResponse,
+  jsonWithSession,
+  resolveSession,
+} from "@/lib/api/handler-utils";
+import { getMockStore } from "@/lib/mock/store";
+
+type RouteParams = { params: Promise<{ courseId: string; index: string }> };
+
+export async function GET(request: Request, { params }: RouteParams) {
+  const { sessionId } = resolveSession(request);
+  const { courseId, index } = await params;
+  const lessonIndex = Number.parseInt(index, 10);
+  if (Number.isNaN(lessonIndex)) {
+    return jsonWithSession(
+      { error: "invalid", code: "invalid_index" },
+      sessionId,
+      { status: 400 },
+    );
+  }
+
+  try {
+    const store = getMockStore();
+    const quiz = store.getQuiz(sessionId, courseId, lessonIndex);
+    return jsonWithSession(quiz, sessionId);
+  } catch {
+    return jsonWithSession(
+      { error: "not found", code: "not_found" },
+      sessionId,
+      { status: 404 },
+    );
+  }
+}
+
+export async function POST(request: Request, { params }: RouteParams) {
+  const { sessionId } = resolveSession(request);
+  const { courseId, index } = await params;
+  const lessonIndex = Number.parseInt(index, 10);
+  if (Number.isNaN(lessonIndex)) {
+    return jsonWithSession(
+      { error: "invalid", code: "invalid_index" },
+      sessionId,
+      { status: 400 },
+    );
+  }
+
+  const body: unknown = await request.json().catch(() => null);
+  const parsed = QuizSubmitRequestSchema.safeParse(body);
+  if (!parsed.success) {
+    return invalidBodyResponse();
+  }
+
+  try {
+    const store = getMockStore();
+    const result = store.submitQuiz(
+      sessionId,
+      courseId,
+      lessonIndex,
+      parsed.data,
+    );
+    return jsonWithSession(result, sessionId);
+  } catch {
+    return jsonWithSession(
+      { error: "not found", code: "not_found" },
+      sessionId,
+      { status: 404 },
+    );
+  }
+}
