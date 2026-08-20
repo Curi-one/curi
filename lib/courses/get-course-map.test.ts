@@ -7,6 +7,7 @@ const COURSE_ID = "course-abc";
 function mockAdmin(options: {
   course: Record<string, unknown> | null;
   lessons: { index: number; title: string }[];
+  hasActivityToday?: boolean;
 }) {
   return {
     from: vi.fn((table: string) => {
@@ -36,6 +37,22 @@ function mockAdmin(options: {
               order: vi.fn().mockResolvedValue({
                 data: options.lessons,
                 error: null,
+              }),
+            }),
+          }),
+        };
+      }
+      if (table === "lesson_activity") {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  maybeSingle: vi.fn().mockResolvedValue({
+                    data: options.hasActivityToday ? { id: "a1" } : null,
+                    error: null,
+                  }),
+                }),
               }),
             }),
           }),
@@ -80,6 +97,7 @@ describe("getCourseMap", () => {
     const result = await getCourseMap(COURSE_ID, {
       admin: admin as never,
       getUserId: async () => USER_ID,
+      loadTimezone: async () => "Australia/Sydney",
     });
 
     expect(result.ok).toBe(true);
@@ -87,6 +105,40 @@ describe("getCourseMap", () => {
       expect(result.data.nodes.map((n) => n.status)).toEqual([
         "read",
         "today",
+        "locked",
+      ]);
+    }
+  });
+
+  it("locks the progress node when the user already has activity today", async () => {
+    const admin = mockAdmin({
+      course: {
+        id: COURSE_ID,
+        topic: "Cap tables",
+        depth: "fluent",
+        progress: 1,
+        total: 12,
+        status: "active",
+      },
+      lessons: [
+        { index: 0, title: "Intro" },
+        { index: 1, title: "Dilution" },
+        { index: 2, title: "Options" },
+      ],
+      hasActivityToday: true,
+    });
+
+    const result = await getCourseMap(COURSE_ID, {
+      admin: admin as never,
+      getUserId: async () => USER_ID,
+      loadTimezone: async () => "Australia/Sydney",
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.nodes.map((n) => n.status)).toEqual([
+        "read",
+        "locked",
         "locked",
       ]);
     }

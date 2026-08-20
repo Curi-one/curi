@@ -1,16 +1,30 @@
 import Link from "next/link";
 import { ArrowRight, Library, Sparkles } from "lucide-react";
 import type { FeedResponse } from "@/lib/api/schemas";
-import { PathRow } from "@/components/PathRow";
+import { LessonFeedCard } from "@/components/LessonFeedCard";
 
 type Props = FeedResponse & {
   streak?: number;
   streakAtRisk?: boolean;
 };
 
-export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
+export function TodayView({
+  due,
+  done,
+  groups = [],
+  streak = 0,
+  streakAtRisk,
+}: Props) {
   const total = due.length + done.length;
   const empty = total === 0;
+
+  /** Course ids that still owe today's lesson — used to pick the tomorrow lock copy. */
+  const courseIdsPendingToday = new Set(
+    groups
+      .flatMap((g) => g.items)
+      .filter((i) => i.status === "available" || i.status === "overdue")
+      .map((i) => i.courseId),
+  );
 
   if (empty) {
     return (
@@ -98,57 +112,41 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
         </Link>
       </header>
 
-      {due.length === 0 && done.length > 0 ? (
-        <div className="surface-card p-8 text-center">
-          <p className="font-display text-xl text-ink">All caught up</p>
-          <p className="mt-2 text-sm text-ink-muted">
-            Next lessons unlock tomorrow. Or start another path.
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <Link href="/progress" className="btn-secondary inline-block">
-              View progress
-            </Link>
-            <Link href="/new" className="btn-ghost inline-block text-sm">
-              New path
-            </Link>
-          </div>
-        </div>
-      ) : (
-        <>
-          {due.length > 0 && (
-            <section className="mb-8">
-              <h2 className="type-kicker mb-3">Still to read</h2>
-              <ul className="space-y-3">
-                {due.map((path) => (
-                  <li key={path.id}>
-                    <PathRow path={path} />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {done.length > 0 && (
-            <section>
-              <h2 className="type-kicker mb-3">Already today</h2>
-              <ul className="space-y-3">
-                {done.map((path) => (
-                  <li key={path.id}>
-                    <PathRow path={path} dimmed />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          <div className="mt-10 text-center">
-            <Link
-              href="/new"
-              className="text-sm text-ink-muted underline hover:text-ink"
-            >
-              Create a new path
-            </Link>
-          </div>
-        </>
+      {due.length === 0 && done.length > 0 && (
+        <p className="mb-6 text-sm text-ink-muted">
+          All caught up for today — next lessons unlock tomorrow.
+        </p>
       )}
+
+      {groups.map((group) => (
+        <section key={group.daysAgo} className="mb-8">
+          <h2 className="type-kicker mb-3">{group.label}</h2>
+          <ul className="space-y-3">
+            {group.items.map((item) => (
+              <li key={item.id}>
+                <LessonFeedCard
+                  item={item}
+                  lockedCopy={
+                    item.status === "locked" &&
+                    courseIdsPendingToday.has(item.courseId)
+                      ? "Unlocks after today's lesson"
+                      : "Unlocks tomorrow"
+                  }
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+
+      <div className="mt-10 text-center">
+        <Link
+          href="/new"
+          className="text-sm text-ink-muted underline hover:text-ink"
+        >
+          Create a new path
+        </Link>
+      </div>
     </div>
   );
 }

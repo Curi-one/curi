@@ -83,11 +83,14 @@ Pending path: 24h TTL on anonymous session. Back from auth after quiz returns to
 ## F2 — Daily return (member)
 
 ```
-Today
-  ├─ Still to read    → row per due path → lesson → quiz (MCQ + feel) → complete sheet
-  ├─ Already today    → dimmed rows; re-read only
-  └─ Streak           → Progress screen
+Today (chronological lesson feed)
+  ├─ Tomorrow     → next lesson preview, locked until local midnight after today’s complete
+  ├─ Today        → available (still to read) + completed (re-read)
+  ├─ Past         → completed lessons + overdue catch-up if a day was missed
+  └─ Streak       → Progress screen
 ```
+
+**Unlock rule:** one lesson per path per local calendar day. Completing today’s lesson (quiz + feel) moves the path to done for today; the next lesson index unlocks tomorrow. Re-read of completed lessons is always allowed. Reading the next unfinished lesson early returns locked.
 
 **Complete sheet**
 

@@ -26,8 +26,10 @@ import {
   clarificationsToMap,
   normalizeTopic,
 } from "@/lib/courses/outline";
+import { isLessonReadable } from "@/lib/courses/path-map";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAuthenticatedUserId } from "@/lib/auth/user-id";
+import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
 
 export type { DifficultyModifier };
 
@@ -87,6 +89,9 @@ export type CourseContext = {
   userId?: string;
   /** Guest feels from pending_courses.lesson_feels (lesson index → feel). */
   lessonFeels?: Record<number, LessonFeel>;
+  /** Member courses only — used for the unlock-tomorrow read gate below. */
+  progress?: number;
+  hasActivityToday?: boolean;
 };
 
 export type GetLessonBodySuccess = {
@@ -100,7 +105,16 @@ export type GetLessonBodyNotFound = {
   message: string;
 };
 
-export type GetLessonBodyResult = GetLessonBodySuccess | GetLessonBodyNotFound;
+export type GetLessonBodyLocked = {
+  ok: false;
+  code: "locked";
+  message: string;
+};
+
+export type GetLessonBodyResult =
+  | GetLessonBodySuccess
+  | GetLessonBodyNotFound
+  | GetLessonBodyLocked;
 
 export type GetLessonBodyDeps = {
   admin?: SupabaseClient;
@@ -305,7 +319,7 @@ export async function defaultLoadCourse(
 
   const { data: course, error: courseError } = await admin
     .from("courses")
-    .select("id, user_id, topic, depth, clarifications")
+    .select("id, user_id, topic, depth, clarifications, progress")
     .eq("id", params.courseId)
     .eq("user_id", userId)
     .maybeSingle();
@@ -332,14 +346,51 @@ export async function defaultLoadCourse(
     throw new Error(`course_lessons lookup failed: ${lessonsError.message}`);
   }
 
+  const memberUserId = String(course.user_id);
+  const hasActivityToday = await defaultLoadHasActivityToday(
+    { courseId: params.courseId, userId: memberUserId },
+    admin,
+  );
+
   return {
     kind: "member",
     topic: String(course.topic),
     depth: depthParsed.data,
     clarifications: parseClarifications(course.clarifications),
     lessons: parseOutlineLessons(lessonRows ?? []),
-    userId: String(course.user_id),
+    userId: memberUserId,
+    progress: typeof course.progress === "number" ? course.progress : 0,
+    hasActivityToday,
   };
+}
+
+/** Whether the member already has lesson_activity today for this course (unlock-tomorrow gate). */
+export async function defaultLoadHasActivityToday(
+  params: { courseId: string; userId: string },
+  admin: SupabaseClient,
+): Promise<boolean> {
+  const { data: userRow } = await admin
+    .from("users")
+    .select("timezone")
+    .eq("id", params.userId)
+    .maybeSingle();
+  const tz = userRow?.timezone;
+  const timezone =
+    typeof tz === "string" && tz.length > 0 ? tz : DEFAULT_TIMEZONE;
+  const today = todayInTimezone(timezone);
+
+  const { data, error } = await admin
+    .from("lesson_activity")
+    .select("id")
+    .eq("course_id", params.courseId)
+    .eq("user_id", params.userId)
+    .eq("activity_date", today)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`lesson_activity lookup failed: ${error.message}`);
+  }
+  return Boolean(data);
 }
 
 export async function defaultLoadPriorFeel(
@@ -529,6 +580,22 @@ export async function getLessonBody(
   const lesson = course.lessons.find((l) => l.index === params.lessonIndex);
   if (!lesson) {
     return { ok: false, code: "not_found", message: "Lesson not found" };
+  }
+
+  if (
+    course.kind === "member" &&
+    typeof course.progress === "number" &&
+    !isLessonReadable({
+      index: params.lessonIndex,
+      progress: course.progress,
+      hasActivityToday: course.hasActivityToday ?? false,
+    })
+  ) {
+    return {
+      ok: false,
+      code: "locked",
+      message: "This lesson unlocks tomorrow",
+    };
   }
 
   let modifier: DifficultyModifier = "baseline";

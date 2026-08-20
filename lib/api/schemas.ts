@@ -71,9 +71,41 @@ export const PathSummarySchema = z.object({
 });
 export type PathSummary = z.infer<typeof PathSummarySchema>;
 
+/** Chronological Today feed item status (F2 lesson feed by day). */
+export const FeedItemStatusSchema = z.enum([
+  "available",
+  "completed",
+  "locked",
+  "overdue",
+]);
+export type FeedItemStatus = z.infer<typeof FeedItemStatusSchema>;
+
+export const FeedLessonItemSchema = z.object({
+  id: z.string(),
+  courseId: z.string(),
+  topic: z.string(),
+  lessonIndex: z.number().int().nonnegative(),
+  title: z.string(),
+  lessonNumber: z.number().int().positive(),
+  totalLessons: z.number().int().positive(),
+  /** 0 = today, -1 = tomorrow (locked preview), >0 = that many days in the past. */
+  daysAgo: z.number().int(),
+  status: FeedItemStatusSchema,
+});
+export type FeedLessonItem = z.infer<typeof FeedLessonItemSchema>;
+
+export const FeedDayGroupSchema = z.object({
+  daysAgo: z.number().int(),
+  label: z.string(),
+  items: z.array(FeedLessonItemSchema),
+});
+export type FeedDayGroup = z.infer<typeof FeedDayGroupSchema>;
+
 export const FeedResponseSchema = z.object({
   due: z.array(PathSummarySchema),
   done: z.array(PathSummarySchema),
+  /** Chronological lesson feed grouped by day (F2) — tomorrow, today, then past. */
+  groups: z.array(FeedDayGroupSchema),
 });
 export type FeedResponse = z.infer<typeof FeedResponseSchema>;
 

@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
   const result = await getFeed();
   if (!result.ok) {
-    return jsonWithSession({ due: [], done: [] }, sessionId);
+    return jsonWithSession({ due: [], done: [], groups: [] }, sessionId);
   }
 
   return jsonWithSession(result.data, sessionId);

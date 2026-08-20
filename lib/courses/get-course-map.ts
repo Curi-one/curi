@@ -4,6 +4,7 @@ import { getAuthenticatedUserId } from "@/lib/auth/user-id";
 import { buildPathMapNodes, type PathMapInput } from "@/lib/courses/path-map";
 import { parseDepth } from "@/lib/courses/summary";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
 
 export type CourseMapResponse = {
   id: string;
@@ -19,7 +20,39 @@ export type GetCourseMapResult =
 export type GetCourseMapDeps = {
   admin?: SupabaseClient;
   getUserId?: () => Promise<string | null>;
+  loadTimezone?: (userId: string, admin: SupabaseClient) => Promise<string>;
+  now?: () => Date;
 };
+
+async function defaultLoadTimezone(
+  userId: string,
+  admin: SupabaseClient,
+): Promise<string> {
+  const { data } = await admin
+    .from("users")
+    .select("timezone")
+    .eq("id", userId)
+    .maybeSingle();
+  const tz = data?.timezone;
+  return typeof tz === "string" && tz.length > 0 ? tz : DEFAULT_TIMEZONE;
+}
+
+async function loadHasActivityToday(
+  params: { courseId: string; userId: string; today: string },
+  admin: SupabaseClient,
+): Promise<boolean> {
+  const { data, error } = await admin
+    .from("lesson_activity")
+    .select("id")
+    .eq("course_id", params.courseId)
+    .eq("user_id", params.userId)
+    .eq("activity_date", params.today)
+    .maybeSingle();
+  if (error) {
+    throw new Error(`lesson_activity map load failed: ${error.message}`);
+  }
+  return Boolean(data);
+}
 
 export async function getCourseMap(
   courseId: string,
@@ -70,6 +103,17 @@ export async function getCourseMap(
     title: String(row.title),
   }));
 
+  let hasActivityToday = false;
+  if (status === "active") {
+    const loadTimezone = deps?.loadTimezone ?? defaultLoadTimezone;
+    const timezone = await loadTimezone(userId, admin);
+    const today = todayInTimezone(timezone, deps?.now?.());
+    hasActivityToday = await loadHasActivityToday(
+      { courseId, userId, today },
+      admin,
+    );
+  }
+
   return {
     ok: true,
     data: {
@@ -80,6 +124,7 @@ export async function getCourseMap(
         progress,
         status,
         lessons: lessonRows,
+        hasActivityToday,
       }),
     },
   };

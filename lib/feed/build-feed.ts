@@ -52,5 +52,5 @@ export function buildFeed(
     }
   }
 
-  return { due, done };
+  return { due, done, groups: [] };
 }

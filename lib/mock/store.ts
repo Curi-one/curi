@@ -14,7 +14,13 @@ import type {
   QuizSubmitResponse,
   UserSession,
 } from "@/lib/api/schemas";
+import { buildPathMapNodes, isLessonReadable } from "@/lib/courses/path-map";
 import { isPathDueToday } from "@/lib/due-today";
+import {
+  buildDailyFeed,
+  type DailyFeedActivityRow,
+  type DailyFeedCourseRow,
+} from "@/lib/feed/build-daily-feed";
 import { getExploreCatalogue } from "@/lib/explore/catalogue";
 import {
   feelToDifficultyModifier,
@@ -100,7 +106,7 @@ const MOCK_DIFFICULTY_HINTS: Record<DifficultyModifier, string | null> = {
     "*Tuned clearer: more concrete examples and a short recap up front.*",
 };
 
-function priorLessonFeel(
+export function priorLessonFeel(
   activity: ActivityRecord[],
   courseId: string,
   priorLessonIndex: number,
@@ -110,7 +116,7 @@ function priorLessonFeel(
   )?.lessonFeel;
 }
 
-function applyDifficultyModifier(
+export function applyDifficultyModifier(
   content: LessonResponse,
   modifier: DifficultyModifier,
 ): LessonResponse {
@@ -270,7 +276,23 @@ class MockStore {
       }
     }
 
-    return { due, done };
+    const dailyFeedCourses: DailyFeedCourseRow[] = paths.map((path) => ({
+      id: path.id,
+      topic: path.topic,
+      lessonTitles: path.lessonTitles,
+      progress: path.progress,
+      createdAt: path.createdAt,
+    }));
+    const dailyFeedActivity: DailyFeedActivityRow[] = data.activity
+      .filter((a) => paths.some((p) => p.id === a.courseId))
+      .map((a) => ({
+        courseId: a.courseId,
+        lessonIndex: a.lessonIndex,
+        activityDate: a.activityDate,
+      }));
+    const groups = buildDailyFeed(dailyFeedCourses, dailyFeedActivity, today);
+
+    return { due, done, groups };
   }
 
   getLesson(
@@ -285,6 +307,24 @@ class MockStore {
     }
     if (index < 0 || index >= path.lessonTitles.length) {
       return { ok: false, code: "not_found", message: "Lesson not found" };
+    }
+
+    // Member paths follow the unlock-tomorrow rule (FLOWS F2); pending/guest
+    // paths are capped to lesson 1 elsewhere and never reach index > 0 here.
+    if (data.session.kind === "member") {
+      const today = todayInTimezone(data.timezone);
+      const readable = isLessonReadable({
+        index,
+        progress: path.progress,
+        hasActivityToday: hasActivityToday(data.activity, path.id, today),
+      });
+      if (!readable) {
+        return {
+          ok: false,
+          code: "locked",
+          message: "This lesson unlocks tomorrow",
+        };
+      }
     }
 
     const content = getLessonContent(
@@ -459,13 +499,12 @@ class MockStore {
         : path.status === "shelved"
           ? "shelved"
           : "active";
-    const nodes = path.lessonTitles.map((title, index) => {
-      let status: "read" | "today" | "locked" = "locked";
-      if (index < path.progress) status = "read";
-      else if (index === path.progress && path.status === "active") {
-        status = "today";
-      }
-      return { index, title, status };
+    const today = todayInTimezone(data.timezone);
+    const nodes = buildPathMapNodes({
+      progress: path.progress,
+      status: dbStatus,
+      lessons: path.lessonTitles.map((title, index) => ({ index, title })),
+      hasActivityToday: hasActivityToday(data.activity, path.id, today),
     });
     return {
       ok: true,

@@ -23,7 +23,7 @@ describe("GET /api/feed (mock)", () => {
       }),
     );
     const body = await res.json();
-    expect(body).toEqual({ due: [], done: [] });
+    expect(body).toEqual({ due: [], done: [], groups: [] });
   });
 
   it("returns due and done for default member persona", async () => {

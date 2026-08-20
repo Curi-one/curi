@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { getMockStore, resetMockStore } from "@/lib/mock/store";
+import {
+  applyDifficultyModifier,
+  getMockStore,
+  priorLessonFeel,
+  resetMockStore,
+} from "@/lib/mock/store";
+import { feelToDifficultyModifier } from "@/lib/lessons/body";
 
 const MEMBER_SESSION = "member-default";
 
@@ -136,33 +142,57 @@ describe("MockStore", () => {
     });
   });
 
-  describe("getLesson difficulty modifier from prior lesson feel", () => {
-    it("applies an easier hint to lesson 2 body after too_hard feel on lesson 1", () => {
-      const store = getMockStore();
+  describe("getLesson difficulty modifier mapping (pure)", () => {
+    it("maps a too_hard prior feel to an easier body hint", () => {
+      const activity = [
+        {
+          courseId: "p1",
+          lessonIndex: 0,
+          activityDate: "2026-01-01",
+          lessonFeel: "too_hard" as const,
+        },
+      ];
+      const feel = priorLessonFeel(activity, "p1", 0);
+      expect(feel).toBe("too_hard");
 
-      const baseline = store.getLesson(MEMBER_SESSION, "mock-path-1", 1);
-      expect(baseline.ok).toBe(true);
+      const modifier = feelToDifficultyModifier(feel!);
+      const content = { title: "Lesson 2", body: ["Original."], sources: [] };
+      const adjusted = applyDifficultyModifier(content, modifier);
 
-      const quiz = store.getQuiz(MEMBER_SESSION, "mock-path-1", 0);
-      store.submitQuiz(MEMBER_SESSION, "mock-path-1", 0, {
-        answers: quiz.questions.map((q) => ({
-          questionId: q.id,
-          selectedIndex: q.correctIndex,
-        })),
-        lessonFeel: "too_hard",
-      });
-
-      const adjusted = store.getLesson(MEMBER_SESSION, "mock-path-1", 1);
-      expect(adjusted.ok).toBe(true);
-      if (!baseline.ok || !adjusted.ok) return;
-
-      expect(adjusted.data.body).not.toEqual(baseline.data.body);
-      expect(adjusted.data.body[0]).toMatch(/shorter sentences|easier/i);
+      expect(adjusted.body).not.toEqual(content.body);
+      expect(adjusted.body[0]).toMatch(/shorter sentences|easier/i);
     });
 
     it("keeps baseline body when prior feel was just_right", () => {
-      const store = getMockStore();
+      const activity = [
+        {
+          courseId: "p1",
+          lessonIndex: 0,
+          activityDate: "2026-01-01",
+          lessonFeel: "just_right" as const,
+        },
+      ];
+      const feel = priorLessonFeel(activity, "p1", 0);
+      const modifier = feelToDifficultyModifier(feel!);
+      const content = { title: "Lesson 2", body: ["Original."], sources: [] };
 
+      expect(applyDifficultyModifier(content, modifier)).toEqual(content);
+    });
+  });
+
+  describe("getLesson unlock-tomorrow rule", () => {
+    it("locks a lesson index ahead of progress", () => {
+      const store = getMockStore();
+      const result = store.getLesson(MEMBER_SESSION, "mock-path-1", 1);
+      expect(result).toEqual({
+        ok: false,
+        code: "locked",
+        message: "This lesson unlocks tomorrow",
+      });
+    });
+
+    it("locks the next lesson for today once a quiz is already completed today", () => {
+      const store = getMockStore();
       const quiz = store.getQuiz(MEMBER_SESSION, "mock-path-1", 0);
       store.submitQuiz(MEMBER_SESSION, "mock-path-1", 0, {
         answers: quiz.questions.map((q) => ({
@@ -172,10 +202,27 @@ describe("MockStore", () => {
         lessonFeel: "just_right",
       });
 
-      const baseline = store.getLesson(MEMBER_SESSION, "mock-path-1", 1);
-      expect(baseline.ok).toBe(true);
-      if (!baseline.ok) return;
-      expect(baseline.data.body[0]).not.toMatch(/shorter sentences|easier/i);
+      const result = store.getLesson(MEMBER_SESSION, "mock-path-1", 1);
+      expect(result).toEqual({
+        ok: false,
+        code: "locked",
+        message: "This lesson unlocks tomorrow",
+      });
+    });
+
+    it("still allows re-reading a completed lesson the same day", () => {
+      const store = getMockStore();
+      const quiz = store.getQuiz(MEMBER_SESSION, "mock-path-1", 0);
+      store.submitQuiz(MEMBER_SESSION, "mock-path-1", 0, {
+        answers: quiz.questions.map((q) => ({
+          questionId: q.id,
+          selectedIndex: q.correctIndex,
+        })),
+        lessonFeel: "just_right",
+      });
+
+      const result = store.getLesson(MEMBER_SESSION, "mock-path-1", 0);
+      expect(result.ok).toBe(true);
     });
   });
 });

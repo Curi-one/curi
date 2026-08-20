@@ -314,6 +314,103 @@ describe("getLessonBody", () => {
     expect(lookup).not.toHaveBeenCalled();
   });
 
+  it("locks a member lesson ahead of progress", async () => {
+    loadCourse.mockResolvedValueOnce({
+      kind: "member",
+      topic: TOPIC,
+      depth: DEPTH,
+      clarifications: CLARIFICATIONS,
+      lessons: LESSONS,
+      userId: "user-1",
+      progress: 0,
+      hasActivityToday: false,
+    });
+
+    const result = await getLessonBody(
+      { courseId: "c1", lessonIndex: 1, sessionId: "sess" },
+      baseDeps,
+    );
+
+    expect(result).toEqual({
+      ok: false,
+      code: "locked",
+      message: "This lesson unlocks tomorrow",
+    });
+    expect(lookup).not.toHaveBeenCalled();
+  });
+
+  it("locks the next lesson once activity already happened today", async () => {
+    loadCourse.mockResolvedValueOnce({
+      kind: "member",
+      topic: TOPIC,
+      depth: DEPTH,
+      clarifications: CLARIFICATIONS,
+      lessons: LESSONS,
+      userId: "user-1",
+      progress: 1,
+      hasActivityToday: true,
+    });
+
+    const result = await getLessonBody(
+      { courseId: "c1", lessonIndex: 1, sessionId: "sess" },
+      baseDeps,
+    );
+
+    expect(result).toEqual({
+      ok: false,
+      code: "locked",
+      message: "This lesson unlocks tomorrow",
+    });
+  });
+
+  it("allows re-reading a completed member lesson even with activity today", async () => {
+    loadCourse.mockResolvedValueOnce({
+      kind: "member",
+      topic: TOPIC,
+      depth: DEPTH,
+      clarifications: CLARIFICATIONS,
+      lessons: LESSONS,
+      userId: "user-1",
+      progress: 1,
+      hasActivityToday: true,
+    });
+    lookup.mockResolvedValueOnce({
+      payload: { body: ["Re-read body."] },
+      sources: [],
+    });
+
+    const result = await getLessonBody(
+      { courseId: "c1", lessonIndex: 0, sessionId: "sess" },
+      baseDeps,
+    );
+
+    expect(result.ok).toBe(true);
+  });
+
+  it("allows the current due lesson when no activity has happened today", async () => {
+    loadCourse.mockResolvedValueOnce({
+      kind: "member",
+      topic: TOPIC,
+      depth: DEPTH,
+      clarifications: CLARIFICATIONS,
+      lessons: LESSONS,
+      userId: "user-1",
+      progress: 1,
+      hasActivityToday: false,
+    });
+    lookup.mockResolvedValueOnce({
+      payload: { body: ["Due lesson body."] },
+      sources: [],
+    });
+
+    const result = await getLessonBody(
+      { courseId: "c1", lessonIndex: 1, sessionId: "sess" },
+      baseDeps,
+    );
+
+    expect(result.ok).toBe(true);
+  });
+
   it("returns not_found when lesson index is out of bounds", async () => {
     loadCourse.mockResolvedValueOnce({
       kind: "pending",

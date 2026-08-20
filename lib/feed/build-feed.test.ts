@@ -48,6 +48,7 @@ describe("buildFeed", () => {
 
     expect(feed.due.map((p) => p.id)).toEqual(["path-1", "path-2"]);
     expect(feed.done.map((p) => p.id)).toEqual(["path-3"]);
+    expect(feed.groups).toEqual([]);
   });
 
   it("excludes completed paths from due and done", () => {
@@ -55,6 +56,7 @@ describe("buildFeed", () => {
     const feed = buildFeed(courses, new Set());
     expect(feed.due).toEqual([]);
     expect(feed.done).toEqual([]);
+    expect(feed.groups).toEqual([]);
   });
 
   it("puts path with activity today in done not due", () => {
@@ -63,5 +65,6 @@ describe("buildFeed", () => {
     expect(feed.due).toEqual([]);
     expect(feed.done).toHaveLength(1);
     expect(feed.done[0]?.id).toBe("active");
+    expect(feed.groups).toEqual([]);
   });
 });

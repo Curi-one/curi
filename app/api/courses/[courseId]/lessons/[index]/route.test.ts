@@ -77,6 +77,21 @@ describe("GET /api/courses/:courseId/lessons/:index", () => {
     expect(data.code).toBe("not_found");
   });
 
+  it("returns 403 locked when reading past the member's progress", async () => {
+    const { getMockStore } = await import("@/lib/mock/store");
+    const store = getMockStore();
+    store.setPersona(GUEST_SESSION, "member");
+
+    const response = await GET(
+      lessonRequest("mock-path-1", "1", GUEST_SESSION),
+      { params: Promise.resolve({ courseId: "mock-path-1", index: "1" }) },
+    );
+
+    expect(response.status).toBe(403);
+    const data = await response.json();
+    expect(data.code).toBe("locked");
+  });
+
   it("returns 400 for invalid index", async () => {
     const response = await GET(lessonRequest("any", "nope"), {
       params: Promise.resolve({ courseId: "any", index: "nope" }),
