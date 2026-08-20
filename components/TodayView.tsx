@@ -14,7 +14,7 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
 
   if (empty) {
     return (
-      <div className="mx-auto w-full max-w-[580px] pb-24 pt-2">
+      <div className="mx-auto w-full max-w-[580px] pb-4 pt-2">
         <div className="mb-8 border-b border-border pb-8">
           <h1
             className="font-display text-3xl font-light leading-snug tracking-tight text-ink"
@@ -74,7 +74,7 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
   }
 
   return (
-    <div className="pb-24">
+    <div className="pb-4">
       <header className="mb-8 flex items-start justify-between gap-3">
         <div>
           <h1
@@ -91,7 +91,7 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
         </div>
         <Link
           href="/progress"
-          className={`inline-flex shrink-0 items-center gap-1 font-meta ${streakAtRisk ? "text-accent" : ""}`}
+          className={`inline-flex min-h-11 shrink-0 items-center gap-1 font-meta ${streakAtRisk ? "text-accent" : ""}`}
         >
           {streak} day streak
           <ArrowRight className="h-3 w-3" aria-hidden />

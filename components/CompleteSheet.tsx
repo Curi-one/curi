@@ -96,13 +96,13 @@ export function CompleteSheet({
       }}
     >
       <div
-        className="relative w-full max-w-[480px] animate-slide-up bg-paper sm:mx-4 sm:rounded-2xl"
+        className="relative flex max-h-[90dvh] w-full max-w-[480px] flex-col animate-slide-up bg-paper sm:mx-4 sm:rounded-2xl"
         style={{ borderTop: "4px solid var(--color-accent)" }}
         role="dialog"
         aria-modal="true"
         aria-labelledby="complete-sheet-title"
       >
-        <div className="px-7 pb-6 pt-7">
+        <div className="shrink-0 px-7 pb-6 pt-7">
           {(courseTopic || lessonNumber != null) && (
             <div className="mb-2 font-meta text-ink-muted">
               {courseTopic}
@@ -146,74 +146,78 @@ export function CompleteSheet({
           )}
         </div>
 
-        <div className="mx-7 h-px bg-border" />
+        <div className="mx-7 h-px shrink-0 bg-border" />
 
-        <div className="px-7 py-5">
-          <div className="mb-4 font-meta text-ink-muted">Today&apos;s insight</div>
-          <blockquote
-            className="font-display text-xl font-light leading-snug tracking-[-0.02em] text-ink"
-            style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 1" }}
-          >
-            &ldquo;{insight.fact}&rdquo;
-          </blockquote>
-          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-            {insight.reflection}
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <a
-              href={tweetUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center rounded-lg border border-border bg-ink px-4 py-2.5 text-xs font-medium text-paper transition hover:opacity-90"
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="px-7 py-5">
+            <div className="mb-4 font-meta text-ink-muted">
+              Today&apos;s insight
+            </div>
+            <blockquote
+              className="font-display text-xl font-light leading-snug tracking-[-0.02em] text-ink"
+              style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 1" }}
             >
-              Share on X
-            </a>
-            <a
-              href={liUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center rounded-lg border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
-            >
-              Share on LinkedIn
-            </a>
-            <button
-              type="button"
-              onClick={copyText}
-              className="inline-flex items-center rounded-lg border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
-            >
-              {copied ? "Copied!" : "Copy text"}
-            </button>
+              &ldquo;{insight.fact}&rdquo;
+            </blockquote>
+            <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+              {insight.reflection}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <a
+                href={tweetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center rounded-lg border border-border bg-ink px-4 py-2.5 text-xs font-medium text-paper transition hover:opacity-90"
+              >
+                Share on X
+              </a>
+              <a
+                href={liUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
+              >
+                Share on LinkedIn
+              </a>
+              <button
+                type="button"
+                onClick={copyText}
+                className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
+              >
+                {copied ? "Copied!" : "Copy text"}
+              </button>
+            </div>
           </div>
+
+          {showTomorrow && (
+            <>
+              <div className="mx-7 h-px bg-border" />
+              <div className="px-7 py-5">
+                <div className="mb-3 font-meta text-ink-muted">
+                  Up next · Tomorrow
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex-1">
+                    <div className="font-display text-base leading-snug text-ink/50">
+                      {nextLessonTitle ?? "Your next lesson"}
+                    </div>
+                    <p className="mt-1.5 text-[11px] text-ink-muted/70">
+                      {lessonNumber != null && totalLessons != null
+                        ? `Lesson ${lessonNumber + 1} of ${totalLessons} · ~5 min · unlocks tomorrow`
+                        : "~5 min · unlocks tomorrow"}
+                    </p>
+                  </div>
+                  <Lock
+                    className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-muted/40"
+                    aria-hidden
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
-        {showTomorrow && (
-          <>
-            <div className="mx-7 h-px bg-border" />
-            <div className="px-7 py-5">
-              <div className="mb-3 font-meta text-ink-muted">
-                Up next · Tomorrow
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="flex-1">
-                  <div className="font-display text-base leading-snug text-ink/50">
-                    {nextLessonTitle ?? "Your next lesson"}
-                  </div>
-                  <p className="mt-1.5 text-[11px] text-ink-muted/70">
-                    {lessonNumber != null && totalLessons != null
-                      ? `Lesson ${lessonNumber + 1} of ${totalLessons} · ~5 min · unlocks tomorrow`
-                      : "~5 min · unlocks tomorrow"}
-                  </p>
-                </div>
-                <Lock
-                  className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-muted/40"
-                  aria-hidden
-                />
-              </div>
-            </div>
-          </>
-        )}
-
-        <div className="space-y-3 border-t border-border px-7 py-5">
+        <div className="shrink-0 space-y-3 border-t border-border px-7 py-5 pb-[max(1rem,env(safe-area-inset-bottom))]">
           {pathMastered ? (
             <>
               <Link

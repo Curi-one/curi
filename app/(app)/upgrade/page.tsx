@@ -53,7 +53,7 @@ export default function UpgradePage() {
       <p className="font-meta">Curi Academy</p>
 
       <h1
-        className="mt-5 font-display text-[2.75rem] font-light leading-[1.08] tracking-[-0.04em] text-ink sm:text-5xl"
+        className="mt-5 font-display text-[2.1rem] font-light leading-[1.08] tracking-[-0.04em] text-ink sm:text-5xl"
         style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
       >
         Unlimited curiosity. Every path open.
@@ -66,7 +66,7 @@ export default function UpgradePage() {
       <div className="mt-10 border-y border-border py-8">
         <div className="flex items-baseline gap-3">
           <span
-            className="font-display text-[4.5rem] leading-[0.9] tracking-[-0.05em] text-ink sm:text-[5.5rem]"
+            className="font-display text-[3.5rem] leading-[0.9] tracking-[-0.05em] text-ink sm:text-[5.5rem]"
             style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 1" }}
           >
             $2.50

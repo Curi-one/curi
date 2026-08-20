@@ -98,7 +98,7 @@ function LibraryContent() {
           />
         )}
         {paths.length > 0 && tab === "mastered" && (
-          <ul className="grid grid-cols-2 gap-3 sm:gap-4">
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             {paths.map((p) => (
               <li key={p.id}>
                 <LibraryPathCard path={p} tab={tab} />

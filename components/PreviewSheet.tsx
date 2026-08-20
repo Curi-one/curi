@@ -79,10 +79,10 @@ export function PreviewSheet({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-border bg-paper/90 text-ink-muted shadow-sm transition hover:bg-paper-secondary hover:text-ink sm:right-5 sm:top-5"
+          className="absolute right-3 top-3 z-10 flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border bg-paper/90 text-ink-muted shadow-sm transition hover:bg-paper-secondary hover:text-ink sm:right-4 sm:top-4"
           aria-label="Close"
         >
-          <X className="h-3 w-3" strokeWidth={2.5} aria-hidden />
+          <X className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden />
         </button>
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
@@ -125,7 +125,7 @@ export function PreviewSheet({
           )}
         </div>
 
-        <div className="shrink-0 border-t border-border bg-paper-secondary/40 px-5 py-4 sm:px-6 sm:py-5">
+        <div className="shrink-0 border-t border-border bg-paper-secondary/40 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-5 sm:pb-5">
           {atLimit ? (
             <>
               <div className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-paper-secondary py-3 text-sm font-medium text-ink-muted">
