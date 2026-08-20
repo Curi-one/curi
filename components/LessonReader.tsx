@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { ArrowLeft, ChevronDown, Globe2, X } from "lucide-react";
+import { EquationBlock } from "@/components/lesson/EquationBlock";
 import { IdeaDiagram } from "@/components/lesson/IdeaDiagram";
 import { LessonImage } from "@/components/lesson/LessonImage";
 import { ShareableFact } from "@/components/lesson/ShareableFact";
@@ -23,6 +24,7 @@ import {
   type ReaderSettings,
 } from "@/lib/lessons/reader-settings";
 import { getLessonTakeaways } from "@/lib/lessons/takeaways";
+import { hasLessonVisual } from "@/lib/lessons/visuals";
 
 type Props = {
   lesson: LessonResponse;
@@ -375,8 +377,9 @@ export function LessonReader({
         </p>,
       );
 
-      if (i === imageAfter && topicLabel) {
+      if (i === imageAfter && topicLabel && hasLessonVisual(topicLabel)) {
         nodes.push(<LessonImage key="lesson-image" topic={topicLabel} />);
+        nodes.push(<EquationBlock key="equation-block" topic={topicLabel} />);
       }
       if (i === keyIdeaAfter && keyIdea) {
         nodes.push(

@@ -105,6 +105,34 @@ describe("LessonReader", () => {
     expect(otherLink).not.toHaveClass("border-accent");
   });
 
+  it("shows a lesson visual and equation block for topics with curated visuals", () => {
+    render(
+      <LessonReader
+        lesson={lesson}
+        lessonIndex={0}
+        topic="Unit Economics"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Visual note")).toBeInTheDocument();
+    expect(screen.getByText("Working equation")).toBeInTheDocument();
+  });
+
+  it("does not show a generic decorative image for topics without a curated visual", () => {
+    render(
+      <LessonReader
+        lesson={lesson}
+        lessonIndex={0}
+        topic="Some Random Topic"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText("Visual note")).not.toBeInTheDocument();
+    expect(screen.queryByText("Working equation")).not.toBeInTheDocument();
+  });
+
   it("clears the citation highlight when the sources drawer is closed", () => {
     render(
       <LessonReader
