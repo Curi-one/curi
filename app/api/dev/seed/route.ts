@@ -4,7 +4,7 @@ import { seedStagingMember } from "@/lib/seed/staging-member";
 
 /**
  * POST /api/dev/seed — staging demo member with 3 paths (2 due, 1 done today).
- * Blocked in production. Optional Bearer CRON_SECRET when configured.
+ * Blocked in production. Requires Bearer CRON_SECRET outside local.
  */
 export async function POST(request: Request) {
   const env = getEnv();
@@ -13,8 +13,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+  // Local may omit CRON_SECRET; staging/production require Bearer.
   const cronSecret = env.CRON_SECRET.trim();
-  if (cronSecret.length > 0) {
+  if (env.APP_ENV !== "local") {
+    if (!cronSecret) {
+      return NextResponse.json(
+        { error: "CRON_SECRET not configured" },
+        { status: 503 },
+      );
+    }
+    const auth = request.headers.get("authorization");
+    if (auth !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  } else if (cronSecret.length > 0) {
     const auth = request.headers.get("authorization");
     if (auth !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

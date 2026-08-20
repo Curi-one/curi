@@ -1,6 +1,7 @@
 import type {
   AuthRequest,
   BillingCheckoutResponse,
+  BillingPortalResponse,
   ClarifyRequest,
   ClarifyResponse,
   CourseCreateRequest,
@@ -169,6 +170,13 @@ export function patchMe(body: { name?: string }) {
 
 export function postCheckout() {
   return apiFetch<BillingCheckoutResponse>("/api/billing/checkout", {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
+export function postBillingPortal() {
+  return apiFetch<BillingPortalResponse>("/api/billing/portal", {
     method: "POST",
     body: JSON.stringify({}),
   });

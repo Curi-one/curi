@@ -22,7 +22,7 @@ export default function UpgradePage() {
     setLoading(true);
     try {
       const res = await postCheckout();
-      setMessage(res.message);
+      setMessage(res.message ?? null);
       if (res.url) router.push(res.url);
     } catch {
       setMessage("Checkout unavailable until Stripe is wired.");
@@ -40,8 +40,7 @@ export default function UpgradePage() {
       className="pt-4"
     >
       <p className="mt-4 text-[15px] font-light leading-relaxed text-ink-muted">
-        Same calm daily lessons. More room for parallel paths — $10/month when
-        billing ships.
+        Same calm daily lessons. More room for parallel paths — $10/month.
       </p>
 
       <div className="mt-8 overflow-hidden rounded-xl border border-border">

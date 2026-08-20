@@ -9,6 +9,7 @@ import {
 import { getEnv } from "@/lib/env";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
 
 /**
  * Supabase Auth OTP helpers (email 6-digit code + optional magic link).
@@ -46,10 +47,6 @@ type PendingCourseRow = {
   expires_at: string;
   lesson_feels: unknown;
 };
-
-function todayUtcDate(now: Date): string {
-  return now.toISOString().slice(0, 10);
-}
 
 function parseOutline(raw: unknown): OutlineLesson[] {
   if (!Array.isArray(raw)) {
@@ -297,6 +294,17 @@ export async function migratePending(
     throw new Error(`pending_courses migrate select failed: ${error.message}`);
   }
 
+  const { data: profile } = await admin
+    .from("users")
+    .select("timezone")
+    .eq("id", userId)
+    .maybeSingle();
+  const timezone =
+    typeof profile?.timezone === "string" && profile.timezone.length > 0
+      ? profile.timezone
+      : DEFAULT_TIMEZONE;
+  const activityDate = todayInTimezone(timezone, now);
+
   const migratedPathIds: string[] = [];
   const pending = (rows ?? []) as PendingCourseRow[];
 
@@ -368,7 +376,7 @@ export async function migratePending(
       user_id: userId,
       course_id: course.id as string,
       lesson_index: Number(indexKey),
-      activity_date: todayUtcDate(now),
+      activity_date: activityDate,
       lesson_feel: feel,
     }));
 

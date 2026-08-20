@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
-import { getMe, patchMe, postSignOut, type UserSession } from "@/lib/api/client";
+import { getMe, patchMe, postBillingPortal, postSignOut, type UserSession } from "@/lib/api/client";
 
 type Theme = "system" | "light" | "dark";
 
@@ -26,6 +26,9 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [theme, setTheme] = useState<Theme>("system");
 
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [portalMessage, setPortalMessage] = useState<string | null>(null);
+
   useEffect(() => {
     const stored = localStorage.getItem("curi-theme") as Theme | null;
     if (stored) {
@@ -42,6 +45,23 @@ export default function ProfilePage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  async function openPortal() {
+    setPortalLoading(true);
+    setPortalMessage(null);
+    try {
+      const res = await postBillingPortal();
+      if (res.url) {
+        router.push(res.url);
+        return;
+      }
+      setPortalMessage(res.message ?? "Billing portal unavailable.");
+    } catch {
+      setPortalMessage("Billing portal unavailable.");
+    } finally {
+      setPortalLoading(false);
+    }
+  }
 
   async function saveName() {
     if (!name.trim()) return;
@@ -92,16 +112,28 @@ export default function ProfilePage() {
     <PageShell back={{ href: "/today", label: "Today" }} title="Profile" withTabPad={false} className="pt-4">
       <section className="mt-6 surface-card p-4">
         <p className="font-meta">Plan</p>
-        <div className="mt-2 flex items-center justify-between">
+        <div className="mt-2 flex items-center justify-between gap-3">
           <span className="text-lg text-ink">
             {isAcademy ? "Academy" : "Free"}
           </span>
-          {!isAcademy && (
+          {!isAcademy ? (
             <Link href="/upgrade" className="text-sm text-accent underline">
               Upgrade
             </Link>
+          ) : (
+            <button
+              type="button"
+              disabled={portalLoading}
+              onClick={() => void openPortal()}
+              className="text-sm text-accent underline disabled:opacity-40"
+            >
+              {portalLoading ? "Opening…" : "Manage billing"}
+            </button>
           )}
         </div>
+        {portalMessage && (
+          <p className="mt-2 text-sm text-ink-muted">{portalMessage}</p>
+        )}
       </section>
 
       <dl className="mt-8 space-y-6">

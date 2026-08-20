@@ -18,7 +18,7 @@ describe("POST /api/dev/seed", () => {
 
   beforeEach(() => {
     process.env.APP_ENV = "staging";
-    delete process.env.CRON_SECRET;
+    process.env.CRON_SECRET = "test-secret";
   });
 
   afterEach(() => {
@@ -40,8 +40,13 @@ describe("POST /api/dev/seed", () => {
     expect(res.status).toBe(404);
   });
 
-  it("seeds demo member on staging", async () => {
-    const res = await POST(new Request("http://localhost/api/dev/seed", { method: "POST" }));
+  it("seeds demo member on staging with Bearer CRON_SECRET", async () => {
+    const res = await POST(
+      new Request("http://localhost/api/dev/seed", {
+        method: "POST",
+        headers: { Authorization: "Bearer test-secret" },
+      }),
+    );
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.ok).toBe(true);
@@ -49,9 +54,19 @@ describe("POST /api/dev/seed", () => {
     expect(body.courseIds).toHaveLength(3);
   });
 
-  it("requires CRON_SECRET when configured", async () => {
-    process.env.CRON_SECRET = "test-secret";
+  it("requires CRON_SECRET on staging", async () => {
     const res = await POST(new Request("http://localhost/api/dev/seed", { method: "POST" }));
     expect(res.status).toBe(401);
+  });
+
+  it("returns 503 when staging has no CRON_SECRET configured", async () => {
+    delete process.env.CRON_SECRET;
+    const res = await POST(
+      new Request("http://localhost/api/dev/seed", {
+        method: "POST",
+        headers: { Authorization: "Bearer anything" },
+      }),
+    );
+    expect(res.status).toBe(503);
   });
 });

@@ -1,10 +1,11 @@
+import type { FeedResponse } from "@/lib/api/schemas";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { DepthSlug, FeedResponse } from "@/lib/api/schemas";
 import {
   buildFeed,
   courseIdsWithActivityOnDate,
   type FeedCourseRow,
 } from "@/lib/feed/build-feed";
+import { parseDepth } from "@/lib/courses/summary";
 import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient as createServerClient } from "@/lib/supabase/server";
@@ -14,18 +15,11 @@ export type GetFeedResult =
   | { ok: false; code: "unauthorized"; message: string };
 
 export type GetFeedDeps = {
-  admin?: SupabaseClient;
   getUserId?: () => Promise<string | null>;
+  admin?: SupabaseClient;
   loadTimezone?: (userId: string) => Promise<string>;
   now?: () => Date;
 };
-
-function parseDepth(raw: unknown): DepthSlug {
-  if (raw === "essentials" || raw === "fluent" || raw === "thorough") {
-    return raw;
-  }
-  return "essentials";
-}
 
 async function defaultGetUserId(): Promise<string | null> {
   try {

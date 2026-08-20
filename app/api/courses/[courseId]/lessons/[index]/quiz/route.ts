@@ -75,7 +75,18 @@ export async function POST(request: Request, { params }: RouteParams) {
         parsed.data,
       );
       return jsonWithSession(result, sessionId);
-    } catch {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      if (message === "already_done_today") {
+        return jsonWithSession(
+          {
+            error: "This path already has a lesson completed today",
+            code: "already_done_today",
+          },
+          sessionId,
+          { status: 409 },
+        );
+      }
       return jsonWithSession(
         { error: "not found", code: "not_found" },
         sessionId,
@@ -94,7 +105,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     return jsonWithSession(
       { error: result.message, code: result.code },
       sessionId,
-      { status: 404 },
+      { status: result.code === "already_done_today" ? 409 : 404 },
     );
   }
   return jsonWithSession(result.data, sessionId);

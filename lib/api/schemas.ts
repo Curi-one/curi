@@ -156,12 +156,20 @@ export const UserSessionSchema = z.object({
 export type UserSession = z.infer<typeof UserSessionSchema>;
 
 export const BillingCheckoutResponseSchema = z.object({
-  url: z.null(),
-  message: z.string(),
+  url: z.string().nullable(),
+  message: z.string().optional(),
+  code: z.string().optional(),
 });
 export type BillingCheckoutResponse = z.infer<
   typeof BillingCheckoutResponseSchema
 >;
+
+export const BillingPortalResponseSchema = z.object({
+  url: z.string().nullable(),
+  message: z.string().optional(),
+  code: z.string().optional(),
+});
+export type BillingPortalResponse = z.infer<typeof BillingPortalResponseSchema>;
 
 export const ApiErrorSchema = z.object({
   error: z.string(),
