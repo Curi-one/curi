@@ -43,22 +43,32 @@ export type MockPath = {
 
 export const CATALOGUE_PATHS: CataloguePath[] = [
   {
-    id: "catalogue-stoicism",
-    topic: "Stoicism for modern life",
-    description: "Practical wisdom from Marcus Aurelius and Epictetus.",
-    depth: "essentials",
-  },
-  {
-    id: "catalogue-climate",
-    topic: "Climate science essentials",
-    description: "How the greenhouse effect works and what we can do.",
+    id: "catalogue-vc",
+    topic: "Venture Capital",
+    description:
+      "How VC funds work and what first-time founders need before the first institutional round.",
     depth: "fluent",
   },
   {
-    id: "catalogue-ai",
-    topic: "How large language models work",
-    description: "From tokens to transformers, explained clearly.",
-    depth: "thorough",
+    id: "catalogue-term-sheets",
+    topic: "Term Sheets",
+    description:
+      "Valuation, preferences, and governance — the clauses that become real when you sign.",
+    depth: "fluent",
+  },
+  {
+    id: "catalogue-safe",
+    topic: "SAFE Notes",
+    description:
+      "Simple until they convert. The ownership math founders need before the priced round.",
+    depth: "essentials",
+  },
+  {
+    id: "catalogue-cap-table",
+    topic: "Cap Tables",
+    description:
+      "Ownership, dilution, and option pools — the spreadsheet investors actually read.",
+    depth: "essentials",
   },
 ];
 

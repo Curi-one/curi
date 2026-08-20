@@ -39,10 +39,9 @@ describe("TodayView", () => {
   it("shows Explore CTA when empty", () => {
     render(<TodayView due={[]} done={[]} streak={0} streakAtRisk={false} />);
 
-    expect(screen.getByText("No paths yet.")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Explore paths" })).toHaveAttribute(
-      "href",
-      "/explore",
-    );
+    expect(screen.getByText("Nothing due today")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Explore founder paths" }),
+    ).toHaveAttribute("href", "/explore");
   });
 });

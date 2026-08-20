@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Heatmap } from "@/components/Heatmap";
 import { PageShell } from "@/components/PageShell";
+import { PathProgressBar } from "@/components/PathProgressBar";
 import { getLibrary, getProgress } from "@/lib/api/client";
 import type { PathSummary } from "@/lib/api/schemas";
 import { depthLabel } from "@/lib/ui/constants";
@@ -12,12 +13,17 @@ export default function ProgressPage() {
   const [streak, setStreak] = useState(0);
   const [dates, setDates] = useState<string[]>([]);
   const [paths, setPaths] = useState<PathSummary[]>([]);
+  const [stats, setStats] = useState({ active: 0, mastered: 0 });
 
   useEffect(() => {
     Promise.all([getProgress(), getLibrary()]).then(([p, lib]) => {
       setStreak(p.streak);
       setDates(p.heatmap);
       setPaths([...lib.exploring, ...lib.mastered]);
+      setStats({
+        active: p.activePaths ?? lib.exploring.length,
+        mastered: p.masteredPaths ?? lib.mastered.length,
+      });
     });
   }, []);
 
@@ -27,7 +33,18 @@ export default function ProgressPage() {
       title="Progress"
       kicker="Streak & paths"
       withTabPad={false}
+      className="pt-4"
     >
+      <div className="mt-6 grid grid-cols-2 gap-3">
+        <div className="surface-card px-4 py-3">
+          <p className="font-meta">Active</p>
+          <p className="mt-1 font-display text-2xl text-ink">{stats.active}</p>
+        </div>
+        <div className="surface-card px-4 py-3">
+          <p className="font-meta">Mastered</p>
+          <p className="mt-1 font-display text-2xl text-ink">{stats.mastered}</p>
+        </div>
+      </div>
       <div className="mt-8">
         <Heatmap dates={dates} streak={streak} />
       </div>
@@ -37,7 +54,7 @@ export default function ProgressPage() {
           <p className="mt-4 text-ink-muted">
             No paths yet.{" "}
             <Link href="/explore" className="underline hover:text-ink">
-              Explore
+              Explore founder paths
             </Link>
           </p>
         ) : (
@@ -46,12 +63,17 @@ export default function ProgressPage() {
               <li key={p.id}>
                 <Link
                   href={`/library/${p.id}`}
-                  className="surface-card block px-4 py-3 hover:border-ink/30"
+                  className="surface-card block px-4 py-3 hover:border-accent/30"
                 >
                   <p className="font-medium text-ink">{p.topic}</p>
                   <p className="mt-1 font-meta">
                     {p.progress} / {p.totalLessons} · {depthLabel(p.depth)}
                   </p>
+                  <PathProgressBar
+                    progress={p.progress}
+                    total={p.totalLessons}
+                    className="mt-2"
+                  />
                 </Link>
               </li>
             ))}

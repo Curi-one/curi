@@ -3,14 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LandingHeadline } from "@/components/LandingHeadline";
 import { Wordmark } from "@/components/Wordmark";
+import {
+  FOUNDER_LANDING_HOOK,
+  FOUNDER_TOPIC_SUGGESTIONS,
+} from "@/lib/content/founder-catalogue";
 import { getMe } from "@/lib/api/client";
-
-const SUGGESTIONS = [
-  "Stoicism for modern life",
-  "How AI actually works",
-  "The science of sleep",
-];
 
 const AUTH_TODAY = "/auth?intent=signin&returnTo=%2Ftoday";
 const SIGNUP_TODAY = "/auth?intent=signup&returnTo=%2Ftoday";
@@ -38,7 +37,7 @@ export default function LandingPage() {
   }
 
   return (
-    <main className="app-shell flex flex-col pb-16 pt-6">
+    <main className="app-shell flex flex-col pb-16 pt-6 animate-fade-in">
       <header className="flex items-center justify-between">
         <Wordmark />
         <nav className="flex items-center gap-1" aria-label="Account">
@@ -54,15 +53,11 @@ export default function LandingPage() {
         </nav>
       </header>
 
-      <p className="type-kicker mt-16">Three minutes a day</p>
-      <h1
-        className="mt-4 font-display text-[2.35rem] font-light leading-[1.12] tracking-tight text-ink sm:text-[2.75rem]"
-        style={{ fontVariationSettings: "'SOFT' 70, 'WONK' 1" }}
-      >
-        What are you curious about?
-      </h1>
+      <p className="type-kicker mt-16">For first-time founders</p>
+      <LandingHeadline />
       <p className="mt-4 max-w-sm text-[15px] font-light leading-relaxed text-ink-muted">
-        Free to start. No account needed until after your first lesson.
+        {FOUNDER_LANDING_HOOK} Free to start — no account until after your first
+        lesson.
       </p>
       <label className="mt-10 block">
         <span className="sr-only">Topic</span>
@@ -71,7 +66,7 @@ export default function LandingPage() {
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && start(topic)}
-          placeholder="e.g. Stoicism, sleep, climate policy…"
+          placeholder="e.g. term sheets, SAFE notes, cap tables…"
           className="input-field"
         />
       </label>
@@ -86,12 +81,12 @@ export default function LandingPage() {
       <div className="mt-12">
         <p className="type-kicker">Suggestions</p>
         <ul className="mt-3 flex flex-wrap gap-2">
-          {SUGGESTIONS.map((s) => (
+          {FOUNDER_TOPIC_SUGGESTIONS.map((s) => (
             <li key={s}>
               <button
                 type="button"
                 onClick={() => start(s)}
-                className="rounded-full border border-border px-4 py-2 text-[13px] text-ink hover:border-ink"
+                className="rounded-full border border-border bg-paper-secondary px-4 py-2 text-[13px] text-ink transition-colors hover:border-accent/40 hover:bg-paper"
               >
                 {s}
               </button>

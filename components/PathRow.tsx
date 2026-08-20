@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { PathSummary } from "@/lib/api/schemas";
+import { PathProgressBar } from "@/components/PathProgressBar";
 import { depthLabel } from "@/lib/ui/constants";
 
 type Props = {
@@ -15,7 +16,7 @@ export function PathRow({ path, dimmed }: Props) {
     <Link
       href={href}
       className={`surface-card block px-4 py-4 transition-opacity ${
-        dimmed ? "opacity-50" : "hover:border-ink/30"
+        dimmed ? "opacity-55" : "hover:border-accent/30"
       }`}
     >
       <p
@@ -27,6 +28,7 @@ export function PathRow({ path, dimmed }: Props) {
       <p className="mt-2 font-meta">
         {depthLabel(path.depth)} · Lesson {lessonNum} of {path.totalLessons}
       </p>
+      <PathProgressBar progress={path.progress} total={path.totalLessons} />
     </Link>
   );
 }

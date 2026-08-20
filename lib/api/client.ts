@@ -160,6 +160,13 @@ export function getMe() {
   return apiFetch<{ session: UserSession }>("/api/me");
 }
 
+export function patchMe(body: { name?: string }) {
+  return apiFetch<{ session: UserSession }>("/api/me", {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
 export function postCheckout() {
   return apiFetch<BillingCheckoutResponse>("/api/billing/checkout", {
     method: "POST",

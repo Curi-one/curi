@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DepthSlug } from "@/lib/api/schemas";
 import { getAuthenticatedUserId } from "@/lib/auth/user-id";
-import { buildPathMapNodes } from "@/lib/courses/path-map";
+import { buildPathMapNodes, type PathMapInput } from "@/lib/courses/path-map";
 import { parseDepth } from "@/lib/courses/summary";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -57,7 +57,7 @@ export async function getCourseMap(
   }
 
   const statusRaw = String(course.status);
-  const status: CourseMapResponse["status"] =
+  const status: PathMapInput["status"] =
     statusRaw === "completed" || statusRaw === "shelved"
       ? statusRaw
       : "active";

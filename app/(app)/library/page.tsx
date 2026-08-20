@@ -1,13 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
+import { LibraryPathCard } from "@/components/LibraryPathCard";
 import { PageShell } from "@/components/PageShell";
+import { TabPills } from "@/components/TabPills";
 import type { LibraryResponse } from "@/lib/api/schemas";
 import { getLibrary } from "@/lib/api/client";
-import { depthLabel } from "@/lib/ui/constants";
 
 type Tab = keyof LibraryResponse;
 
@@ -17,15 +16,17 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "shelved", label: "Shelved" },
 ];
 
-export default function LibraryPage() {
-  const searchParams = useSearchParams();
-  const initialTab = searchParams.get("tab");
-  const [tab, setTab] = useState<Tab>(
-    initialTab === "mastered" || initialTab === "shelved"
-      ? initialTab
-      : "exploring",
-  );
+function LibraryContent() {
+  const [tab, setTab] = useState<Tab>("exploring");
   const [lib, setLib] = useState<LibraryResponse | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("tab");
+    if (q === "mastered" || q === "shelved" || q === "exploring") {
+      setTab(q);
+    }
+  }, []);
 
   useEffect(() => {
     getLibrary().then(setLib).catch(() =>
@@ -36,20 +37,17 @@ export default function LibraryPage() {
   const paths = lib?.[tab] ?? [];
 
   return (
-    <PageShell title="Library" kicker="Your paths" withTabPad={false} className="pt-4">
-      <div className="mt-6 flex gap-2">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setTab(t.id)}
-            className={`rounded-full px-4 py-2 text-sm ${
-              tab === t.id ? "bg-ink text-paper" : "border border-border"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+    <>
+      <div className="mt-6">
+        <TabPills
+          tabs={TABS.map((t) => ({
+            id: t.id,
+            label: t.label,
+            count: lib?.[t.id].length,
+          }))}
+          active={tab}
+          onChange={(id) => setTab(id as Tab)}
+        />
       </div>
       <div className="mt-6">
         {!lib && <p className="text-ink-muted">Loading…</p>}
@@ -70,23 +68,22 @@ export default function LibraryPage() {
           <ul className="space-y-3">
             {paths.map((p) => (
               <li key={p.id}>
-                <Link
-                  href={`/library/${p.id}`}
-                  className="surface-card block px-4 py-4 hover:border-ink/30"
-                >
-                  <p className="font-display text-[22px] leading-snug text-ink">
-                    {p.topic}
-                  </p>
-                  <p className="mt-2 font-meta">
-                    {depthLabel(p.depth)} · {p.progress} of {p.totalLessons}{" "}
-                    lessons
-                  </p>
-                </Link>
+                <LibraryPathCard path={p} tab={tab} />
               </li>
             ))}
           </ul>
         )}
       </div>
+    </>
+  );
+}
+
+export default function LibraryPage() {
+  return (
+    <PageShell title="Library" kicker="Your paths" withTabPad={false} className="pt-4">
+      <Suspense fallback={<p className="mt-6 text-ink-muted">Loading…</p>}>
+        <LibraryContent />
+      </Suspense>
     </PageShell>
   );
 }
