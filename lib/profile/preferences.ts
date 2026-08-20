@@ -1,7 +1,9 @@
+export type LessonLength = "Short" | "Medium" | "Long";
+
 export type LearningPreferences = {
   goal: string;
   curiosityContext: string;
-  lessonDepth: string;
+  lessonDepth: LessonLength;
   learningStyle: string;
 };
 
@@ -19,7 +21,7 @@ export type ProfilePreferences = LearningPreferences & EmailPreferences;
 export const DEFAULT_PREFERENCES: ProfilePreferences = {
   goal: "",
   curiosityContext: "For work or a project",
-  lessonDepth: "Standard",
+  lessonDepth: "Medium",
   learningStyle: "With real examples",
   emailEnabled: false,
   emailTime: "morning",
@@ -36,6 +38,27 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+const LESSON_LENGTH_VALUES: LessonLength[] = ["Short", "Medium", "Long"];
+
+/** Legacy Quick/Standard/Deep labels migrate to Short/Medium/Long. */
+const LEGACY_LESSON_DEPTH_MIGRATIONS: Record<string, LessonLength> = {
+  Quick: "Short",
+  Standard: "Medium",
+  Deep: "Long",
+};
+
+function normalizeLessonDepth(value: unknown): LessonLength {
+  if (typeof value !== "string") {
+    return DEFAULT_PREFERENCES.lessonDepth;
+  }
+  const migrated = LEGACY_LESSON_DEPTH_MIGRATIONS[value];
+  if (migrated) return migrated;
+  if (LESSON_LENGTH_VALUES.includes(value as LessonLength)) {
+    return value as LessonLength;
+  }
+  return DEFAULT_PREFERENCES.lessonDepth;
+}
+
 function mergeWithDefaults(raw: unknown): ProfilePreferences {
   if (!isPlainObject(raw)) return { ...DEFAULT_PREFERENCES };
 
@@ -46,10 +69,7 @@ function mergeWithDefaults(raw: unknown): ProfilePreferences {
       typeof raw.curiosityContext === "string"
         ? raw.curiosityContext
         : DEFAULT_PREFERENCES.curiosityContext,
-    lessonDepth:
-      typeof raw.lessonDepth === "string"
-        ? raw.lessonDepth
-        : DEFAULT_PREFERENCES.lessonDepth,
+    lessonDepth: normalizeLessonDepth(raw.lessonDepth),
     learningStyle:
       typeof raw.learningStyle === "string"
         ? raw.learningStyle

@@ -50,9 +50,9 @@ const CURIOSITY_OPTIONS = [
 ] as const;
 
 const DEPTH_OPTIONS = [
-  { value: "Quick", label: "A taste · ~2 min" },
-  { value: "Standard", label: "The essentials · ~5 min" },
-  { value: "Deep", label: "Full depth · ~10 min" },
+  { value: "Short", label: "Short · ~2 min" },
+  { value: "Medium", label: "Medium · ~5 min" },
+  { value: "Long", label: "Long · ~10 min" },
 ] as const;
 
 const STYLE_OPTIONS = [
@@ -406,10 +406,12 @@ export default function ProfilePage() {
           <div className="my-5 h-px bg-border" aria-hidden />
 
           <SettingChips
-            label="How far do you want to go?"
-            hint="Sets lesson length and how much ground each session covers."
+            label="How long should each lesson run?"
+            hint="Sets how much ground each daily lesson covers. Medium is the default."
             value={prefs.lessonDepth}
-            onChange={(v) => patchPrefs("lessonDepth", v)}
+            onChange={(v) =>
+              patchPrefs("lessonDepth", v as ProfilePreferences["lessonDepth"])
+            }
             options={[...DEPTH_OPTIONS]}
           />
 
