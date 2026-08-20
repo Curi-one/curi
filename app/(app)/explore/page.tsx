@@ -243,14 +243,14 @@ export default function ExplorePage() {
                 >
                   <CourseCover topic={featured.topic} height={160} />
                   <div className="px-5 pb-5 pt-4">
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
                         <p className="font-meta">Featured · Founder path</p>
                         <h3 className="mt-1 font-display text-[22px] leading-snug text-ink sm:text-2xl">
                           {featured.topic}
                         </h3>
                       </div>
-                      <span className="shrink-0 rounded-full border border-border bg-paper-secondary px-3 py-1.5 font-meta normal-case">
+                      <span className="w-fit shrink-0 rounded-full border border-border bg-paper-secondary px-3 py-1.5 font-meta normal-case">
                         {lessonCountForDepth(featured.topic, featured.depth)}{" "}
                         lessons
                       </span>
@@ -383,8 +383,11 @@ function PathSearchRow({
         <p className="mt-0.5 line-clamp-1 text-xs text-ink-muted">
           {item.description}
         </p>
+        <span className="mt-1 block font-meta normal-case sm:hidden">
+          {lessons} · {depthLabel(item.depth)}
+        </span>
       </div>
-      <span className="shrink-0 font-meta normal-case">
+      <span className="hidden shrink-0 font-meta normal-case sm:inline">
         {lessons} · {depthLabel(item.depth)}
       </span>
       <ArrowRight className="h-4 w-4 shrink-0 text-ink-muted/40 group-hover:text-ink-muted" aria-hidden />
@@ -412,8 +415,11 @@ function BookSearchRow({
         <p className="mt-0.5 line-clamp-1 text-xs text-ink-muted">
           {item.author} · {item.description}
         </p>
+        <span className="mt-1 block font-meta normal-case sm:hidden">
+          {item.pathCount} paths
+        </span>
       </div>
-      <span className="shrink-0 font-meta normal-case">
+      <span className="hidden shrink-0 font-meta normal-case sm:inline">
         {item.pathCount} paths
       </span>
       <ArrowRight

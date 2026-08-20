@@ -275,7 +275,7 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-4 gap-1 rounded-full border border-border p-1">
+      <div className="flex overflow-x-auto rounded-full border border-border p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {(
           [
             ["account", "Account"],
@@ -288,7 +288,7 @@ export default function ProfilePage() {
             key={id}
             type="button"
             onClick={() => setTab(id)}
-            className={`rounded-full px-1 py-2 text-center text-xs transition-colors sm:text-sm ${
+            className={`min-h-11 shrink-0 rounded-full px-3 text-center text-xs transition-colors sm:text-sm ${
               tab === id
                 ? "bg-ink text-paper"
                 : "text-ink-muted hover:text-ink"

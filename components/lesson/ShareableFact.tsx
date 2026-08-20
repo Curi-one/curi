@@ -38,12 +38,12 @@ export function ShareableFact({ topic, title }: Props) {
           <p className="mt-4 max-w-2xl text-base leading-7 text-ink-muted">
             {item.reflection}
           </p>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="mt-6 flex w-full flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <a
               href={`https://twitter.com/intent/tweet?text=${encoded}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-lg bg-ink px-5 py-3 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-ink px-5 py-3 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
             >
               Share on X
             </a>
@@ -51,7 +51,7 @@ export function ShareableFact({ topic, title }: Props) {
               href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://curi.one")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-lg border border-border px-5 py-3 text-sm font-medium text-ink/80 transition-colors hover:border-accent/40 hover:text-accent"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-5 py-3 text-sm font-medium text-ink/80 transition-colors hover:border-accent/40 hover:text-accent"
               onClick={(e) => {
                 e.preventDefault();
                 copyShareText();
@@ -67,7 +67,7 @@ export function ShareableFact({ topic, title }: Props) {
             <button
               type="button"
               onClick={copyShareText}
-              className="rounded-lg border border-border px-5 py-3 text-sm font-medium text-ink/80 transition-colors hover:border-accent/40 hover:text-accent"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-5 py-3 text-sm font-medium text-ink/80 transition-colors hover:border-accent/40 hover:text-accent"
             >
               {copied ? "Copied" : "Copy text"}
             </button>

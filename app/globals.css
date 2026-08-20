@@ -138,7 +138,7 @@ body {
   }
 
   .app-shell {
-    @apply mx-auto min-h-screen w-full max-w-lg px-5;
+    @apply mx-auto min-h-screen min-w-0 w-full max-w-lg overflow-x-hidden px-5;
     background: var(--color-bg-primary);
   }
 

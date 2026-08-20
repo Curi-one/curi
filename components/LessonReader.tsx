@@ -296,7 +296,7 @@ export function LessonReader({
           {isFirst && firstLetter ? (
             <>
               <span
-                className="float-left mr-3 mt-1 font-display text-7xl font-light leading-[0.78] text-ink"
+                className="float-left mr-3 mt-1 font-display text-5xl font-light leading-[0.78] text-ink sm:text-7xl"
                 style={{ fontVariationSettings: "'SOFT' 55, 'WONK' 1" }}
                 aria-hidden
               >
@@ -392,10 +392,12 @@ export function LessonReader({
           {back ? (
             <Link
               href={back.href}
-              className="inline-flex min-h-11 items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
+              className="inline-flex min-h-11 min-w-0 items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
             >
-              <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
-              {back.label}
+              <ArrowLeft className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span className="truncate max-w-[40vw] sm:max-w-none">
+                {back.label}
+              </span>
             </Link>
           ) : (
             <span />
@@ -406,7 +408,7 @@ export function LessonReader({
               type="button"
               onClick={() => setShowReaderSettings((v) => !v)}
               aria-label="Reader display settings"
-              className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full border px-3 text-xs font-medium transition-colors ${
                 showReaderSettings
                   ? "border-ink/30 bg-ink text-paper"
                   : "border-border text-ink-muted hover:border-ink/25 hover:text-ink"
@@ -419,7 +421,7 @@ export function LessonReader({
             {showReaderSettings && (
               <div
                 ref={settingsPanelRef}
-                className="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-2xl border border-border bg-paper shadow-xl"
+                className="fixed left-1/2 top-auto z-50 mt-2 w-[min(18rem,calc(100vw-2rem))] max-h-[70dvh] -translate-x-1/2 overflow-y-auto rounded-2xl border border-border bg-paper shadow-xl sm:absolute sm:left-auto sm:right-0 sm:w-72 sm:translate-x-0"
                 style={
                   settings.theme !== "light"
                     ? { background: theme.card, borderColor: theme.border }
@@ -439,7 +441,7 @@ export function LessonReader({
                         })
                       }
                       disabled={sizeIdx <= 0}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-ink-muted transition hover:border-ink/30 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                      className="flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-border text-ink-muted transition hover:border-ink/30 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                       aria-label="Decrease font size"
                     >
                       −
@@ -480,7 +482,7 @@ export function LessonReader({
                         })
                       }
                       disabled={sizeIdx >= READER_SIZES.length - 1}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-ink-muted transition hover:border-ink/30 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                      className="flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-border text-ink-muted transition hover:border-ink/30 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                       aria-label="Increase font size"
                     >
                       +
@@ -620,9 +622,24 @@ export function LessonReader({
           <div className="mb-8 overflow-hidden rounded-2xl border border-border bg-paper-secondary/60">
             <div className="flex items-center gap-0 divide-x divide-border">
               {[
-                { n: "1", label: "Read lesson", done: true },
-                { n: "2", label: "Complete the quiz", done: false },
-                { n: "3", label: "Save & unlock lesson 2", done: false },
+                {
+                  n: "1",
+                  short: "Read",
+                  label: "Read lesson",
+                  done: true,
+                },
+                {
+                  n: "2",
+                  short: "Quiz",
+                  label: "Complete the quiz",
+                  done: false,
+                },
+                {
+                  n: "3",
+                  short: "Save",
+                  label: "Save & unlock lesson 2",
+                  done: false,
+                },
               ].map((step) => (
                 <div
                   key={step.n}
@@ -639,6 +656,9 @@ export function LessonReader({
                   >
                     {step.done ? "✓" : step.n}
                   </span>
+                  <span className="text-[11px] leading-snug sm:hidden">
+                    {step.short}
+                  </span>
                   <span className="hidden text-[11px] leading-snug sm:inline">
                     {step.label}
                   </span>
@@ -648,7 +668,10 @@ export function LessonReader({
           </div>
         )}
 
-        <article ref={articleRef} className="pb-32">
+        <article
+          ref={articleRef}
+          className="pb-[calc(8rem+env(safe-area-inset-bottom))]"
+        >
           <div className="mb-6 flex flex-wrap items-center gap-2.5 text-xs uppercase tracking-[0.3em] text-ink-muted">
             <span>
               Lesson {lessonIndex + 1}
@@ -775,7 +798,7 @@ export function LessonReader({
               <button
                 type="button"
                 onClick={() => setShowSources(false)}
-                className="mt-0.5 rounded-lg p-1.5 text-ink-muted transition hover:bg-paper-secondary hover:text-ink"
+                className="mt-0.5 flex min-h-11 min-w-11 items-center justify-center rounded-lg text-ink-muted transition hover:bg-paper-secondary hover:text-ink"
                 aria-label="Close sources"
               >
                 <X className="h-4 w-4" aria-hidden />

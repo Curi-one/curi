@@ -30,7 +30,7 @@ export function TabPills({
               role="tab"
               aria-selected={isActive}
               onClick={() => onChange(tab.id)}
-              className={`relative mr-5 pb-3 text-sm font-medium transition-colors ${
+              className={`relative mr-5 min-h-11 pb-3 text-sm font-medium transition-colors ${
                 isActive ? "text-ink" : "text-ink-muted hover:text-ink"
               }`}
             >
@@ -58,7 +58,7 @@ export function TabPills({
           key={tab.id}
           type="button"
           onClick={() => onChange(tab.id)}
-          className={`rounded-full px-4 py-2 text-sm transition-colors ${
+          className={`min-h-11 rounded-full px-4 py-2 text-sm transition-colors ${
             active === tab.id
               ? "bg-ink text-paper shadow-[inset_0_-2px_0_var(--color-accent)]"
               : "border border-border text-ink-muted hover:border-ink/30 hover:text-ink"

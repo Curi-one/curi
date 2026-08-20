@@ -18,7 +18,7 @@ export function LessonImage({ topic }: Props) {
             ))}
           </div>
         </div>
-        <figcaption className="flex flex-col justify-end border-l border-border pl-6">
+        <figcaption className="flex flex-col justify-end border-l-0 pl-0 pt-4 lg:border-l lg:border-border lg:pl-6 lg:pt-0">
           <div className="text-xs uppercase tracking-[0.24em] text-ink-muted">
             Visual note
           </div>

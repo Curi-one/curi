@@ -143,7 +143,7 @@ export default function LandingPage() {
             <button
               type="submit"
               disabled={!topic.trim()}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-paper transition-all duration-150 hover:scale-[1.07] active:scale-95 disabled:opacity-20"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-paper transition-all duration-150 hover:scale-[1.07] active:scale-95 disabled:opacity-20"
               aria-label="Start exploring"
             >
               <ArrowUp className="h-4 w-4" aria-hidden />
@@ -177,7 +177,7 @@ export default function LandingPage() {
                 key={suggestion}
                 type="button"
                 onClick={() => start(suggestion)}
-                className="shrink-0 rounded-full px-3.5 py-2 text-[13px] text-ink-muted transition-colors active:scale-[0.97]"
+                className="min-h-11 shrink-0 rounded-full px-3.5 py-2 text-[13px] text-ink-muted transition-colors active:scale-[0.97]"
                 style={{
                   background:
                     "color-mix(in srgb, var(--color-ink) 4%, transparent)",
