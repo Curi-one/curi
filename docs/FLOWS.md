@@ -146,7 +146,7 @@ Path map nodes: **read** · **today** (current) · **locked**.
 ## F5 — Auth (other entry)
 
 - Profile → Sign out → Landing (guest).  
-- Sign in without pending path → Today (empty or existing paths).
+- Sign in without pending path → Today (empty or existing paths). Landing **Sign in** / **Sign up** (header) is this entry — guest Start stays the primary CTA.
 
 ---
 

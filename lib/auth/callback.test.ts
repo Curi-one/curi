@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   completeEmailLink,
   resolveAuthLanding,
-  successRedirectPath,
+  shouldCollectName,
 } from "@/lib/auth/callback";
 
 describe("resolveAuthLanding", () => {
@@ -65,8 +65,9 @@ describe("completeEmailLink", () => {
   });
 });
 
-describe("successRedirectPath", () => {
-  it("returns to auth name collection after the session cookie is set", () => {
-    expect(successRedirectPath()).toBe("/auth?from=link");
+describe("shouldCollectName", () => {
+  it("skips the name step when the member already has a name", () => {
+    expect(shouldCollectName({ name: "Alex" })).toBe(false);
+    expect(shouldCollectName({ name: undefined })).toBe(true);
   });
 });

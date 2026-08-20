@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { getMe, postAuth } from "@/lib/api/client";
-import { resolveAuthLanding } from "@/lib/auth/callback";
+import { resolveAuthLanding, shouldCollectName } from "@/lib/auth/callback";
 
 type Step = "email" | "code" | "name";
 
@@ -11,6 +12,7 @@ function AuthContent() {
   const router = useRouter();
   const params = useSearchParams();
   const returnTo = params.get("returnTo") ?? "/today";
+  const intent = params.get("intent");
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -71,7 +73,15 @@ function AuthContent() {
         return;
       }
       if (step === "code") {
-        await postAuth({ email, code });
+        const res = await postAuth({ email, code });
+        if (
+          "session" in res &&
+          res.session?.kind === "member" &&
+          !shouldCollectName(res.session)
+        ) {
+          router.push(returnTo);
+          return;
+        }
         setStep("name");
         return;
       }
@@ -99,12 +109,20 @@ function AuthContent() {
   return (
     <div className="flex min-h-[70vh] flex-col">
       <h1 className="font-display text-2xl text-ink">
-        {step === "email" && "Save your progress"}
+        {step === "email" &&
+          (intent === "signin"
+            ? "Welcome back"
+            : intent === "signup"
+              ? "Create your account"
+              : "Save your progress")}
         {step === "code" && "Check your email"}
         {step === "name" && "What should we call you?"}
       </h1>
       <p className="mt-2 text-ink-muted">
-        {step === "email" && "Enter your email — no password needed."}
+        {step === "email" &&
+          (intent === "signin"
+            ? "Enter your email — we'll send a code, no password."
+            : "Enter your email — no password needed.")}
         {step === "code" &&
           (devHint
             ? `We sent a code to ${email}. Dev code: ${devHint}`
@@ -152,6 +170,14 @@ function AuthContent() {
         >
           Continue
         </button>
+        {(intent === "signin" || intent === "signup") && (
+          <Link
+            href="/"
+            className="mt-4 block text-center text-sm text-ink-muted hover:text-ink"
+          >
+            Back to start
+          </Link>
+        )}
       </div>
     </div>
   );

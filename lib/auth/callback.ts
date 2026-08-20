@@ -53,6 +53,10 @@ export function successRedirectPath(): string {
   return "/auth?from=link";
 }
 
+export function shouldCollectName(session: { name?: string } | undefined): boolean {
+  return !session?.name?.trim();
+}
+
 export function failureRedirectPath(): string {
   return "/auth?error=link";
 }
