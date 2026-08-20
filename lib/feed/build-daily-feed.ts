@@ -110,10 +110,22 @@ export function buildDailyFeedItems(
     if (!hasActivityToday) {
       items.push(feedItem(course, course.progress, 0, "available"));
 
-      const hasEverHadActivity = courseActivity.length > 0;
+      const lastActivityDate = courseActivity.reduce(
+        (latest, row) =>
+          row.activityDate > latest ? row.activityDate : latest,
+        "",
+      );
+      const daysSinceLastActivity =
+        lastActivityDate.length > 0
+          ? daysAgoFromDate(today, lastActivityDate)
+          : Number.POSITIVE_INFINITY;
       const createdBeforeToday =
         course.createdAt !== undefined && course.createdAt < today;
-      const missedDaySignal = hasEverHadActivity || createdBeforeToday;
+      // Overdue only when a calendar day was skipped since last completion,
+      // or a path created before today still has zero completions.
+      const missedDaySignal =
+        (courseActivity.length > 0 && daysSinceLastActivity >= 2) ||
+        (courseActivity.length === 0 && createdBeforeToday);
       if (missedDaySignal) {
         items.push(feedItem(course, course.progress, 1, "overdue"));
       }

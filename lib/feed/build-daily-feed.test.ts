@@ -104,6 +104,25 @@ describe("buildDailyFeedItems", () => {
     expect(completed.map((i) => i.daysAgo).sort()).toEqual([0, 1, 2]);
   });
 
+  it("does not duplicate today’s lesson under yesterday after completing on schedule", () => {
+    const courses = [course({ id: "p1", progress: 1, createdAt: "2026-08-19" })];
+    const activity: DailyFeedActivityRow[] = [
+      { courseId: "p1", lessonIndex: 0, activityDate: "2026-08-19" },
+    ];
+    const items = buildDailyFeedItems(courses, activity, TODAY);
+
+    expect(items.filter((i) => i.lessonIndex === 1 && i.status === "available")).toEqual([
+      expect.objectContaining({ daysAgo: 0, status: "available" }),
+    ]);
+    expect(items.some((i) => i.lessonIndex === 1 && i.status === "overdue")).toBe(
+      false,
+    );
+    expect(items.find((i) => i.status === "locked")).toMatchObject({
+      lessonIndex: 2,
+      daysAgo: -1,
+    });
+  });
+
   it("adds an overdue item for the current lesson when a day was missed", () => {
     const courses = [
       course({ id: "p1", progress: 2, createdAt: "2026-08-15" }),
@@ -149,11 +168,12 @@ describe("groupFeedItems", () => {
     const groups = groupFeedItems(items, TODAY);
 
     expect(groups.map((g) => g.daysAgo)).toEqual([-1, 0, 1, 2]);
+    expect(groups.find((g) => g.daysAgo === 1)?.items.every((i) => i.status === "completed")).toBe(true);
     expect(groups.map((g) => g.label)).toEqual([
       "Tomorrow",
       "Today",
       "Yesterday",
-      "2026-08-18".length > 0 ? feedDateLabel(2, TODAY) : "",
+      feedDateLabel(2, TODAY),
     ]);
   });
 });
