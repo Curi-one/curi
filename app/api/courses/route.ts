@@ -4,6 +4,8 @@ import {
   jsonWithSession,
   resolveSession,
 } from "@/lib/api/handler-utils";
+import { createCourse } from "@/lib/courses/create-course";
+import { getEnv } from "@/lib/env";
 import { getMockStore } from "@/lib/mock/store";
 
 export async function POST(request: Request) {
@@ -14,8 +16,25 @@ export async function POST(request: Request) {
     return invalidBodyResponse();
   }
 
-  const store = getMockStore();
-  const result = store.createCourse(sessionId, parsed.data);
+  // Preview USE_MOCK_API=false is flipped by ops/manager, not this route.
+  if (getEnv().USE_MOCK_API) {
+    const store = getMockStore();
+    const result = store.createCourse(sessionId, parsed.data);
+    if (!result.ok) {
+      return jsonWithSession(
+        { error: result.message, code: result.code },
+        sessionId,
+        { status: 403 },
+      );
+    }
+    return jsonWithSession(result.data, sessionId);
+  }
+
+  const result = await createCourse({
+    sessionId,
+    request: parsed.data,
+  });
+
   if (!result.ok) {
     return jsonWithSession(
       { error: result.message, code: result.code },
