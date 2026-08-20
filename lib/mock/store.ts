@@ -15,11 +15,14 @@ import type {
   UserSession,
 } from "@/lib/api/schemas";
 import { isPathDueToday } from "@/lib/due-today";
+import { getExploreCatalogue } from "@/lib/explore/catalogue";
+import {
+  feelToDifficultyModifier,
+  type DifficultyModifier,
+} from "@/lib/lessons/body";
 import { FREE_ACTIVE_PATH_LIMIT } from "@/lib/plans";
 import { computeStreak } from "@/lib/streak";
 import {
-  CATALOGUE_BOOKS,
-  CATALOGUE_PATHS,
   clarifyQuestionsForTopic,
   createDefaultMemberActivity,
   createDefaultMemberPaths,
@@ -85,6 +88,35 @@ function hasActivityToday(
 
 function activityDates(activity: ActivityRecord[]): string[] {
   return activity.map((a) => a.activityDate);
+}
+
+/** Mirrors MODIFIER_HINTS in lib/lessons/body.ts for the mock content path (CUR-45). */
+const MOCK_DIFFICULTY_HINTS: Record<DifficultyModifier, string | null> = {
+  baseline: null,
+  easier:
+    "*Tuned easier: shorter sentences, terms defined, lighter assumed knowledge.*",
+  deeper: "*Tuned deeper: more nuance and edge cases, less repetition.*",
+  clearer:
+    "*Tuned clearer: more concrete examples and a short recap up front.*",
+};
+
+function priorLessonFeel(
+  activity: ActivityRecord[],
+  courseId: string,
+  priorLessonIndex: number,
+): ActivityRecord["lessonFeel"] {
+  return activity.find(
+    (a) => a.courseId === courseId && a.lessonIndex === priorLessonIndex,
+  )?.lessonFeel;
+}
+
+function applyDifficultyModifier(
+  content: LessonResponse,
+  modifier: DifficultyModifier,
+): LessonResponse {
+  const hint = MOCK_DIFFICULTY_HINTS[modifier];
+  if (!hint) return content;
+  return { ...content, body: [hint, ...content.body] };
 }
 
 function nextCourseId(topic: string): string {
@@ -261,13 +293,25 @@ class MockStore {
       index,
       path.lessonTitles[index],
     );
+
+    let modifier: DifficultyModifier = "baseline";
+    if (index > 0) {
+      const feel = priorLessonFeel(data.activity, path.id, index - 1);
+      if (feel) {
+        modifier = feelToDifficultyModifier(feel);
+      }
+    }
+
     return {
       ok: true,
-      data: {
-        title: content.title,
-        body: content.body,
-        sources: content.sources,
-      },
+      data: applyDifficultyModifier(
+        {
+          title: content.title,
+          body: content.body,
+          sources: content.sources,
+        },
+        modifier,
+      ),
     };
   }
 
@@ -509,7 +553,7 @@ class MockStore {
   }
 
   getExplore() {
-    return { paths: CATALOGUE_PATHS, books: CATALOGUE_BOOKS };
+    return getExploreCatalogue();
   }
 
   getProgress(sessionId: string) {
