@@ -12,36 +12,28 @@ PRD, flows, decisions, architecture, data, AI, environments locked.
 
 ---
 
-## Slice 1 — App skeleton (partial ✓)
+## Slice 1 — App skeleton ✓
 
-**Done (local, no external services):**
+**Done:**
 
-- Next.js 15 at repo root; `docs/` at repo root  
-- TypeScript strict, ESLint, Vitest, GitHub CI  
-- `app/page`, `app/(app)/today`, `app/api/health`  
-- Domain stubs: `fingerprint`, `due-today`, `streak` + tests  
-- `.env.example` (empty placeholders)
-
-**Remaining (when you add keys):**
-
-- Vercel projects · Supabase auth · deploy staging · sign in/out
+- Next.js 15 at repo root; TypeScript, ESLint, Vitest, GitHub CI  
+- Domain stubs: `fingerprint`, `due-today`, `streak`  
+- Vercel project **`curi`** linked to GitHub; **stage.curi.one** on `staging`  
+- Prod domains detached until launch  
 
 ---
 
 ## Slice 1b — Frontend flows + mock APIs ✓
 
-**Done (local, mock store only):**
+**Done (local + staging mock):**
 
 - All F1–F7 screens wired to `/api/*` mock Route Handlers  
-- Zod schemas in `lib/api/schemas.ts`; in-memory store in `lib/mock/store.ts`  
-- Guest F1: landing → clarify → generating → lesson → quiz → feel → auth → Today  
-- Member: Today (due/done), Explore, Library, Progress, Profile, Upgrade  
-- Dev persona toggle (Guest / Member)  
-- Tests: store, API route, DepthPicker, TodayView  
+- Zod schemas; in-memory store; Dev persona toggle  
+- Deployed on [stage.curi.one](https://stage.curi.one)  
 
-**Exit:** Walk every flow in `pnpm dev` without external services.
+**Tracking:** Linear project [Curi v1](https://linear.app/curi-one/project/curi-v1-05a9e167751d) — see [TRACKING.md](./TRACKING.md).
 
-**Next:** Replace mock handler bodies slice-by-slice (Slice 2+); UI stays stable.
+**Next:** Slice 2 — replace mock handlers with Supabase + Perplexity.
 
 ---
 

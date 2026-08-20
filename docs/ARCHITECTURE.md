@@ -2,6 +2,9 @@
 
 Single deployable: **Next.js on Vercel** with Route Handlers, **Supabase** for auth and Postgres, **Perplexity** for AI (server-side only, **cache miss only**).
 
+Environments and deploy topology: [ENVIRONMENTS.md](./ENVIRONMENTS.md).  
+Delivery tracking: Linear **Curi v1** ([linear.app/curi-one](https://linear.app/curi-one)).
+
 ```
 ┌─────────┐     ┌──────────────────────────────┐     ┌─────────────┐
 │ Browser │────▶│ Next.js (Vercel)             │────▶│ Supabase    │
@@ -15,6 +18,16 @@ Single deployable: **Next.js on Vercel** with Route Handlers, **Supabase** for a
                 │ Perplexity API (Sonar)       │
                 └──────────────────────────────┘
 ```
+
+### Deploy topology (current)
+
+| Surface | Target |
+|---|---|
+| `stage.curi.one` | Git branch `staging` → Vercel Preview |
+| `*.vercel.app` (Production) | Git branch `main` — no custom domain until launch |
+| Local | Mock store (`USE_MOCK_API=true`) in `lib/mock/store.ts` |
+
+**Phase now:** UI + Zod contracts + mock Route Handlers. Slice 2+ swaps handler bodies to Supabase + Perplexity without changing client contracts (`lib/api/schemas.ts`).
 
 Cron jobs (email, later) call `/api/cron/*` on the same app.
 

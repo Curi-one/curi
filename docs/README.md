@@ -18,8 +18,11 @@ Canonical product and engineering spec for **Curi**. The production app lives at
 | 10 | [TDD.md](./TDD.md) | Test-driven development |
 | 11 | [UX-PRINCIPLES.md](./UX-PRINCIPLES.md) | Mental models, behavioural UX |
 | 12 | [AGENT-ROSTER.md](./AGENT-ROSTER.md) | Cursor / Claude agents |
+| 13 | [TRACKING.md](./TRACKING.md) | Linear project & issue map |
 
 Agents: [`../AGENTS.md`](../AGENTS.md) · skills in [`.cursor/skills/`](../.cursor/skills/)
+
+**Live staging:** [stage.curi.one](https://stage.curi.one) · **Linear:** [Curi v1](https://linear.app/curi-one/project/curi-v1-05a9e167751d)
 
 ## vs prototypes
 

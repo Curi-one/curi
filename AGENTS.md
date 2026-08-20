@@ -48,4 +48,5 @@ Auth after first quiz · one lesson/path/day · multi-path Today · cache before
 
 ## Current status
 
-**Slice 1b ✓** — all v1 frontend flows + mock `/api/*`. Slice 2+ replaces mock backends. Pending deploy when keys added.
+**Slice 1b ✓** — frontend + mock APIs on [stage.curi.one](https://stage.curi.one).  
+Track work in Linear **Curi v1** — [`docs/TRACKING.md`](./docs/TRACKING.md). Slice 2+ replaces mock backends.

@@ -2,6 +2,8 @@
 
 Three environments with **identical architecture** and **isolated data and secrets**. Never share a database between them.
 
+**Tracking:** Linear workspace [Curi](https://linear.app/curi-one) — project **Curi v1**.
+
 ---
 
 ## Summary
@@ -9,13 +11,42 @@ Three environments with **identical architecture** and **isolated data and secre
 | | Local | Staging | Production |
 |---|---|---|---|
 | **Purpose** | Development | Pre-release verification | Live users |
-| **URL** | `http://localhost:3000` | `https://stage.curi.one` | `https://curi.one` (apex → www) |
-| **Deploy** | Developer machine | Auto from `staging` branch | Auto from `main` after CI — **domains off until launch** |
-| **Database** | Supabase local or dedicated dev project | Dedicated Supabase project | Dedicated Supabase project |
-| **Stripe** | Test mode | Test mode | Live mode |
-| **Perplexity** | Real key, low usage | Real key | Real key |
-| **Auth email** | Inbucket / console log | Real delivery, catch-all OK | Real users |
+| **URL** | `http://localhost:3000` | `https://stage.curi.one` | `https://curi.one` → `www.curi.one` |
+| **Git branch** | any | `staging` | `main` |
+| **Deploy** | `pnpm dev` | Auto from `staging` | Auto from `main` — **custom domains off until launch** |
+| **Vercel project** | — | `curi-one/curi` (Preview / branch alias) | same project (Production target) |
+| **Database** | Supabase local or shared dev project | Dedicated Supabase (TBD) | Dedicated Supabase (TBD) |
+| **API mode** | `USE_MOCK_API=true` until Slice 2+ | Mock until backends land | Real |
+| **Stripe** | — | Test mode | Live mode |
+| **Perplexity** | `.env.local` | Vercel Preview env | Vercel Production env (at launch) |
+| **Auth email** | Console / Inbucket | Real delivery, catch-all OK | Real users |
 | **Data** | Disposable | Seeded, resettable | Protected |
+
+---
+
+## How it is wired today
+
+```
+GitHub Curi-one/curi
+  ├── staging ──▶ Vercel Preview ──▶ stage.curi.one
+  └── main    ──▶ Vercel Production ──▶ *.vercel.app only
+                                         (curi.one / www detached until launch)
+
+Local
+  └── pnpm dev ──▶ localhost:3000 ──▶ mock /api/* (lib/mock/store)
+```
+
+| Service | Account / ID | Notes |
+|---|---|---|
+| GitHub | [Curi-one/curi](https://github.com/Curi-one/curi) | Public (Hobby); make private after Pro if desired |
+| Vercel team | `curi-one` | Project **`curi`** (Next.js) |
+| Staging domain | `stage.curi.one` | Assigned to git branch **`staging`** |
+| Prod domains | `curi.one`, `www.curi.one` | Owned by team; **not** attached to project yet |
+| Supabase | Project `xoyqmwmudqoncwxvtkps` | Healthy; **no app tables yet** |
+| Linear | [linear.app/curi-one](https://linear.app/curi-one) | Delivery tracking |
+| Cursor Origin | `awaisibrahim/curi` | Optional mirror; primary remote is GitHub |
+
+Prototype project **`curi-prototype`** (Vite) is legacy — do not deploy product changes there.
 
 ---
 
@@ -23,11 +54,11 @@ Three environments with **identical architecture** and **isolated data and secre
 
 ```
 feature branch
-  → PR (lint, typecheck, tests)
-  → merge staging
-  → smoke F1 + F2 on staging
-  → merge main
-  → production
+  → PR into staging (lint, typecheck, tests)
+  → merge staging → auto deploy → smoke on stage.curi.one
+  → PR staging → main
+  → production deploy (vercel.app)
+  → at launch: attach curi.one + www to Production
 ```
 
 No production hot-fix without the same change on staging first.
@@ -38,40 +69,67 @@ No production hot-fix without the same change on staging first.
 
 | Variable | Exposure | Environments |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Client | All |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client | All |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server only | All |
-| `PERPLEXITY_API_KEY` | Server only | All |
+| `APP_ENV` | Server | `local` \| `staging` \| `production` |
+| `USE_MOCK_API` | Server | `true` until Slice 2+ backends |
+| `NEXT_PUBLIC_SUPABASE_URL` | Client | All (when wired) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client | All (when wired) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server only | All (when wired) |
+| `PERPLEXITY_API_KEY` | Server only | Local + Preview (set); Production at launch |
 | `STRIPE_SECRET_KEY` | Server only | Staging (test), Prod (live) |
 | `STRIPE_WEBHOOK_SECRET` | Server only | Staging, Prod |
 | `SENTRY_DSN` | Server | Staging, Prod |
 | `CRON_SECRET` | Server | Staging, Prod (when cron ships) |
-| `APP_ENV` | Server | `local` \| `staging` \| `production` |
 
-`.env.example` lists names only — never commit values. Vercel holds per-environment secrets.
+`.env.example` lists names only — **never commit values**.  
+Secrets live in `.env.local` (gitignored) and Vercel project env.
 
 Do not infer business logic from hostname except OAuth/magic-link callback URLs.
 
 ---
 
-## Local setup (Slice 1+)
+## Local setup
 
 ```bash
-supabase start          # optional local Postgres + Auth
 cp .env.example .env.local
+# Fill PERPLEXITY_API_KEY (and later Supabase keys)
 pnpm install
 pnpm dev
 ```
 
-**Seed:** member with three paths (two due, one done today) so F2 is testable without repeating F1.
+```bash
+pnpm test && pnpm lint && pnpm typecheck
+```
+
+Optional: `supabase start` when local Postgres/Auth is needed.
+
+**Seed (mock):** Dev persona toggle Guest / Member; member fixture has two paths (one due, one done).
 
 ---
 
 ## Staging
 
-- Same flows as production with test Stripe and seeded data.  
-- Magic links may route to a team catch-all inbox — document the address.  
-- Cron routes gated by `CRON_SECRET` until email is ready.
+- URL: **https://stage.curi.one**
+- Branch: **`staging`**
+- Same UI as production; backends swap in per roadmap slice.
+- Magic links may use a team catch-all — document when auth ships.
+- Cron gated by `CRON_SECRET` until email is ready.
+
+Redeploy after adding env vars if Preview deployment was created earlier:
+
+```bash
+git push origin staging
+# or: Vercel dashboard → Redeploy latest staging deployment
+```
+
+---
+
+## Production (launch)
+
+1. Branch protection on `main`  
+2. Attach `www.curi.one` then `curi.one` (apex → www, 308) to Production  
+3. Set Production env vars (Supabase, Perplexity, Stripe live, Sentry)  
+4. RLS verified; service role never in client bundle  
+5. Smoke F1–F2 on staging immediately before attach  
 
 ---
 
@@ -82,4 +140,6 @@ pnpm dev
 - [ ] Service role never in client bundle  
 - [ ] Supabase PITR enabled (Pro)  
 - [ ] Sentry + PostHog receiving events  
-- [ ] Perplexity rate limits and app rate limits configured
+- [ ] Perplexity rate limits and app rate limits configured  
+- [ ] `curi.one` / `www` attached and verified  
+- [ ] Repo visibility / Vercel Pro decision if org private repos required  

@@ -15,6 +15,20 @@ Change only by explicit product decision; update this file and cross-references 
 
 If a prototype conflicts with `docs/`, **`docs/` wins**.
 
+### Delivery tracking
+
+Linear workspace **Curi** — project **Curi v1**. Issues map to roadmap slices and FLOWS. See [TRACKING.md](./TRACKING.md).
+
+### Hosting (locked)
+
+| Concern | Choice |
+|---|---|
+| App hosting | Vercel project `curi` (team `curi-one`) |
+| Staging URL | `stage.curi.one` ← git branch `staging` |
+| Production URL | `curi.one` / `www` — attach at launch only |
+| Source | GitHub `Curi-one/curi` |
+| AI | Perplexity (server); key in Vercel Preview + `.env.local` |
+
 ---
 
 ## Product
