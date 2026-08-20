@@ -55,7 +55,7 @@ export default function ProgressPage() {
         {paths.length === 0 ? (
           <p className="mt-4 text-ink-muted">
             No paths yet.{" "}
-            <Link href="/explore" className="underline hover:text-ink">
+            <Link href="/explore" className="link-subtle focus-ring inline-block rounded-sm">
               Explore founder paths
             </Link>
           </p>
@@ -65,9 +65,9 @@ export default function ProgressPage() {
               <li key={p.id}>
                 <Link
                   href={`/library/${p.id}`}
-                  className="surface-card block px-4 py-3 hover:border-accent/30"
+                  className="surface-card surface-card-interactive interactive-card focus-ring group block px-4 py-3"
                 >
-                  <p className="font-medium text-ink">{p.topic}</p>
+                  <p className="font-medium text-ink transition-colors group-hover:text-ink">{p.topic}</p>
                   <p className="mt-1 font-meta">
                     {p.progress} / {p.totalLessons} · {depthLabel(p.depth)}
                   </p>

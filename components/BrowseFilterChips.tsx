@@ -17,10 +17,10 @@ export function BrowseFilterChips({ categories, active, onChange }: Props) {
         type="button"
         onClick={() => onChange(null)}
         aria-pressed={active === null}
-        className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-3.5 py-2 text-xs font-medium leading-none transition-colors ${
+        className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-3.5 py-2 text-xs font-medium leading-none transition-colors focus-ring ${
           active === null
             ? "border-ink bg-ink text-paper"
-            : "border-border bg-paper text-ink-muted hover:border-ink/40 hover:text-ink"
+            : "interactive-chip border-border bg-paper text-ink-muted hover:border-ink/40"
         }`}
       >
         All
@@ -33,10 +33,10 @@ export function BrowseFilterChips({ categories, active, onChange }: Props) {
             type="button"
             onClick={() => onChange(category)}
             aria-pressed={selected}
-            className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-3.5 py-2 text-xs font-medium leading-none transition-colors ${
+            className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-3.5 py-2 text-xs font-medium leading-none transition-colors focus-ring ${
               selected
                 ? "border-ink bg-ink text-paper"
-                : "border-border bg-paper text-ink-muted hover:border-ink/40 hover:text-ink"
+                : "interactive-chip border-border bg-paper text-ink-muted hover:border-ink/40"
             }`}
           >
             {category}

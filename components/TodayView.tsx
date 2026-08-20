@@ -31,7 +31,7 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
         <div className="space-y-2">
           <Link
             href="/explore"
-            className="group flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left transition hover:bg-paper-tertiary/60"
+            className="group interactive-card focus-ring flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left hover:border-accent/20"
           >
             <div>
               <div className="flex items-center gap-2 font-medium text-ink">
@@ -51,7 +51,7 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
 
           <Link
             href="/new"
-            className="group flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left transition hover:bg-paper-tertiary/60"
+            className="group interactive-card focus-ring flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left hover:border-accent/20"
           >
             <div>
               <div className="flex items-center gap-2 font-medium text-ink">
@@ -91,7 +91,9 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
         </div>
         <Link
           href="/progress"
-          className={`inline-flex min-h-11 shrink-0 items-center gap-1 font-meta ${streakAtRisk ? "text-accent" : ""}`}
+          className={`focus-ring inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full px-2 font-meta transition-colors hover:bg-ink/[0.04] ${
+            streakAtRisk ? "text-accent hover:text-accent-dark" : "hover:text-ink"
+          }`}
         >
           {streak} day streak
           <ArrowRight className="h-3 w-3" aria-hidden />
@@ -140,10 +142,7 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
             </section>
           )}
           <div className="mt-10 text-center">
-            <Link
-              href="/new"
-              className="text-sm text-ink-muted underline hover:text-ink"
-            >
+            <Link href="/new" className="link-subtle focus-ring inline-block rounded-sm">
               Create a new path
             </Link>
           </div>

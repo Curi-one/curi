@@ -27,10 +27,8 @@ export function LessonFeel({ onSelect, selected }: Props) {
             <button
               type="button"
               onClick={() => onSelect(opt.slug)}
-              className={`w-full rounded-xl border px-4 py-4 text-left text-[15px] min-h-[52px] transition-colors ${
-                selected === opt.slug
-                  ? "border-ink bg-ink text-paper shadow-[inset_0_-2px_0_var(--color-accent)]"
-                  : "border-border bg-paper-secondary hover:border-accent/30"
+              className={`option-card focus-ring text-[15px] ${
+                selected === opt.slug ? "option-card-selected" : ""
               }`}
             >
               {opt.label}

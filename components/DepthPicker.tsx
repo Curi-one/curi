@@ -25,7 +25,7 @@ export function DepthPicker({
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex min-h-11 items-center gap-1.5 text-sm text-ink-muted hover:text-ink"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-1 text-sm text-ink-muted transition-colors hover:bg-ink/[0.04] hover:text-ink focus-ring"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
             Back
@@ -50,10 +50,8 @@ export function DepthPicker({
             <button
               type="button"
               onClick={() => onSelect(opt.slug)}
-              className={`w-full rounded-xl border px-4 py-4 text-left min-h-[52px] transition-colors ${
-                selected === opt.slug
-                  ? "border-ink bg-ink text-paper shadow-[inset_0_-2px_0_var(--color-accent)]"
-                  : "border-border bg-paper-secondary hover:border-accent/30"
+              className={`option-card focus-ring text-[16px] ${
+                selected === opt.slug ? "option-card-selected" : ""
               }`}
             >
               <span className="block font-medium text-[16px]">{opt.label}</span>

@@ -88,7 +88,7 @@ export default function LandingPage() {
           </Link>
           <Link
             href={SIGNUP_TODAY}
-            className="inline-flex min-h-11 items-center rounded-full border border-border px-4 text-sm text-ink"
+            className="btn-secondary inline-flex min-h-11 items-center rounded-full px-4 text-sm"
           >
             Sign up
           </Link>
@@ -115,11 +115,14 @@ export default function LandingPage() {
 
         <form onSubmit={onSubmit} className="mb-3 mt-8">
           <div
-            className="flex cursor-text items-center gap-3 rounded-2xl px-5 py-[15px] transition-colors duration-200"
+            className="flex cursor-text items-center gap-3 rounded-2xl border border-transparent px-5 py-[15px] transition-[background-color,border-color,box-shadow] duration-200 hover:border-border/80"
             style={{
               background: inputFocused
                 ? "color-mix(in srgb, var(--color-ink) 4.5%, transparent)"
                 : "var(--color-bg-secondary)",
+              borderColor: inputFocused
+                ? "var(--color-border-default)"
+                : undefined,
             }}
             onMouseDown={(e) => {
               if ((e.target as HTMLElement).closest("button")) return;
@@ -177,7 +180,7 @@ export default function LandingPage() {
                 key={suggestion}
                 type="button"
                 onClick={() => start(suggestion)}
-                className="min-h-11 shrink-0 rounded-full px-3.5 py-2 text-[13px] text-ink-muted transition-colors active:scale-[0.97]"
+                className="interactive-chip focus-ring min-h-11 shrink-0 rounded-full px-3.5 py-2 text-[13px] text-ink-muted"
                 style={{
                   background:
                     "color-mix(in srgb, var(--color-ink) 4%, transparent)",

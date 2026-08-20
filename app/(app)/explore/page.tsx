@@ -261,7 +261,7 @@ export default function ExplorePage() {
                 <button
                   type="button"
                   onClick={() => setPreviewPath(featured)}
-                  className="group mt-3 w-full overflow-hidden rounded-2xl border border-border bg-paper text-left transition-colors hover:border-ink/25"
+                  className="group interactive-card focus-ring mt-3 w-full overflow-hidden rounded-2xl border border-border bg-paper text-left hover:border-accent/20"
                 >
                   <CourseCover topic={featured.topic} height={160} />
                   <div className="px-5 pb-5 pt-4">
@@ -365,7 +365,7 @@ function PathMarketCard({
     <button
       type="button"
       onClick={onClick}
-      className="group flex h-full w-full flex-col overflow-hidden rounded-xl border border-border bg-paper text-left transition-colors hover:border-ink/25"
+      className="group interactive-card focus-ring flex h-full w-full flex-col overflow-hidden rounded-xl border border-border bg-paper text-left hover:border-accent/20"
     >
       <CourseCover topic={item.topic} height={100} />
       <div className="flex flex-1 flex-col gap-1 p-3.5">
@@ -396,7 +396,7 @@ function PathSearchRow({
     <button
       type="button"
       onClick={onClick}
-      className="group flex w-full items-center gap-3.5 rounded-xl border border-border bg-paper p-3.5 text-left transition-colors hover:border-ink/25"
+      className="group interactive-card focus-ring flex w-full items-center gap-3.5 rounded-xl border border-border bg-paper p-3.5 text-left hover:border-accent/20"
     >
       <CourseCover topic={item.topic} height={54} width={54} />
       <div className="min-w-0 flex-1">
@@ -412,7 +412,7 @@ function PathSearchRow({
       <span className="hidden shrink-0 font-meta normal-case sm:inline">
         {lessons} · {depthLabel(item.depth)}
       </span>
-      <ArrowRight className="h-4 w-4 shrink-0 text-ink-muted/40 group-hover:text-ink-muted" aria-hidden />
+      <ArrowRight className="h-4 w-4 shrink-0 text-ink-muted/40 transition-colors group-hover:text-accent" aria-hidden />
     </button>
   );
 }
@@ -428,7 +428,7 @@ function BookSearchRow({
     <button
       type="button"
       onClick={onClick}
-      className="group flex w-full items-center gap-3.5 rounded-xl border border-border bg-paper p-3.5 text-left transition-colors hover:border-ink/25"
+      className="group interactive-card focus-ring flex w-full items-center gap-3.5 rounded-xl border border-border bg-paper p-3.5 text-left hover:border-accent/20"
     >
       <CourseCover topic={item.title} height={54} width={54} />
       <div className="min-w-0 flex-1">

@@ -109,10 +109,10 @@ export function PathMap({ courseId, nodes, readOnly }: Props) {
                       <li key={node.index}>
                         <Link
                           href={`/courses/${courseId}/lessons/${node.index}?from=library`}
-                          className={`group relative block w-full rounded-xl px-4 py-3 text-left transition-all duration-150 ${
+                          className={`group focus-ring relative block w-full rounded-xl px-4 py-3 text-left transition-all duration-150 ${
                             isToday
-                              ? "bg-ink text-paper"
-                              : "hover:bg-paper-secondary/80"
+                              ? "bg-ink text-paper hover:bg-ink/95"
+                              : "hover:bg-paper-secondary hover:shadow-sm"
                           }`}
                         >
                           {inner}
