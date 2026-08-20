@@ -34,17 +34,20 @@ describe("TodayView", () => {
     expect(screen.getByText("Stoicism")).toBeInTheDocument();
     expect(screen.getByText("Sleep science")).toBeInTheDocument();
     expect(screen.getByText("1 of 2 still to read")).toBeInTheDocument();
+    expect(screen.getByText("Read now")).toBeInTheDocument();
+    expect(screen.getByText("Read")).toBeInTheDocument();
   });
 
-  it("shows Browse primary and Create secondary when empty", () => {
+  it("shows welcome headline and full-width action rows when empty", () => {
     render(<TodayView due={[]} done={[]} streak={0} streakAtRisk={false} />);
 
-    expect(screen.getByText("Nothing due today")).toBeInTheDocument();
+    expect(screen.getByText("Your daily founder fluency")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Browse founder paths" }),
+      screen.getByRole("link", { name: /Browse founder paths/ }),
     ).toHaveAttribute("href", "/explore");
     expect(
-      screen.getByRole("link", { name: "Create a custom path" }),
+      screen.getByRole("link", { name: /Create a custom path/ }),
     ).toHaveAttribute("href", "/new");
+    expect(screen.queryByText("Nothing due today")).not.toBeInTheDocument();
   });
 });

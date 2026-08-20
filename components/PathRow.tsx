@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { PathSummary } from "@/lib/api/schemas";
-import { PathProgressBar } from "@/components/PathProgressBar";
+import { TopicThumbnail } from "@/components/TopicThumbnail";
 import { depthLabel } from "@/lib/ui/constants";
 
 type Props = {
@@ -8,27 +8,58 @@ type Props = {
   dimmed?: boolean;
 };
 
+function pathBlurb(path: PathSummary, lessonNum: number): string {
+  const depth = depthLabel(path.depth);
+  if (path.progress === 0) {
+    return `${depth} path · start with lesson 1 of ${path.totalLessons}.`;
+  }
+  if (path.progress >= path.totalLessons) {
+    return `${depth} path · all ${path.totalLessons} lessons complete.`;
+  }
+  return `${depth} path · continue with lesson ${lessonNum} of ${path.totalLessons}.`;
+}
+
 export function PathRow({ path, dimmed }: Props) {
   const lessonNum = Math.min(path.progress + 1, path.totalLessons);
   const href = `/courses/${path.id}/lessons/${path.progress}?from=today`;
+  const blurb = pathBlurb(path, lessonNum);
 
   return (
     <Link
       href={href}
-      className={`surface-card block px-4 py-4 transition-opacity ${
-        dimmed ? "opacity-55" : "hover:border-accent/30"
+      className={`group flex w-full gap-3.5 rounded-lg border border-border/50 bg-paper-secondary p-4 transition-[border-color,opacity,box-shadow] duration-200 hover:border-border sm:gap-4 sm:p-5 ${
+        dimmed ? "opacity-55" : ""
       }`}
     >
-      <p
-        className="font-display text-[22px] font-normal leading-snug text-ink"
-        style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 0" }}
-      >
-        {path.topic}
-      </p>
-      <p className="mt-2 font-meta">
-        {depthLabel(path.depth)} · Lesson {lessonNum} of {path.totalLessons}
-      </p>
-      <PathProgressBar progress={path.progress} total={path.totalLessons} />
+      <TopicThumbnail topic={path.topic} />
+
+      <div className="min-w-0 flex-1">
+        <h3
+          className={`text-[14px] font-semibold leading-snug tracking-tight sm:text-[15px] ${
+            dimmed ? "text-ink/55" : "text-ink"
+          }`}
+        >
+          {path.topic}
+        </h3>
+        <p className="mt-1 font-meta">
+          {depthLabel(path.depth)} · Lesson {lessonNum} of {path.totalLessons}
+        </p>
+        <p className="mt-1.5 line-clamp-2 text-[12px] leading-relaxed text-ink-muted sm:text-[13px]">
+          {blurb}
+        </p>
+
+        <div className="mt-3 h-px bg-border/55" aria-hidden />
+
+        <div className="mt-2 flex items-center justify-end">
+          <span
+            className={`text-[10px] font-semibold uppercase tracking-wider ${
+              dimmed ? "text-ink-muted/45" : "text-accent"
+            }`}
+          >
+            {dimmed ? "Read" : "Read now"}
+          </span>
+        </div>
+      </div>
     </Link>
   );
 }

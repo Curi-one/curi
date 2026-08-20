@@ -6,38 +6,59 @@ import { FOUNDER_HEADLINE_SUBJECTS } from "@/lib/content/founder-catalogue";
 export function LandingHeadline() {
   const [index, setIndex] = useState(0);
   const [text, setText] = useState("");
-  const [deleting, setDeleting] = useState(false);
+  const [phase, setPhase] = useState<"typing" | "deleting">("typing");
+  const [cursorOn, setCursorOn] = useState(true);
 
   useEffect(() => {
-    const subject = FOUNDER_HEADLINE_SUBJECTS[index] ?? "";
-    const timeout = setTimeout(
-      () => {
-        if (!deleting && text.length < subject.length) {
-          setText(subject.slice(0, text.length + 1));
-        } else if (!deleting && text.length === subject.length) {
-          setDeleting(true);
-        } else if (deleting && text.length > 0) {
-          setText(subject.slice(0, text.length - 1));
-        } else {
-          setDeleting(false);
-          setIndex((i) => (i + 1) % FOUNDER_HEADLINE_SUBJECTS.length);
-        }
-      },
-      deleting ? 35 : text.length === subject.length ? 1800 : 55,
-    );
-    return () => clearTimeout(timeout);
-  }, [text, deleting, index]);
+    const id = setInterval(() => setCursorOn((v) => !v), 520);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const target = FOUNDER_HEADLINE_SUBJECTS[index] ?? "";
+    if (phase === "typing") {
+      if (text.length < target.length) {
+        const id = setTimeout(
+          () => setText(target.slice(0, text.length + 1)),
+          58,
+        );
+        return () => clearTimeout(id);
+      }
+      const id = setTimeout(() => setPhase("deleting"), 2400);
+      return () => clearTimeout(id);
+    }
+    if (text.length > 0) {
+      const id = setTimeout(() => setText((t) => t.slice(0, -1)), 32);
+      return () => clearTimeout(id);
+    }
+    setIndex((i) => (i + 1) % FOUNDER_HEADLINE_SUBJECTS.length);
+    setPhase("typing");
+  }, [text, index, phase]);
 
   return (
     <h1
-      className="mt-4 font-display text-[2.35rem] font-light leading-[1.12] tracking-tight text-ink sm:text-[2.75rem]"
-      style={{ fontVariationSettings: "'SOFT' 70, 'WONK' 1" }}
+      className="font-display text-[2.6rem] font-normal tracking-[-0.025em] text-ink sm:text-[3.2rem]"
+      style={{
+        lineHeight: 1.1,
+        fontVariationSettings: "'SOFT' 70, 'WONK' 1",
+      }}
     >
-      Understand{" "}
-      <span className="text-accent underline decoration-accent/40 underline-offset-4">
+      Explore
+      <br />
+      <em className="italic">
         {text}
-        <span className="animate-pulse">|</span>
-      </span>
+        <span
+          className="ml-px inline-block w-[2px]"
+          style={{
+            height: "0.82em",
+            background: "#C1121F",
+            opacity: cursorOn ? 1 : 0,
+            transition: "opacity 80ms",
+            verticalAlign: "middle",
+          }}
+          aria-hidden
+        />
+      </em>
     </h1>
   );
 }
