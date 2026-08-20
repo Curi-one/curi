@@ -35,7 +35,20 @@ describe("TodayView", () => {
     expect(screen.getByText("Sleep science")).toBeInTheDocument();
     expect(screen.getByText("1 of 2 still to read")).toBeInTheDocument();
     expect(screen.getByText("Read now")).toBeInTheDocument();
-    expect(screen.getByText("Read")).toBeInTheDocument();
+    expect(screen.getByText("Completed")).toBeInTheDocument();
+  });
+
+  it("links a completed-today path back to its last completed lesson for re-reading", () => {
+    render(
+      <TodayView due={due} done={done} streak={3} streakAtRisk={false} />,
+    );
+
+    const completedLink = screen.getByRole("link", { name: /Sleep science/ });
+    expect(completedLink).toHaveAttribute(
+      "href",
+      "/courses/b/lessons/0?from=today",
+    );
+    expect(screen.getByText(/completed today/i)).toBeInTheDocument();
   });
 
   it("shows welcome headline and full-width action rows when empty", () => {

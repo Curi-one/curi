@@ -12,12 +12,23 @@ export default function TodayPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getFeed(), getProgress()])
-      .then(([f, p]) => {
-        setFeed(f);
-        setStreak(p.streak);
-      })
-      .catch(() => setError("Could not load Today."));
+    function load() {
+      Promise.all([getFeed(), getProgress()])
+        .then(([f, p]) => {
+          setFeed(f);
+          setStreak(p.streak);
+        })
+        .catch(() => setError("Could not load Today."));
+    }
+
+    load();
+
+    /** Re-reading a lesson elsewhere shouldn't leave Today stale (CUR-46). */
+    function onFocus() {
+      load();
+    }
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, []);
 
   return (

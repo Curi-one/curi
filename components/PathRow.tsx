@@ -8,8 +8,11 @@ type Props = {
   dimmed?: boolean;
 };
 
-function pathBlurb(path: PathSummary, lessonNum: number): string {
+function pathBlurb(path: PathSummary, lessonNum: number, dimmed: boolean): string {
   const depth = depthLabel(path.depth);
+  if (dimmed) {
+    return `${depth} path · completed today. Tap to re-read.`;
+  }
   if (path.progress === 0) {
     return `${depth} path · start with lesson 1 of ${path.totalLessons}.`;
   }
@@ -21,8 +24,12 @@ function pathBlurb(path: PathSummary, lessonNum: number): string {
 
 export function PathRow({ path, dimmed }: Props) {
   const lessonNum = Math.min(path.progress + 1, path.totalLessons);
-  const href = `/courses/${path.id}/lessons/${path.progress}?from=today`;
-  const blurb = pathBlurb(path, lessonNum);
+  /** Done-today paths link back to the last completed (re-readable) lesson (DECISIONS: re-read allowed). */
+  const lessonIndex = dimmed
+    ? Math.max(0, path.progress - 1)
+    : path.progress;
+  const href = `/courses/${path.id}/lessons/${lessonIndex}?from=today`;
+  const blurb = pathBlurb(path, lessonNum, !!dimmed);
 
   return (
     <Link
@@ -56,7 +63,7 @@ export function PathRow({ path, dimmed }: Props) {
               dimmed ? "text-ink-muted/45" : "text-accent"
             }`}
           >
-            {dimmed ? "Read" : "Read now"}
+            {dimmed ? "Completed" : "Read now"}
           </span>
         </div>
       </div>
