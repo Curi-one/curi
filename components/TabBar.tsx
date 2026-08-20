@@ -45,7 +45,7 @@ export function TabBar() {
       className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
       aria-label="Main"
     >
-      <div className="mx-auto flex max-w-lg">
+      <div className="mx-auto flex max-w-lg md:max-w-none">
         {tabs.map((tab) => {
           const active = pathname.startsWith(tab.href);
           return (

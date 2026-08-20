@@ -155,7 +155,7 @@ export default function ProfilePage() {
   const streak = progress?.streak ?? 0;
 
   return (
-    <main className="app-shell pb-24 pt-4">
+    <main className="app-shell pb-12 pt-4 md:pb-12">
       <div className="mb-8 flex items-center justify-between gap-3">
         <Link
           href="/today"

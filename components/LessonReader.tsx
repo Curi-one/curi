@@ -62,8 +62,8 @@ export function LessonReader({ lesson, lessonIndex, onStartQuiz }: Props) {
           </ul>
         </section>
       )}
-      <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md">
-        <div className="mx-auto max-w-lg">
+      <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md md:left-[84px]">
+        <div className="mx-auto max-w-lg md:max-w-xl lg:max-w-2xl">
           <button type="button" onClick={onStartQuiz} className="btn-primary w-full">
             Take the quiz
           </button>
