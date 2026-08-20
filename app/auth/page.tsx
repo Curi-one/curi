@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { getMe, postAuth } from "@/lib/api/client";
 import { resolveAuthLanding, shouldCollectName } from "@/lib/auth/callback";
+import { loadClarifySession } from "@/lib/clarify-store";
 
 type Step = "email" | "code" | "name";
 
@@ -14,6 +15,7 @@ function AuthContent() {
   const params = useSearchParams();
   const returnTo = params.get("returnTo") ?? "/today";
   const intent = params.get("intent");
+  const fromQuiz = params.get("from") === "quiz";
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -23,6 +25,12 @@ function AuthContent() {
   const [emailSent, setEmailSent] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const pendingTopic = loadClarifySession()?.topic;
+
+  const lessonBackHref =
+    returnTo.startsWith("/courses/") || returnTo === "/today"
+      ? returnTo
+      : "/today";
 
   useEffect(() => {
     const landing = resolveAuthLanding(params);
@@ -119,10 +127,22 @@ function AuthContent() {
   }
 
   return (
-    <div className="flex min-h-[70vh] flex-col">
+    <div className="flex min-h-[70vh] flex-col animate-fade-in">
       <Wordmark />
+      {(fromQuiz || pendingTopic) && (
+        <div className="mt-8 rounded-xl border border-border bg-paper-secondary px-4 py-3">
+          <p className="font-meta">Pending path</p>
+          <p className="mt-1 text-sm text-ink">
+            {pendingTopic
+              ? `We'll attach “${pendingTopic}” to your account after you sign in.`
+              : "Your first lesson will attach to your account after you sign in."}
+          </p>
+        </div>
+      )}
       <h1
-        className="mt-12 font-display text-[2rem] font-light leading-tight tracking-tight text-ink"
+        className={`font-display text-[2rem] font-light leading-tight tracking-tight text-ink ${
+          fromQuiz || pendingTopic ? "mt-8" : "mt-12"
+        }`}
         style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
       >
         {step === "email" &&
@@ -192,13 +212,22 @@ function AuthContent() {
         >
           Continue
         </button>
-        {(intent === "signin" || intent === "signup") && (
+        {fromQuiz ? (
           <Link
-            href="/"
+            href={lessonBackHref}
             className="mt-4 block text-center text-sm text-ink-muted hover:text-ink"
           >
-            Back to start
+            Back to lesson
           </Link>
+        ) : (
+          (intent === "signin" || intent === "signup") && (
+            <Link
+              href="/"
+              className="mt-4 block text-center text-sm text-ink-muted hover:text-ink"
+            >
+              Back to start
+            </Link>
+          )
         )}
       </div>
     </div>

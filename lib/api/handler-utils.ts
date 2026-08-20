@@ -20,10 +20,16 @@ export function withSessionCookie(
   response: NextResponse,
   sessionId: string,
 ): NextResponse {
+  const secure =
+    process.env.APP_ENV === "staging" ||
+    process.env.APP_ENV === "production" ||
+    process.env.NODE_ENV === "production";
   response.cookies.set(SESSION_COOKIE, sessionId, {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
+    secure,
+    maxAge: 60 * 60 * 24 * 30,
   });
   return response;
 }

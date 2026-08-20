@@ -27,6 +27,7 @@ import {
   normalizeTopic,
 } from "@/lib/courses/outline";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAuthenticatedUserId } from "@/lib/auth/user-id";
 
 export type { DifficultyModifier };
 
@@ -239,7 +240,7 @@ export function parseLessonFeels(raw: unknown): Record<number, LessonFeel> {
 }
 
 export async function defaultLoadCourse(
-  params: { courseId: string; sessionId: string },
+  params: { courseId: string; sessionId: string; userId?: string | null },
   admin: SupabaseClient,
 ): Promise<CourseContext | null> {
   const { data: pending, error: pendingError } = await admin
@@ -278,10 +279,19 @@ export async function defaultLoadCourse(
     };
   }
 
+  const userId =
+    params.userId !== undefined
+      ? params.userId
+      : await getAuthenticatedUserId();
+  if (!userId) {
+    return null;
+  }
+
   const { data: course, error: courseError } = await admin
     .from("courses")
     .select("id, user_id, topic, depth, clarifications")
     .eq("id", params.courseId)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (courseError) {

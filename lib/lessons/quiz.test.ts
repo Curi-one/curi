@@ -294,6 +294,7 @@ describe("submitQuiz", () => {
       courseId: "c1",
       lessonIndex: 0,
       totalLessons: 2,
+      userId: "user-1",
     });
     expect(result.data.streak).toBe(1);
     expect(result.data.pathsStillDue).toBe(1);
@@ -331,10 +332,56 @@ describe("submitQuiz", () => {
         bumpProgress,
         loadActivityDates,
         countPathsStillDue,
+        today: () => "2026-08-20",
       },
     );
 
     expect(result.ok).toBe(true);
+    expect(bumpProgress).not.toHaveBeenCalled();
+  });
+
+  it("returns already_done_today when day limit blocks persist", async () => {
+    persistFeel.mockResolvedValueOnce({
+      isNew: false,
+      blockedByDayLimit: true,
+    });
+    loadCourse.mockResolvedValueOnce({
+      kind: "member",
+      topic: TOPIC,
+      depth: DEPTH,
+      clarifications: CLARIFICATIONS,
+      lessons: LESSONS,
+      userId: "user-1",
+    });
+    lookup.mockResolvedValueOnce({
+      payload: { questions: CACHED_QUESTIONS },
+      sources: [],
+    });
+
+    const result = await submitQuiz(
+      {
+        courseId: "c1",
+        lessonIndex: 1,
+        sessionId: "sess",
+        request: {
+          answers: [],
+          lessonFeel: "just_right",
+        },
+      },
+      {
+        lookup,
+        loadCourse,
+        persistFeel,
+        bumpProgress,
+        loadActivityDates,
+        countPathsStillDue,
+      },
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      code: "already_done_today",
+    });
     expect(bumpProgress).not.toHaveBeenCalled();
   });
 });

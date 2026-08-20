@@ -23,7 +23,11 @@ export default function QuizPage() {
     { questionId: string; selectedIndex: number }[]
   >([]);
   const [feel, setFeel] = useState<LessonFeelType | undefined>();
-  const [sheet, setSheet] = useState({ open: false, allDone: false });
+  const [sheet, setSheet] = useState({
+    open: false,
+    allDone: false,
+    pathMastered: false,
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,12 +46,15 @@ export default function QuizPage() {
       });
       const me = await getMe();
       if (me.session.kind === "guest") {
-        router.push(`/auth?returnTo=${encodeURIComponent("/today")}`);
+        router.push(
+          `/auth?returnTo=${encodeURIComponent("/today")}&from=quiz`,
+        );
         return;
       }
       setSheet({
         open: true,
         allDone: (result.pathsStillDue ?? 0) === 0,
+        pathMastered: result.pathMastered === true,
       });
       setPhase("done");
     } catch {
@@ -91,7 +98,6 @@ export default function QuizPage() {
         href: `/courses/${params.courseId}/lessons/${params.lessonIndex}`,
         label: "Lesson",
       }}
-      title={phase === "feel" ? "How did that land?" : undefined}
       withTabPad={false}
       className="pt-4"
     >
@@ -113,7 +119,7 @@ export default function QuizPage() {
           />
         </>
       )}
-      {phase === "done" && (
+      {phase === "done" && !sheet.open && (
         <p className="mt-6 text-ink-muted">
           Lesson complete.{" "}
           <Link href="/today" className="underline hover:text-ink">
@@ -124,7 +130,10 @@ export default function QuizPage() {
       <CompleteSheet
         open={sheet.open}
         allPathsDoneToday={sheet.allDone}
-        onClose={() => setSheet({ open: false, allDone: false })}
+        pathMastered={sheet.pathMastered}
+        onClose={() =>
+          setSheet({ open: false, allDone: false, pathMastered: false })
+        }
       />
     </PageShell>
   );

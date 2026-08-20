@@ -37,9 +37,22 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
 
       {empty ? (
         <div className="surface-card p-8 text-center">
-          <p className="text-ink-muted">No paths yet.</p>
+          <p className="font-display text-xl text-ink">Nothing due today</p>
+          <p className="mt-2 text-sm text-ink-muted">
+            Start a path from Explore or the landing page.
+          </p>
           <Link href="/explore" className="btn-primary mt-6 inline-block">
-            Explore paths
+            Explore founder paths
+          </Link>
+        </div>
+      ) : due.length === 0 && done.length > 0 ? (
+        <div className="surface-card p-8 text-center">
+          <p className="font-display text-xl text-ink">All caught up</p>
+          <p className="mt-2 text-sm text-ink-muted">
+            Next lessons unlock tomorrow.
+          </p>
+          <Link href="/progress" className="btn-secondary mt-6 inline-block">
+            View progress
           </Link>
         </div>
       ) : (

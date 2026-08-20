@@ -44,6 +44,16 @@
   --color-streak: var(--color-accent);
 }
 
+html.dark {
+  --color-bg-primary: #0a0908;
+  --color-bg-secondary: #1c1a18;
+  --color-bg-tertiary: #2a2724;
+  --color-text-primary: #faf9f5;
+  --color-text-secondary: #b8b4ac;
+  --color-text-tertiary: #7a7670;
+  --color-border-subtle: #2a2724;
+}
+
 html {
   background: var(--color-bg-inverse);
 }

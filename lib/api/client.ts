@@ -1,6 +1,7 @@
 import type {
   AuthRequest,
   BillingCheckoutResponse,
+  BillingPortalResponse,
   ClarifyRequest,
   ClarifyResponse,
   CourseCreateRequest,
@@ -95,6 +96,13 @@ export function getLibrary() {
   return apiFetch<LibraryResponse>("/api/library");
 }
 
+export function patchShelveCourse(courseId: string) {
+  return apiFetch<{ ok: true; courseId: string }>(`/api/courses/${courseId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ action: "shelve" }),
+  });
+}
+
 export type CourseMapResponse = {
   id: string;
   topic: string;
@@ -153,8 +161,22 @@ export function getMe() {
   return apiFetch<{ session: UserSession }>("/api/me");
 }
 
+export function patchMe(body: { name?: string }) {
+  return apiFetch<{ session: UserSession }>("/api/me", {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
 export function postCheckout() {
   return apiFetch<BillingCheckoutResponse>("/api/billing/checkout", {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
+export function postBillingPortal() {
+  return apiFetch<BillingPortalResponse>("/api/billing/portal", {
     method: "POST",
     body: JSON.stringify({}),
   });

@@ -35,6 +35,7 @@ import {
 } from "@/lib/lessons/body";
 import { computeStreak } from "@/lib/streak";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
 
 const PerplexityQuizSchema = z.object({
   questions: z
@@ -61,12 +62,12 @@ export type GetQuizNotFound = {
 export type GetQuizResult = GetQuizSuccess | GetQuizNotFound;
 
 export type SubmitQuizSuccess = { ok: true; data: QuizSubmitResponse };
-export type SubmitQuizNotFound = {
+export type SubmitQuizError = {
   ok: false;
-  code: "not_found";
+  code: "not_found" | "already_done_today";
   message: string;
 };
-export type SubmitQuizResult = SubmitQuizSuccess | SubmitQuizNotFound;
+export type SubmitQuizResult = SubmitQuizSuccess | SubmitQuizError;
 
 export type GetQuizDeps = {
   admin?: SupabaseClient;
@@ -103,11 +104,12 @@ export type SubmitQuizDeps = {
     lessonIndex: number;
     lessonFeel: LessonFeel;
     sessionId: string;
-  }) => Promise<{ isNew: boolean }>;
+  }) => Promise<{ isNew: boolean; blockedByDayLimit?: boolean }>;
   bumpProgress?: (params: {
     courseId: string;
     lessonIndex: number;
     totalLessons: number;
+    userId?: string;
   }) => Promise<void>;
   loadActivityDates?: (userId: string) => Promise<string[]>;
   countPathsStillDue?: (userId: string, today: string) => Promise<number>;
@@ -121,8 +123,17 @@ export class QuizGenerationError extends Error {
   }
 }
 
-function todayUtcDate(): string {
-  return new Date().toISOString().slice(0, 10);
+async function loadUserTimezone(
+  userId: string,
+  admin: SupabaseClient,
+): Promise<string> {
+  const { data } = await admin
+    .from("users")
+    .select("timezone")
+    .eq("id", userId)
+    .maybeSingle();
+  const tz = data?.timezone;
+  return typeof tz === "string" && tz.length > 0 ? tz : DEFAULT_TIMEZONE;
 }
 
 function toQuizResponse(questions: QuizQuestionPayload[]): QuizResponse {
@@ -268,7 +279,7 @@ async function defaultPersistFeel(
     sessionId: string;
   },
   admin: SupabaseClient,
-): Promise<{ isNew: boolean }> {
+): Promise<{ isNew: boolean; blockedByDayLimit?: boolean }> {
   if (params.course.kind === "pending") {
     const { data: pending, error: readError } = await admin
       .from("pending_courses")
@@ -287,6 +298,11 @@ async function defaultPersistFeel(
         : {};
     const key = String(params.lessonIndex);
     const already = existing[key] !== undefined;
+    // Guest loop: auth after first quiz — only one lesson per pending path.
+    const otherKeys = Object.keys(existing).filter((k) => k !== key);
+    if (!already && otherKeys.length > 0) {
+      return { isNew: false, blockedByDayLimit: true };
+    }
     const next = { ...existing, [key]: params.lessonFeel };
     const { error: writeError } = await admin
       .from("pending_courses")
@@ -317,11 +333,33 @@ async function defaultPersistFeel(
     return { isNew: false };
   }
 
+  const timezone = await loadUserTimezone(params.course.userId, admin);
+  const today = todayInTimezone(timezone);
+
+  // One lesson / path / day — block a different lesson on the same local day.
+  const { data: todayRow, error: todayError } = await admin
+    .from("lesson_activity")
+    .select("lesson_index")
+    .eq("user_id", params.course.userId)
+    .eq("course_id", params.courseId)
+    .eq("activity_date", today)
+    .maybeSingle();
+  if (todayError) {
+    throw new Error(`lesson_activity today lookup failed: ${todayError.message}`);
+  }
+  if (
+    todayRow &&
+    typeof todayRow.lesson_index === "number" &&
+    todayRow.lesson_index !== params.lessonIndex
+  ) {
+    return { isNew: false, blockedByDayLimit: true };
+  }
+
   const { error: insertError } = await admin.from("lesson_activity").insert({
     user_id: params.course.userId,
     course_id: params.courseId,
     lesson_index: params.lessonIndex,
-    activity_date: todayUtcDate(),
+    activity_date: today,
     lesson_feel: params.lessonFeel,
   });
   if (insertError) {
@@ -339,14 +377,18 @@ async function defaultBumpProgress(
     courseId: string;
     lessonIndex: number;
     totalLessons: number;
+    userId?: string;
   },
   admin: SupabaseClient,
 ): Promise<void> {
-  const { data: course, error: readError } = await admin
+  let query = admin
     .from("courses")
     .select("progress, total, status")
-    .eq("id", params.courseId)
-    .maybeSingle();
+    .eq("id", params.courseId);
+  if (params.userId) {
+    query = query.eq("user_id", params.userId);
+  }
+  const { data: course, error: readError } = await query.maybeSingle();
   if (readError) {
     throw new Error(`courses progress read failed: ${readError.message}`);
   }
@@ -369,10 +411,11 @@ async function defaultBumpProgress(
     patch.status = "completed";
   }
 
-  const { error: writeError } = await admin
-    .from("courses")
-    .update(patch)
-    .eq("id", params.courseId);
+  let update = admin.from("courses").update(patch).eq("id", params.courseId);
+  if (params.userId) {
+    update = update.eq("user_id", params.userId);
+  }
+  const { error: writeError } = await update;
   if (writeError) {
     throw new Error(`courses progress update failed: ${writeError.message}`);
   }
@@ -579,9 +622,8 @@ export async function submitQuiz(
     ((userId) => defaultLoadActivityDates(userId, resolveAdmin()));
   const countPathsStillDue =
     deps?.countPathsStillDue ??
-    ((userId, today) =>
-      defaultCountPathsStillDue(userId, today, resolveAdmin()));
-  const today = deps?.today ?? todayUtcDate;
+    ((userId, day) =>
+      defaultCountPathsStillDue(userId, day, resolveAdmin()));
 
   const course = await loadCourse({
     courseId: params.courseId,
@@ -615,7 +657,7 @@ export async function submitQuiz(
     };
   });
 
-  const { isNew } = await persistFeel({
+  const persistResult = await persistFeel({
     course,
     courseId: params.courseId,
     lessonIndex: params.lessonIndex,
@@ -623,26 +665,45 @@ export async function submitQuiz(
     sessionId: params.sessionId,
   });
 
-  if (course.kind === "member" && isNew) {
+  if (persistResult.blockedByDayLimit) {
+    return {
+      ok: false,
+      code: "already_done_today",
+      message: "This path already has a lesson completed today",
+    };
+  }
+
+  if (course.kind === "member" && persistResult.isNew) {
     await bumpProgress({
       courseId: params.courseId,
       lessonIndex: params.lessonIndex,
       totalLessons: course.lessons.length,
+      userId: course.userId,
     });
   }
+
+  const nextProgress = Math.max(
+    course.kind === "member" ? params.lessonIndex + 1 : 0,
+    params.lessonIndex + 1,
+  );
+  const pathMastered =
+    persistResult.isNew && nextProgress >= course.lessons.length;
 
   const response: QuizSubmitResponse = {
     feedback,
     complete: true,
+    pathMastered,
   };
 
   if (course.kind === "member" && course.userId) {
     const dates = await loadActivityDates(course.userId);
     response.streak = computeStreak(dates);
-    response.pathsStillDue = await countPathsStillDue(
-      course.userId,
-      today(),
-    );
+    const today =
+      deps?.today?.() ??
+      todayInTimezone(
+        await loadUserTimezone(course.userId, resolveAdmin()),
+      );
+    response.pathsStillDue = await countPathsStillDue(course.userId, today);
   }
 
   return { ok: true, data: response };

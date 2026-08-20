@@ -53,7 +53,8 @@ No RLS. Read/write via service role in Route Handlers.
 | id | uuid | PK, FK → auth.users |
 | email | text | |
 | name | text | |
-| plan | text | `free` \| `paid` |
+| plan | text | `free` \| `academy` (legacy `paid` migrated → `academy`) |
+| stripe_customer_id | text | nullable; Stripe Customer id |
 | timezone | text | IANA |
 
 ### `courses`

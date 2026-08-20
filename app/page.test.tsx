@@ -27,6 +27,6 @@ describe("LandingPage", () => {
       screen.getByRole("link", { name: "Sign up" }),
     ).toHaveAttribute("href", "/auth?intent=signup&returnTo=%2Ftoday");
     expect(screen.getByRole("button", { name: "Start" })).toBeInTheDocument();
-    expect(screen.getByText("What are you curious about?")).toBeInTheDocument();
+    expect(screen.getByText("For first-time founders")).toBeInTheDocument();
   });
 });

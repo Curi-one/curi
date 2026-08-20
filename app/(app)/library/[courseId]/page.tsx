@@ -1,23 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { PathMap } from "@/components/PathMap";
-import { getCourseMap, type CourseMapResponse } from "@/lib/api/client";
+import {
+  getCourseMap,
+  patchShelveCourse,
+  type CourseMapResponse,
+} from "@/lib/api/client";
 import { depthLabel } from "@/lib/ui/constants";
 
 export default function LibraryCoursePage() {
   const params = useParams<{ courseId: string }>();
+  const router = useRouter();
   const [course, setCourse] = useState<CourseMapResponse | null>(null);
   const [error, setError] = useState(false);
+  const [shelving, setShelving] = useState(false);
 
   useEffect(() => {
     getCourseMap(params.courseId)
       .then(setCourse)
       .catch(() => setError(true));
   }, [params.courseId]);
+
+  async function handleShelve() {
+    if (!course || shelving) return;
+    setShelving(true);
+    try {
+      await patchShelveCourse(course.id);
+      router.push("/library?tab=shelved");
+    } catch {
+      setError(true);
+    } finally {
+      setShelving(false);
+    }
+  }
 
   if (error) {
     return (
@@ -39,6 +58,7 @@ export default function LibraryCoursePage() {
   }
 
   const todayNode = course.nodes.find((n) => n.status === "today");
+  const canShelve = !!todayNode;
 
   return (
     <PageShell back={{ href: "/library", label: "Library" }} withTabPad={false} className="pt-4">
@@ -57,13 +77,23 @@ export default function LibraryCoursePage() {
         />
       </div>
       {todayNode ? (
-        <div className="mt-8">
+        <div className="mt-8 space-y-3">
           <Link
-            href={`/courses/${course.id}/lessons/${todayNode.index}`}
+            href={`/courses/${course.id}/lessons/${todayNode.index}?from=library`}
             className="btn-primary block w-full text-center"
           >
             Continue today&apos;s lesson
           </Link>
+          {canShelve && (
+            <button
+              type="button"
+              onClick={() => void handleShelve()}
+              disabled={shelving}
+              className="btn-secondary block w-full text-center"
+            >
+              {shelving ? "Shelving…" : "Shelve path"}
+            </button>
+          )}
         </div>
       ) : (
         <p className="mt-8 text-sm text-ink-muted">

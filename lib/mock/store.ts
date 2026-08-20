@@ -15,6 +15,7 @@ import type {
   UserSession,
 } from "@/lib/api/schemas";
 import { isPathDueToday } from "@/lib/due-today";
+import { FREE_ACTIVE_PATH_LIMIT } from "@/lib/plans";
 import { computeStreak } from "@/lib/streak";
 import {
   CATALOGUE_BOOKS,
@@ -23,7 +24,6 @@ import {
   createDefaultMemberActivity,
   createDefaultMemberPaths,
   DEFAULT_MEMBER,
-  DEFAULT_TIMEZONE,
   generateLessonTitles,
   getLessonContent,
   lessonCountForDepth,
@@ -32,9 +32,10 @@ import {
   type ActivityRecord,
   type MockPath,
 } from "@/lib/mock/fixtures";
+import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
 
 export const SESSION_COOKIE = "curi_session";
-export const FREE_ACTIVE_PATH_LIMIT = 2;
+export { FREE_ACTIVE_PATH_LIMIT };
 export const MOCK_AUTH_CODE = "123456";
 
 type PendingCourse = {
@@ -57,15 +58,6 @@ type StoreResult<T> =
 export type CourseCreateResult =
   | { ok: true; data: CourseCreateResponse }
   | { ok: false; code: string; message: string };
-
-function todayInTimezone(timezone: string): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: timezone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-}
 
 function pathToSummary(path: MockPath): PathSummary {
   return {
@@ -331,6 +323,16 @@ class MockStore {
         a.lessonIndex === index &&
         a.lessonFeel !== undefined,
     );
+    const otherLessonToday = data.activity.some(
+      (a) =>
+        a.courseId === courseId &&
+        a.activityDate === today &&
+        a.lessonIndex !== index &&
+        a.lessonFeel !== undefined,
+    );
+    if (otherLessonToday) {
+      throw new Error("already_done_today");
+    }
 
     const feedback = content.quiz.map((q) => {
       const answer = request.answers.find((a) => a.questionId === q.id);
@@ -367,6 +369,7 @@ class MockStore {
       complete: true,
       streak,
       pathsStillDue: feed.due.length,
+      pathMastered: path.status === "mastered",
     };
   }
 
@@ -391,6 +394,7 @@ class MockStore {
     id: string;
     topic: string;
     depth: MockPath["depth"];
+    status: "active" | "completed" | "shelved";
     nodes: { index: number; title: string; status: "read" | "today" | "locked" }[];
   }> {
     const data = this.getOrCreateSession(sessionId);
@@ -398,6 +402,12 @@ class MockStore {
     if (!path) {
       return { ok: false, code: "not_found", message: "Path not found" };
     }
+    const dbStatus: "active" | "completed" | "shelved" =
+      path.status === "mastered"
+        ? "completed"
+        : path.status === "shelved"
+          ? "shelved"
+          : "active";
     const nodes = path.lessonTitles.map((title, index) => {
       let status: "read" | "today" | "locked" = "locked";
       if (index < path.progress) status = "read";
@@ -412,9 +422,30 @@ class MockStore {
         id: path.id,
         topic: path.topic,
         depth: path.depth,
+        status: dbStatus,
         nodes,
       },
     };
+  }
+
+  shelvePath(
+    sessionId: string,
+    courseId: string,
+  ): StoreResult<{ courseId: string }> {
+    const data = this.getOrCreateSession(sessionId);
+    const path = data.paths.find((p) => p.id === courseId);
+    if (!path) {
+      return { ok: false, code: "not_found", message: "Path not found" };
+    }
+    if (path.status !== "active") {
+      return {
+        ok: false,
+        code: "invalid_state",
+        message: "Only active paths can be shelved",
+      };
+    }
+    path.status = "shelved";
+    return { ok: true, data: { courseId } };
   }
 
   signIn(

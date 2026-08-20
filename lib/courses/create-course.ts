@@ -11,11 +11,12 @@ import {
   normalizeTopic,
   type GeneratePathOutlineDeps,
 } from "@/lib/courses/outline";
+import { FREE_ACTIVE_PATH_LIMIT, isFreePlan, normalizePlan } from "@/lib/plans";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 
-/** Free plan active-path cap (docs/FLOWS.md, mock store). */
-export const FREE_ACTIVE_PATH_LIMIT = 2;
+/** @deprecated Use FREE_ACTIVE_PATH_LIMIT from @/lib/plans */
+export { FREE_ACTIVE_PATH_LIMIT };
 const PENDING_TTL_MS = 24 * 60 * 60 * 1000;
 
 export type CreateCourseSuccess = {
@@ -33,7 +34,7 @@ export type CreateCourseResult = CreateCourseSuccess | CreateCoursePlanLimit;
 
 export type AuthUser = {
   id: string;
-  plan: Plan | "paid";
+  plan: Plan;
 };
 
 export type CreateCourseDeps = {
@@ -63,15 +64,12 @@ async function defaultGetUser(): Promise<AuthUser | null> {
       .eq("id", user.id)
       .maybeSingle();
 
-    const planRaw = profile?.plan;
-    const plan: Plan | "paid" =
-      planRaw === "paid" || planRaw === "academy" || planRaw === "free"
-        ? planRaw === "academy"
-          ? "academy"
-          : planRaw
-        : "free";
-
-    return { id: user.id, plan };
+    return {
+      id: user.id,
+      plan: normalizePlan(
+        typeof profile?.plan === "string" ? profile.plan : null,
+      ),
+    };
   } catch {
     // No Supabase auth session yet (staging until auth ships).
     return null;
@@ -116,8 +114,7 @@ export async function createCourse(
       deps?.countActiveCourses ??
       ((userId: string) => defaultCountActiveCourses(admin, userId));
     const activeCount = await countActive(user.id);
-    const isFree = user.plan === "free";
-    if (isFree && activeCount >= FREE_ACTIVE_PATH_LIMIT) {
+    if (isFreePlan(user.plan) && activeCount >= FREE_ACTIVE_PATH_LIMIT) {
       return {
         ok: false,
         code: "plan_limit",

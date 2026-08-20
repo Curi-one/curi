@@ -215,6 +215,18 @@ describe("migratePending", () => {
       if (table === "pending_courses") {
         return { select: pendingSelect, delete: pendingDelete };
       }
+      if (table === "users") {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              maybeSingle: vi.fn().mockResolvedValue({
+                data: { timezone: "UTC" },
+                error: null,
+              }),
+            }),
+          }),
+        };
+      }
       if (table === "courses") {
         return { insert: courseInsert };
       }
@@ -283,9 +295,25 @@ describe("migratePending", () => {
 
   it("skips expired rows (query filters expires_at > now)", async () => {
     const gt = vi.fn().mockResolvedValue({ data: [], error: null });
-    const eq = vi.fn().mockReturnValue({ gt });
-    const select = vi.fn().mockReturnValue({ eq });
-    const from = vi.fn().mockReturnValue({ select });
+    const pendingEq = vi.fn().mockReturnValue({ gt });
+    const pendingSelect = vi.fn().mockReturnValue({ eq: pendingEq });
+    const usersMaybeSingle = vi.fn().mockResolvedValue({
+      data: { timezone: "UTC" },
+      error: null,
+    });
+    const from = vi.fn((table: string) => {
+      if (table === "pending_courses") {
+        return { select: pendingSelect };
+      }
+      if (table === "users") {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({ maybeSingle: usersMaybeSingle }),
+          }),
+        };
+      }
+      throw new Error(`unexpected table ${table}`);
+    });
 
     const result = await migratePending("anon-session", "user-1", {
       createAdminClient: () => ({ from }) as never,

@@ -144,6 +144,7 @@ function ClarifyContent() {
       selectedAnswer={selected}
       onSelect={selectOption}
       onBack={goBack}
+      topic={topicParam || loadClarifySession()?.topic}
     />
   );
 }
