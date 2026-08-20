@@ -68,6 +68,8 @@ export type CourseContext = {
   clarifications: ClarificationItem[];
   lessons: CourseLessonRef[];
   userId?: string;
+  /** Guest feels from pending_courses.lesson_feels (lesson index → feel). */
+  lessonFeels?: Record<number, LessonFeel>;
 };
 
 export type GetLessonBodySuccess = {
@@ -127,6 +129,9 @@ export function feelToDifficultyModifier(
       return "clearer";
   }
 }
+
+/** Alias used by quiz / feel exit criteria. */
+export const modifierFromFeel = feelToDifficultyModifier;
 
 /** Split markdown body into paragraph strings for LessonResponse. */
 export function markdownToParagraphs(markdown: string): string[] {
@@ -217,13 +222,31 @@ function parseClarifications(raw: unknown): ClarificationItem[] {
   return items;
 }
 
+export function parseLessonFeels(raw: unknown): Record<number, LessonFeel> {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    return {};
+  }
+  const out: Record<number, LessonFeel> = {};
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    const index = Number.parseInt(key, 10);
+    if (Number.isNaN(index)) continue;
+    const parsed = LessonFeelSchema.safeParse(value);
+    if (parsed.success) {
+      out[index] = parsed.data;
+    }
+  }
+  return out;
+}
+
 export async function defaultLoadCourse(
   params: { courseId: string; sessionId: string },
   admin: SupabaseClient,
 ): Promise<CourseContext | null> {
   const { data: pending, error: pendingError } = await admin
     .from("pending_courses")
-    .select("id, topic, depth, clarifications, outline, expires_at")
+    .select(
+      "id, topic, depth, clarifications, outline, expires_at, lesson_feels",
+    )
     .eq("id", params.courseId)
     .eq("anonymous_id", params.sessionId)
     .maybeSingle();
@@ -251,6 +274,7 @@ export async function defaultLoadCourse(
       depth: depthParsed.data,
       clarifications: parseClarifications(pending.clarifications),
       lessons: parseOutlineLessons(pending.outline),
+      lessonFeels: parseLessonFeels(pending.lesson_feels),
     };
   }
 
@@ -457,12 +481,17 @@ export async function getLessonBody(
   }
 
   let modifier: DifficultyModifier = "baseline";
-  if (params.lessonIndex > 0 && course.kind === "member" && course.userId) {
-    const priorFeel = await loadPriorFeel({
-      courseId: params.courseId,
-      priorLessonIndex: params.lessonIndex - 1,
-      userId: course.userId,
-    });
+  if (params.lessonIndex > 0) {
+    let priorFeel: LessonFeel | null = null;
+    if (course.kind === "member" && course.userId) {
+      priorFeel = await loadPriorFeel({
+        courseId: params.courseId,
+        priorLessonIndex: params.lessonIndex - 1,
+        userId: course.userId,
+      });
+    } else if (course.kind === "pending" && course.lessonFeels) {
+      priorFeel = course.lessonFeels[params.lessonIndex - 1] ?? null;
+    }
     if (priorFeel) {
       modifier = feelToDifficultyModifier(priorFeel);
     }

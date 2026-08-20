@@ -44,6 +44,10 @@ export function QuizFlow({ questions, onComplete }: Props) {
   }
 
   const correct = selectedIndex === q.correctIndex;
+  const why =
+    q.explanation && q.explanation.trim().length > 0
+      ? q.explanation
+      : "Check the lesson sources for more detail.";
 
   return (
     <div className="flex min-h-[70vh] flex-col pb-28">
@@ -78,9 +82,7 @@ export function QuizFlow({ questions, onComplete }: Props) {
       {revealed && (
         <div className="mt-8 rounded-xl border border-border bg-paper-secondary p-4">
           <p className="font-medium text-ink">{correct ? "Right" : "Not quite"}</p>
-          <p className="mt-2 text-sm text-ink-muted">
-            Check the lesson sources for more detail.
-          </p>
+          <p className="mt-2 text-sm text-ink-muted">{why}</p>
         </div>
       )}
       {revealed && (

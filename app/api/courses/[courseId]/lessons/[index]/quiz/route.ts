@@ -4,6 +4,8 @@ import {
   jsonWithSession,
   resolveSession,
 } from "@/lib/api/handler-utils";
+import { getEnv } from "@/lib/env";
+import { getQuiz, submitQuiz } from "@/lib/lessons/quiz";
 import { getMockStore } from "@/lib/mock/store";
 
 type RouteParams = { params: Promise<{ courseId: string; index: string }> };
@@ -20,17 +22,29 @@ export async function GET(request: Request, { params }: RouteParams) {
     );
   }
 
-  try {
-    const store = getMockStore();
-    const quiz = store.getQuiz(sessionId, courseId, lessonIndex);
-    return jsonWithSession(quiz, sessionId);
-  } catch {
+  if (getEnv().USE_MOCK_API) {
+    try {
+      const store = getMockStore();
+      const quiz = store.getQuiz(sessionId, courseId, lessonIndex);
+      return jsonWithSession(quiz, sessionId);
+    } catch {
+      return jsonWithSession(
+        { error: "not found", code: "not_found" },
+        sessionId,
+        { status: 404 },
+      );
+    }
+  }
+
+  const result = await getQuiz({ courseId, lessonIndex, sessionId });
+  if (!result.ok) {
     return jsonWithSession(
-      { error: "not found", code: "not_found" },
+      { error: result.message, code: result.code },
       sessionId,
       { status: 404 },
     );
   }
+  return jsonWithSession(result.data, sessionId);
 }
 
 export async function POST(request: Request, { params }: RouteParams) {
@@ -51,20 +65,37 @@ export async function POST(request: Request, { params }: RouteParams) {
     return invalidBodyResponse();
   }
 
-  try {
-    const store = getMockStore();
-    const result = store.submitQuiz(
-      sessionId,
-      courseId,
-      lessonIndex,
-      parsed.data,
-    );
-    return jsonWithSession(result, sessionId);
-  } catch {
+  if (getEnv().USE_MOCK_API) {
+    try {
+      const store = getMockStore();
+      const result = store.submitQuiz(
+        sessionId,
+        courseId,
+        lessonIndex,
+        parsed.data,
+      );
+      return jsonWithSession(result, sessionId);
+    } catch {
+      return jsonWithSession(
+        { error: "not found", code: "not_found" },
+        sessionId,
+        { status: 404 },
+      );
+    }
+  }
+
+  const result = await submitQuiz({
+    courseId,
+    lessonIndex,
+    sessionId,
+    request: parsed.data,
+  });
+  if (!result.ok) {
     return jsonWithSession(
-      { error: "not found", code: "not_found" },
+      { error: result.message, code: result.code },
       sessionId,
       { status: 404 },
     );
   }
+  return jsonWithSession(result.data, sessionId);
 }

@@ -39,9 +39,27 @@ function resolveAdmin(deps?: ContentCacheDeps): SupabaseClient {
   return deps?.admin ?? createAdminClient();
 }
 
+export type QuizQuestionPayload = {
+  id: string;
+  prompt: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+  source_refs?: unknown;
+};
+
+export type QuizPayload = {
+  questions: QuizQuestionPayload[];
+};
+
+export type QuizCacheHit = {
+  payload: QuizPayload;
+  sources: unknown;
+};
+
 async function lookupCacheRow(
   fingerprint: string,
-  cacheType: "path_outline" | "lesson_body",
+  cacheType: "path_outline" | "lesson_body" | "quiz",
   deps?: ContentCacheDeps,
 ): Promise<{ id: string; payload: unknown; sources: unknown } | null> {
   const admin = resolveAdmin(deps);
@@ -170,6 +188,57 @@ export async function storeLessonBody(
       depth: input.depth,
       lesson_index: input.lessonIndex,
       difficulty_modifier: input.difficultyModifier,
+      payload: input.payload,
+      sources: input.sources,
+      hit_count: 0,
+    },
+    { onConflict: "cache_key" },
+  );
+
+  if (error) {
+    throw new Error(`content_cache store failed: ${error.message}`);
+  }
+}
+
+/** Lookup quiz by fingerprint; increments hit_count on hit. */
+export async function lookupQuiz(
+  fingerprint: string,
+  deps?: ContentCacheDeps,
+): Promise<QuizCacheHit | null> {
+  const row = await lookupCacheRow(fingerprint, "quiz", deps);
+  if (!row) {
+    return null;
+  }
+  return {
+    payload: row.payload as QuizPayload,
+    sources: row.sources,
+  };
+}
+
+export type StoreQuizInput = {
+  cacheKey: string;
+  topicNormalized: string;
+  depth: string;
+  lessonIndex: number;
+  payload: QuizPayload;
+  sources: unknown;
+};
+
+/** Insert or upsert a quiz cache row (difficulty always baseline — CONTENT-CACHE). */
+export async function storeQuiz(
+  input: StoreQuizInput,
+  deps?: ContentCacheDeps,
+): Promise<void> {
+  const admin = resolveAdmin(deps);
+
+  const { error } = await admin.from("content_cache").upsert(
+    {
+      cache_key: input.cacheKey,
+      cache_type: "quiz",
+      topic_normalized: input.topicNormalized,
+      depth: input.depth,
+      lesson_index: input.lessonIndex,
+      difficulty_modifier: "baseline",
       payload: input.payload,
       sources: input.sources,
       hit_count: 0,

@@ -200,7 +200,7 @@ describe("getLessonBody", () => {
     expect(lookup).toHaveBeenCalledWith(fingerprintFor(1, "easier"));
   });
 
-  it("uses baseline for guests on lesson index > 0 (no activity)", async () => {
+  it("uses baseline for guests on lesson index > 0 when no feel stored", async () => {
     loadCourse.mockResolvedValueOnce({
       kind: "pending",
       topic: TOPIC,

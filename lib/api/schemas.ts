@@ -95,6 +95,8 @@ export const QuizQuestionSchema = z.object({
   prompt: z.string(),
   options: z.array(z.string()).min(2),
   correctIndex: z.number().int().nonnegative(),
+  /** Optional per-answer why copy for QuizFlow (also returned on submit feedback). */
+  explanation: z.string().optional(),
 });
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
 

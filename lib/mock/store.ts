@@ -301,6 +301,7 @@ class MockStore {
         prompt: q.prompt,
         options: q.options,
         correctIndex: q.correctIndex,
+        explanation: q.explanation,
       })),
     };
   }
