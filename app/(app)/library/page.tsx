@@ -36,6 +36,12 @@ function LibraryContent() {
   }, []);
 
   const paths = lib?.[tab] ?? [];
+  const masteredCount = lib?.mastered.length ?? 0;
+  const exploringCount = lib?.exploring.length ?? 0;
+  const totalPaths =
+    (lib?.exploring.length ?? 0) +
+    (lib?.mastered.length ?? 0) +
+    (lib?.shelved.length ?? 0);
 
   return (
     <>
@@ -45,6 +51,24 @@ function LibraryContent() {
           New path
         </Link>
       </div>
+
+      {lib && totalPaths > 0 && (
+        <div className="mt-7 grid grid-cols-2 divide-x divide-border border-y border-border py-5">
+          <div className="px-4 sm:px-6">
+            <p className="font-display text-4xl leading-none tracking-[-0.04em] text-ink">
+              {masteredCount}
+            </p>
+            <p className="mt-2 font-meta">mastered</p>
+          </div>
+          <div className="px-4 sm:px-6">
+            <p className="font-display text-4xl leading-none tracking-[-0.04em] text-ink">
+              {exploringCount}
+            </p>
+            <p className="mt-2 font-meta">exploring</p>
+          </div>
+        </div>
+      )}
+
       <div className="mt-6">
         <TabPills
           tabs={TABS.map((t) => ({
@@ -73,7 +97,16 @@ function LibraryContent() {
             secondaryLabel={tab === "exploring" ? "New path" : undefined}
           />
         )}
-        {paths.length > 0 && (
+        {paths.length > 0 && tab === "mastered" && (
+          <ul className="grid grid-cols-2 gap-3 sm:gap-4">
+            {paths.map((p) => (
+              <li key={p.id}>
+                <LibraryPathCard path={p} tab={tab} />
+              </li>
+            ))}
+          </ul>
+        )}
+        {paths.length > 0 && tab !== "mastered" && (
           <ul className="space-y-3">
             {paths.map((p) => (
               <li key={p.id}>

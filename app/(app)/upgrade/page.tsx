@@ -8,18 +8,23 @@ import { PageShell } from "@/components/PageShell";
 import { postCheckout } from "@/lib/api/client";
 
 const FEATURES = [
-  { label: "Active paths", free: "2", academy: "Unlimited" },
-  { label: "Daily lessons", free: true, academy: true },
-  { label: "Lesson feel tuning", free: true, academy: true },
-  { label: "Shelve & restore", free: "Shelve only", academy: "Full" },
+  {
+    label: "Unlimited active learning paths",
+    sub: "Free plan caps at 2 — follow more curiosities in parallel",
+  },
+  {
+    label: "Full lesson archive",
+    sub: "Return to any completed lesson from any path, any time",
+  },
+  {
+    label: "Full learning analytics",
+    sub: "Progress, streak history, and completion across all paths",
+  },
+  {
+    label: "Email preferences",
+    sub: "Coming later — control timing and frequency when digests ship",
+  },
 ] as const;
-
-function Cell({ value }: { value: string | true }) {
-  if (value === true) {
-    return <Check className="h-4 w-4 text-ink" strokeWidth={2.5} aria-label="Included" />;
-  }
-  return <span>{value}</span>;
-}
 
 export default function UpgradePage() {
   const router = useRouter();
@@ -42,56 +47,80 @@ export default function UpgradePage() {
   return (
     <PageShell
       back={{ href: "/profile", label: "Profile" }}
-      title="Academy"
-      kicker="Upgrade"
       withTabPad={false}
       className="pt-4"
     >
+      <p className="font-meta">Curi Academy</p>
+
+      <h1
+        className="mt-5 font-display text-[2.75rem] font-light leading-[1.08] tracking-[-0.04em] text-ink sm:text-5xl"
+        style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
+      >
+        Unlimited curiosity. Every path open.
+      </h1>
       <p className="mt-4 text-[15px] font-light leading-relaxed text-ink-muted">
-        Same calm daily lessons. More room for parallel paths — $10/month.
+        Follow multiple curiosities in parallel. One lesson per path, every day
+        — with your full history always accessible.
       </p>
 
-      <div className="mt-8 overflow-hidden rounded-xl border border-border">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border bg-paper-secondary">
-              <th className="px-4 py-3 text-left font-normal text-ink-muted" />
-              <th className="px-4 py-3 text-left font-meta normal-case">Free</th>
-              <th className="px-4 py-3 text-left font-meta normal-case text-accent">
-                Academy
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {FEATURES.map((row) => (
-              <tr key={row.label} className="border-b border-border last:border-0">
-                <td className="px-4 py-3 text-ink">{row.label}</td>
-                <td className="px-4 py-3 text-ink-muted">
-                  <Cell value={row.free} />
-                </td>
-                <td className="px-4 py-3 text-ink">
-                  <Cell value={row.academy} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="mt-10 border-y border-border py-8">
+        <div className="flex items-baseline gap-3">
+          <span
+            className="font-display text-[4.5rem] leading-[0.9] tracking-[-0.05em] text-ink sm:text-[5.5rem]"
+            style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 1" }}
+          >
+            $2.50
+          </span>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-base font-medium text-ink/70">/ week</span>
+            <span className="text-sm text-ink-muted">billed as $10 / month</span>
+          </div>
+        </div>
+        <div className="mt-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-border" aria-hidden />
+          <span className="shrink-0 font-meta">Less than a cup of coffee</span>
+          <div className="h-px flex-1 bg-border" aria-hidden />
+        </div>
       </div>
 
+      <ul className="mt-8 space-y-4">
+        {FEATURES.map(({ label, sub }) => (
+          <li key={label} className="flex items-start gap-3.5">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border bg-ink/10">
+              <Check
+                className="h-2.5 w-2.5 text-ink/70"
+                strokeWidth={2.5}
+                aria-hidden
+              />
+            </span>
+            <span>
+              <span className="text-sm font-medium leading-snug text-ink">
+                {label}
+              </span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-ink-muted">
+                {sub}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+
       {message && <p className="mt-4 text-sm text-ink-muted">{message}</p>}
-      <div className="mt-10 space-y-3">
-        <button
-          type="button"
-          disabled={loading}
-          onClick={() => void checkout()}
-          className="btn-primary w-full disabled:opacity-40"
-        >
-          {loading ? "Starting checkout…" : "Subscribe — $10/mo"}
-        </button>
-        <Link href="/today" className="btn-secondary block w-full text-center">
-          Back to Today
-        </Link>
-      </div>
+
+      <button
+        type="button"
+        disabled={loading}
+        onClick={() => void checkout()}
+        className="btn-primary mt-10 w-full disabled:opacity-40"
+      >
+        {loading ? "Starting checkout…" : "Start Academy — $2.50 a week"}
+      </button>
+      <p className="mt-3 text-center text-xs text-ink-muted">
+        Cancel anytime · No lock-in · Your progress stays
+      </p>
+      <Link href="/today" className="btn-secondary mt-4 block w-full text-center">
+        Back to Today
+      </Link>
     </PageShell>
   );
 }

@@ -54,7 +54,8 @@ function SidebarNavBtn({
 
 function pathActive(pathname: string, key: string): boolean {
   const groups: Record<string, string[]> = {
-    today: ["/today"],
+    // Lesson + quiz keep Home highlighted (prototype Sidebar today group)
+    today: ["/today", "/courses"],
     explore: ["/explore"],
     library: ["/library"],
     progress: ["/progress"],
@@ -176,7 +177,7 @@ export function AppSidebar() {
         {!isAcademy && (
           <Link
             href="/upgrade"
-            className="flex w-full flex-col items-center gap-1.5 rounded-xl px-1.5 py-2.5 text-ink-muted transition hover:bg-ink/[0.05] hover:text-ink"
+            className="flex w-full flex-col items-center gap-1.5 rounded-xl px-1.5 py-2.5 text-violet-500/70 transition hover:bg-violet-500/10 hover:text-violet-600"
           >
             <ArrowUp size={18} strokeWidth={1.8} aria-hidden />
             <span className="text-[10px] font-medium leading-none opacity-80">
