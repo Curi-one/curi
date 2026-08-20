@@ -30,42 +30,39 @@ describe("requestOtp", () => {
       auth: {
         signInWithOtp: vi
           .fn()
-          .mockResolvedValue({ error: { message: "rate limited" } }),
+          .mockResolvedValue({ error: { message: "service unavailable" } }),
       },
     });
 
     await expect(
       requestOtp("learner@example.com", { createServerClient }),
-    ).rejects.toThrow("rate limited");
+    ).rejects.toThrow("service unavailable");
   });
 
-  it("retries as sign-in when the email already exists", async () => {
-    const signInWithOtp = vi
-      .fn()
-      .mockResolvedValueOnce({
-        error: { message: "User already registered" },
-      })
-      .mockResolvedValueOnce({ error: null });
+  it("does not throw on rate limit so the user can still enter a prior code", async () => {
+    const createServerClient = vi.fn().mockResolvedValue({
+      auth: {
+        signInWithOtp: vi
+          .fn()
+          .mockResolvedValue({ error: { message: "email rate limit exceeded" } }),
+      },
+    });
+
+    await expect(
+      requestOtp("learner@example.com", { createServerClient }),
+    ).resolves.toEqual({ sent: false, rateLimited: true });
+  });
+
+  it("sends once even when the email already exists", async () => {
+    const signInWithOtp = vi.fn().mockResolvedValue({ error: null });
     const createServerClient = vi.fn().mockResolvedValue({
       auth: { signInWithOtp },
     });
 
-    await requestOtp("learner@example.com", { createServerClient });
-
-    expect(signInWithOtp).toHaveBeenNthCalledWith(1, {
-      email: "learner@example.com",
-      options: {
-        shouldCreateUser: true,
-        emailRedirectTo: expect.stringContaining("/auth/callback"),
-      },
-    });
-    expect(signInWithOtp).toHaveBeenNthCalledWith(2, {
-      email: "learner@example.com",
-      options: {
-        shouldCreateUser: false,
-        emailRedirectTo: expect.stringContaining("/auth/callback"),
-      },
-    });
+    await expect(
+      requestOtp("learner@example.com", { createServerClient }),
+    ).resolves.toEqual({ sent: true, rateLimited: false });
+    expect(signInWithOtp).toHaveBeenCalledTimes(1);
   });
 });
 

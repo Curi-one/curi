@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Wordmark } from "@/components/Wordmark";
 import { getMe } from "@/lib/api/client";
 
 const SUGGESTIONS = [
@@ -37,31 +38,32 @@ export default function LandingPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col px-6 pb-12 pt-6">
+    <main className="app-shell flex flex-col pb-16 pt-6">
       <header className="flex items-center justify-between">
-        <p className="font-display text-lg text-ink">
-          Cu<em className="italic">ri</em>
-        </p>
-        <div className="flex items-center gap-2">
-          <Link
-            href={AUTH_TODAY}
-            className="inline-flex min-h-11 items-center rounded-full border border-border px-4 text-sm text-ink hover:border-ink/30"
-          >
+        <Wordmark />
+        <nav className="flex items-center gap-1" aria-label="Account">
+          <Link href={AUTH_TODAY} className="btn-ghost">
             Sign in
           </Link>
           <Link
             href={SIGNUP_TODAY}
-            className="inline-flex min-h-11 items-center rounded-full bg-ink px-4 text-sm text-paper hover:opacity-90"
+            className="inline-flex min-h-11 items-center rounded-full border border-border px-4 text-sm text-ink"
           >
             Sign up
           </Link>
-        </div>
+        </nav>
       </header>
 
-      <h1 className="mt-14 font-display text-4xl leading-tight text-ink">
+      <p className="type-kicker mt-16">Three minutes a day</p>
+      <h1
+        className="mt-4 font-display text-[2.35rem] font-light leading-[1.12] tracking-tight text-ink sm:text-[2.75rem]"
+        style={{ fontVariationSettings: "'SOFT' 70, 'WONK' 1" }}
+      >
         What are you curious about?
       </h1>
-      <p className="mt-3 text-ink-muted">Free to start · No account needed</p>
+      <p className="mt-4 max-w-sm text-[15px] font-light leading-relaxed text-ink-muted">
+        Free to start. No account needed until after your first lesson.
+      </p>
       <label className="mt-10 block">
         <span className="sr-only">Topic</span>
         <input
@@ -70,26 +72,26 @@ export default function LandingPage() {
           onChange={(e) => setTopic(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && start(topic)}
           placeholder="e.g. Stoicism, sleep, climate policy…"
-          className="w-full rounded-xl border border-border bg-paper-secondary px-4 py-4 text-lg outline-none focus:border-ink"
+          className="input-field"
         />
       </label>
       <button
         type="button"
         onClick={() => start(topic)}
         disabled={!topic.trim()}
-        className="btn-primary mt-4 w-full disabled:opacity-40"
+        className="btn-primary mt-4 w-full"
       >
         Start
       </button>
-      <div className="mt-10">
-        <p className="text-sm text-ink-muted">Suggestions</p>
+      <div className="mt-12">
+        <p className="type-kicker">Suggestions</p>
         <ul className="mt-3 flex flex-wrap gap-2">
           {SUGGESTIONS.map((s) => (
             <li key={s}>
               <button
                 type="button"
                 onClick={() => start(s)}
-                className="rounded-full border border-border px-4 py-2 text-sm hover:border-ink/30"
+                className="rounded-full border border-border px-4 py-2 text-[13px] text-ink hover:border-ink"
               >
                 {s}
               </button>

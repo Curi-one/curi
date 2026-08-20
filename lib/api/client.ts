@@ -121,6 +121,8 @@ export type AuthCodeStepResponse = {
   session?: UserSession;
   /** Present only when USE_MOCK_API — never set for real Supabase OTP. */
   devHint?: string;
+  /** New email was not sent (provider rate limit). User can still enter a prior code. */
+  notice?: string;
 };
 
 export type AuthSessionResponse = {

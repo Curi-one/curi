@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { AuthRequestSchema } from "@/lib/api/schemas";
 import {
   invalidBodyResponse,
@@ -8,6 +9,7 @@ import {
   classifyAuthError,
   loadMemberSession,
   migratePending,
+  OTP_RATE_LIMIT_NOTICE,
   requestOtp,
   updateUserName,
   verifyOtp,
@@ -60,14 +62,25 @@ export async function POST(request: Request) {
   try {
     // Email only → send OTP
     if (!code && !name) {
+      const cookieCarrier = new NextResponse();
+      const otp = await requestOtp(email, {
+        createServerClient: async () =>
+          createClientForResponse(
+            requestFromIncoming(request),
+            cookieCarrier,
+          ),
+      });
       const response = jsonWithSession(
-        { ok: true as const, step: "code" as const },
+        {
+          ok: true as const,
+          step: "code" as const,
+          ...(otp.rateLimited ? { notice: OTP_RATE_LIMIT_NOTICE } : {}),
+        },
         sessionId,
       );
-      await requestOtp(email, {
-        createServerClient: async () =>
-          createClientForResponse(requestFromIncoming(request), response),
-      });
+      for (const cookie of cookieCarrier.cookies.getAll()) {
+        response.cookies.set(cookie.name, cookie.value);
+      }
       return response;
     }
 

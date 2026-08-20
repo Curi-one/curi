@@ -14,12 +14,17 @@ export function PathRow({ path, dimmed }: Props) {
   return (
     <Link
       href={href}
-      className={`block rounded-xl border border-border bg-paper-secondary px-4 py-4 transition-opacity ${
-        dimmed ? "opacity-50" : "hover:border-ink/20"
+      className={`surface-card block px-4 py-4 transition-opacity ${
+        dimmed ? "opacity-50" : "hover:border-ink/30"
       }`}
     >
-      <p className="font-display text-lg leading-snug text-ink">{path.topic}</p>
-      <p className="mt-1 text-sm text-ink-muted">
+      <p
+        className="font-display text-[22px] font-normal leading-snug text-ink"
+        style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 0" }}
+      >
+        {path.topic}
+      </p>
+      <p className="mt-2 font-meta">
         {depthLabel(path.depth)} · Lesson {lessonNum} of {path.totalLessons}
       </p>
     </Link>

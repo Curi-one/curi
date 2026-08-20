@@ -133,39 +133,34 @@ function authEmailRedirectTo(): string {
   return "http://localhost:3000/auth/callback";
 }
 
+export type RequestOtpResult = {
+  sent: boolean;
+  rateLimited: boolean;
+};
+
+export const OTP_RATE_LIMIT_NOTICE =
+  "A new email was not sent (provider limit). Enter the code from the last Curi email, or wait a few minutes.";
+
 export async function requestOtp(
   email: string,
   deps?: OtpDeps,
-): Promise<void> {
+): Promise<RequestOtpResult> {
   const createServer = deps?.createServerClient ?? createClient;
   const supabase = await createServer();
-  const redirectTo = authEmailRedirectTo();
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
       shouldCreateUser: true,
-      emailRedirectTo: redirectTo,
+      emailRedirectTo: authEmailRedirectTo(),
     },
   });
-  if (
-    error &&
-    /already (been )?registered|user already exists/i.test(error.message)
-  ) {
-    const retry = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: false,
-        emailRedirectTo: redirectTo,
-      },
-    });
-    if (retry.error) {
-      throw new Error(retry.error.message);
-    }
-    return;
-  }
   if (error) {
+    if (classifyAuthError(error.message).code === "rate_limited") {
+      return { sent: false, rateLimited: true };
+    }
     throw new Error(error.message);
   }
+  return { sent: true, rateLimited: false };
 }
 
 const OTP_TYPES = ["email", "magiclink", "signup"] as const;

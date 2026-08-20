@@ -15,23 +15,28 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
     <div className="pb-24">
       <header className="mb-8 flex items-start justify-between">
         <div>
-          <h1 className="font-display text-3xl text-ink">Today</h1>
+          <h1
+            className="font-display text-[2rem] font-light tracking-tight text-ink"
+            style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
+          >
+            Today
+          </h1>
           {!empty && due.length > 0 && (
-            <p className="mt-1 text-ink-muted">
+            <p className="mt-1 text-[15px] font-light text-ink-muted">
               {due.length} of {total} still to read
             </p>
           )}
         </div>
         <Link
           href="/progress"
-          className={`text-sm font-medium ${streakAtRisk ? "text-streak" : "text-ink-muted"}`}
+          className={`font-meta ${streakAtRisk ? "text-accent" : ""}`}
         >
           {streak} day streak →
         </Link>
       </header>
 
       {empty ? (
-        <div className="rounded-xl border border-border bg-paper-secondary p-8 text-center">
+        <div className="surface-card p-8 text-center">
           <p className="text-ink-muted">No paths yet.</p>
           <Link href="/explore" className="btn-primary mt-6 inline-block">
             Explore paths
@@ -41,9 +46,7 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
         <>
           {due.length > 0 && (
             <section className="mb-8">
-              <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-ink-muted">
-                Still to read
-              </h2>
+              <h2 className="type-kicker mb-3">Still to read</h2>
               <ul className="space-y-3">
                 {due.map((path) => (
                   <li key={path.id}>
@@ -55,9 +58,7 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
           )}
           {done.length > 0 && (
             <section>
-              <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-ink-muted">
-                Already today
-              </h2>
+              <h2 className="type-kicker mb-3">Already today</h2>
               <ul className="space-y-3">
                 {done.map((path) => (
                   <li key={path.id}>

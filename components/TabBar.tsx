@@ -24,10 +24,16 @@ export function TabBar() {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`flex min-h-[52px] flex-1 items-center justify-center text-sm font-medium transition-colors ${
+              className={`relative flex min-h-[56px] flex-1 items-center justify-center text-[13px] tracking-wide transition-colors ${
                 active ? "text-ink" : "text-ink-muted"
               }`}
             >
+              {active && (
+                <span
+                  className="absolute inset-x-8 top-0 h-[2px] bg-accent"
+                  aria-hidden
+                />
+              )}
               {tab.label}
             </Link>
           );

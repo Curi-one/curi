@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Wordmark } from "@/components/Wordmark";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { getMe, postAuth } from "@/lib/api/client";
@@ -69,6 +70,9 @@ function AuthContent() {
         } else {
           setDevHint(null);
         }
+        if ("notice" in res && typeof res.notice === "string") {
+          setError(res.notice);
+        }
         setStep("code");
         return;
       }
@@ -108,7 +112,11 @@ function AuthContent() {
 
   return (
     <div className="flex min-h-[70vh] flex-col">
-      <h1 className="font-display text-2xl text-ink">
+      <Wordmark />
+      <h1
+        className="mt-12 font-display text-[2rem] font-light leading-tight tracking-tight text-ink"
+        style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
+      >
         {step === "email" &&
           (intent === "signin"
             ? "Welcome back"
@@ -118,11 +126,11 @@ function AuthContent() {
         {step === "code" && "Check your email"}
         {step === "name" && "What should we call you?"}
       </h1>
-      <p className="mt-2 text-ink-muted">
+      <p className="mt-3 text-[15px] font-light leading-relaxed text-ink-muted">
         {step === "email" &&
           (intent === "signin"
-            ? "Enter your email — we'll send a code, no password."
-            : "Enter your email — no password needed.")}
+            ? "Enter your email. We'll send a code, no password."
+            : "Enter your email. No password needed.")}
         {step === "code" &&
           (devHint
             ? `We sent a code to ${email}. Dev code: ${devHint}`
@@ -136,7 +144,7 @@ function AuthContent() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-8 w-full rounded-xl border border-border bg-paper-secondary px-4 py-4"
+          className="input-field mt-8"
           placeholder="you@example.com"
         />
       )}
@@ -145,7 +153,7 @@ function AuthContent() {
           autoFocus
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          className="mt-8 w-full rounded-xl border border-border bg-paper-secondary px-4 py-4 tracking-widest"
+          className="input-field mt-8 tracking-[0.35em]"
           placeholder="000000"
         />
       )}
@@ -154,12 +162,14 @@ function AuthContent() {
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mt-8 w-full rounded-xl border border-border bg-paper-secondary px-4 py-4"
+          className="input-field mt-8"
           placeholder="Alex"
         />
       )}
 
-      {error && <p className="mt-4 text-sm text-ink-muted">{error}</p>}
+      {error && (
+        <p className="mt-4 text-[13px] leading-relaxed text-ink-muted">{error}</p>
+      )}
 
       <div className="mt-auto pt-8">
         <button
@@ -185,7 +195,7 @@ function AuthContent() {
 
 export default function AuthPage() {
   return (
-    <main className="mx-auto min-h-screen max-w-lg px-6 py-10">
+    <main className="app-shell py-8">
       <Suspense fallback={<p className="text-ink-muted">Loading…</p>}>
         <AuthContent />
       </Suspense>

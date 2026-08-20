@@ -20,7 +20,7 @@ export default function TodayPage() {
   }, []);
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-10">
+    <main className="app-shell py-10">
       {error && <p className="text-ink-muted">{error}</p>}
       {!feed && !error && <p className="text-ink-muted">Loading…</p>}
       {feed && (
