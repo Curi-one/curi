@@ -51,7 +51,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div
           className={
             showTabBar
-              ? "pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0"
+              ? "pb-[calc(3rem+env(safe-area-inset-bottom))] md:pb-0"
               : ""
           }
         >

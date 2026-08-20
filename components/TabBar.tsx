@@ -23,10 +23,10 @@ export function TabBar() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/80 bg-paper/92 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
       aria-label="Main"
     >
-      <div className="mx-auto flex max-w-lg md:max-w-none">
+      <div className="mx-auto flex h-12 max-w-lg md:max-w-none">
         {tabs.map((tab) => {
           const active = pathname.startsWith(tab.href);
           const Icon = tab.icon;
@@ -34,17 +34,17 @@ export function TabBar() {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-0.5 text-[12px] tracking-wide transition-colors ${
+              className={`relative flex h-12 flex-1 flex-col items-center justify-center gap-0.5 text-[10px] tracking-wide transition-colors ${
                 active ? "font-medium text-ink" : "text-ink-muted"
               }`}
             >
               {active && (
                 <span
-                  className="absolute inset-x-6 top-0 h-[2px] rounded-full bg-accent"
+                  className="absolute inset-x-8 top-0 h-[2px] rounded-full bg-accent"
                   aria-hidden
                 />
               )}
-              <Icon size={20} strokeWidth={active ? 2.1 : 1.75} aria-hidden />
+              <Icon size={18} strokeWidth={active ? 2.1 : 1.75} aria-hidden />
               {tab.label}
             </Link>
           );
