@@ -14,3 +14,5 @@ Read root `AGENTS.md` before substantive work. Multi-step work: use `curi-manage
 **Invariants:** Auth after first quiz · one lesson/path/day · multi-path Today · cache before Perplexity · lesson feel · free 2 paths.
 
 **Prototypes** live in `prototypes/` — visual only; `docs/` wins on behaviour.
+
+**Hosting:** staging = `stage.curi.one` (`staging` branch). Track delivery in Linear — `docs/TRACKING.md`.
