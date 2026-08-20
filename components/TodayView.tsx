@@ -13,7 +13,7 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
 
   return (
     <div className="pb-24">
-      <header className="mb-8 flex items-start justify-between">
+      <header className="mb-8 flex items-start justify-between gap-3">
         <div>
           <h1
             className="font-display text-[2rem] font-light tracking-tight text-ink"
@@ -29,7 +29,7 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
         </div>
         <Link
           href="/progress"
-          className={`font-meta ${streakAtRisk ? "text-accent" : ""}`}
+          className={`shrink-0 font-meta ${streakAtRisk ? "text-accent" : ""}`}
         >
           {streak} day streak →
         </Link>
@@ -39,21 +39,34 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
         <div className="surface-card p-8 text-center">
           <p className="font-display text-xl text-ink">Nothing due today</p>
           <p className="mt-2 text-sm text-ink-muted">
-            Start a path from Explore or the landing page.
+            Browse curated founder paths, or create a custom path on any topic.
           </p>
-          <Link href="/explore" className="btn-primary mt-6 inline-block">
-            Explore founder paths
-          </Link>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link href="/explore" className="btn-primary inline-block">
+              Browse founder paths
+            </Link>
+            <Link
+              href="/new"
+              className="text-sm text-ink-muted underline hover:text-ink sm:self-center"
+            >
+              Create a custom path
+            </Link>
+          </div>
         </div>
       ) : due.length === 0 && done.length > 0 ? (
         <div className="surface-card p-8 text-center">
           <p className="font-display text-xl text-ink">All caught up</p>
           <p className="mt-2 text-sm text-ink-muted">
-            Next lessons unlock tomorrow.
+            Next lessons unlock tomorrow. Or start another path.
           </p>
-          <Link href="/progress" className="btn-secondary mt-6 inline-block">
-            View progress
-          </Link>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link href="/progress" className="btn-secondary inline-block">
+              View progress
+            </Link>
+            <Link href="/new" className="btn-ghost inline-block text-sm">
+              New path
+            </Link>
+          </div>
         </div>
       ) : (
         <>
@@ -81,9 +94,16 @@ export function TodayView({ due, done, streak = 0, streakAtRisk }: Props) {
               </ul>
             </section>
           )}
+          <div className="mt-10 text-center">
+            <Link
+              href="/new"
+              className="text-sm text-ink-muted underline hover:text-ink"
+            >
+              Create a new path
+            </Link>
+          </div>
         </>
       )}
-
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { LibraryPathCard } from "@/components/LibraryPathCard";
@@ -38,6 +39,12 @@ function LibraryContent() {
 
   return (
     <>
+      <div className="mt-2 flex items-center justify-between gap-3">
+        <p className="text-sm text-ink-muted">Your paths</p>
+        <Link href="/new" className="btn-secondary h-9 px-3 text-sm">
+          New path
+        </Link>
+      </div>
       <div className="mt-6">
         <TabPills
           tabs={TABS.map((t) => ({
@@ -55,13 +62,15 @@ function LibraryContent() {
           <EmptyState
             message={
               tab === "exploring"
-                ? "No active paths yet. Start one from Explore or the landing page."
+                ? "No active paths yet. Start a curated founder path, or create a custom one."
                 : tab === "mastered"
                   ? "Nothing mastered yet. Finish a path to see it here."
                   : "No shelved paths."
             }
             actionHref={tab === "exploring" ? "/explore" : undefined}
-            actionLabel={tab === "exploring" ? "Explore paths" : undefined}
+            actionLabel={tab === "exploring" ? "Browse Explore" : undefined}
+            secondaryHref={tab === "exploring" ? "/new" : undefined}
+            secondaryLabel={tab === "exploring" ? "New path" : undefined}
           />
         )}
         {paths.length > 0 && (
@@ -80,7 +89,7 @@ function LibraryContent() {
 
 export default function LibraryPage() {
   return (
-    <PageShell title="Library" kicker="Your paths" withTabPad={false} className="pt-4">
+    <PageShell title="Library" withTabPad={false} className="pt-4">
       <Suspense fallback={<p className="mt-6 text-ink-muted">Loading…</p>}>
         <LibraryContent />
       </Suspense>

@@ -36,12 +36,15 @@ describe("TodayView", () => {
     expect(screen.getByText("1 of 2 still to read")).toBeInTheDocument();
   });
 
-  it("shows Explore CTA when empty", () => {
+  it("shows Browse primary and Create secondary when empty", () => {
     render(<TodayView due={[]} done={[]} streak={0} streakAtRisk={false} />);
 
     expect(screen.getByText("Nothing due today")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Explore founder paths" }),
+      screen.getByRole("link", { name: "Browse founder paths" }),
     ).toHaveAttribute("href", "/explore");
+    expect(
+      screen.getByRole("link", { name: "Create a custom path" }),
+    ).toHaveAttribute("href", "/new");
   });
 });
