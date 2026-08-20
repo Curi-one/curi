@@ -7,7 +7,7 @@ import {
 } from "@/lib/auth/callback";
 import { sanitizeReturnTo } from "@/lib/auth/intent";
 import { loadMemberSession } from "@/lib/auth/otp";
-import { createClientForResponse } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   const origin = request.nextUrl.origin;
@@ -17,10 +17,9 @@ export async function GET(request: NextRequest) {
   const returnTo = sanitizeReturnTo(request.nextUrl.searchParams.get("next"));
 
   let redirectPath = failureRedirectPath(returnTo);
-  const response = NextResponse.redirect(new URL(redirectPath, origin));
 
   try {
-    const supabase = createClientForResponse(request, response);
+    const supabase = await createClient();
     await completeEmailLink(
       { code, tokenHash, type },
       {
@@ -45,6 +44,5 @@ export async function GET(request: NextRequest) {
     redirectPath = failureRedirectPath(returnTo);
   }
 
-  response.headers.set("Location", new URL(redirectPath, origin).toString());
-  return response;
+  return NextResponse.redirect(new URL(redirectPath, origin));
 }
