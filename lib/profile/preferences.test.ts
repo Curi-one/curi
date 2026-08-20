@@ -18,9 +18,47 @@ describe("profile preferences", () => {
   it("returns opt-in defaults when nothing is stored", () => {
     expect(loadPreferences("member")).toEqual(DEFAULT_PREFERENCES);
     expect(DEFAULT_PREFERENCES.emailEnabled).toBe(false);
-    expect(DEFAULT_PREFERENCES.lessonDepth).toBe("Standard");
+    expect(DEFAULT_PREFERENCES.lessonDepth).toBe("Medium");
     expect(DEFAULT_PREFERENCES.emailTime).toBe("morning");
     expect(DEFAULT_PREFERENCES.emailFormat).toBe("Full");
+  });
+
+  it("migrates legacy lessonDepth values to the new Short/Medium/Long scale", () => {
+    localStorage.setItem(
+      "curi-prefs:member",
+      JSON.stringify({ lessonDepth: "Standard" }),
+    );
+    expect(loadPreferences("member").lessonDepth).toBe("Medium");
+
+    localStorage.setItem(
+      "curi-prefs:a",
+      JSON.stringify({ lessonDepth: "Quick" }),
+    );
+    expect(loadPreferences("a").lessonDepth).toBe("Short");
+
+    localStorage.setItem(
+      "curi-prefs:b",
+      JSON.stringify({ lessonDepth: "Deep" }),
+    );
+    expect(loadPreferences("b").lessonDepth).toBe("Long");
+  });
+
+  it("keeps a valid current lessonDepth value as-is", () => {
+    localStorage.setItem(
+      "curi-prefs:member",
+      JSON.stringify({ lessonDepth: "Long" }),
+    );
+    expect(loadPreferences("member").lessonDepth).toBe("Long");
+  });
+
+  it("falls back to default lessonDepth for unrecognised values", () => {
+    localStorage.setItem(
+      "curi-prefs:member",
+      JSON.stringify({ lessonDepth: "Nonsense" }),
+    );
+    expect(loadPreferences("member").lessonDepth).toBe(
+      DEFAULT_PREFERENCES.lessonDepth,
+    );
   });
 
   it("persists and reloads under curi-prefs:userKey", () => {

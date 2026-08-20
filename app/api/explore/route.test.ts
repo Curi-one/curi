@@ -22,4 +22,17 @@ describe("GET /api/explore", () => {
     expect(body.paths.length).toBeGreaterThan(0);
     expect(body.books.length).toBeGreaterThan(0);
   });
+
+  it("returns deduped category lists for browse filter chips", async () => {
+    const res = await GET();
+    const body = await res.json();
+    expect(body.pathCategories.length).toBeGreaterThanOrEqual(2);
+    expect(body.bookCategories.length).toBeGreaterThanOrEqual(2);
+    expect(
+      body.paths.every((p: { category?: string }) => Boolean(p.category)),
+    ).toBe(true);
+    expect(
+      body.books.every((b: { category?: string }) => Boolean(b.category)),
+    ).toBe(true);
+  });
 });

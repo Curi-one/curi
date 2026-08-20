@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Search, Sparkles } from "lucide-react";
+import { BrowseFilterChips } from "@/components/BrowseFilterChips";
 import { CourseCover } from "@/components/CourseCover";
 import { EmptyState } from "@/components/EmptyState";
 import { PageShell } from "@/components/PageShell";
@@ -34,7 +35,10 @@ export default function ExplorePage() {
   const router = useRouter();
   const [paths, setPaths] = useState<CataloguePath[]>([]);
   const [books, setBooks] = useState<CatalogueBook[]>([]);
+  const [pathCategories, setPathCategories] = useState<string[]>([]);
+  const [bookCategories, setBookCategories] = useState<string[]>([]);
   const [tab, setTab] = useState<"paths" | "books">("paths");
+  const [category, setCategory] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [previewPath, setPreviewPath] = useState<CataloguePath | null>(null);
   const [previewBook, setPreviewBook] = useState<CatalogueBook | null>(null);
@@ -47,6 +51,8 @@ export default function ExplorePage() {
       .then(([explore, lib, me]) => {
         setPaths(explore.paths);
         setBooks(explore.books);
+        setPathCategories(explore.pathCategories ?? []);
+        setBookCategories(explore.bookCategories ?? []);
         setActiveCount(lib.exploring.length);
         setPlan(me.session.plan);
       })
@@ -56,24 +62,33 @@ export default function ExplorePage() {
   const atLimit = plan === "free" && activeCount >= 2;
   const q = query.trim().toLowerCase();
 
+  function handleTabChange(id: "paths" | "books") {
+    setTab(id);
+    setCategory(null);
+  }
+
   const filteredPaths = useMemo(() => {
-    if (!q) return paths;
-    return paths.filter(
-      (p) =>
-        p.topic.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q),
-    );
-  }, [paths, q]);
+    return paths
+      .filter((p) => !category || p.category === category)
+      .filter(
+        (p) =>
+          !q ||
+          p.topic.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q),
+      );
+  }, [paths, q, category]);
 
   const filteredBooks = useMemo(() => {
-    if (!q) return books;
-    return books.filter(
-      (b) =>
-        b.title.toLowerCase().includes(q) ||
-        b.author.toLowerCase().includes(q) ||
-        b.description.toLowerCase().includes(q),
-    );
-  }, [books, q]);
+    return books
+      .filter((b) => !category || b.category === category)
+      .filter(
+        (b) =>
+          !q ||
+          b.title.toLowerCase().includes(q) ||
+          b.author.toLowerCase().includes(q) ||
+          b.description.toLowerCase().includes(q),
+      );
+  }, [books, q, category]);
 
   const featured = !q && filteredPaths.length > 0 ? filteredPaths[0]! : null;
   const restPaths =
@@ -171,8 +186,15 @@ export default function ExplorePage() {
               { id: "books", label: "Books", count: books.length },
             ]}
             active={tab}
-            onChange={(id) => setTab(id as "paths" | "books")}
+            onChange={(id) => handleTabChange(id as "paths" | "books")}
           />
+          <div className="mt-4">
+            <BrowseFilterChips
+              categories={tab === "paths" ? pathCategories : bookCategories}
+              active={category}
+              onChange={setCategory}
+            />
+          </div>
         </div>
       )}
 

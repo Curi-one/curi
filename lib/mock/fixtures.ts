@@ -7,6 +7,9 @@ export type CataloguePath = {
   topic: string;
   description: string;
   depth: DepthSlug;
+  /** Browse category (F3). See docs/DATA.md taxonomy note. */
+  category: string;
+  tag?: string;
 };
 
 export type CatalogueBook = {
@@ -15,12 +18,24 @@ export type CatalogueBook = {
   author: string;
   description: string;
   pathCount: number;
+  /** Browse category (F3). See docs/DATA.md taxonomy note. */
+  category: string;
+  tag?: string;
 };
 
 export type MockLessonContent = {
   title: string;
   body: string[];
   sources: Source[];
+  takeaways?: string[];
+  shareableFact?: { fact: string; reflection: string };
+  visuals?: {
+    title: string;
+    caption: string;
+    equation?: string;
+    formulaNote?: string;
+    imageUrl?: string;
+  }[];
   quiz: {
     id: string;
     prompt: string;
@@ -48,6 +63,8 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
     description:
       "How VC funds work and what first-time founders need before the first institutional round.",
     depth: "fluent",
+    category: "Raising & deal terms",
+    tag: "Fundraising",
   },
   {
     id: "catalogue-term-sheets",
@@ -55,6 +72,8 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
     description:
       "Valuation, preferences, and governance — the clauses that become real when you sign.",
     depth: "fluent",
+    category: "Raising & deal terms",
+    tag: "Deals",
   },
   {
     id: "catalogue-safe",
@@ -62,6 +81,8 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
     description:
       "Simple until they convert. The ownership math founders need before the priced round.",
     depth: "essentials",
+    category: "Raising & deal terms",
+    tag: "Instruments",
   },
   {
     id: "catalogue-cap-table",
@@ -69,6 +90,53 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
     description:
       "Ownership, dilution, and option pools — the spreadsheet investors actually read.",
     depth: "essentials",
+    category: "Raising & deal terms",
+    tag: "Equity",
+  },
+  {
+    id: "catalogue-unit-economics",
+    topic: "Unit Economics",
+    description:
+      "CAC, LTV, payback, and the customer-level math investors expect you to know.",
+    depth: "essentials",
+    category: "While you're building",
+    tag: "Metrics",
+  },
+  {
+    id: "catalogue-business-models",
+    topic: "Business Models",
+    description:
+      "How companies actually make money, and why the model matters more than the product.",
+    depth: "essentials",
+    category: "While you're building",
+    tag: "Models",
+  },
+  {
+    id: "catalogue-pricing-psychology",
+    topic: "Pricing Psychology",
+    description:
+      "The perception games behind every price a customer agrees to pay.",
+    depth: "essentials",
+    category: "While you're building",
+    tag: "Pricing",
+  },
+  {
+    id: "catalogue-behavioral-economics",
+    topic: "Behavioral Economics",
+    description:
+      "The cognitive biases that quietly shape decisions classical economics assumes away.",
+    depth: "fluent",
+    category: "Decisions & behavior",
+    tag: "Economics",
+  },
+  {
+    id: "catalogue-negotiation",
+    topic: "Negotiation",
+    description:
+      "Leverage, anchoring, and the preparation that decides a deal before anyone speaks.",
+    depth: "essentials",
+    category: "Decisions & behavior",
+    tag: "Negotiation",
   },
 ];
 
@@ -79,6 +147,28 @@ export const CATALOGUE_BOOKS: CatalogueBook[] = [
     author: "Daniel Kahneman",
     description: "Biases, heuristics, and how we really decide.",
     pathCount: 12,
+    category: "Behavioral economics",
+    tag: "Decisions",
+  },
+  {
+    id: "book-predictably-irrational",
+    title: "Predictably Irrational",
+    author: "Dan Ariely",
+    description:
+      "The behavioural economics of why people buy — anchoring, relativity, and the power of defaults.",
+    pathCount: 9,
+    category: "Behavioral economics",
+    tag: "Pricing",
+  },
+  {
+    id: "book-nudge",
+    title: "Nudge",
+    author: "Richard Thaler & Cass Sunstein",
+    description:
+      "Improving decisions without removing choice — the architecture behind every default.",
+    pathCount: 8,
+    category: "Behavioral economics",
+    tag: "Design",
   },
   {
     id: "book-sapiens",
@@ -86,6 +176,18 @@ export const CATALOGUE_BOOKS: CatalogueBook[] = [
     author: "Yuval Noah Harari",
     description: "A brief history of humankind in digestible paths.",
     pathCount: 18,
+    category: "Founder mindset",
+    tag: "History",
+  },
+  {
+    id: "book-zero-to-one",
+    title: "Zero to One",
+    author: "Peter Thiel",
+    description:
+      "Monopoly, not competition, is the goal — what that means for how you build and pitch.",
+    pathCount: 8,
+    category: "Founder mindset",
+    tag: "Strategy",
   },
 ];
 
@@ -93,9 +195,29 @@ export const MOCK_PATH_1_LESSONS: Record<number, MockLessonContent> = {
   0: {
     title: "What is the Fermi paradox?",
     body: [
-      "The **Fermi paradox** asks why, given the vast number of stars and potentially habitable planets, we have not yet detected signs of intelligent extraterrestrial life.",
-      "Enrico Fermi reportedly posed the question over lunch in 1950: *Where is everybody?* The scale of the Milky Way suggests many opportunities for life to arise and spread.",
+      "The **Fermi paradox** asks why, given the vast number of stars and potentially habitable planets, we have not yet detected signs of intelligent extraterrestrial life. [1]",
+      "Enrico Fermi reportedly posed the question over lunch in 1950: *Where is everybody?* The scale of the Milky Way suggests many opportunities for life to arise and spread. [2]",
       "Possible explanations range from the **Rare Earth hypothesis** (complex life is uncommon) to the **Great Filter** (civilizations tend to destroy themselves before becoming interstellar).",
+    ],
+    takeaways: [
+      "The Fermi paradox is the tension between high odds of life and zero confirmed contact.",
+      "Explanations span Rare Earth (life is rare) to Great Filter (something stops civilizations).",
+      "The question forces you to separate speculation from evidence when talking about life beyond Earth.",
+    ],
+    shareableFact: {
+      fact: "Fermi’s lunch-table question still frames the search for life: if the galaxy should be busy, why is it silent?",
+      reflection:
+        "A good paradox isn’t trivia — it tells you which assumption in your model is doing the real work.",
+    },
+    visuals: [
+      {
+        title: "Silence vs scale",
+        caption:
+          "Billions of stars suggest many chances for life; the empty sky suggests a bottleneck somewhere.",
+        equation: "Expectation ≫ Evidence",
+        formulaNote:
+          "The paradox is not that life is impossible — it is that our priors and observations disagree.",
+      },
     ],
     sources: [
       {
@@ -138,6 +260,26 @@ export const MOCK_PATH_1_LESSONS: Record<number, MockLessonContent> = {
       "It multiplies factors like star formation rate, fraction of stars with planets, habitable planets per star, and the fraction that develop intelligent life.",
       "Each term carries enormous uncertainty — the equation is useful for structuring debate rather than producing a precise number.",
     ],
+    takeaways: [
+      "The Drake equation estimates communicative civilizations, not just planets.",
+      "Every factor multiplies uncertainty — the value is framing, not a precise N.",
+      "Use it to name assumptions before arguing about aliens or SETI strategy.",
+    ],
+    shareableFact: {
+      fact: "The Drake equation is less a calculator than a checklist of assumptions about life in the galaxy.",
+      reflection:
+        "When someone quotes a huge N, ask which factors they treated as near-certain.",
+    },
+    visuals: [
+      {
+        title: "N as a product",
+        caption:
+          "Change one factor and the whole estimate swings by orders of magnitude.",
+        equation: "N = R* × fp × ne × fl × fi × fc × L",
+        formulaNote:
+          "The equation’s power is making each assumption visible — not pretending the product is known.",
+      },
+    ],
     sources: [
       {
         title: "Frank Drake — SETI",
@@ -173,6 +315,23 @@ function defaultLessonContent(
       `Welcome to lesson ${lessonIndex + 1} of **${pathTopic}**.`,
       "This is mock content for frontend-first development. Real lesson bodies will come from Perplexity on cache miss.",
       "Focus on one clear idea per paragraph — Curi lessons are meant to be read in a few minutes.",
+    ],
+    takeaways: [
+      `${pathTopic} has a surface definition and a decision underneath.`,
+      `Lesson ${lessonIndex + 1} should change what you notice before you act.`,
+      "Ask who benefits if you misunderstand the concept.",
+    ],
+    shareableFact: {
+      fact: `The expensive mistakes in ${pathTopic} usually come from misunderstood incentives, not missing definitions.`,
+      reflection:
+        "A good lesson should make the next decision less reactive.",
+    },
+    visuals: [
+      {
+        title: `A decision map for ${pathTopic}`,
+        caption:
+          "Every concept has a definition on the surface and a trade-off underneath.",
+      },
     ],
     sources: [
       {

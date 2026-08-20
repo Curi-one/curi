@@ -19,7 +19,7 @@ Per-user **difficulty tuning** (from lesson feel) uses a separate modifier on th
 | Type | Stored payload | When lookup runs |
 |---|---|---|
 | `path_outline` | `{ total, lessons: [{ index, title }] }` | `POST /api/courses` |
-| `lesson_body` | `{ body, sources }` | `GET .../lessons/:index` |
+| `lesson_body` | `{ body, takeaways, shareableFact, visuals?, sources }` | `GET .../lessons/:index` |
 | `quiz` | `{ questions: [...] }` | `GET .../lessons/:index/quiz` |
 
 Clarify topic questions stay **uncached** (cheap, short, topic-varying).

@@ -40,6 +40,19 @@ const MODIFIER_HINTS: Record<DifficultyModifier, string> = {
     "More concrete examples, explicit structure, and a short recap opening.",
 };
 
+const PerplexityVisualSchema = z.object({
+  title: z.string().min(1),
+  caption: z.string().min(1),
+  equation: z.string().min(1).optional(),
+  formulaNote: z.string().min(1).optional(),
+  imageUrl: z.string().url().optional(),
+});
+
+const PerplexityShareableFactSchema = z.object({
+  fact: z.string().min(1),
+  reflection: z.string().min(1),
+});
+
 const PerplexityLessonBodySchema = z.object({
   body: z.string().min(1),
   sources: z
@@ -50,6 +63,9 @@ const PerplexityLessonBodySchema = z.object({
       }),
     )
     .optional(),
+  takeaways: z.array(z.string().min(1)).min(3).max(3),
+  shareableFact: PerplexityShareableFactSchema,
+  visuals: z.array(PerplexityVisualSchema).max(3).optional().default([]),
 });
 
 export type CourseLessonRef = {
@@ -399,14 +415,16 @@ function buildMessages(input: {
   modifier: DifficultyModifier;
 }): PerplexityMessage[] {
   const lines = [
-    `Topic: ${input.topic}`,
+    `Path topic (broader context): ${input.topic}`,
     `Depth band: ${input.depth}`,
     `Lesson index: ${input.lessonIndex} (0-based)`,
     `Lesson title: ${input.lessonTitle}`,
     `Difficulty modifier: ${input.modifier}`,
     `Modifier instruction: ${MODIFIER_HINTS[input.modifier]}`,
-    "Write the lesson body as markdown paragraphs suitable for a 3–5 minute micro-lesson.",
-    'Return ONLY valid JSON: {"body":"markdown string","sources":[{"title":"...","url":"https://..."}]}',
+    "Write a 3–5 minute micro-lesson body as markdown paragraphs separated by blank lines.",
+    "Also return exactly 3 takeaways and 1 shareableFact tied to this lesson and the broader path topic.",
+    "Add visuals (0–3) only when a figure, diagram caption, or equation materially helps understanding.",
+    "Return ONLY valid JSON matching the schema in the system message.",
   ];
 
   if (input.clarifications.length > 0) {
@@ -419,18 +437,41 @@ function buildMessages(input: {
   return [
     {
       role: "system",
-      content: `You write cited micro-lesson bodies for Curi.
+      content: `You write cited micro-lesson payloads for Curi.
 Return ONLY valid JSON (no markdown fences, no commentary) matching:
-{"body":"markdown","sources":[{"title":string,"url":string}]}
+{
+  "body":"markdown string",
+  "sources":[{"title":string,"url":string}],
+  "takeaways":[string,string,string],
+  "shareableFact":{"fact":string,"reflection":string},
+  "visuals":[{"title":string,"caption":string,"equation"?:string,"formulaNote"?:string,"imageUrl"?:string}]
+}
 
 Rules:
-- body is markdown with short paragraphs separated by blank lines.
-- Stay on the lesson title; do not cover the whole path.
-- Include concrete examples where helpful.
+- body is the teaching content: markdown with short paragraphs separated by blank lines. The app displays body as you write it (only blank-line splitting). Do not put takeaways inside body.
+- Stay on the lesson title; use the path topic for broader context only.
+- takeaways: exactly 3 memorable, concrete insights from THIS lesson (not generic advice).
+- shareableFact: one punchy fact + short reflection clearly related to the lesson and/or broader path topic — suitable to share on social.
+- visuals: omit or [] when text alone is enough. When helpful, include title+caption; add equation/formulaNote for formulas; imageUrl only if a real public https image URL would help (never invent broken URLs).
 - Prefer accurate, source-backed claims.`,
     },
     { role: "user", content: lines.join("\n") },
   ];
+}
+
+function enrichmentFromPayload(payload: LessonBodyPayload): Pick<
+  LessonResponse,
+  "takeaways" | "shareableFact" | "visuals"
+> {
+  return {
+    ...(payload.takeaways && payload.takeaways.length > 0
+      ? { takeaways: payload.takeaways }
+      : {}),
+    ...(payload.shareableFact ? { shareableFact: payload.shareableFact } : {}),
+    ...(payload.visuals && payload.visuals.length > 0
+      ? { visuals: payload.visuals }
+      : {}),
+  };
 }
 
 function sourcesFromCache(raw: unknown): Source[] {
@@ -521,6 +562,7 @@ export async function getLessonBody(
   if (hit) {
     const body = bodyParagraphsFromPayload(hit.payload);
     const sources = sourcesFromCache(hit.sources);
+    const enrichment = enrichmentFromPayload(hit.payload);
     if (course.kind === "member") {
       await upsertLessonContent({
         courseId: params.courseId,
@@ -536,6 +578,7 @@ export async function getLessonBody(
         title: lesson.title,
         body,
         sources,
+        ...enrichment,
       },
     };
   }
@@ -551,7 +594,7 @@ export async function getLessonBody(
       modifier,
     }),
     temperature: 0.3,
-    max_tokens: 2000,
+    max_tokens: 3200,
   });
 
   const parsed = parseLessonBodyJson(result.content);
@@ -569,7 +612,20 @@ export async function getLessonBody(
     result.sources as PerplexitySource[],
   );
 
-  const payload: LessonBodyPayload = { body };
+  const visuals = (parsed.visuals ?? []).map((v) => ({
+    title: v.title,
+    caption: v.caption,
+    ...(v.equation ? { equation: v.equation } : {}),
+    ...(v.formulaNote ? { formulaNote: v.formulaNote } : {}),
+    ...(v.imageUrl ? { imageUrl: v.imageUrl } : {}),
+  }));
+
+  const payload: LessonBodyPayload = {
+    body,
+    takeaways: parsed.takeaways,
+    shareableFact: parsed.shareableFact,
+    ...(visuals.length > 0 ? { visuals } : {}),
+  };
   await store({
     cacheKey,
     topicNormalized,
@@ -596,6 +652,9 @@ export async function getLessonBody(
       title: lesson.title,
       body,
       sources,
+      takeaways: parsed.takeaways,
+      shareableFact: parsed.shareableFact,
+      ...(visuals.length > 0 ? { visuals } : {}),
     },
   };
 }

@@ -1,22 +1,13 @@
+import { getMentalModel } from "@/lib/lessons/mental-models";
+
 type Props = { topic: string };
 
 export function IdeaDiagram({ topic }: Props) {
+  const model = getMentalModel(topic);
   const columns = [
-    {
-      n: "01",
-      title: "Surface",
-      body: "The acronym, clause, metric, or phrase you need to recognise quickly.",
-    },
-    {
-      n: "02",
-      title: "Incentive",
-      body: `The investor, founder, employee, or customer motivation that makes ${topic.toLowerCase()} matter.`,
-    },
-    {
-      n: "03",
-      title: "Trade-off",
-      body: "What you gain and what you give up when this concept shows up in a real company decision.",
-    },
+    { n: "01", title: "Surface", body: model.surface },
+    { n: "02", title: "Incentive", body: model.incentive },
+    { n: "03", title: "Trade-off", body: model.tradeoff },
   ];
 
   return (

@@ -16,8 +16,24 @@ export type PathOutlineCacheHit = {
   sources: unknown;
 };
 
+export type LessonBodyVisual = {
+  title: string;
+  caption: string;
+  equation?: string;
+  formulaNote?: string;
+  imageUrl?: string;
+};
+
+export type LessonBodyShareableFact = {
+  fact: string;
+  reflection: string;
+};
+
 export type LessonBodyPayload = {
   body: string[];
+  takeaways?: string[];
+  shareableFact?: LessonBodyShareableFact;
+  visuals?: LessonBodyVisual[];
 };
 
 export type LessonBodyCacheHit = {

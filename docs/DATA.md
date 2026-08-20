@@ -117,6 +117,17 @@ Per-user copies from cache (or cache_key reference). See prior fields in ARCHITE
 
 ---
 
+## Browse taxonomy
+
+Explore catalogue (F3) is static in v1 — `CATALOGUE_PATHS` / `CATALOGUE_BOOKS` in `lib/mock/fixtures.ts`, served via `lib/explore/catalogue.ts`. Each path and book carries:
+
+| Field | Notes |
+|---|---|
+| `category` | Required. Groups items for the browse filter chips (e.g. "Raising & deal terms", "Behavioral economics"). |
+| `tag` | Optional short label (e.g. "Fundraising", "Metrics") for future card chrome; not currently rendered. |
+
+`getExploreCatalogue()` (and the mock `GET /api/explore`) also return deduped `pathCategories` / `bookCategories` in first-appearance order, consumed by `BrowseFilterChips`. DB-backed catalogue with admin-managed categories is deferred past v1.
+
 ## Deferred
 
-Stripe columns, flashcards, referrals, semantic similarity matching (v2 — fuzzy cache beyond exact fingerprint).
+Stripe columns, flashcards, referrals, semantic similarity matching (v2 — fuzzy cache beyond exact fingerprint), DB-backed browse catalogue.

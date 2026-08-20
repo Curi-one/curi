@@ -3,6 +3,14 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Flame, Lock } from "lucide-react";
+import type { ShareableFactPayload } from "@/lib/api/schemas";
+import { getShareableFact } from "@/lib/lessons/shareable-facts";
+import {
+  buildShareText,
+  copyAndOpenLinkedIn,
+  linkedinShareUrl,
+  twitterIntentUrl,
+} from "@/lib/share/lesson-share";
 
 type Insight = { fact: string; reflection: string };
 
@@ -39,6 +47,8 @@ export type CompleteSheetProps = {
   lessonNumber?: number;
   totalLessons?: number;
   nextLessonTitle?: string;
+  /** Prefer lesson API / Perplexity shareable fact when present. */
+  shareableFact?: ShareableFactPayload;
 };
 
 export function CompleteSheet({
@@ -52,9 +62,14 @@ export function CompleteSheet({
   lessonNumber,
   totalLessons,
   nextLessonTitle,
+  shareableFact,
 }: CompleteSheetProps) {
   const [copied, setCopied] = useState(false);
-  const insight = useMemo(() => (open ? pickInsight() : null), [open]);
+  const insight = useMemo(() => {
+    if (!open) return null;
+    if (shareableFact) return shareableFact;
+    return courseTopic ? getShareableFact(courseTopic) : pickInsight();
+  }, [open, courseTopic, shareableFact]);
 
   if (!open || !insight) return null;
 
@@ -72,10 +87,12 @@ export function CompleteSheet({
       ? "Next lessons unlock tomorrow."
       : "You still have paths to read today.";
 
-  const shareTopic = courseTopic ?? "founder";
-  const shareText = `Today I learned:\n\n"${insight.fact}"\n\n— from my ${shareTopic} path on Curi.\n\ncuri.app`;
-  const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
-  const liUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://curi.app")}`;
+  const shareText = buildShareText({
+    fact: insight.fact,
+    topic: courseTopic ?? "founder",
+  });
+  const tweetUrl = twitterIntentUrl(shareText);
+  const liUrl = linkedinShareUrl();
 
   const showTomorrow =
     Boolean(nextLessonTitle) || (allPathsDoneToday && !pathMastered);
@@ -84,6 +101,12 @@ export function CompleteSheet({
     void navigator.clipboard?.writeText(shareText);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2000);
+  }
+
+  function shareToLinkedIn() {
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+    void copyAndOpenLinkedIn(shareText);
   }
 
   return (
@@ -176,6 +199,10 @@ export function CompleteSheet({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
+                onClick={(e) => {
+                  e.preventDefault();
+                  shareToLinkedIn();
+                }}
               >
                 Share on LinkedIn
               </a>

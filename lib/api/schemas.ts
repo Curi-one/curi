@@ -83,10 +83,32 @@ export const SourceSchema = z.object({
 });
 export type Source = z.infer<typeof SourceSchema>;
 
+export const LessonVisualSchema = z.object({
+  title: z.string().min(1),
+  caption: z.string().min(1),
+  equation: z.string().min(1).optional(),
+  formulaNote: z.string().min(1).optional(),
+  /** Optional public image URL when a real figure helps; omit if none. */
+  imageUrl: z.string().url().optional(),
+});
+export type LessonVisualBlock = z.infer<typeof LessonVisualSchema>;
+
+export const ShareableFactSchema = z.object({
+  fact: z.string().min(1),
+  reflection: z.string().min(1),
+});
+export type ShareableFactPayload = z.infer<typeof ShareableFactSchema>;
+
 export const LessonResponseSchema = z.object({
   title: z.string(),
+  /** Markdown paragraphs exactly as generated (split on blank lines only). */
   body: z.array(z.string()),
   sources: z.array(SourceSchema),
+  /** Exactly three key takeaways when generated; optional for older cache rows. */
+  takeaways: z.array(z.string().min(1)).min(1).max(5).optional(),
+  shareableFact: ShareableFactSchema.optional(),
+  /** Structured visuals when the lesson benefits from a figure/equation. */
+  visuals: z.array(LessonVisualSchema).max(3).optional(),
 });
 export type LessonResponse = z.infer<typeof LessonResponseSchema>;
 

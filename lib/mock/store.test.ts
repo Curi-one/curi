@@ -135,4 +135,47 @@ describe("MockStore", () => {
       expect(second.streak).toBe(1);
     });
   });
+
+  describe("getLesson difficulty modifier from prior lesson feel", () => {
+    it("applies an easier hint to lesson 2 body after too_hard feel on lesson 1", () => {
+      const store = getMockStore();
+
+      const baseline = store.getLesson(MEMBER_SESSION, "mock-path-1", 1);
+      expect(baseline.ok).toBe(true);
+
+      const quiz = store.getQuiz(MEMBER_SESSION, "mock-path-1", 0);
+      store.submitQuiz(MEMBER_SESSION, "mock-path-1", 0, {
+        answers: quiz.questions.map((q) => ({
+          questionId: q.id,
+          selectedIndex: q.correctIndex,
+        })),
+        lessonFeel: "too_hard",
+      });
+
+      const adjusted = store.getLesson(MEMBER_SESSION, "mock-path-1", 1);
+      expect(adjusted.ok).toBe(true);
+      if (!baseline.ok || !adjusted.ok) return;
+
+      expect(adjusted.data.body).not.toEqual(baseline.data.body);
+      expect(adjusted.data.body[0]).toMatch(/shorter sentences|easier/i);
+    });
+
+    it("keeps baseline body when prior feel was just_right", () => {
+      const store = getMockStore();
+
+      const quiz = store.getQuiz(MEMBER_SESSION, "mock-path-1", 0);
+      store.submitQuiz(MEMBER_SESSION, "mock-path-1", 0, {
+        answers: quiz.questions.map((q) => ({
+          questionId: q.id,
+          selectedIndex: q.correctIndex,
+        })),
+        lessonFeel: "just_right",
+      });
+
+      const baseline = store.getLesson(MEMBER_SESSION, "mock-path-1", 1);
+      expect(baseline.ok).toBe(true);
+      if (!baseline.ok) return;
+      expect(baseline.data.body[0]).not.toMatch(/shorter sentences|easier/i);
+    });
+  });
 });
