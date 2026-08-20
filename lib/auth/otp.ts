@@ -10,10 +10,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Supabase Auth OTP helpers (magic link / email code).
+ * Supabase Auth OTP helpers (email 6-digit code + optional magic link).
  *
- * Ops: Supabase Auth URL / redirect allowlist must include https://stage.curi.one
- * (Site URL + Additional Redirect URLs) for staging email links.
+ * Ops (staging):
+ * - Site URL + Additional Redirect URLs: https://stage.curi.one/**
+ * - Email templates → Magic Link: include {{ .Token }} (the 6-digit code).
+ *   Default template is only a clickable link — codes will not appear in the dashboard.
  */
 
 export type OtpDeps = {
@@ -119,6 +121,17 @@ function progressFromFeels(feels: Record<number, LessonFeel>): number {
   return Math.max(...indices) + 1;
 }
 
+function authEmailRedirectTo(): string {
+  const appEnv = process.env.APP_ENV;
+  if (appEnv === "production") {
+    return "https://www.curi.one/auth";
+  }
+  if (appEnv === "staging") {
+    return "https://stage.curi.one/auth";
+  }
+  return "http://localhost:3000/auth";
+}
+
 export async function requestOtp(
   email: string,
   deps?: OtpDeps,
@@ -127,7 +140,10 @@ export async function requestOtp(
   const supabase = await createServer();
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { shouldCreateUser: true },
+    options: {
+      shouldCreateUser: true,
+      emailRedirectTo: authEmailRedirectTo(),
+    },
   });
   if (error) {
     throw new Error(error.message);

@@ -17,7 +17,10 @@ describe("requestOtp", () => {
 
     expect(signInWithOtp).toHaveBeenCalledWith({
       email: "learner@example.com",
-      options: { shouldCreateUser: true },
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: expect.stringContaining("/auth"),
+      },
     });
   });
 
