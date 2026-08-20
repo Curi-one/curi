@@ -260,12 +260,12 @@ function AuthContent() {
         <input
           autoFocus
           value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
           className="input-field mt-8 tracking-[0.35em]"
           placeholder="000000"
           inputMode="numeric"
           autoComplete="one-time-code"
-          maxLength={6}
+          maxLength={8}
         />
       )}
 
@@ -293,7 +293,7 @@ function AuthContent() {
             disabled={
               loading ||
               (step === "email" && !email.trim()) ||
-              (step === "code" && code.length < 6) ||
+              (step === "code" && (code.length < 6 || code.length === 7)) ||
               (step === "name" && !name.trim())
             }
             onClick={() => void submit()}

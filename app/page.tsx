@@ -14,8 +14,8 @@ import { Wordmark } from "@/components/Wordmark";
 import { FOUNDER_TOPIC_SUGGESTIONS } from "@/lib/content/founder-catalogue";
 import { getMe } from "@/lib/api/client";
 
-const AUTH_TODAY = "/auth?intent=signin&returnTo=%2Ftoday";
-const SIGNUP_TODAY = "/auth?intent=signup&returnTo=%2Ftoday";
+const AUTH_HOME = "/auth?intent=signin&returnTo=%2F";
+const SIGNUP_HOME = "/auth?intent=signup&returnTo=%2F";
 
 const QUICK_BATCH = 4;
 const QUICK_CYCLE = 4000;
@@ -83,11 +83,11 @@ export default function LandingPage() {
       <header className="flex items-center justify-between">
         <Wordmark />
         <nav className="flex items-center gap-1" aria-label="Account">
-          <Link href={AUTH_TODAY} className="btn-ghost">
+          <Link href={AUTH_HOME} className="btn-ghost">
             Sign in
           </Link>
           <Link
-            href={SIGNUP_TODAY}
+            href={SIGNUP_HOME}
             className="btn-secondary inline-flex min-h-11 items-center rounded-full px-4 text-sm"
           >
             Sign up

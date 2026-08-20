@@ -38,6 +38,7 @@ content = (root / "supabase/templates/magic_link.html").read_text()
 print(json.dumps({
     "mailer_subjects_magic_link": "Your Curi sign-in link and code",
     "mailer_templates_magic_link_content": content,
+    "mailer_otp_length": 6,
 }))
 PY
 )
@@ -49,4 +50,4 @@ curl -fsS -X PATCH \
   -d "$PAYLOAD"
 
 echo ""
-echo "Applied magic link template (ConfirmationURL + Token) to project ${SUPABASE_PROJECT_REF}"
+echo "Applied magic link template (ConfirmationURL + Token) and OTP length 6 to project ${SUPABASE_PROJECT_REF}"

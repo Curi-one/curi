@@ -16,12 +16,11 @@ export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get("type");
   const returnTo = sanitizeReturnTo(request.nextUrl.searchParams.get("next"));
 
-  const success = NextResponse.redirect(
-    new URL(postSignInRedirectPath(returnTo, true), origin),
-  );
+  let redirectPath = failureRedirectPath(returnTo);
+  const response = NextResponse.redirect(new URL(redirectPath, origin));
 
   try {
-    const supabase = createClientForResponse(request, success);
+    const supabase = createClientForResponse(request, response);
     await completeEmailLink(
       { code, tokenHash, type },
       {
@@ -37,17 +36,15 @@ export async function GET(request: NextRequest) {
 
     if (user) {
       const session = await loadMemberSession(user.id, user.email ?? undefined);
-      if (!shouldCollectName(session)) {
-        return NextResponse.redirect(
-          new URL(postSignInRedirectPath(returnTo, false), origin),
-        );
-      }
+      redirectPath = postSignInRedirectPath(
+        returnTo,
+        shouldCollectName(session),
+      );
     }
-
-    return NextResponse.redirect(
-      new URL(postSignInRedirectPath(returnTo, true), origin),
-    );
   } catch {
-    return NextResponse.redirect(new URL(failureRedirectPath(returnTo), origin));
+    redirectPath = failureRedirectPath(returnTo);
   }
+
+  response.headers.set("Location", new URL(redirectPath, origin).toString());
+  return response;
 }

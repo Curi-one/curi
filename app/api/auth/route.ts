@@ -19,7 +19,6 @@ import {
 import { getEnv } from "@/lib/env";
 import { getMockStore, MOCK_AUTH_CODE } from "@/lib/mock/store";
 import {
-  createClient,
   createClientForResponse,
   requestFromIncoming,
 } from "@/lib/supabase/server";
@@ -87,7 +86,12 @@ export async function POST(request: Request) {
       return response;
     }
 
-    const supabase = await createClient();
+    const incoming = requestFromIncoming(request);
+    const cookieCarrier = new NextResponse();
+    const createServer = async () =>
+      createClientForResponse(incoming, cookieCarrier);
+
+    const supabase = await createServer();
     const {
       data: { user: existing },
     } = await supabase.auth.getUser();
@@ -98,8 +102,11 @@ export async function POST(request: Request) {
     // OTP is single-use — only verify when we do not already have a session.
     if (code && !userId) {
       const verified = isStagingOtpBypass(code)
-        ? await signInWithStagingOtp(email)
-        : await verifyOtp({ email, token: code });
+        ? await signInWithStagingOtp(email, { createServerClient: createServer })
+        : await verifyOtp(
+            { email, token: code },
+            { createServerClient: createServer },
+          );
       userId = verified.userId;
       userEmail = verified.email;
     }
@@ -120,13 +127,17 @@ export async function POST(request: Request) {
     }
 
     const session = await loadMemberSession(userId, userEmail);
-    return jsonWithSession(
+    const response = jsonWithSession(
       {
         session,
         ...(migratedPathId ? { migratedPathId } : {}),
       },
       sessionId,
     );
+    for (const cookie of cookieCarrier.cookies.getAll()) {
+      response.cookies.set(cookie.name, cookie.value);
+    }
+    return response;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Auth failed";
     const classified = classifyAuthError(message);
