@@ -28,7 +28,21 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(body || `Request failed (${res.status})`);
+    let message = body || `Request failed (${res.status})`;
+    try {
+      const parsed: unknown = JSON.parse(body);
+      if (
+        parsed &&
+        typeof parsed === "object" &&
+        "error" in parsed &&
+        typeof parsed.error === "string"
+      ) {
+        message = parsed.error;
+      }
+    } catch {
+      // Keep raw body when it is not JSON.
+    }
+    throw new Error(message);
   }
   return res.json() as Promise<T>;
 }

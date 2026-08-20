@@ -83,11 +83,13 @@ function AuthContent() {
       if ("session" in res && res.session?.kind === "member") {
         router.push(returnTo);
       }
-    } catch {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
       setError(
-        step === "code" || step === "name"
-          ? "Invalid code. Check your email and try again."
-          : "Something went wrong.",
+        message ||
+          (step === "code" || step === "name"
+            ? "Invalid code. Check your email and try again."
+            : "Something went wrong."),
       );
     } finally {
       setLoading(false);

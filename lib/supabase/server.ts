@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import type { NextRequest, NextResponse } from "next/server";
+import { NextRequest, type NextResponse } from "next/server";
 
 function requirePublicSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -13,6 +13,17 @@ function requirePublicSupabase() {
   }
 
   return { url, anonKey };
+}
+
+/**
+ * Copy cookies/headers without cloning a locked body.
+ * `new NextRequest(url, request)` throws after `request.json()`.
+ */
+export function requestFromIncoming(request: Request): NextRequest {
+  return new NextRequest(request.url, {
+    method: request.method,
+    headers: request.headers,
+  });
 }
 
 /** Server Supabase client with cookie session (Next.js App Router). */

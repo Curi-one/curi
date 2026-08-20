@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  classifyAuthError,
   migratePending,
   requestOtp,
   updateUserName,
@@ -37,6 +38,35 @@ describe("requestOtp", () => {
       requestOtp("learner@example.com", { createServerClient }),
     ).rejects.toThrow("rate limited");
   });
+
+  it("retries as sign-in when the email already exists", async () => {
+    const signInWithOtp = vi
+      .fn()
+      .mockResolvedValueOnce({
+        error: { message: "User already registered" },
+      })
+      .mockResolvedValueOnce({ error: null });
+    const createServerClient = vi.fn().mockResolvedValue({
+      auth: { signInWithOtp },
+    });
+
+    await requestOtp("learner@example.com", { createServerClient });
+
+    expect(signInWithOtp).toHaveBeenNthCalledWith(1, {
+      email: "learner@example.com",
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: expect.stringContaining("/auth/callback"),
+      },
+    });
+    expect(signInWithOtp).toHaveBeenNthCalledWith(2, {
+      email: "learner@example.com",
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: expect.stringContaining("/auth/callback"),
+      },
+    });
+  });
 });
 
 describe("verifyOtp", () => {
@@ -62,6 +92,22 @@ describe("verifyOtp", () => {
     expect(result).toEqual({
       userId: "user-1",
       email: "learner@example.com",
+    });
+  });
+});
+
+describe("classifyAuthError", () => {
+  it("treats rate limits as 429 not a generic 500", () => {
+    expect(classifyAuthError("email rate limit exceeded")).toEqual({
+      status: 429,
+      code: "rate_limited",
+    });
+  });
+
+  it("treats otp failures as invalid_code", () => {
+    expect(classifyAuthError("Token has expired or is invalid")).toEqual({
+      status: 401,
+      code: "invalid_code",
     });
   });
 });

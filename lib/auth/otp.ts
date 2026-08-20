@@ -139,17 +139,36 @@ export async function requestOtp(
 ): Promise<void> {
   const createServer = deps?.createServerClient ?? createClient;
   const supabase = await createServer();
+  const redirectTo = authEmailRedirectTo();
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
       shouldCreateUser: true,
-      emailRedirectTo: authEmailRedirectTo(),
+      emailRedirectTo: redirectTo,
     },
   });
+  if (
+    error &&
+    /already (been )?registered|user already exists/i.test(error.message)
+  ) {
+    const retry = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: redirectTo,
+      },
+    });
+    if (retry.error) {
+      throw new Error(retry.error.message);
+    }
+    return;
+  }
   if (error) {
     throw new Error(error.message);
   }
 }
+
+const OTP_TYPES = ["email", "magiclink", "signup"] as const;
 
 export async function verifyOtp(
   params: { email: string; token: string },
@@ -157,21 +176,47 @@ export async function verifyOtp(
 ): Promise<VerifyOtpResult> {
   const createServer = deps?.createServerClient ?? createClient;
   const supabase = await createServer();
-  const { data, error } = await supabase.auth.verifyOtp({
-    email: params.email,
-    token: params.token,
-    type: "email",
-  });
-  if (error) {
-    throw new Error(error.message);
+  let lastMessage = "OTP verification returned no user";
+
+  for (const type of OTP_TYPES) {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: params.email,
+      token: params.token,
+      type,
+    });
+    if (!error && data.user) {
+      return {
+        userId: data.user.id,
+        email: data.user.email ?? params.email,
+      };
+    }
+    if (error) {
+      lastMessage = error.message;
+    }
   }
-  if (!data.user) {
-    throw new Error("OTP verification returned no user");
+
+  throw new Error(lastMessage);
+}
+
+export function classifyAuthError(message: string): {
+  status: number;
+  code: string;
+} {
+  const lower = message.toLowerCase();
+  if (
+    lower.includes("rate limit") ||
+    /only request this after/.test(lower) ||
+    lower.includes("too many")
+  ) {
+    return { status: 429, code: "rate_limited" };
   }
-  return {
-    userId: data.user.id,
-    email: data.user.email ?? params.email,
-  };
+  if (
+    /otp|token|invalid|expired/.test(lower) ||
+    lower.includes("verify")
+  ) {
+    return { status: 401, code: "invalid_code" };
+  }
+  return { status: 500, code: "auth_error" };
 }
 
 /**

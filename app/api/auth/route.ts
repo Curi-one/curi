@@ -5,6 +5,7 @@ import {
   resolveSession,
 } from "@/lib/api/handler-utils";
 import {
+  classifyAuthError,
   loadMemberSession,
   migratePending,
   requestOtp,
@@ -16,8 +17,8 @@ import { getMockStore, MOCK_AUTH_CODE } from "@/lib/mock/store";
 import {
   createClient,
   createClientForResponse,
+  requestFromIncoming,
 } from "@/lib/supabase/server";
-import { NextRequest } from "next/server";
 
 export async function POST(request: Request) {
   const { sessionId } = resolveSession(request);
@@ -65,7 +66,7 @@ export async function POST(request: Request) {
       );
       await requestOtp(email, {
         createServerClient: async () =>
-          createClientForResponse(new NextRequest(request.url, request), response),
+          createClientForResponse(requestFromIncoming(request), response),
       });
       return response;
     }
@@ -110,16 +111,18 @@ export async function POST(request: Request) {
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : "Auth failed";
-    const isInvalid =
-      /otp|token|invalid|expired/i.test(message) ||
-      message.toLowerCase().includes("verify");
+    const classified = classifyAuthError(message);
+    const clientMessage =
+      classified.code === "rate_limited"
+        ? "Too many sign-in emails. Wait a few minutes, or open the link we already sent."
+        : message;
     return jsonWithSession(
       {
-        error: message,
-        code: isInvalid ? "invalid_code" : "auth_error",
+        error: clientMessage,
+        code: classified.code,
       },
       sessionId,
-      { status: isInvalid ? 401 : 500 },
+      { status: classified.status },
     );
   }
 }
