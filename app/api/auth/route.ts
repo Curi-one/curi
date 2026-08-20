@@ -74,6 +74,7 @@ export async function POST(request: Request) {
         {
           ok: true as const,
           step: "code" as const,
+          emailSent: otp.sent,
           ...(otp.rateLimited ? { notice: OTP_RATE_LIMIT_NOTICE } : {}),
         },
         sessionId,

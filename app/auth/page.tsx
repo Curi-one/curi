@@ -19,6 +19,7 @@ function AuthContent() {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [devHint, setDevHint] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -73,6 +74,7 @@ function AuthContent() {
         if ("notice" in res && typeof res.notice === "string") {
           setError(res.notice);
         }
+        setEmailSent(res.emailSent !== false);
         setStep("code");
         return;
       }
@@ -123,7 +125,7 @@ function AuthContent() {
             : intent === "signup"
               ? "Create your account"
               : "Save your progress")}
-        {step === "code" && "Check your email"}
+        {step === "code" && (emailSent ? "Check your email" : "No new email sent")}
         {step === "name" && "What should we call you?"}
       </h1>
       <p className="mt-3 text-[15px] font-light leading-relaxed text-ink-muted">
@@ -134,7 +136,9 @@ function AuthContent() {
         {step === "code" &&
           (devHint
             ? `We sent a code to ${email}. Dev code: ${devHint}`
-            : `Check your inbox for a 6-digit code sent to ${email}. You can also tap the link in the email.`)}
+            : emailSent
+              ? `Check your inbox for a 6-digit code sent to ${email}. You can also tap the link in the email.`
+              : `Nothing new was sent to ${email}. If you already have a code from an earlier try, enter it below. Otherwise wait about an hour (Supabase free mailer limit) or ask us to enable custom SMTP.`)}
         {step === "name" && "Just a first name is fine."}
       </p>
 

@@ -42,9 +42,23 @@ describe("requestOtp", () => {
   it("does not throw on rate limit so the user can still enter a prior code", async () => {
     const createServerClient = vi.fn().mockResolvedValue({
       auth: {
+        signInWithOtp: vi.fn().mockResolvedValue({
+          error: { message: "email rate limit exceeded", status: 429 },
+        }),
+      },
+    });
+
+    await expect(
+      requestOtp("learner@example.com", { createServerClient }),
+    ).resolves.toEqual({ sent: false, rateLimited: true });
+  });
+
+  it("detects rate limit from HTTP 429 even when message is generic", async () => {
+    const createServerClient = vi.fn().mockResolvedValue({
+      auth: {
         signInWithOtp: vi
           .fn()
-          .mockResolvedValue({ error: { message: "email rate limit exceeded" } }),
+          .mockResolvedValue({ error: { message: "Too Many Requests", status: 429 } }),
       },
     });
 

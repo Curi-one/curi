@@ -119,6 +119,8 @@ export type AuthCodeStepResponse = {
   ok: true;
   step: "code";
   session?: UserSession;
+  /** False when Supabase rejected the send (e.g. rate limit). */
+  emailSent?: boolean;
   /** Present only when USE_MOCK_API — never set for real Supabase OTP. */
   devHint?: string;
   /** New email was not sent (provider rate limit). User can still enter a prior code. */

@@ -139,7 +139,15 @@ export type RequestOtpResult = {
 };
 
 export const OTP_RATE_LIMIT_NOTICE =
-  "A new email was not sent (provider limit). Enter the code from the last Curi email, or wait a few minutes.";
+  "Supabase did not send a new email (hourly limit on the free mailer). Use a code from an earlier email, or wait about an hour and try again.";
+
+function isRateLimitedAuthError(error: { message?: string; status?: number }): boolean {
+  if (error.status === 429) {
+    return true;
+  }
+  const message = error.message ?? "";
+  return classifyAuthError(message).code === "rate_limited";
+}
 
 export async function requestOtp(
   email: string,
@@ -155,7 +163,7 @@ export async function requestOtp(
     },
   });
   if (error) {
-    if (classifyAuthError(error.message).code === "rate_limited") {
+    if (isRateLimitedAuthError(error)) {
       return { sent: false, rateLimited: true };
     }
     throw new Error(error.message);

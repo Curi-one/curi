@@ -19,7 +19,7 @@ Three environments with **identical architecture** and **isolated data and secre
 | **API mode** | `USE_MOCK_API=true` until Slice 2+ | Mock until backends land | Real |
 | **Stripe** | — | Test mode | Live mode |
 | **Perplexity** | `.env.local`; `sonar` only | Preview env; `sonar` only (no `sonar-pro`) | Production env at launch; lesson body `sonar-pro` |
-| **Auth email** | Console / Inbucket | Real delivery, catch-all OK | Real users |
+| **Auth email** | Console / Inbucket | Real delivery; **configure custom SMTP** (free built-in mailer ~4/hr) | Real users |
 | **Data** | Disposable | Seeded, resettable | Protected |
 
 ---
