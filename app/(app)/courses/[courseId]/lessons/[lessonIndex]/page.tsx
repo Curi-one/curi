@@ -5,7 +5,12 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { LessonReader } from "@/components/LessonReader";
-import { getLesson } from "@/lib/api/client";
+import {
+  getCourseMap,
+  getLesson,
+  getMe,
+  type CourseMapResponse,
+} from "@/lib/api/client";
 import type { LessonResponse } from "@/lib/api/schemas";
 
 function LessonContent() {
@@ -14,6 +19,9 @@ function LessonContent() {
   const router = useRouter();
   const [lesson, setLesson] = useState<LessonResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [topic, setTopic] = useState<string | undefined>();
+  const [totalLessons, setTotalLessons] = useState<number | undefined>();
+  const [isGuest, setIsGuest] = useState(false);
 
   const from = search.get("from");
   const back =
@@ -28,6 +36,23 @@ function LessonContent() {
       .then(setLesson)
       .catch(() => setError("Could not load lesson."));
   }, [params.courseId, params.lessonIndex]);
+
+  useEffect(() => {
+    getCourseMap(params.courseId)
+      .then((map: CourseMapResponse) => {
+        setTopic(map.topic);
+        setTotalLessons(map.nodes.length);
+      })
+      .catch(() => {
+        /* topic / count optional for chrome */
+      });
+  }, [params.courseId]);
+
+  useEffect(() => {
+    getMe()
+      .then((me) => setIsGuest(me.session.kind === "guest"))
+      .catch(() => setIsGuest(false));
+  }, []);
 
   if (error) {
     return (
@@ -52,10 +77,14 @@ function LessonContent() {
   }
 
   return (
-    <PageShell back={back} withTabPad={false} className="pt-4">
+    <PageShell withTabPad={false} className="max-w-[724px] pt-4 md:max-w-[724px]">
       <LessonReader
         lesson={lesson}
         lessonIndex={Number(params.lessonIndex)}
+        totalLessons={totalLessons}
+        topic={topic}
+        back={back}
+        isGuest={isGuest}
         onStartQuiz={() =>
           router.push(
             `/courses/${params.courseId}/lessons/${params.lessonIndex}/quiz`,
