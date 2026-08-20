@@ -129,6 +129,8 @@ Guests starting from Explore follow the same path; auth still gates after first 
 
 Completing the final lesson moves the path to **Mastered** (Library).
 
+Paths and books each carry a `category` (see [DATA.md](./DATA.md#browse-taxonomy)). Explore shows category filter chips (**All** + one per category) alongside search; selecting a category narrows the Paths/Books list without leaving the tab. Search still overrides tab/category grouping.
+
 ---
 
 ## F4 — Library

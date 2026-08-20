@@ -117,6 +117,8 @@ export function getCourseMap(courseId: string) {
 export type ExploreResponse = {
   paths: CataloguePath[];
   books: CatalogueBook[];
+  pathCategories: string[];
+  bookCategories: string[];
 };
 
 export function getExplore() {

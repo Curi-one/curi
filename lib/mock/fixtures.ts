@@ -7,6 +7,9 @@ export type CataloguePath = {
   topic: string;
   description: string;
   depth: DepthSlug;
+  /** Browse category (F3). See docs/DATA.md taxonomy note. */
+  category: string;
+  tag?: string;
 };
 
 export type CatalogueBook = {
@@ -15,6 +18,9 @@ export type CatalogueBook = {
   author: string;
   description: string;
   pathCount: number;
+  /** Browse category (F3). See docs/DATA.md taxonomy note. */
+  category: string;
+  tag?: string;
 };
 
 export type MockLessonContent = {
@@ -48,6 +54,8 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
     description:
       "How VC funds work and what first-time founders need before the first institutional round.",
     depth: "fluent",
+    category: "Raising & deal terms",
+    tag: "Fundraising",
   },
   {
     id: "catalogue-term-sheets",
@@ -55,6 +63,8 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
     description:
       "Valuation, preferences, and governance — the clauses that become real when you sign.",
     depth: "fluent",
+    category: "Raising & deal terms",
+    tag: "Deals",
   },
   {
     id: "catalogue-safe",
@@ -62,6 +72,8 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
     description:
       "Simple until they convert. The ownership math founders need before the priced round.",
     depth: "essentials",
+    category: "Raising & deal terms",
+    tag: "Instruments",
   },
   {
     id: "catalogue-cap-table",
@@ -69,6 +81,53 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
     description:
       "Ownership, dilution, and option pools — the spreadsheet investors actually read.",
     depth: "essentials",
+    category: "Raising & deal terms",
+    tag: "Equity",
+  },
+  {
+    id: "catalogue-unit-economics",
+    topic: "Unit Economics",
+    description:
+      "CAC, LTV, payback, and the customer-level math investors expect you to know.",
+    depth: "essentials",
+    category: "While you're building",
+    tag: "Metrics",
+  },
+  {
+    id: "catalogue-business-models",
+    topic: "Business Models",
+    description:
+      "How companies actually make money, and why the model matters more than the product.",
+    depth: "essentials",
+    category: "While you're building",
+    tag: "Models",
+  },
+  {
+    id: "catalogue-pricing-psychology",
+    topic: "Pricing Psychology",
+    description:
+      "The perception games behind every price a customer agrees to pay.",
+    depth: "essentials",
+    category: "While you're building",
+    tag: "Pricing",
+  },
+  {
+    id: "catalogue-behavioral-economics",
+    topic: "Behavioral Economics",
+    description:
+      "The cognitive biases that quietly shape decisions classical economics assumes away.",
+    depth: "fluent",
+    category: "Decisions & behavior",
+    tag: "Economics",
+  },
+  {
+    id: "catalogue-negotiation",
+    topic: "Negotiation",
+    description:
+      "Leverage, anchoring, and the preparation that decides a deal before anyone speaks.",
+    depth: "essentials",
+    category: "Decisions & behavior",
+    tag: "Negotiation",
   },
 ];
 
@@ -79,6 +138,28 @@ export const CATALOGUE_BOOKS: CatalogueBook[] = [
     author: "Daniel Kahneman",
     description: "Biases, heuristics, and how we really decide.",
     pathCount: 12,
+    category: "Behavioral economics",
+    tag: "Decisions",
+  },
+  {
+    id: "book-predictably-irrational",
+    title: "Predictably Irrational",
+    author: "Dan Ariely",
+    description:
+      "The behavioural economics of why people buy — anchoring, relativity, and the power of defaults.",
+    pathCount: 9,
+    category: "Behavioral economics",
+    tag: "Pricing",
+  },
+  {
+    id: "book-nudge",
+    title: "Nudge",
+    author: "Richard Thaler & Cass Sunstein",
+    description:
+      "Improving decisions without removing choice — the architecture behind every default.",
+    pathCount: 8,
+    category: "Behavioral economics",
+    tag: "Design",
   },
   {
     id: "book-sapiens",
@@ -86,6 +167,18 @@ export const CATALOGUE_BOOKS: CatalogueBook[] = [
     author: "Yuval Noah Harari",
     description: "A brief history of humankind in digestible paths.",
     pathCount: 18,
+    category: "Founder mindset",
+    tag: "History",
+  },
+  {
+    id: "book-zero-to-one",
+    title: "Zero to One",
+    author: "Peter Thiel",
+    description:
+      "Monopoly, not competition, is the goal — what that means for how you build and pitch.",
+    pathCount: 8,
+    category: "Founder mindset",
+    tag: "Strategy",
   },
 ];
 
@@ -93,8 +186,8 @@ export const MOCK_PATH_1_LESSONS: Record<number, MockLessonContent> = {
   0: {
     title: "What is the Fermi paradox?",
     body: [
-      "The **Fermi paradox** asks why, given the vast number of stars and potentially habitable planets, we have not yet detected signs of intelligent extraterrestrial life.",
-      "Enrico Fermi reportedly posed the question over lunch in 1950: *Where is everybody?* The scale of the Milky Way suggests many opportunities for life to arise and spread.",
+      "The **Fermi paradox** asks why, given the vast number of stars and potentially habitable planets, we have not yet detected signs of intelligent extraterrestrial life. [1]",
+      "Enrico Fermi reportedly posed the question over lunch in 1950: *Where is everybody?* The scale of the Milky Way suggests many opportunities for life to arise and spread. [2]",
       "Possible explanations range from the **Rare Earth hypothesis** (complex life is uncommon) to the **Great Filter** (civilizations tend to destroy themselves before becoming interstellar).",
     ],
     sources: [
