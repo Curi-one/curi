@@ -1,8 +1,9 @@
 "use client";
 
 import type { CatalogueBook, CataloguePath } from "@/lib/mock/fixtures";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { PageShell } from "@/components/PageShell";
 import { PreviewSheet } from "@/components/PreviewSheet";
@@ -15,6 +16,7 @@ export default function ExplorePage() {
   const [paths, setPaths] = useState<CataloguePath[]>([]);
   const [books, setBooks] = useState<CatalogueBook[]>([]);
   const [tab, setTab] = useState<"paths" | "books">("paths");
+  const [query, setQuery] = useState("");
   const [previewPath, setPreviewPath] = useState<CataloguePath | null>(null);
   const [previewBook, setPreviewBook] = useState<CatalogueBook | null>(null);
   const [activeCount, setActiveCount] = useState(0);
@@ -33,6 +35,26 @@ export default function ExplorePage() {
   }, []);
 
   const atLimit = plan === "free" && activeCount >= 2;
+  const q = query.trim().toLowerCase();
+
+  const filteredPaths = useMemo(() => {
+    if (!q) return paths;
+    return paths.filter(
+      (p) =>
+        p.topic.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q),
+    );
+  }, [paths, q]);
+
+  const filteredBooks = useMemo(() => {
+    if (!q) return books;
+    return books.filter(
+      (b) =>
+        b.title.toLowerCase().includes(q) ||
+        b.author.toLowerCase().includes(q) ||
+        b.description.toLowerCase().includes(q),
+    );
+  }, [books, q]);
 
   function handleStart() {
     if (atLimit) {
@@ -45,17 +67,69 @@ export default function ExplorePage() {
     }
   }
 
+  function startCustomFromQuery() {
+    const topic = query.trim();
+    if (!topic) {
+      router.push("/new");
+      return;
+    }
+    if (atLimit) {
+      router.push("/upgrade");
+      return;
+    }
+    router.push(`/clarify?topic=${encodeURIComponent(topic)}`);
+  }
+
+  const listEmpty =
+    !loading &&
+    ((tab === "paths" && filteredPaths.length === 0) ||
+      (tab === "books" && filteredBooks.length === 0));
+
   return (
     <PageShell title="Explore" kicker="Founder catalogue" withTabPad={false} className="pt-4">
       <p className="mt-2 text-sm text-ink-muted">
         Curated paths for first-time founders. Every start runs clarify — no
         skipping onboarding.
       </p>
+
+      <div className="mt-5">
+        <Link
+          href="/new"
+          className="btn-secondary flex min-h-11 w-full items-center justify-center"
+        >
+          Start a custom path
+        </Link>
+      </div>
+
+      <div className="mt-4">
+        <label className="sr-only" htmlFor="explore-search">
+          Search catalogue
+        </label>
+        <input
+          id="explore-search"
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search paths or books…"
+          className="input-field w-full"
+        />
+      </div>
+
+      {atLimit && (
+        <p className="mt-4 rounded-xl border border-border bg-paper-secondary px-4 py-3 text-sm text-ink-muted">
+          You have 2 active paths. Finish or shelve one in Library, or{" "}
+          <Link href="/upgrade" className="text-accent underline">
+            upgrade
+          </Link>
+          .
+        </p>
+      )}
+
       <div className="mt-6">
         <TabPills
           tabs={[
-            { id: "paths", label: "Paths", count: paths.length },
-            { id: "books", label: "Books", count: books.length },
+            { id: "paths", label: "Paths", count: filteredPaths.length },
+            { id: "books", label: "Books", count: filteredBooks.length },
           ]}
           active={tab}
           onChange={(id) => setTab(id as "paths" | "books")}
@@ -63,16 +137,31 @@ export default function ExplorePage() {
       </div>
       <div className="mt-6">
         {loading && <p className="text-ink-muted">Loading catalogue…</p>}
-        {!loading && tab === "paths" && paths.length === 0 && (
+        {listEmpty && !q && (
           <EmptyState
             message="Nothing in the catalogue yet."
-            actionHref="/"
-            actionLabel="Start a custom topic"
+            actionHref="/new"
+            actionLabel="Create a custom path"
           />
         )}
-        {!loading && tab === "paths" && paths.length > 0 && (
+        {listEmpty && q && (
+          <div className="surface-card p-8 text-center">
+            <p className="text-[15px] font-light leading-relaxed text-ink-muted">
+              No catalogue match for “{query.trim()}”. Start a custom path on
+              that topic.
+            </p>
+            <button
+              type="button"
+              onClick={() => startCustomFromQuery()}
+              className="btn-primary mt-6 inline-block"
+            >
+              Start a path on “{query.trim()}”
+            </button>
+          </div>
+        )}
+        {!loading && tab === "paths" && filteredPaths.length > 0 && (
           <ul className="space-y-3">
-            {paths.map((item) => (
+            {filteredPaths.map((item) => (
               <li key={item.id}>
                 <button
                   type="button"
@@ -89,9 +178,9 @@ export default function ExplorePage() {
             ))}
           </ul>
         )}
-        {!loading && tab === "books" && books.length > 0 && (
+        {!loading && tab === "books" && filteredBooks.length > 0 && (
           <ul className="space-y-3">
-            {books.map((item) => (
+            {filteredBooks.map((item) => (
               <li key={item.id}>
                 <button
                   type="button"
@@ -111,14 +200,8 @@ export default function ExplorePage() {
           </ul>
         )}
       </div>
-      <p className="mt-10 text-center">
-        <button
-          type="button"
-          onClick={() => router.push("/")}
-          className="text-sm text-ink-muted underline hover:text-ink"
-        >
-          Or enter a custom topic on the landing page
-        </button>
+      <p className="mt-10 text-center text-sm text-ink-muted">
+        Prefer typing a topic? Use Start a custom path above.
       </p>
       <PreviewSheet
         item={previewPath ?? previewBook}

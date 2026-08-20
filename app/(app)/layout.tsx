@@ -1,11 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AppTopBar } from "@/components/AppTopBar";
 import { TabBar } from "@/components/TabBar";
 import { getMe, type UserSession } from "@/lib/api/client";
 
+/** Bottom tabs only on primary member destinations (FLOWS + mobile prototype). */
+function showMemberTabBar(pathname: string): boolean {
+  return (
+    pathname === "/today" ||
+    pathname === "/library" ||
+    pathname === "/explore"
+  );
+}
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const [session, setSession] = useState<UserSession | null | undefined>(
     undefined,
   );
@@ -16,13 +27,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       .catch(() => setSession(null));
   }, []);
 
-  const showTabs = session?.kind === "member";
+  const isMember = session?.kind === "member";
+  const showTabBar = isMember && showMemberTabBar(pathname);
 
   return (
     <>
-      {showTabs && <AppTopBar />}
-      <div className={showTabs ? "pb-20" : ""}>{children}</div>
-      {showTabs && <TabBar />}
+      {isMember && <AppTopBar compact={!showTabBar} />}
+      <div
+        className={
+          showTabBar ? "pb-[calc(4.5rem+env(safe-area-inset-bottom))]" : ""
+        }
+      >
+        {children}
+      </div>
+      {showTabBar && <TabBar />}
     </>
   );
 }
