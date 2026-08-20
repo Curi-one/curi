@@ -1,40 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Flame, Lock } from "lucide-react";
 import type { ShareableFactPayload } from "@/lib/api/schemas";
-import { getShareableFact } from "@/lib/lessons/shareable-facts";
 import {
   buildShareText,
   copyAndOpenLinkedIn,
   linkedinShareUrl,
   twitterIntentUrl,
 } from "@/lib/share/lesson-share";
-
-type Insight = { fact: string; reflection: string };
-
-const DEFAULT_INSIGHTS: Insight[] = [
-  {
-    fact: "The expensive business mistakes usually come from misunderstood incentives, not missing definitions.",
-    reflection:
-      "A good concept shouldn't just explain a term. It should change the decision you make the next time that term shows up in a real situation.",
-  },
-  {
-    fact: "Most people are far more predictable than they think — biases and incentives explain more than personality does.",
-    reflection:
-      "The advantage of knowing this material early isn't sounding smart. It's recognising the pattern before it costs you a decision.",
-  },
-  {
-    fact: "Knowledge that stays abstract rarely changes behaviour. Knowledge tied to a real decision usually does.",
-    reflection:
-      "The test of whether a lesson landed isn't whether you can define it — it's whether you'd decide differently next time.",
-  },
-];
-
-function pickInsight(): Insight {
-  return DEFAULT_INSIGHTS[Math.floor(Math.random() * DEFAULT_INSIGHTS.length)]!;
-}
 
 export type CompleteSheetProps = {
   open: boolean;
@@ -65,13 +40,9 @@ export function CompleteSheet({
   shareableFact,
 }: CompleteSheetProps) {
   const [copied, setCopied] = useState(false);
-  const insight = useMemo(() => {
-    if (!open) return null;
-    if (shareableFact) return shareableFact;
-    return courseTopic ? getShareableFact(courseTopic) : pickInsight();
-  }, [open, courseTopic, shareableFact]);
+  const insight = shareableFact ?? null;
 
-  if (!open || !insight) return null;
+  if (!open) return null;
 
   const title = pathMastered
     ? "Path mastered"
@@ -87,23 +58,24 @@ export function CompleteSheet({
       ? "Next lessons unlock tomorrow."
       : "You still have paths to read today.";
 
-  const shareText = buildShareText({
-    fact: insight.fact,
-    topic: courseTopic ?? "founder",
-  });
-  const tweetUrl = twitterIntentUrl(shareText);
+  const shareText = insight
+    ? buildShareText({ fact: insight.fact, topic: courseTopic ?? "founder" })
+    : null;
+  const tweetUrl = shareText ? twitterIntentUrl(shareText) : null;
   const liUrl = linkedinShareUrl();
 
   const showTomorrow =
     Boolean(nextLessonTitle) || (allPathsDoneToday && !pathMastered);
 
   function copyText() {
+    if (!shareText) return;
     void navigator.clipboard?.writeText(shareText);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2000);
   }
 
   function shareToLinkedIn() {
+    if (!shareText) return;
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2000);
     void copyAndOpenLinkedIn(shareText);
@@ -172,49 +144,51 @@ export function CompleteSheet({
         <div className="mx-7 h-px shrink-0 bg-border" />
 
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="px-7 py-5">
-            <div className="mb-4 font-meta text-ink-muted">
-              Today&apos;s insight
+          {insight && (
+            <div className="px-7 py-5">
+              <div className="mb-4 font-meta text-ink-muted">
+                Today&apos;s insight
+              </div>
+              <blockquote
+                className="font-display text-xl font-light leading-snug tracking-[-0.02em] text-ink"
+                style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 1" }}
+              >
+                &ldquo;{insight.fact}&rdquo;
+              </blockquote>
+              <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+                {insight.reflection}
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <a
+                  href={tweetUrl ?? undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 items-center rounded-lg border border-border bg-ink px-4 py-2.5 text-xs font-medium text-paper transition hover:opacity-90"
+                >
+                  Share on X
+                </a>
+                <a
+                  href={liUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    shareToLinkedIn();
+                  }}
+                >
+                  Share on LinkedIn
+                </a>
+                <button
+                  type="button"
+                  onClick={copyText}
+                  className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
+                >
+                  {copied ? "Copied!" : "Copy text"}
+                </button>
+              </div>
             </div>
-            <blockquote
-              className="font-display text-xl font-light leading-snug tracking-[-0.02em] text-ink"
-              style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 1" }}
-            >
-              &ldquo;{insight.fact}&rdquo;
-            </blockquote>
-            <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-              {insight.reflection}
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <a
-                href={tweetUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center rounded-lg border border-border bg-ink px-4 py-2.5 text-xs font-medium text-paper transition hover:opacity-90"
-              >
-                Share on X
-              </a>
-              <a
-                href={liUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
-                onClick={(e) => {
-                  e.preventDefault();
-                  shareToLinkedIn();
-                }}
-              >
-                Share on LinkedIn
-              </a>
-              <button
-                type="button"
-                onClick={copyText}
-                className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
-              >
-                {copied ? "Copied!" : "Copy text"}
-              </button>
-            </div>
-          </div>
+          )}
 
           {showTomorrow && (
             <>

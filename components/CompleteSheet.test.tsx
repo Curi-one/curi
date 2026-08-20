@@ -1,7 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CompleteSheet } from "@/components/CompleteSheet";
-import { getShareableFact } from "@/lib/lessons/shareable-facts";
 import { linkedinShareUrl } from "@/lib/share/lesson-share";
 
 describe("CompleteSheet", () => {
@@ -44,7 +43,7 @@ describe("CompleteSheet", () => {
     );
   });
 
-  it("renders lesson meta, streak, insight, and tomorrow teaser when provided", () => {
+  it("renders lesson meta, streak, and tomorrow teaser when provided", () => {
     render(
       <CompleteSheet
         open
@@ -62,10 +61,8 @@ describe("CompleteSheet", () => {
     expect(screen.getByText(/Lesson 2 of 10/)).toBeInTheDocument();
     expect(screen.getByText("What is a valuation?")).toBeInTheDocument();
     expect(screen.getByText("4-day streak")).toBeInTheDocument();
-    expect(screen.getByText("Today's insight")).toBeInTheDocument();
     expect(screen.getByText("Dilution basics")).toBeInTheDocument();
     expect(screen.getByText(/Up next · Tomorrow/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Share on X" })).toBeInTheDocument();
   });
 
   it("uses lesson-number title framing when provided and paths remain", () => {
@@ -80,7 +77,7 @@ describe("CompleteSheet", () => {
     expect(screen.getByText("Lesson 1 complete.")).toBeInTheDocument();
   });
 
-  it("shows the shareable fact matching the course topic instead of a random insight", () => {
+  it("hides the insight section entirely when no shareable fact is provided", () => {
     render(
       <CompleteSheet
         open
@@ -89,11 +86,11 @@ describe("CompleteSheet", () => {
         courseTopic="Venture Capital"
       />,
     );
-    const fact = getShareableFact("Venture Capital");
-    expect(screen.getByText(`“${fact.fact}”`)).toBeInTheDocument();
+    expect(screen.queryByText("Today's insight")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Share on X" })).not.toBeInTheDocument();
   });
 
-  it("prefers the lesson API shareable fact over curated topic copy", () => {
+  it("shows the insight section only when the lesson API shareable fact is provided", () => {
     render(
       <CompleteSheet
         open
@@ -106,10 +103,12 @@ describe("CompleteSheet", () => {
         }}
       />,
     );
+    expect(screen.getByText("Today's insight")).toBeInTheDocument();
     expect(
       screen.getByText(/Generated fact from this lesson/),
     ).toBeInTheDocument();
     expect(screen.getByText("Generated reflection")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Share on X" })).toBeInTheDocument();
   });
 
   describe("Share on LinkedIn", () => {
@@ -128,6 +127,10 @@ describe("CompleteSheet", () => {
           allPathsDoneToday={false}
           onClose={vi.fn()}
           courseTopic="Venture Capital"
+          shareableFact={{
+            fact: "Generated fact from this lesson",
+            reflection: "Generated reflection",
+          }}
         />,
       );
       fireEvent.click(

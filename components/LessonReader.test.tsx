@@ -24,7 +24,7 @@ const lesson: LessonResponse = {
 };
 
 describe("LessonReader", () => {
-  it("renders title, takeaways label, Sources, and Take the quiz", () => {
+  it("renders title, Sources, and Take the quiz from API data alone", () => {
     render(
       <LessonReader
         lesson={lesson}
@@ -40,13 +40,47 @@ describe("LessonReader", () => {
         name: "Why unit economics matter before you scale",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/things from this lesson/i)).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /sources/i }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /take the quiz/i }),
     ).toBeInTheDocument();
+  });
+
+  it("renders all body paragraphs in order with no peeled-off 'So what?' section", () => {
+    const { container } = render(
+      <LessonReader
+        lesson={lesson}
+        lessonIndex={0}
+        topic="Unit Economics"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    const text = container.textContent ?? "";
+    expect(text).toMatch(/room with two doors/);
+    expect(text).toMatch(/Do not ask only what this means/);
+    const lastParaIndex = text.indexOf("Do not ask only what this means");
+    const firstParaIndex = text.indexOf("growth without contribution margin");
+    expect(lastParaIndex).toBeGreaterThan(firstParaIndex);
+    expect(screen.queryByText("So what?")).not.toBeInTheDocument();
+  });
+
+  it("hides takeaways, shareable fact, and visuals when the API omits them", () => {
+    render(
+      <LessonReader
+        lesson={lesson}
+        lessonIndex={0}
+        topic="Unit Economics"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText(/things from this lesson/i)).not.toBeInTheDocument();
+    expect(screen.queryByText("Shareable fact")).not.toBeInTheDocument();
+    expect(screen.queryByText("Visual note")).not.toBeInTheDocument();
+    expect(screen.queryByText("Working equation")).not.toBeInTheDocument();
   });
 
   it("opens sources panel from Sources button", () => {
@@ -105,35 +139,7 @@ describe("LessonReader", () => {
     expect(otherLink).not.toHaveClass("border-accent");
   });
 
-  it("shows a lesson visual and equation block for topics with curated visuals", () => {
-    render(
-      <LessonReader
-        lesson={lesson}
-        lessonIndex={0}
-        topic="Unit Economics"
-        onStartQuiz={vi.fn()}
-      />,
-    );
-
-    expect(screen.getByText("Visual note")).toBeInTheDocument();
-    expect(screen.getByText("Working equation")).toBeInTheDocument();
-  });
-
-  it("does not show a generic decorative image for topics without a curated visual", () => {
-    render(
-      <LessonReader
-        lesson={lesson}
-        lessonIndex={0}
-        topic="Some Random Topic"
-        onStartQuiz={vi.fn()}
-      />,
-    );
-
-    expect(screen.queryByText("Visual note")).not.toBeInTheDocument();
-    expect(screen.queryByText("Working equation")).not.toBeInTheDocument();
-  });
-
-  it("prefers API takeaways, shareable fact, and visuals from the lesson payload", () => {
+  it("shows API-provided takeaways, shareable fact, and visuals when present in the payload", () => {
     render(
       <LessonReader
         lesson={{
@@ -169,6 +175,20 @@ describe("LessonReader", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("API visual title")).toBeInTheDocument();
     expect(screen.getByText("API = Visual × Equation")).toBeInTheDocument();
+  });
+
+  it("does not show any visual when the API returns no visuals, regardless of topic", () => {
+    render(
+      <LessonReader
+        lesson={lesson}
+        lessonIndex={0}
+        topic="Some Random Topic"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText("Visual note")).not.toBeInTheDocument();
+    expect(screen.queryByText("Working equation")).not.toBeInTheDocument();
   });
 
   it("clears the citation highlight when the sources drawer is closed", () => {

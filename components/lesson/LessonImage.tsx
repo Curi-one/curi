@@ -1,20 +1,12 @@
 import type { LessonVisualBlock } from "@/lib/api/schemas";
-import { getLessonVisual } from "@/lib/lessons/visuals";
 
 type Props = {
-  topic?: string;
-  /** Prefer Perplexity / API visual when provided. */
-  visual?: LessonVisualBlock;
+  /** Visual returned by the lesson API / Perplexity. */
+  visual: LessonVisualBlock;
 };
 
-export function LessonImage({ topic = "", visual }: Props) {
-  const curated = topic ? getLessonVisual(topic) : null;
-  const title = visual?.title ?? curated?.imageTitle ?? "Visual note";
-  const caption =
-    visual?.caption ??
-    curated?.imageCaption ??
-    "A figure that clarifies the idea.";
-  const imageUrl = visual?.imageUrl;
+export function LessonImage({ visual }: Props) {
+  const { title, caption, imageUrl } = visual;
 
   return (
     <figure className="my-10 border-y border-border py-6">

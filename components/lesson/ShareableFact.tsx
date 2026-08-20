@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import type { ShareableFactPayload } from "@/lib/api/schemas";
-import { getShareableFact } from "@/lib/lessons/shareable-facts";
 import {
   buildShareText,
   copyAndOpenLinkedIn,
@@ -13,12 +12,12 @@ import {
 type Props = {
   topic: string;
   title: string;
-  /** Prefer Perplexity / API fact when provided. */
-  fact?: ShareableFactPayload;
+  /** Lesson API / Perplexity shareable fact — required, no curated fallback. */
+  fact: ShareableFactPayload;
 };
 
 export function ShareableFact({ topic, title, fact }: Props) {
-  const item = fact ?? getShareableFact(topic);
+  const item = fact;
   const shareText = buildShareText({
     fact: item.fact,
     topic,

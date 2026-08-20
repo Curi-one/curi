@@ -10,7 +10,6 @@ import {
 } from "react";
 import { ArrowLeft, ChevronDown, Globe2, X } from "lucide-react";
 import { EquationBlock } from "@/components/lesson/EquationBlock";
-import { IdeaDiagram } from "@/components/lesson/IdeaDiagram";
 import { LessonImage } from "@/components/lesson/LessonImage";
 import { ShareableFact } from "@/components/lesson/ShareableFact";
 import type { LessonResponse } from "@/lib/api/schemas";
@@ -23,8 +22,6 @@ import {
   saveReaderSettings,
   type ReaderSettings,
 } from "@/lib/lessons/reader-settings";
-import { getLessonTakeaways } from "@/lib/lessons/takeaways";
-import { hasLessonVisual } from "@/lib/lessons/visuals";
 
 type Props = {
   lesson: LessonResponse;
@@ -41,40 +38,6 @@ function stripInlineMarkdown(text: string): string {
     .replace(/\*\*([^*]+)\*\*/g, "$1")
     .replace(/\*([^*]+)\*/g, "$1")
     .trim();
-}
-
-/** First 2–3 body paragraphs (or leading sentences) as takeaway bullets. */
-function extractTakeaways(body: string[]): string[] {
-  const out: string[] = [];
-  for (const para of body) {
-    const clean = stripInlineMarkdown(para);
-    if (!clean) continue;
-    const sentences = clean.split(/(?<=[.!?])\s+/).filter(Boolean);
-    if (sentences.length === 0) continue;
-    if (clean.length <= 180 || sentences.length === 1) {
-      out.push(clean);
-    } else {
-      out.push(sentences[0]);
-    }
-    if (out.length >= 3) break;
-  }
-  return out.slice(0, 3);
-}
-
-function pickKeyIdea(body: string[]): string | null {
-  if (body.length === 0) return null;
-  const mid =
-    body.length >= 3
-      ? body[Math.floor(body.length / 2)]
-      : body.length >= 2
-        ? body[1]
-        : body[0];
-  const clean = stripInlineMarkdown(mid);
-  const sentences = clean.split(/(?<=[.!?])\s+/).filter(Boolean);
-  if (sentences.length >= 2) {
-    return sentences[Math.floor(sentences.length / 2)];
-  }
-  return clean.length > 40 ? clean : null;
 }
 
 function estimateReadMinutes(body: string[]): number {
@@ -209,13 +172,7 @@ export function LessonReader({
   const sourceRowRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   const topicLabel = topic?.trim() || "";
-  const takeaways =
-    lesson.takeaways && lesson.takeaways.length > 0
-      ? lesson.takeaways
-      : topicLabel.length > 0
-        ? getLessonTakeaways(topicLabel)
-        : extractTakeaways(lesson.body);
-  const keyIdea = pickKeyIdea(lesson.body);
+  const takeaways = lesson.takeaways ?? [];
   const readMins = estimateReadMinutes(lesson.body);
   const total = totalLessons ?? Math.max(lessonIndex + 1, 1);
   const showEditorial = lesson.body.length >= 3;
@@ -316,38 +273,18 @@ export function LessonReader({
     setShowSources(true);
   }
 
-  const bodyParas = lesson.body;
-  const soWhatPara =
-    bodyParas.length >= 3
-      ? bodyParas[bodyParas.length - 1]
-      : bodyParas.length >= 2
-        ? bodyParas[bodyParas.length - 1]
-        : null;
-  const mainParas =
-    soWhatPara && bodyParas.length >= 2
-      ? bodyParas.slice(0, -1)
-      : bodyParas;
+  const mainParas = lesson.body;
 
-  /** Insert LessonImage after first para; IdeaDiagram mid; ShareableFact near end. */
+  /** Insert LessonImage after first para; ShareableFact near end. */
   function renderBody() {
     if (mainParas.length === 0) return null;
 
     const nodes: ReactNode[] = [];
     const imageAfter = showEditorial ? 0 : -1;
-    const diagramAfter =
-      showEditorial && mainParas.length >= 2
-        ? Math.min(Math.floor(mainParas.length * 0.55), mainParas.length - 1)
-        : -1;
     const shareAfter =
       showEditorial && mainParas.length >= 2
         ? mainParas.length - 1
         : -1;
-    const keyIdeaAfter =
-      keyIdea && mainParas.length >= 2
-        ? Math.min(1, mainParas.length - 1)
-        : keyIdea
-          ? 0
-          : -1;
 
     mainParas.forEach((para, i) => {
       const clean = stripInlineMarkdown(para);
@@ -386,46 +323,17 @@ export function LessonReader({
         if (useApiVisuals) {
           apiVisuals.forEach((visual, vi) => {
             nodes.push(
-              <LessonImage
-                key={`lesson-image-${vi}`}
-                topic={topicLabel}
-                visual={visual}
-              />,
+              <LessonImage key={`lesson-image-${vi}`} visual={visual} />,
             );
             if (visual.equation) {
               nodes.push(
-                <EquationBlock
-                  key={`equation-block-${vi}`}
-                  topic={topicLabel}
-                  visual={visual}
-                />,
+                <EquationBlock key={`equation-block-${vi}`} visual={visual} />,
               );
             }
           });
-        } else if (topicLabel && hasLessonVisual(topicLabel)) {
-          nodes.push(<LessonImage key="lesson-image" topic={topicLabel} />);
-          nodes.push(
-            <EquationBlock key="equation-block" topic={topicLabel} />,
-          );
         }
       }
-      if (i === keyIdeaAfter && keyIdea) {
-        nodes.push(
-          <div
-            key="key-idea"
-            className="border-l-2 border-accent bg-paper-secondary/60 px-6 py-5 text-base leading-7 text-ink/80"
-          >
-            <div className="mb-2 text-xs uppercase tracking-[0.24em] text-ink-muted">
-              Key idea
-            </div>
-            {settings.bionic ? applyBionic(keyIdea) : keyIdea}
-          </div>,
-        );
-      }
-      if (i === diagramAfter && topicLabel) {
-        nodes.push(<IdeaDiagram key="idea-diagram" topic={topicLabel} />);
-      }
-      if (i === shareAfter && (shareable || topicLabel)) {
+      if (i === shareAfter && shareable) {
         nodes.push(
           <ShareableFact
             key="shareable"
@@ -839,21 +747,6 @@ export function LessonReader({
             }}
           >
             {renderBody()}
-
-            {soWhatPara && (
-              <div>
-                <h3 className="mb-3 text-sm uppercase tracking-[0.28em] text-ink-muted">
-                  So what?
-                </h3>
-                <p>
-                  {renderParagraph(
-                    soWhatPara,
-                    settings.bionic,
-                    handleCitationClick,
-                  )}
-                </p>
-              </div>
-            )}
           </div>
         </article>
 
