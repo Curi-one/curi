@@ -40,9 +40,9 @@ Slice **1b (CUR-5)** shipped functional mock UI for all v1 screens. Remaining wo
 | Clarify + generating | CUR-8–9 ✓ | CUR-20 |
 | Lesson + quiz | CUR-10–11 ✓ | CUR-28, CUR-29 |
 | Auth | CUR-12 ✓ | CUR-30 |
-| F2 Today | CUR-13 | CUR-21, CUR-31 |
+| F2 Today | CUR-13, CUR-36 | CUR-21, CUR-31 |
 | F3 Explore | CUR-14 | CUR-27 |
-| F4 Library + path map | CUR-15 | CUR-25, CUR-26 |
+| F4 Library + path map | CUR-15, CUR-37 | CUR-25, CUR-26, CUR-38 |
 | F6 Upgrade | CUR-16, CUR-17 | CUR-24 |
 | F7 Progress + profile | CUR-16 | CUR-22, CUR-23 |
 
@@ -89,6 +89,10 @@ Slice **1b (CUR-5)** shipped functional mock UI for all v1 screens. Remaining wo
 | CUR-29 | Quiz — QuizFlow, LessonFeel, CompleteSheet |
 | CUR-30 | Auth — magic link UI |
 | CUR-31 | App shell — TabBar, guest vs member |
+| CUR-36 | Staging seed — 3 paths, 2 due |
+| CUR-37 | Shelve path (free slot) |
+| CUR-38 | Path mastered completion UI |
+| CUR-39 | Brand tokens & typography |
 
 ### Canceled — prototype only (Out of v1)
 
