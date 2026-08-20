@@ -1,6 +1,8 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { CompleteSheet } from "@/components/CompleteSheet";
+import { getShareableFact } from "@/lib/lessons/shareable-facts";
+import { linkedinShareUrl } from "@/lib/share/lesson-share";
 
 describe("CompleteSheet", () => {
   it("shows path mastered CTAs when pathMastered", () => {
@@ -76,5 +78,51 @@ describe("CompleteSheet", () => {
       />,
     );
     expect(screen.getByText("Lesson 1 complete.")).toBeInTheDocument();
+  });
+
+  it("shows the shareable fact matching the course topic instead of a random insight", () => {
+    render(
+      <CompleteSheet
+        open
+        allPathsDoneToday={false}
+        onClose={vi.fn()}
+        courseTopic="Venture Capital"
+      />,
+    );
+    const fact = getShareableFact("Venture Capital");
+    expect(screen.getByText(`“${fact.fact}”`)).toBeInTheDocument();
+  });
+
+  describe("Share on LinkedIn", () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("copies the share text and opens LinkedIn", async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, { clipboard: { writeText } });
+      const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+
+      render(
+        <CompleteSheet
+          open
+          allPathsDoneToday={false}
+          onClose={vi.fn()}
+          courseTopic="Venture Capital"
+        />,
+      );
+      fireEvent.click(
+        screen.getByRole("link", { name: /share on linkedin/i }),
+      );
+
+      expect(writeText).toHaveBeenCalled();
+      await waitFor(() =>
+        expect(openSpy).toHaveBeenCalledWith(
+          linkedinShareUrl(),
+          "_blank",
+          "noopener,noreferrer",
+        ),
+      );
+    });
   });
 });

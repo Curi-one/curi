@@ -2,13 +2,22 @@
 
 import { useState } from "react";
 import { getShareableFact } from "@/lib/lessons/shareable-facts";
+import {
+  buildShareText,
+  copyAndOpenLinkedIn,
+  linkedinShareUrl,
+  twitterIntentUrl,
+} from "@/lib/share/lesson-share";
 
 type Props = { topic: string; title: string };
 
 export function ShareableFact({ topic, title }: Props) {
   const item = getShareableFact(topic);
-  const shareText = `Today I learned: ${item.fact} — from my Curi lesson "${title}" on ${topic}.`;
-  const encoded = encodeURIComponent(shareText);
+  const shareText = buildShareText({
+    fact: item.fact,
+    topic,
+    lessonTitle: title,
+  });
   const [copied, setCopied] = useState(false);
 
   function copyShareText() {
@@ -18,6 +27,12 @@ export function ShareableFact({ topic, title }: Props) {
         window.setTimeout(() => setCopied(false), 1600);
       });
     }
+  }
+
+  function shareToLinkedIn() {
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1600);
+    void copyAndOpenLinkedIn(shareText);
   }
 
   return (
@@ -40,7 +55,7 @@ export function ShareableFact({ topic, title }: Props) {
           </p>
           <div className="mt-6 flex w-full flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <a
-              href={`https://twitter.com/intent/tweet?text=${encoded}`}
+              href={twitterIntentUrl(shareText)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex min-h-11 items-center justify-center rounded-lg bg-ink px-5 py-3 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
@@ -48,18 +63,13 @@ export function ShareableFact({ topic, title }: Props) {
               Share on X
             </a>
             <a
-              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://curi.one")}`}
+              href={linkedinShareUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-5 py-3 text-sm font-medium text-ink/80 transition-colors hover:border-accent/40 hover:text-accent"
               onClick={(e) => {
                 e.preventDefault();
-                copyShareText();
-                window.open(
-                  `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://curi.one")}`,
-                  "_blank",
-                  "noopener,noreferrer",
-                );
+                shareToLinkedIn();
               }}
             >
               Share on LinkedIn
