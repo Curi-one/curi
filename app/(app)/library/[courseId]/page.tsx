@@ -79,7 +79,7 @@ export default function LibraryCoursePage() {
       {todayNode ? (
         <div className="mt-8 space-y-3">
           <Link
-            href={`/courses/${course.id}/lessons/${todayNode.index}`}
+            href={`/courses/${course.id}/lessons/${todayNode.index}?from=library`}
             className="btn-primary block w-full text-center"
           >
             Continue today&apos;s lesson

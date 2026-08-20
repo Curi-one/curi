@@ -129,6 +129,7 @@ export const QuizSubmitResponseSchema = z.object({
   complete: z.boolean(),
   streak: z.number().int().nonnegative().optional(),
   pathsStillDue: z.number().int().nonnegative().optional(),
+  pathMastered: z.boolean().optional(),
 });
 export type QuizSubmitResponse = z.infer<typeof QuizSubmitResponseSchema>;
 

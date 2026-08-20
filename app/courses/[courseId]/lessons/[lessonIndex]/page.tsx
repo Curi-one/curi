@@ -1,18 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { LessonReader } from "@/components/LessonReader";
 import { getLesson } from "@/lib/api/client";
 import type { LessonResponse } from "@/lib/api/schemas";
 
-export default function LessonPage() {
+function LessonContent() {
   const params = useParams<{ courseId: string; lessonIndex: string }>();
+  const search = useSearchParams();
   const router = useRouter();
   const [lesson, setLesson] = useState<LessonResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const from = search.get("from");
+  const back =
+    from === "today"
+      ? { href: "/today", label: "Today" }
+      : from === "library"
+        ? { href: `/library/${params.courseId}`, label: "Path map" }
+        : { href: `/library/${params.courseId}`, label: "Path map" };
 
   useEffect(() => {
     getLesson(params.courseId, Number(params.lessonIndex))
@@ -22,9 +31,12 @@ export default function LessonPage() {
 
   if (error) {
     return (
-      <PageShell back={{ href: "/today", label: "Today" }} withTabPad={false}>
+      <PageShell back={back} withTabPad={false}>
         <p className="mt-6 text-ink-muted">{error}</p>
-        <Link href={`/library/${params.courseId}`} className="mt-4 inline-block text-sm underline">
+        <Link
+          href={`/library/${params.courseId}`}
+          className="mt-4 inline-block text-sm underline"
+        >
           View path map
         </Link>
       </PageShell>
@@ -33,20 +45,17 @@ export default function LessonPage() {
 
   if (!lesson) {
     return (
-      <PageShell back={{ href: "/today", label: "Today" }} withTabPad={false}>
+      <PageShell back={back} withTabPad={false}>
         <p className="mt-6 text-ink-muted">Loading lesson…</p>
       </PageShell>
     );
   }
 
   return (
-    <PageShell
-      back={{ href: `/library/${params.courseId}`, label: "Path map" }}
-      withTabPad={false}
-      className="pt-4"
-    >
+    <PageShell back={back} withTabPad={false} className="pt-4">
       <LessonReader
         lesson={lesson}
+        lessonIndex={Number(params.lessonIndex)}
         onStartQuiz={() =>
           router.push(
             `/courses/${params.courseId}/lessons/${params.lessonIndex}/quiz`,
@@ -54,5 +63,19 @@ export default function LessonPage() {
         }
       />
     </PageShell>
+  );
+}
+
+export default function LessonPage() {
+  return (
+    <Suspense
+      fallback={
+        <PageShell withTabPad={false}>
+          <p className="mt-6 text-ink-muted">Loading lesson…</p>
+        </PageShell>
+      }
+    >
+      <LessonContent />
+    </Suspense>
   );
 }

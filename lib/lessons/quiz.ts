@@ -631,9 +631,16 @@ export async function submitQuiz(
     });
   }
 
+  const nextProgress = Math.max(
+    course.kind === "member" ? (params.lessonIndex + 1) : 0,
+    params.lessonIndex + 1,
+  );
+  const pathMastered = nextProgress >= course.lessons.length;
+
   const response: QuizSubmitResponse = {
     feedback,
     complete: true,
+    pathMastered,
   };
 
   if (course.kind === "member" && course.userId) {

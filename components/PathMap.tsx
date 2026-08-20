@@ -52,7 +52,7 @@ export function PathMap({ courseId, nodes, readOnly }: Props) {
           return (
             <li key={node.index}>
               <Link
-                href={`/courses/${courseId}/lessons/${node.index}`}
+                href={`/courses/${courseId}/lessons/${node.index}?from=library`}
                 className="flex items-center gap-3 rounded-xl border border-border bg-paper-secondary px-3 hover:border-ink/20"
               >
                 {content}

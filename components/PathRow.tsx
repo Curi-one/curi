@@ -10,7 +10,7 @@ type Props = {
 
 export function PathRow({ path, dimmed }: Props) {
   const lessonNum = Math.min(path.progress + 1, path.totalLessons);
-  const href = `/courses/${path.id}/lessons/${path.progress}`;
+  const href = `/courses/${path.id}/lessons/${path.progress}?from=today`;
 
   return (
     <Link

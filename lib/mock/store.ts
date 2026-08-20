@@ -367,6 +367,7 @@ class MockStore {
       complete: true,
       streak,
       pathsStillDue: feed.due.length,
+      pathMastered: path.status === "mastered",
     };
   }
 
