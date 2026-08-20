@@ -78,18 +78,22 @@ export default function NewPathPage() {
         </p>
 
         {atLimit && !checking && (
-          <p className="mt-4 rounded-xl border border-border bg-paper-secondary px-4 py-3 text-sm text-ink-muted">
-            Free plan allows 2 active paths.{" "}
-            <Link href="/upgrade" className="text-accent underline">
+          <p className="mt-4 rounded-none border border-border bg-paper-secondary px-4 py-3 text-sm text-ink-muted">
+            Free plan allows 2 active paths.{""}
+            <Link
+              href="/upgrade"
+              className="text-ink underline underline-offset-2"
+            >
               Upgrade to Academy
-            </Link>{" "}
+            </Link>
+            {""}
             or shelve one in Library.
           </p>
         )}
 
         <form onSubmit={onSubmit} className="mt-8">
           <div
-            className={`flex cursor-text items-center gap-3 rounded-2xl border bg-paper px-5 py-[15px] shadow-sm transition-colors ${
+            className={`flex cursor-text items-center gap-3 rounded-none border bg-paper px-5 py-[15px] transition-colors ${
               focused ? "border-ink/20 bg-ink/[0.03]" : "border-border"
             }`}
             onMouseDown={(e) => {
@@ -113,7 +117,7 @@ export default function NewPathPage() {
             <button
               type="submit"
               disabled={!topic.trim() || checking}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-paper transition-opacity disabled:opacity-20"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-none bg-ink text-paper transition-opacity disabled:opacity-20"
               aria-label="Create path"
             >
               <ArrowUp className="h-4 w-4" aria-hidden />

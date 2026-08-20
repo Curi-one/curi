@@ -1,6 +1,6 @@
 export type ReaderSize = "s" | "m" | "l" | "xl";
 export type ReaderFont = "sans" | "serif" | "mono";
-export type ReaderTheme = "light" | "sepia" | "dark" | "paper";
+export type ReaderTheme = "light" | "paper" | "soft" | "dark";
 
 export type ReaderSettings = {
   size: ReaderSize;
@@ -52,49 +52,51 @@ export const READER_THEMES: {
   border: string;
   card: string;
 }[] = [
+  // Reader themes are a neutral tonal ladder: white, off-white, grey, ink.
+  // No warm, sepia, or tinted surfaces (BRAND.md §4.2, §16.1).
   {
     id: "light",
     label: "Light",
-    swatch: "#FAFAFA",
-    swatchBorder: "#D0D0D0",
-    bg: "#FAFAFA",
+    swatch: "#FFFFFF",
+    swatchBorder: "#E2E2E2",
+    bg: "#FFFFFF",
     fg: "#0D0D0D",
-    muted: "#595959",
-    border: "#C7C7C7",
-    card: "#F7F7F7",
-  },
-  {
-    id: "sepia",
-    label: "Sepia",
-    swatch: "#F4EFE0",
-    swatchBorder: "#C8BEA8",
-    bg: "#F4EFE0",
-    fg: "#3B2A1A",
-    muted: "#6B5848",
-    border: "#C8BEA8",
-    card: "#EBE4D1",
-  },
-  {
-    id: "dark",
-    label: "Dark",
-    swatch: "#18171A",
-    swatchBorder: "#3A3840",
-    bg: "#18171A",
-    fg: "#E2DDD8",
-    muted: "#8A8680",
-    border: "#2E2C30",
-    card: "#221F25",
+    muted: "#666666",
+    border: "#E2E2E2",
+    card: "#FAFAFA",
   },
   {
     id: "paper",
     label: "Paper",
-    swatch: "#FFFEF9",
-    swatchBorder: "#E0DDD6",
-    bg: "#FFFEF9",
-    fg: "#111111",
-    muted: "#6B6B66",
-    border: "#E0DDD6",
-    card: "#F2EFE8",
+    swatch: "#FAFAFA",
+    swatchBorder: "#DCDCDC",
+    bg: "#FAFAFA",
+    fg: "#0D0D0D",
+    muted: "#666666",
+    border: "#DCDCDC",
+    card: "#F2F2F2",
+  },
+  {
+    id: "soft",
+    label: "Soft",
+    swatch: "#F2F2F2",
+    swatchBorder: "#D0D0D0",
+    bg: "#F2F2F2",
+    fg: "#2A2A2A",
+    muted: "#5C5C5C",
+    border: "#D0D0D0",
+    card: "#EAEAEA",
+  },
+  {
+    id: "dark",
+    label: "Dark",
+    swatch: "#0D0D0D",
+    swatchBorder: "#2A2A2A",
+    bg: "#0D0D0D",
+    fg: "#FAFAFA",
+    muted: "#A3A3A3",
+    border: "#2A2A2A",
+    card: "#1F1F1F",
   },
 ];
 

@@ -3,14 +3,16 @@ import { getLibrary } from "@/lib/library/get-library";
 
 const USER_ID = "user-lib";
 
-function mockAdmin(courses: {
-  id: string;
-  topic: string;
-  depth: string;
-  progress: number;
-  total: number;
-  status: string;
-}[]) {
+function mockAdmin(
+  courses: {
+    id: string;
+    topic: string;
+    depth: string;
+    progress: number;
+    total: number;
+    status: string;
+  }[],
+) {
   return {
     from: vi.fn((table: string) => {
       if (table !== "courses") throw new Error(`unexpected ${table}`);

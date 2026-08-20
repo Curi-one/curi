@@ -118,8 +118,7 @@ export async function createCourse(
       return {
         ok: false,
         code: "plan_limit",
-        message:
-          "Free plan allows up to 2 active paths. Upgrade to Academy.",
+        message: "Free plan allows up to 2 active paths. Upgrade to Academy.",
       };
     }
   }
@@ -196,9 +195,7 @@ export async function createCourse(
   );
 
   if (lessonsError) {
-    throw new Error(
-      `Failed to insert course_lessons: ${lessonsError.message}`,
-    );
+    throw new Error(`Failed to insert course_lessons: ${lessonsError.message}`);
   }
 
   return {

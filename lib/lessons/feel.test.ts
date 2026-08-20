@@ -1,9 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { buildFingerprint } from "@/lib/cache/fingerprint";
-import {
-  clarificationsToMap,
-  normalizeTopic,
-} from "@/lib/courses/outline";
+import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
 import {
   getLessonBody,
   modifierFromFeel,

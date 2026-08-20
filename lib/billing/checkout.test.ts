@@ -10,7 +10,11 @@ describe("createCheckoutSession", () => {
     const result = await createCheckoutSession({
       getUser: async () => null,
     });
-    expect(result).toMatchObject({ ok: false, code: "unauthorized", status: 401 });
+    expect(result).toMatchObject({
+      ok: false,
+      code: "unauthorized",
+      status: 401,
+    });
   });
 
   it("creates checkout URL for free member", async () => {
@@ -30,7 +34,11 @@ describe("createCheckoutSession", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             maybeSingle: vi.fn().mockResolvedValue({
-              data: { stripe_customer_id: null, email: "a@b.com", plan: "free" },
+              data: {
+                stripe_customer_id: null,
+                email: "a@b.com",
+                plan: "free",
+              },
               error: null,
             }),
           }),
@@ -47,7 +55,10 @@ describe("createCheckoutSession", () => {
       appUrl: "http://localhost:3000",
     });
 
-    expect(result).toEqual({ ok: true, url: "https://checkout.stripe.com/test" });
+    expect(result).toEqual({
+      ok: true,
+      url: "https://checkout.stripe.com/test",
+    });
     expect(customersCreate).toHaveBeenCalled();
     expect(sessionsCreate).toHaveBeenCalledWith(
       expect.objectContaining({

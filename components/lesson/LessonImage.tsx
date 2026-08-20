@@ -11,7 +11,7 @@ export function LessonImage({ visual }: Props) {
   return (
     <figure className="my-10 border-y border-border py-6">
       <div className="grid gap-6 lg:grid-cols-[0.72fr_1fr] lg:items-stretch">
-        <div className="relative min-h-[200px] overflow-hidden rounded-[2rem] border border-border bg-paper-secondary">
+        <div className="relative min-h-[200px] overflow-hidden rounded-none border border-border bg-paper-secondary">
           {imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- remote Perplexity URLs vary by host
             <img
@@ -21,10 +21,10 @@ export function LessonImage({ visual }: Props) {
             />
           ) : (
             <>
-              <div className="absolute inset-0 bg-gradient-to-br from-paper via-paper-secondary to-accent/10" />
+              <div className="absolute inset-0 bg-gradient-to-br from-paper via-paper-secondary to-paper-tertiary" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(193,18,31,0.08),transparent_42%)]" />
-              <div className="absolute left-8 top-8 h-24 w-24 rounded-full border border-accent/25" />
-              <div className="absolute bottom-8 right-8 h-32 w-32 rounded-t-full border border-border/70" />
+              <div className="absolute left-8 top-8 h-24 w-24 rounded-none border border-border" />
+              <div className="absolute bottom-8 right-8 h-32 w-32 rounded-none border border-border/70" />
               <div className="absolute bottom-10 left-8 right-8 grid grid-cols-5 gap-3">
                 {[1, 2, 3, 4, 5].map((item) => (
                   <div key={item} className="h-20 border-x border-border/50" />

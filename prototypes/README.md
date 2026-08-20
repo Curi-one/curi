@@ -13,7 +13,7 @@ Visual and interaction reference for building the **production app** at the repo
 ## When to use
 
 - **Layout and chrome** — spacing, typography, tab bar, lesson reader feel  
-- **Brand** — [`web/curi-brand-guidelines-v2.md`](./web/curi-brand-guidelines-v2.md), ICP in `web/curi-icp.md`  
+- **Brand** — moved to [`../docs/BRAND.md`](../docs/BRAND.md) (canonical); ICP in `web/curi-icp.md`  
 
 ## Source of truth for behaviour
 

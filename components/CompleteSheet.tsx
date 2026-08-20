@@ -91,8 +91,8 @@ export function CompleteSheet({
       }}
     >
       <div
-        className="relative flex max-h-[90dvh] w-full max-w-[480px] flex-col animate-slide-up bg-paper sm:mx-4 sm:rounded-2xl"
-        style={{ borderTop: "4px solid var(--color-accent)" }}
+        className="relative flex max-h-[90dvh] w-full max-w-[480px] flex-col animate-slide-up bg-paper sm:mx-4 sm:rounded-none"
+        style={{ borderTop: "2px solid var(--color-accent)" }}
         role="dialog"
         aria-modal="true"
         aria-labelledby="complete-sheet-title"
@@ -101,7 +101,7 @@ export function CompleteSheet({
           {(courseTopic || lessonNumber != null) && (
             <div className="mb-2 font-meta text-ink-muted">
               {courseTopic}
-              {courseTopic && lessonNumber != null ? " · " : null}
+              {courseTopic && lessonNumber != null ? " ·" : null}
               {lessonNumber != null && totalLessons != null
                 ? `Lesson ${lessonNumber} of ${totalLessons}`
                 : lessonNumber != null
@@ -129,7 +129,7 @@ export function CompleteSheet({
             </p>
           )}
           {streak != null && streak > 0 && (
-            <div className="mt-3 flex items-center gap-2 text-sm text-accent">
+            <div className="mt-3 flex items-center gap-2 text-sm text-ink-muted">
               <Flame className="h-4 w-4" aria-hidden />
               {streak}-day streak
             </div>
@@ -163,7 +163,7 @@ export function CompleteSheet({
                   href={tweetUrl ?? undefined}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-11 items-center rounded-lg border border-border bg-ink px-4 py-2.5 text-xs font-medium text-paper transition hover:opacity-90"
+                  className="inline-flex min-h-11 items-center rounded-none border border-border bg-ink px-4 py-2.5 text-xs font-medium text-paper transition hover:opacity-90"
                 >
                   Share on X
                 </a>
@@ -171,7 +171,7 @@ export function CompleteSheet({
                   href={liUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
+                  className="inline-flex min-h-11 items-center rounded-none border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
                   onClick={(e) => {
                     e.preventDefault();
                     shareToLinkedIn();
@@ -182,9 +182,9 @@ export function CompleteSheet({
                 <button
                   type="button"
                   onClick={copyText}
-                  className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
+                  className="inline-flex min-h-11 items-center rounded-none border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
                 >
-                  {copied ? "Copied!" : "Copy text"}
+                  {copied ? "Copied" : "Copy text"}
                 </button>
               </div>
             </div>
@@ -199,7 +199,7 @@ export function CompleteSheet({
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="flex-1">
-                    <div className="font-display text-base leading-snug text-ink/50">
+                    <div className="font-ui text-base font-light leading-snug text-ink-faint">
                       {nextLessonTitle ?? "Your next lesson"}
                     </div>
                     <p className="mt-1.5 text-[11px] text-ink-muted/70">
@@ -236,7 +236,10 @@ export function CompleteSheet({
               </Link>
             </>
           ) : allPathsDoneToday ? (
-            <Link href="/today" className="btn-primary block w-full text-center">
+            <Link
+              href="/today"
+              className="btn-primary block w-full text-center"
+            >
               Done
             </Link>
           ) : (

@@ -41,11 +41,7 @@ export type LessonBodyCacheHit = {
   sources: unknown;
 };
 
-export type DifficultyModifier =
-  | "baseline"
-  | "easier"
-  | "deeper"
-  | "clearer";
+export type DifficultyModifier = "baseline" | "easier" | "deeper" | "clearer";
 
 export type ContentCacheDeps = {
   admin?: SupabaseClient;
@@ -105,7 +101,9 @@ async function lookupCacheRow(
     .eq("id", data.id);
 
   if (updateError) {
-    throw new Error(`content_cache hit_count update failed: ${updateError.message}`);
+    throw new Error(
+      `content_cache hit_count update failed: ${updateError.message}`,
+    );
   }
 
   return {

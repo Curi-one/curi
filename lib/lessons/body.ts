@@ -12,7 +12,11 @@ import type {
   LessonResponse,
   Source,
 } from "@/lib/api/schemas";
-import { DepthSlugSchema, LessonFeelSchema, SourceSchema } from "@/lib/api/schemas";
+import {
+  DepthSlugSchema,
+  LessonFeelSchema,
+  SourceSchema,
+} from "@/lib/api/schemas";
 import { buildFingerprint } from "@/lib/cache/fingerprint";
 import {
   lookupLessonBody,
@@ -22,10 +26,7 @@ import {
   type StoreLessonBodyInput,
 } from "@/lib/cache/content-cache";
 import { stripMarkdownFences } from "@/lib/clarify/generate";
-import {
-  clarificationsToMap,
-  normalizeTopic,
-} from "@/lib/courses/outline";
+import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
 import { isLessonReadable } from "@/lib/courses/path-map";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAuthenticatedUserId } from "@/lib/auth/user-id";
@@ -35,8 +36,7 @@ export type { DifficultyModifier };
 
 const MODIFIER_HINTS: Record<DifficultyModifier, string> = {
   baseline: "Standard editorial depth for the depth band.",
-  easier:
-    "Shorter sentences, define terms, lighter assumed knowledge.",
+  easier: "Shorter sentences, define terms, lighter assumed knowledge.",
   deeper: "More nuance, edge cases, less repetition.",
   clearer:
     "More concrete examples, explicit structure, and a short recap opening.",
@@ -112,18 +112,17 @@ export type GetLessonBodyLocked = {
 };
 
 export type GetLessonBodyResult =
-  | GetLessonBodySuccess
-  | GetLessonBodyNotFound
-  | GetLessonBodyLocked;
+  GetLessonBodySuccess | GetLessonBodyNotFound | GetLessonBodyLocked;
 
 export type GetLessonBodyDeps = {
   admin?: SupabaseClient;
   lookup?: typeof lookupLessonBody;
   store?: (input: StoreLessonBodyInput) => Promise<void>;
   complete?: typeof chatCompletion;
-  loadCourse?: (
-    params: { courseId: string; sessionId: string },
-  ) => Promise<CourseContext | null>;
+  loadCourse?: (params: {
+    courseId: string;
+    sessionId: string;
+  }) => Promise<CourseContext | null>;
   loadPriorFeel?: (params: {
     courseId: string;
     priorLessonIndex: number;
@@ -146,9 +145,7 @@ export class LessonBodyGenerationError extends Error {
 }
 
 /** Map prior lesson_feel → next lesson difficulty_modifier (CONTENT-CACHE). */
-export function feelToDifficultyModifier(
-  feel: LessonFeel,
-): DifficultyModifier {
+export function feelToDifficultyModifier(feel: LessonFeel): DifficultyModifier {
   switch (feel) {
     case "too_easy":
       return "deeper";
@@ -510,10 +507,9 @@ Rules:
   ];
 }
 
-function enrichmentFromPayload(payload: LessonBodyPayload): Pick<
-  LessonResponse,
-  "takeaways" | "shareableFact" | "visuals"
-> {
+function enrichmentFromPayload(
+  payload: LessonBodyPayload,
+): Pick<LessonResponse, "takeaways" | "shareableFact" | "visuals"> {
   return {
     ...(payload.takeaways && payload.takeaways.length > 0
       ? { takeaways: payload.takeaways }
@@ -529,9 +525,7 @@ function sourcesFromCache(raw: unknown): Source[] {
   if (!Array.isArray(raw)) {
     return [];
   }
-  return normalizeSources(
-    raw as Array<{ title?: string; url?: string }>,
-  );
+  return normalizeSources(raw as Array<{ title?: string; url?: string }>);
 }
 
 function bodyParagraphsFromPayload(payload: LessonBodyPayload): string[] {
@@ -557,11 +551,9 @@ export async function getLessonBody(
 ): Promise<GetLessonBodyResult> {
   const resolveAdmin = () => deps?.admin ?? createAdminClient();
   const loadCourse =
-    deps?.loadCourse ??
-    ((p) => defaultLoadCourse(p, resolveAdmin()));
+    deps?.loadCourse ?? ((p) => defaultLoadCourse(p, resolveAdmin()));
   const loadPriorFeel =
-    deps?.loadPriorFeel ??
-    ((p) => defaultLoadPriorFeel(p, resolveAdmin()));
+    deps?.loadPriorFeel ?? ((p) => defaultLoadPriorFeel(p, resolveAdmin()));
   const lookup = deps?.lookup ?? lookupLessonBody;
   const store = deps?.store ?? storeLessonBody;
   const complete = deps?.complete ?? chatCompletion;

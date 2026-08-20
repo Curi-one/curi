@@ -19,7 +19,9 @@ export function courseIdsWithActivityOnDate(
   date: string,
 ): Set<string> {
   return new Set(
-    activity.filter((row) => row.activityDate === date).map((row) => row.courseId),
+    activity
+      .filter((row) => row.activityDate === date)
+      .map((row) => row.courseId),
   );
 }
 

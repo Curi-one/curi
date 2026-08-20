@@ -91,12 +91,9 @@ export async function getCourseMap(
 
   const statusRaw = String(course.status);
   const status: PathMapInput["status"] =
-    statusRaw === "completed" || statusRaw === "shelved"
-      ? statusRaw
-      : "active";
+    statusRaw === "completed" || statusRaw === "shelved" ? statusRaw : "active";
 
-  const progress =
-    typeof course.progress === "number" ? course.progress : 0;
+  const progress = typeof course.progress === "number" ? course.progress : 0;
 
   const lessonRows = (lessons ?? []).map((row) => ({
     index: row.index as number,

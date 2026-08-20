@@ -101,9 +101,7 @@ export default function QuizPage() {
       });
       const me = await getMe();
       if (me.session.kind === "guest") {
-        router.push(
-          `/auth?returnTo=${encodeURIComponent("/today")}&from=quiz`,
-        );
+        router.push(`/auth?returnTo=${encodeURIComponent("/today")}&from=quiz`);
         return;
       }
 
@@ -129,12 +127,12 @@ export default function QuizPage() {
         streak,
         lessonTitle: courseMeta.lessonTitle,
         courseTopic: courseMeta.topic,
-        lessonNumber: Number.isFinite(lessonIndex) ? lessonIndex + 1 : undefined,
+        lessonNumber: Number.isFinite(lessonIndex)
+          ? lessonIndex + 1
+          : undefined,
         totalLessons: courseMeta.totalLessons,
         nextLessonTitle:
-          result.pathMastered === true
-            ? undefined
-            : courseMeta.nextLessonTitle,
+          result.pathMastered === true ? undefined : courseMeta.nextLessonTitle,
         shareableFact: courseMeta.shareableFact,
       });
       setPhase("done");
@@ -202,7 +200,7 @@ export default function QuizPage() {
       )}
       {phase === "done" && !sheet.open && (
         <p className="mt-6 text-ink-muted">
-          Lesson complete.{" "}
+          Lesson complete.{""}
           <Link href="/today" className="underline hover:text-ink">
             Back to Today
           </Link>

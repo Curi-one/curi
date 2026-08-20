@@ -41,7 +41,7 @@ function stripInlineMarkdown(text: string): string {
 }
 
 function estimateReadMinutes(body: string[]): number {
-  const words = body.join(" ").split(/\s+/).filter(Boolean).length;
+  const words = body.join("").split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
 }
 
@@ -51,7 +51,10 @@ function domainInitials(title: string, url: string): string {
     const label = host.split(".")[0] || title;
     return label.slice(0, 2).toUpperCase();
   } catch {
-    return title.replace(/^(The |A |An )/i, "").slice(0, 2).toUpperCase();
+    return title
+      .replace(/^(The |A |An )/i, "")
+      .slice(0, 2)
+      .toUpperCase();
   }
 }
 
@@ -72,7 +75,7 @@ function applyBionic(text: string): ReactNode[] {
 
 const CITATION_REGEX = /(\[\d+\])/g;
 
-/** Splits plain text on `[n]` citation markers and renders each as a tappable button. */
+/** Splits plain text on`[n]` citation markers and renders each as a tappable button. */
 function renderTextWithCitations(
   text: string,
   bionic: boolean,
@@ -89,15 +92,13 @@ function renderTextWithCitations(
           type="button"
           onClick={() => onCitationClick?.(n - 1)}
           aria-label={`View source ${n}`}
-          className="citation-ref relative mx-0.5 inline-flex align-baseline text-[0.7em] font-medium text-accent hover:text-accent/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent before:absolute before:-inset-3 before:content-['']"
+          className="citation-ref relative mx-0.5 inline-flex align-baseline text-[0.7em] font-medium text-ink hover:text-ink-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-default before:absolute before:-inset-3 before:content-['']"
         >
           [{n}]
         </button>
       );
     }
-    return (
-      <span key={i}>{bionic ? applyBionic(segment) : segment}</span>
-    );
+    return <span key={i}>{bionic ? applyBionic(segment) : segment}</span>;
   });
 }
 
@@ -125,7 +126,9 @@ function renderParagraph(
       );
     }
     return (
-      <span key={i}>{renderTextWithCitations(part, bionic, onCitationClick)}</span>
+      <span key={i}>
+        {renderTextWithCitations(part, bionic, onCitationClick)}
+      </span>
     );
   });
 }
@@ -282,9 +285,7 @@ export function LessonReader({
     const nodes: ReactNode[] = [];
     const imageAfter = showEditorial ? 0 : -1;
     const shareAfter =
-      showEditorial && mainParas.length >= 2
-        ? mainParas.length - 1
-        : -1;
+      showEditorial && mainParas.length >= 2 ? mainParas.length - 1 : -1;
 
     mainParas.forEach((para, i) => {
       const clean = stripInlineMarkdown(para);
@@ -406,20 +407,20 @@ export function LessonReader({
               type="button"
               onClick={() => setShowReaderSettings((v) => !v)}
               aria-label="Reader display settings"
-              className={`flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full border px-3 text-xs font-medium transition-colors ${
+              className={`flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-none border px-3 text-xs font-medium transition-colors ${
                 showReaderSettings
                   ? "border-ink/30 bg-ink text-paper"
                   : "border-border text-ink-muted hover:border-ink/25 hover:text-ink"
               }`}
             >
-              <span className="font-display text-[13px] font-light">A</span>
+              <span className="font-ui text-[13px] font-light">A</span>
               <span className="text-[10px] font-semibold">a</span>
             </button>
 
             {showReaderSettings && (
               <div
                 ref={settingsPanelRef}
-                className="fixed left-1/2 top-auto z-50 mt-2 w-[min(18rem,calc(100vw-2rem))] max-h-[70dvh] -translate-x-1/2 overflow-y-auto rounded-2xl border border-border bg-paper shadow-xl sm:absolute sm:left-auto sm:right-0 sm:w-72 sm:translate-x-0"
+                className="fixed left-1/2 top-auto z-50 mt-2 w-[min(18rem,calc(100vw-2rem))] max-h-[70dvh] -translate-x-1/2 overflow-y-auto rounded-none border border-border bg-paper sm:absolute sm:left-auto sm:right-0 sm:w-72 sm:translate-x-0"
                 style={
                   settings.theme !== "light"
                     ? { background: theme.card, borderColor: theme.border }
@@ -439,7 +440,7 @@ export function LessonReader({
                         })
                       }
                       disabled={sizeIdx <= 0}
-                      className="flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-border text-ink-muted transition hover:border-ink/30 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                      className="flex min-h-11 min-w-11 items-center justify-center rounded-none border border-border text-ink-muted transition hover:border-ink/30 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                       aria-label="Decrease font size"
                     >
                       −
@@ -451,7 +452,7 @@ export function LessonReader({
                           type="button"
                           onClick={() => updateSettings({ size: s.id })}
                           aria-label={`Font size ${s.id}`}
-                          className={`flex flex-col items-center gap-1 rounded-lg px-2 py-1.5 transition-colors ${
+                          className={`flex flex-col items-center gap-1 rounded-none px-2 py-1.5 transition-colors ${
                             settings.size === s.id
                               ? "bg-ink text-paper"
                               : "text-ink-muted hover:text-ink"
@@ -480,7 +481,7 @@ export function LessonReader({
                         })
                       }
                       disabled={sizeIdx >= READER_SIZES.length - 1}
-                      className="flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-border text-ink-muted transition hover:border-ink/30 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                      className="flex min-h-11 min-w-11 items-center justify-center rounded-none border border-border text-ink-muted transition hover:border-ink/30 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                       aria-label="Increase font size"
                     >
                       +
@@ -500,7 +501,7 @@ export function LessonReader({
                         key={f.id}
                         type="button"
                         onClick={() => updateSettings({ font: f.id })}
-                        className={`flex flex-col items-center gap-1.5 rounded-xl border py-3 transition-colors ${
+                        className={`flex flex-col items-center gap-1.5 rounded-none border py-3 transition-colors ${
                           settings.font === f.id
                             ? "border-ink bg-ink text-paper"
                             : "border-border text-ink-muted hover:border-ink/25 hover:text-ink"
@@ -540,7 +541,7 @@ export function LessonReader({
                         aria-label={t.label}
                       >
                         <span
-                          className="flex h-10 w-10 items-center justify-center rounded-full"
+                          className="flex h-10 w-10 items-center justify-center rounded-none"
                           style={{
                             background: t.swatch,
                             border:
@@ -557,8 +558,7 @@ export function LessonReader({
                             <span
                               className="h-2 w-2 rounded-full opacity-50"
                               style={{
-                                background:
-                                  t.id === "dark" ? "#E2DDD8" : "#0D0D0D",
+                                background: t.fg,
                               }}
                             />
                           )}
@@ -589,7 +589,7 @@ export function LessonReader({
                       </p>
                     </div>
                     <span
-                      className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200"
+                      className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-none transition-colors duration-200"
                       style={{
                         background: settings.bionic
                           ? "var(--color-ink)"
@@ -597,7 +597,7 @@ export function LessonReader({
                       }}
                     >
                       <span
-                        className="inline-block h-3.5 w-3.5 rounded-full bg-paper shadow transition-transform duration-200"
+                        className="inline-block h-3.5 w-3.5 rounded-full bg-paper transition-transform duration-200"
                         style={{
                           transform: settings.bionic
                             ? "translateX(18px)"
@@ -617,7 +617,7 @@ export function LessonReader({
         </div>
 
         {isGuest && (
-          <div className="mb-8 overflow-hidden rounded-2xl border border-border bg-paper-secondary/60">
+          <div className="mb-8 overflow-hidden rounded-none border border-border bg-paper-secondary/60">
             <div className="flex items-center gap-0 divide-x divide-border">
               {[
                 {
@@ -647,9 +647,7 @@ export function LessonReader({
                 >
                   <span
                     className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
-                      step.done
-                        ? "bg-ink text-paper"
-                        : "border border-border"
+                      step.done ? "bg-ink text-paper" : "border border-border"
                     }`}
                   >
                     {step.done ? "✓" : step.n}
@@ -725,9 +723,7 @@ export function LessonReader({
                       key={i}
                       className="flex items-start gap-4 text-sm leading-[1.7] text-ink/80"
                     >
-                      <span className="mt-[-2px] shrink-0 font-display text-xl leading-none text-accent">
-                        {i + 1}
-                      </span>
+                      <span className="takeaway-number">{i + 1}</span>
                       {t}
                     </li>
                   ))}
@@ -773,7 +769,7 @@ export function LessonReader({
           <div
             role="dialog"
             aria-label="Sources"
-            className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[400px] flex-col border-l border-border bg-paper shadow-xl"
+            className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[400px] flex-col border-l border-border bg-paper"
           >
             <div className="flex shrink-0 items-start justify-between border-b border-border px-6 py-5">
               <div>
@@ -787,7 +783,7 @@ export function LessonReader({
               <button
                 type="button"
                 onClick={closeSources}
-                className="mt-0.5 flex min-h-11 min-w-11 items-center justify-center rounded-lg text-ink-muted transition hover:bg-paper-secondary hover:text-ink"
+                className="mt-0.5 flex min-h-11 min-w-11 items-center justify-center rounded-none text-ink-muted transition hover:bg-paper-secondary hover:text-ink"
                 aria-label="Close sources"
               >
                 <X className="h-4 w-4" aria-hidden />
@@ -826,13 +822,13 @@ export function LessonReader({
                         href={source.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`group flex items-start gap-3.5 rounded-xl border p-4 transition-all ${
+                        className={`group flex items-start gap-3.5 rounded-none border p-4 transition-all ${
                           isActive
-                            ? "border-accent bg-accent/5"
+                            ? "border-ink bg-paper-tertiary"
                             : "border-border bg-paper-secondary/40 hover:border-ink/20 hover:bg-paper"
                         }`}
                       >
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-paper-tertiary text-[10px] font-semibold text-ink-muted">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-paper-tertiary text-[10px] font-semibold text-ink-muted">
                           {domainInitials(source.title, source.url)}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -840,7 +836,10 @@ export function LessonReader({
                             {source.title}
                           </span>
                           <div className="mt-1.5 flex items-center gap-1 text-[10px] text-ink-muted/50">
-                            <Globe2 className="h-2.5 w-2.5 shrink-0" aria-hidden />
+                            <Globe2
+                              className="h-2.5 w-2.5 shrink-0"
+                              aria-hidden
+                            />
                             <span className="truncate">{host}</span>
                           </div>
                         </div>

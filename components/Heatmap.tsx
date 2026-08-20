@@ -32,7 +32,9 @@ export function Heatmap({ dates, streak, atRisk }: Props) {
         </span>
         <span className="text-sm text-ink-muted">day streak</span>
         {atRisk && (
-          <span className="ml-auto text-xs font-medium text-streak">At risk</span>
+          <span className="ml-auto text-xs font-medium text-streak">
+            At risk
+          </span>
         )}
       </div>
       <p className="mt-1 text-sm text-ink-muted">
@@ -48,7 +50,7 @@ export function Heatmap({ dates, streak, atRisk }: Props) {
               {week.map((cell, di) => (
                 <div
                   key={`${wi}-${di}`}
-                  className={`h-3 w-3 rounded-sm ${
+                  className={`h-3 w-3 rounded-none ${
                     cell ? "bg-ink" : "bg-paper-tertiary"
                   }`}
                   aria-hidden

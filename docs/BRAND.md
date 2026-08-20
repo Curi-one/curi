@@ -182,7 +182,7 @@ Never: stretch, compress, or rotate the wordmark. Never apply shadows, glows, gr
 
 ### 4.1 The Philosophy
 
-Curi's colour system is strict monotone with a single, disciplined accent. Knowledge is black and white — ink and paper. Colour is not decoration; it is meaning. When vermilion appears, it is because something matters.
+Curi's colour system is strict neutral monotone with a single, disciplined accent. Knowledge is black and white, literally: white paper, black ink, grey between them, and no hue anywhere except the accent. Colour is not decoration; it is meaning. When vermilion appears, it is because something matters.
 
 Most products compete on colour. Curi competes on contrast.
 
@@ -192,16 +192,18 @@ Most products compete on colour. Curi competes on contrast.
 
 | Token | Name | Hex | RGB | Primary role |
 |---|---|---|---|---|
-| `color.ink` | Ink | `#0A0908` | 10, 9, 8 | Primary text, dark backgrounds |
-| `color.ink-2` | Ink 2 | `#1C1A18` | 28, 26, 24 | Hover on dark surfaces |
-| `color.ink-3` | Ink 3 | `#2E2C28` | 46, 44, 40 | Secondary dark surfaces |
-| `color.mid` | Mid | `#6B6760` | 107, 103, 96 | Secondary text, supporting copy |
-| `color.silver` | Silver | `#9E9B94` | 158, 155, 148 | Labels, captions, metadata |
-| `color.light` | Light | `#D4D0C8` | 212, 208, 200 | Borders, rules, subtle backgrounds |
-| `color.paper` | Paper | `#F4F1E8` | 244, 241, 232 | Secondary background, cards |
-| `color.white` | White | `#FAF9F5` | 250, 249, 245 | Primary background |
+| `color.ink` | Ink | `#0D0D0D` | 13, 13, 13 | Primary text, dark backgrounds |
+| `color.ink-2` | Ink 2 | `#1F1F1F` | 31, 31, 31 | Hover on dark surfaces |
+| `color.ink-3` | Ink 3 | `#2A2A2A` | 42, 42, 42 | Secondary dark surfaces |
+| `color.mid` | Mid | `#666666` | 102, 102, 102 | Secondary text, supporting copy |
+| `color.silver` | Silver | `#A3A3A3` | 163, 163, 163 | Labels, captions, metadata |
+| `color.light` | Light | `#E2E2E2` | 226, 226, 226 | Borders, rules, subtle backgrounds |
+| `color.paper` | Paper | `#FAFAFA` | 250, 250, 250 | Secondary background, cards |
+| `color.white` | White | `#FFFFFF` | 255, 255, 255 | Primary background |
 
-None of these values is pure black or pure white. The warmth of aged paper and carbon-black ink is intentional and must be preserved.
+The greyscale is strictly neutral. Every tone is pure grey with no hue: red, green, and blue channels are equal in every value above. Warm, cream, sepia, or otherwise tinted greys are not part of the system and must never be introduced.
+
+Ink is `#0D0D0D`, not pure black. The page is pure white; the ink is softened a fraction so that long-form reading stays comfortable. Vermilion is the only chromatic value in the entire palette.
 
 #### The Accent
 
@@ -237,7 +239,7 @@ The test: *is this the most important thing on this screen?* If not, solve the p
 | Vermilion | Ink | Accent on dark |
 | Vermilion | White | Accent on light |
 
-**Never pair:** Vermilion on Paper (insufficient contrast), Silver on White for body text, or any pairing that fails WCAG AA.
+**Never pair:** Silver on White for body text (it is for labels and metadata only), or any pairing that fails WCAG AA.
 
 ### 4.5 Accessibility
 
@@ -531,32 +533,32 @@ Design tokens are the single source of truth for all visual values. They must be
 
 ```css
 /* ── Background ── */
---color-bg-primary:     #FAF9F5;   /* White — page background */
---color-bg-secondary:   #F4F1E8;   /* Paper — cards, secondary */
---color-bg-tertiary:    #E8E5DC;   /* Pale — hover states, subtle */
---color-bg-inverse:     #0A0908;   /* Ink — dark panels, footer */
---color-bg-inverse-2:   #1C1A18;   /* Ink 2 — hover on dark */
+--color-bg-primary:     #FFFFFF;   /* White — page background */
+--color-bg-secondary:   #FAFAFA;   /* Paper — cards, secondary */
+--color-bg-tertiary:    #F2F2F2;   /* Pale — hover states, subtle */
+--color-bg-inverse:     #0D0D0D;   /* Ink — dark panels, footer */
+--color-bg-inverse-2:   #1F1F1F;   /* Ink 2 — hover on dark */
 
 /* ── Text ── */
---color-text-primary:   #0A0908;   /* Ink — primary text */
---color-text-secondary: #6B6760;   /* Mid — supporting text */
---color-text-tertiary:  #9E9B94;   /* Silver — labels, captions */
---color-text-inverse:   #FAF9F5;   /* White — text on dark bg */
---color-text-disabled:  #D4D0C8;   /* Light — disabled states */
+--color-text-primary:   #0D0D0D;   /* Ink — primary text */
+--color-text-secondary: #666666;   /* Mid — supporting text */
+--color-text-tertiary:  #A3A3A3;   /* Silver — labels, captions */
+--color-text-inverse:   #FFFFFF;   /* White — text on dark bg */
+--color-text-disabled:  #E2E2E2;   /* Light — disabled states */
 
 /* ── Border ── */
---color-border-subtle:  #D4D0C8;   /* Light — standard borders */
---color-border-default: #9E9B94;   /* Silver — input focus ring */
---color-border-strong:  #0A0908;   /* Ink — emphasis borders */
+--color-border-subtle:  #E2E2E2;   /* Light — standard borders */
+--color-border-default: #A3A3A3;   /* Silver — input focus ring */
+--color-border-strong:  #0D0D0D;   /* Ink — emphasis borders */
 
 /* ── Accent ── */
 --color-accent:         #C1121F;   /* Vermilion — ONE use per screen */
 --color-accent-dark:    #A30F1B;   /* Vermilion hover — dark bg */
 
 /* ── Semantic ── */
---color-correct:        #0A0908;   /* Ink fill — correct quiz answer */
---color-correct-text:   #FAF9F5;   /* White — text on correct state */
---color-error-text:     #9E9B94;   /* Silver — error messages (not red) */
+--color-correct:        #0D0D0D;   /* Ink fill — correct quiz answer */
+--color-correct-text:   #FFFFFF;   /* White — text on correct state */
+--color-error-text:     #A3A3A3;   /* Silver — error messages (not red) */
 ```
 
 ### 8.2 Typography Tokens
@@ -662,10 +664,10 @@ The one permitted use of visual depth: a 2px bottom border in Vermilion on the a
 ### 8.6 Border Tokens
 
 ```css
---border-subtle:  1px solid #D4D0C8;   /* Light — standard card borders */
---border-default: 1px solid #9E9B94;   /* Silver — input borders */
---border-strong:  1px solid #0A0908;   /* Ink — emphasis */
---border-bold:    2px solid #0A0908;   /* Ink bold — section breaks, masthead */
+--border-subtle:  1px solid #E2E2E2;   /* Light — standard card borders */
+--border-default: 1px solid #A3A3A3;   /* Silver — input borders */
+--border-strong:  1px solid #0D0D0D;   /* Ink — emphasis */
+--border-bold:    2px solid #0D0D0D;   /* Ink bold — section breaks, masthead */
 --border-accent:  2px solid #C1121F;   /* Vermilion — pull quote rule, CTA bottom */
 ```
 
@@ -1592,13 +1594,13 @@ Web fonts load in Apple Mail, Gmail (via `<link>`), and most modern clients. The
 Container:
   width:          600px
   padding:        28px 36px 0
-  border-bottom:  1px solid #D4D0C8
+  border-bottom:  1px solid #E2E2E2
 
 Wordmark:
   font-family:    Fraunces, Georgia, serif
   font-size:      28px
   font-weight:    300
-  color:          #0A0908
+  color:          #0D0D0D
   Underline:      3px solid #C1121F below wordmark ← accent
                   (use border-bottom on a <span> for email safety)
 
@@ -1607,7 +1609,7 @@ Metadata line:
   font-size:      9px
   letter-spacing: 0.22em
   text-transform: uppercase
-  color:          #9E9B94
+  color:          #A3A3A3
   margin-top:     12px, margin-bottom: 0
   padding-bottom: 20px
   Content:        Day N · [Topic] · [Level]
@@ -1624,7 +1626,7 @@ Metadata line:
    font-weight:   400
    line-height:   1.1
    letter-spacing: -0.02em
-   color:         #0A0908
+   color:         #0D0D0D
    padding:       32px 36px 0
 
 3. LESSON BODY
@@ -1632,7 +1634,7 @@ Metadata line:
    font-size:     16px
    font-weight:   300
    line-height:   1.75
-   color:         #0A0908
+   color:         #0D0D0D
    padding:       20px 36px
 
 4. PULL QUOTE (conditional — one per email)
@@ -1643,11 +1645,11 @@ Metadata line:
    font-size:     18px
    font-weight:   300
    line-height:   1.6
-   color:         #0A0908
+   color:         #0D0D0D
 
 5. AD PLACEMENT (free tier only)
-   border-top:    1px solid #D4D0C8
-   border-bottom: 1px solid #D4D0C8
+   border-top:    1px solid #E2E2E2
+   border-bottom: 1px solid #E2E2E2
    padding:       20px 36px
    Label:         "Supported by" — Mono 9px, Silver, 0.2em tracking
    Headline:      Plus Jakarta Sans, 15px, Regular, Ink
@@ -1656,22 +1658,22 @@ Metadata line:
 
 6. TAKEAWAYS
    padding:       24px 36px
-   border-top:    1px solid #D4D0C8
+   border-top:    1px solid #E2E2E2
 
    Section label: Mono 9px, Silver, 0.28em tracking, uppercase
    Item:          flex row — number in Mono 9px Vermilion, text in PJS 15px
 
 7. TOMORROW TEASER
    padding:       20px 36px 28px
-   background:    #F4F1E8
+   background:    #FAFAFA
 
    Label:         Mono 9px, Silver, uppercase — "Tomorrow"
    Title:         Fraunces 18px, italic, Ink
 
 8. EMAIL FOOTER
    padding:       20px 36px
-   border-top:    1px solid #D4D0C8
-   background:    #FAF9F5
+   border-top:    1px solid #E2E2E2
+   background:    #FFFFFF
 
    Left:          Wordmark (Fraunces 18px, light)
    Right:         Unsubscribe link (PJS 11px, Silver, underline)
@@ -1825,7 +1827,8 @@ Never used in Curi copy:
 
 - Never add a second accent colour. If you need one, the layout is the problem.
 - Never use Vermilion for success states. Correct = Ink fill. Not green. Not Vermilion.
-- Never use pure `#000000` or `#FFFFFF`. The warmth of the palette is the brand.
+- Never tint a grey. Every greyscale value has equal R, G, and B channels. No cream, no sepia, no warm or cool casts — the neutrality of the palette is the brand.
+- Never use pure `#000000`. Ink is `#0D0D0D`; the page background is pure `#FFFFFF`.
 - Never use gradients on type.
 - Never use Vermilion more than once per screen.
 

@@ -2,7 +2,7 @@
 
 Curi UX must feel **effortless, trustworthy, and calm** — world-class without casino mechanics. Apply on every screen; run `curi-ux-review` before merge.
 
-Brand reference: [`prototypes/web/curi-brand-guidelines-v2.md`](../prototypes/web/curi-brand-guidelines-v2.md).
+Brand reference: [`docs/BRAND.md`](./BRAND.md) — visual system is binding; this file governs behaviour.
 
 ---
 
@@ -41,7 +41,7 @@ If the UI contradicts these beliefs, fix the UI — not the user’s expectation
 
 ### Loss aversion (streak)
 
-- Streak visible but **not punitive** — orange “at risk”, no shame copy, no push spam.  
+- Streak visible but **not punitive** — “at risk” is stated in copy, not colour. The palette is monotone and the streak is never Vermilion (BRAND §11.3). No shame copy, no push spam.  
 - Missing a day resets streak; explain quietly, offer return via Today.
 
 ### Trust & credibility
@@ -75,8 +75,8 @@ If the UI contradicts these beliefs, fix the UI — not the user’s expectation
 | Loading | Skeleton or streaming titles; never blank > 300ms without feedback |
 | Errors | Plain language + retry; never raw API errors |
 | Empty states | One CTA (Explore); no clutter |
-| Motion | Spring ease `cubic-bezier(0.16, 1, 0.3, 1)`; purposeful, not decorative |
-| Copy | Editorial, second person sparingly; Fraunces for headlines |
+| Motion | `--ease-out`; 300ms+ for meaningful transitions; no spring or bounce; honours `prefers-reduced-motion` (BRAND §7) |
+| Copy | Editorial, second person sparingly; Fraunces for headlines. No exclamation marks, no em-dashes (BRAND §2.3) |
 
 ---
 
@@ -119,6 +119,8 @@ If the UI contradicts these beliefs, fix the UI — not the user’s expectation
 - Infinite scroll feeds, badges, leaderboards  
 - Dark patterns on upgrade (fake timers, pre-checked add-ons)  
 - Hiding sources on AI content  
+- Vermilion used more than once per screen, or for anything other than a sanctioned accent (BRAND §4.3)  
+- Rounded containers, drop shadows, or hardcoded hex values (BRAND §8, §16.3)  
 
 ---
 

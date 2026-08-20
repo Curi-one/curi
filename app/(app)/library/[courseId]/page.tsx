@@ -53,7 +53,10 @@ export default function LibraryCoursePage() {
 
   if (error) {
     return (
-      <PageShell back={{ href: "/library", label: "Library" }} withTabPad={false}>
+      <PageShell
+        back={{ href: "/library", label: "Library" }}
+        withTabPad={false}
+      >
         <p className="mt-6 text-ink-muted">Could not load this path.</p>
         <Link href="/library" className="btn-secondary mt-6 inline-block">
           Back to Library
@@ -64,7 +67,10 @@ export default function LibraryCoursePage() {
 
   if (!course) {
     return (
-      <PageShell back={{ href: "/library", label: "Library" }} withTabPad={false}>
+      <PageShell
+        back={{ href: "/library", label: "Library" }}
+        withTabPad={false}
+      >
         <LoadingState label="Loading path…" />
       </PageShell>
     );
@@ -74,12 +80,17 @@ export default function LibraryCoursePage() {
   const canShelve = !!todayNode;
   const readCount = course.nodes.filter((n) => n.status === "read").length;
   const total = course.nodes.length;
-  const doneCount = pathEyebrow(course.nodes) === "Mastered" ? total : readCount;
+  const doneCount =
+    pathEyebrow(course.nodes) === "Mastered" ? total : readCount;
   const pct = endowedPct(doneCount, total);
   const eyebrow = pathEyebrow(course.nodes);
 
   return (
-    <PageShell back={{ href: "/library", label: "Library" }} withTabPad={false} className="pt-4">
+    <PageShell
+      back={{ href: "/library", label: "Library" }}
+      withTabPad={false}
+      className="pt-4"
+    >
       <div className="mt-4 flex items-start gap-5">
         <div className="min-w-0 flex-1">
           <p className="font-meta">{eyebrow}</p>
@@ -135,7 +146,7 @@ export default function LibraryCoursePage() {
         </div>
       ) : (
         <p className="mt-8 text-sm text-ink-muted">
-          No lesson due today on this path.{" "}
+          No lesson due today on this path.{""}
           <Link href="/today" className="underline hover:text-ink">
             Back to Today
           </Link>

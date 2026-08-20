@@ -2,89 +2,238 @@
 @tailwind components;
 @tailwind utilities;
 
-/*
-  Curi design tokens — white-first palette matching prototypes/web/src/styles.css
-  (neutral gray + vermilion). Cream/warm paper is not the default app chrome.
-*/
+/* ═══════════════════════════════════════════════════════════════════════════
+   Curi design tokens — docs/BRAND.md §8
+   Single source of truth. Any value not defined here should not exist in the
+   product (BRAND.md §17, principle 04).
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Surfaces — pure white / cool gray */
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #fafafa;
+  /* ── Colour · §8.1 ───────────────────────────────────────────────────────
+     Strictly neutral greyscale — equal R/G/B in every tone. No warm, cream,
+     or cool cast (§16.1). Ink is #0d0d0d, never pure black. */
+
+  /* Greyscale — eight tones (§4.2) */
+  --color-ink: #0d0d0d;
+  --color-ink-2: #1f1f1f;
+  --color-ink-3: #2a2a2a;
+  --color-mid: #666666;
+  --color-silver: #a3a3a3;
+  --color-light: #e2e2e2;
+  --color-paper-tone: #fafafa;
+  --color-white-tone: #ffffff;
+
+  /* Background */
+  --color-bg-primary: var(--color-white-tone);
+  --color-bg-secondary: var(--color-paper-tone);
   --color-bg-tertiary: #f2f2f2;
-  --color-bg-inverse: #0d0d0d;
-  --color-bg-inverse-2: #1f1f1f;
+  --color-bg-inverse: var(--color-ink);
+  --color-bg-inverse-2: var(--color-ink-2);
+  --color-bg-inverse-3: var(--color-ink-3);
 
-  /* Ink */
-  --color-text-primary: #0d0d0d;
-  --color-text-secondary: #666666;
-  --color-text-tertiary: #a3a3a3;
-  --color-text-inverse: #ffffff;
-  --color-text-disabled: #d4d4d4;
+  /* Text */
+  --color-text-primary: var(--color-ink);
+  --color-text-secondary: var(--color-mid);
+  --color-text-tertiary: var(--color-silver);
+  --color-text-inverse: var(--color-white-tone);
+  --color-text-disabled: var(--color-light);
 
-  /* Borders */
-  --color-border-subtle: #e2e2e2;
-  --color-border-default: #d0d0d0;
-  --color-border-strong: #0d0d0d;
+  /* Border */
+  --color-border-subtle: var(--color-light);
+  --color-border-default: var(--color-silver);
+  --color-border-strong: var(--color-ink);
 
-  /* Single accent — vermilion */
+  /* Accent — ONE use per screen (§4.3) */
   --color-accent: #c1121f;
   --color-accent-dark: #a30f1b;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-full: 999px;
+  /* Semantic — correct is Ink, errors are Silver. Never green, never red (§9.6) */
+  --color-correct: var(--color-ink);
+  --color-correct-text: var(--color-white-tone);
+  --color-error-text: var(--color-silver);
 
-  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  /* ── Typography · §8.2 ─────────────────────────────────────────────────── */
+  --font-display-stack: var(--font-display), Georgia, serif;
+  --font-ui-stack: var(--font-ui), system-ui, sans-serif;
+  --font-mono-stack: var(--font-mono), ui-monospace, monospace;
 
-  /* Aliases used by existing Tailwind utilities */
+  --text-display-2xl: 192px;
+  --text-display-xl: 88px;
+  --text-display-lg: 72px;
+  --text-display-md: 52px;
+  --text-display-sm: 38px;
+  --text-display-xs: 28px;
+  --text-display-2xs: 22px;
+
+  --text-ui-xl: 18px;
+  --text-ui-lg: 16px;
+  --text-ui-md: 15px;
+  --text-ui-sm: 14px;
+  --text-ui-xs: 13px;
+  --text-ui-2xs: 12px;
+  --text-ui-3xs: 11px;
+  --text-ui-4xs: 10px;
+
+  --text-mono-md: 11px;
+  --text-mono-sm: 10px;
+  --text-mono-xs: 9px;
+  --text-mono-2xs: 8px;
+
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  --leading-none: 1;
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+  --leading-loose: 1.75;
+
+  --tracking-tighter: -0.04em;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.06em;
+  --tracking-wider: 0.12em;
+  --tracking-widest: 0.22em;
+  --tracking-ultra: 0.3em;
+
+  /* ── Spacing · §8.3 — base-4, rhythm of 8 ──────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* ── Radius · §8.4 — default is zero. Sharp corners are the brand. ─────── */
+  --radius-none: 0px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-full: 9999px;
+
+  /* ── Shadow · §8.5 — Curi uses no box shadows. Depth via surface + rule. ─ */
+  --shadow-none: none;
+
+  /* ── Border · §8.6 ─────────────────────────────────────────────────────── */
+  --border-subtle: 1px solid var(--color-border-subtle);
+  --border-default: 1px solid var(--color-border-default);
+  --border-strong: 1px solid var(--color-border-strong);
+  --border-bold: 2px solid var(--color-border-strong);
+  --border-accent: 2px solid var(--color-accent);
+
+  /* ── Z-index · §8.7 ────────────────────────────────────────────────────── */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-modal: 40;
+  --z-toast: 50;
+  --z-cursor: 99;
+
+  /* ── Grid · §8.9 ───────────────────────────────────────────────────────── */
+  --grid-gutter-mobile: 16px;
+  --grid-gutter-tablet: 24px;
+  --grid-gutter-desktop: 24px;
+  --grid-margin-mobile: 20px;
+  --grid-margin-tablet: 32px;
+  --grid-margin-desktop: 52px;
+  --grid-max-width: 1440px;
+  --content-max-width: 680px;
+  --narrow-max-width: 480px;
+
+  /* ── Motion · §7.2–7.3 ─────────────────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --duration-micro: 120ms;
+  --duration-small: 200ms;
+  --duration-medium: 350ms;
+  --duration-large: 900ms;
+  --duration-xl: 1100ms;
+
+  /* Legacy alias — `--ease-spring` is `--ease-out`. Prefer --ease-out. */
+  --ease-spring: var(--ease-out);
+
+  /* ── Tailwind utility aliases (see tailwind.config.ts) ─────────────────── */
   --color-paper: var(--color-bg-primary);
   --color-paper-secondary: var(--color-bg-secondary);
   --color-paper-tertiary: var(--color-bg-tertiary);
-  --color-ink: var(--color-text-primary);
   --color-ink-muted: var(--color-text-secondary);
+  --color-ink-faint: var(--color-text-tertiary);
   --color-border: var(--color-border-subtle);
-  --color-streak: var(--color-accent);
+  --color-streak: var(
+    --color-text-primary
+  ); /* streak is never Vermilion (§11.3) */
 }
 
+/* Dark chrome — remapped onto the brand Ink tones, not cool grey.
+   BRAND.md defines no dark theme; these are the Ink surfaces of §4.2 used
+   as page chrome, keeping the warm palette intact. */
 html.dark {
-  --color-bg-primary: #0d0d0d;
-  --color-bg-secondary: #1a1a1a;
-  --color-bg-tertiary: #2a2a2a;
-  --color-text-primary: #f5f5f5;
-  --color-text-secondary: #a3a3a3;
-  --color-text-tertiary: #737373;
-  --color-border-subtle: #2a2a2a;
-  --color-text-inverse: #ffffff;
+  --color-bg-primary: var(--color-ink);
+  --color-bg-secondary: var(--color-ink-2);
+  --color-bg-tertiary: var(--color-ink-3);
+  --color-text-primary: var(--color-white-tone);
+  --color-text-secondary: var(--color-silver);
+  --color-text-tertiary: var(--color-mid);
+  --color-border-subtle: var(--color-ink-3);
+  --color-border-default: var(--color-mid);
+  --color-border-strong: var(--color-white-tone);
+  --color-text-inverse: var(--color-ink);
+  --color-bg-inverse: var(--color-white-tone);
+  --color-bg-inverse-2: var(--color-paper-tone);
+  --color-correct-text: var(--color-ink);
 }
 
 html {
-  background: var(--color-bg-inverse);
+  background: var(--color-ink);
 }
 
 body {
   color: var(--color-text-primary);
   background: var(--color-bg-primary);
-  font-family: var(--font-ui), system-ui, sans-serif;
-  font-weight: 400;
-  letter-spacing: 0;
+  font-family: var(--font-ui-stack);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--tracking-normal);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Components — docs/BRAND.md §9, §10, §11
+   Built from tokens only. A hardcoded value here is a bug (§17.04).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 @layer components {
+  /* ── Type · §5 ─────────────────────────────────────────────────────────── */
+
   .font-display {
-    font-family: var(--font-display), Georgia, serif;
-    font-variation-settings: "SOFT" 50, "WONK" 1;
+    font-family: var(--font-display-stack);
+    font-variation-settings:
+      "SOFT" 50,
+      "WONK" 1;
   }
 
   .font-ui {
-    font-family: var(--font-ui), system-ui, sans-serif;
+    font-family: var(--font-ui-stack);
   }
 
+  /* Metadata label — mono, uppercase, Silver (§5.4) */
   .font-meta {
-    font-family: var(--font-mono), ui-monospace, monospace;
-    font-size: 10px;
-    letter-spacing: 0.18em;
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-sm);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-widest);
     text-transform: uppercase;
     color: var(--color-text-tertiary);
   }
@@ -93,10 +242,27 @@ body {
     @apply font-meta;
   }
 
-  /** Editorial display — tight leading, playful Fraunces axis. */
+  /* Form label — mono 9px, 0.3em (§9.2) */
+  .type-label {
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-xs);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-ultra);
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-2);
+    display: block;
+  }
+
+  /* Editorial display — Fraunces Light, tight tracking (§5.2) */
   .type-display {
-    @apply font-display font-light leading-[0.95] tracking-[-0.04em];
-    font-variation-settings: "SOFT" 60, "WONK" 1;
+    font-family: var(--font-display-stack);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tighter);
+    font-variation-settings:
+      "SOFT" 60,
+      "WONK" 1;
   }
 
   .type-display-xl {
@@ -104,164 +270,198 @@ body {
   }
 
   .type-lede {
-    @apply text-[15px] font-light leading-[1.7] text-ink-muted;
+    font-size: var(--text-ui-md);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-loose);
+    color: var(--color-text-secondary);
   }
 
-  /** Section kickers with accent mark — one accent per cluster. */
-  .type-kicker-accent {
+  /* Section kicker. Marker is Ink — section labels repeat, and Vermilion
+     may appear only once per screen (§4.3). */
+  .type-kicker-mark {
     @apply font-meta flex items-center gap-2;
   }
 
-  .type-kicker-accent::before {
+  .type-kicker-mark::before {
     content: "";
     display: block;
-    width: 5px;
-    height: 5px;
+    width: var(--space-1);
+    height: var(--space-1);
     flex-shrink: 0;
-    border-radius: 50%;
-    background: var(--color-accent);
+    background: var(--color-text-primary);
   }
+
+  /* ── Rules ─────────────────────────────────────────────────────────────── */
 
   .editorial-rule {
     height: 1px;
-    background: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--color-accent) 55%, transparent) 0%,
-      var(--color-border-subtle) 28%,
-      transparent 100%
-    );
+    background: var(--color-border-subtle);
   }
 
-  .input-field {
-    @apply w-full border bg-paper-secondary px-4 py-4 text-[16px] text-ink outline-none;
-    border-color: var(--color-border-subtle);
-    border-radius: var(--radius-md);
-    transition:
-      border-color 0.2s var(--ease-spring),
-      background-color 0.2s var(--ease-spring);
+  /* Section break — 2px Ink (§8.6) */
+  .editorial-rule-bold {
+    height: 2px;
+    background: var(--color-border-strong);
   }
 
-  .input-field:hover:not(:focus) {
-    border-color: var(--color-border-default);
-    background: var(--color-bg-primary);
-  }
+  /* ── Buttons · §9.1 ────────────────────────────────────────────────────── */
 
-  .input-field:focus {
-    border-color: var(--color-border-strong);
-    background: var(--color-bg-primary);
-  }
-
+  /* Primary CTA. One per screen. Carries the Vermilion underline. */
   .btn-primary {
-    @apply min-h-[52px] px-6 py-3 text-center font-medium text-paper;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: var(--space-3) var(--space-6);
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-2xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--color-text-inverse);
     background: var(--color-bg-inverse);
-    border-radius: var(--radius-md);
-    box-shadow: inset 0 -3px 0 var(--color-accent);
-    letter-spacing: 0.06em;
-    transition:
-      opacity 0.2s var(--ease-spring),
-      transform 0.2s var(--ease-spring),
-      background-color 0.2s var(--ease-spring);
+    border: none;
+    border-bottom: var(--border-accent);
+    border-radius: var(--radius-none);
+    transition: background-color var(--duration-small) var(--ease-out);
   }
 
   .btn-primary:hover:not(:disabled) {
-    opacity: 0.92;
     background: var(--color-bg-inverse-2);
   }
 
   .btn-primary:active:not(:disabled) {
-    transform: scale(0.98);
+    transform: translateY(1px);
   }
 
   .btn-primary:disabled {
-    opacity: 0.4;
+    background: var(--color-text-disabled);
+    border-bottom: none;
+    cursor: not-allowed;
   }
 
+  /* Secondary (ghost). Never carries the Vermilion underline. */
   .btn-secondary {
-    @apply min-h-[52px] px-6 py-3 text-center font-medium text-ink;
-    background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: var(--space-3) var(--space-6);
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-2xs);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--color-text-primary);
+    background: transparent;
+    border: var(--border-subtle);
+    border-radius: var(--radius-none);
     transition:
-      background-color 0.2s var(--ease-spring),
-      border-color 0.2s var(--ease-spring),
-      transform 0.2s var(--ease-spring);
+      background-color var(--duration-small) var(--ease-out),
+      border-color var(--duration-small) var(--ease-out);
   }
 
   .btn-secondary:hover:not(:disabled) {
     background: var(--color-bg-tertiary);
-    border-color: var(--color-border-default);
+    border-color: var(--color-border-strong);
   }
 
   .btn-secondary:active:not(:disabled) {
-    transform: scale(0.98);
+    transform: translateY(1px);
   }
 
+  .btn-secondary:disabled {
+    color: var(--color-text-disabled);
+    border-color: var(--color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* Tertiary / inline action */
   .btn-ghost {
-    @apply inline-flex min-h-11 items-center px-4 text-sm text-ink-muted;
-    border-radius: var(--radius-full);
-    transition:
-      color 0.2s var(--ease-spring),
-      background-color 0.2s var(--ease-spring);
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-xs);
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-none);
+    transition: color var(--duration-small) var(--ease-out);
   }
 
   .btn-ghost:hover {
     color: var(--color-text-primary);
-    background: color-mix(in srgb, var(--color-ink) 5%, transparent);
   }
 
-  .btn-ghost:active {
-    transform: scale(0.98);
+  /* Destructive — resolved through copy, never colour (§9.1) */
+  .btn-danger {
+    @apply btn-secondary;
+    color: var(--color-text-secondary);
+    border-color: var(--color-border-subtle);
   }
 
-  /** Clickable cards and list rows — border, surface, subtle lift on hover. */
-  .interactive-card {
-    transition:
-      border-color 0.2s var(--ease-spring),
-      background-color 0.2s var(--ease-spring),
-      box-shadow 0.2s var(--ease-spring),
-      transform 0.2s var(--ease-spring);
-  }
-
-  .interactive-card:hover {
-    border-color: var(--color-border-default);
-    background: var(--color-bg-primary);
-    box-shadow: 0 2px 10px color-mix(in srgb, var(--color-ink) 5%, transparent);
-  }
-
-  .interactive-card:active {
-    transform: scale(0.995);
-  }
-
-  /** Pill / chip buttons (landing suggestions, filters). */
-  .interactive-chip {
-    transition:
-      background-color 0.15s var(--ease-spring),
-      color 0.15s var(--ease-spring),
-      border-color 0.15s var(--ease-spring),
-      transform 0.15s var(--ease-spring);
-  }
-
-  .interactive-chip:hover {
-    background: color-mix(in srgb, var(--color-ink) 7%, transparent) !important;
+  .btn-danger:hover:not(:disabled) {
     color: var(--color-text-primary);
+    border-color: var(--color-border-strong);
+    background: transparent;
   }
 
-  .interactive-chip:active {
-    transform: scale(0.97);
+  /* ── Form inputs · §9.2 ────────────────────────────────────────────────── */
+
+  .input-field {
+    width: 100%;
+    padding: var(--space-3) 0;
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-lg);
+    font-weight: var(--weight-regular);
+    color: var(--color-text-primary);
+    background: transparent;
+    border: none;
+    border-bottom: var(--border-subtle);
+    border-radius: var(--radius-none);
+    outline: none;
+    transition: border-color var(--duration-small) var(--ease-out);
   }
 
-  .focus-ring:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
+  .input-field::placeholder {
+    color: var(--color-text-tertiary);
+    font-style: italic;
   }
+
+  .input-field:hover:not(:focus) {
+    border-bottom-color: var(--color-border-default);
+  }
+
+  .input-field:focus {
+    border-bottom: var(--border-strong);
+  }
+
+  .input-field:disabled {
+    color: var(--color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* Error text — Silver, never red (§9.2) */
+  .input-error {
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-2xs);
+    color: var(--color-error-text);
+    margin-top: var(--space-2);
+  }
+
+  /* ── Cards · §9.3 ──────────────────────────────────────────────────────── */
 
   .surface-card {
     background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-md);
+    border: var(--border-subtle);
+    border-radius: var(--radius-none);
     transition:
-      border-color 0.2s var(--ease-spring),
-      background-color 0.2s var(--ease-spring);
+      background-color var(--duration-medium) var(--ease-out),
+      border-color var(--duration-medium) var(--ease-out);
   }
 
   .surface-card-interactive {
@@ -269,78 +469,250 @@ body {
   }
 
   .surface-card-interactive:hover {
-    border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border-subtle));
-    background: var(--color-bg-primary);
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-border-strong);
   }
 
-  /** Text links — muted by default, underline + ink on hover. */
+  /* Clickable rows and cards — no shadow, no lift (§16.3) */
+  .interactive-card {
+    border-radius: var(--radius-none);
+    transition:
+      background-color var(--duration-medium) var(--ease-out),
+      border-color var(--duration-medium) var(--ease-out);
+  }
+
+  .interactive-card:hover {
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-border-strong);
+  }
+
+  /* Dark feature card (§9.3) */
+  .surface-card-dark {
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
+    border: none;
+    border-radius: var(--radius-none);
+    transition: background-color var(--duration-medium) var(--ease-out);
+  }
+
+  .surface-card-dark:hover {
+    background: var(--color-bg-inverse-2);
+  }
+
+  /* ── Chips · derived from Badge §9.4 ───────────────────────────────────── */
+
+  .interactive-chip {
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-3xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    border-radius: var(--radius-none);
+    transition:
+      background-color var(--duration-micro) var(--ease-out),
+      color var(--duration-micro) var(--ease-out),
+      border-color var(--duration-micro) var(--ease-out);
+  }
+
+  .interactive-chip:hover {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+  }
+
+  /* ── Focus · §9.1 — Silver ring. The accent is not spent on focus. ─────── */
+
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--color-border-default);
+    outline-offset: 2px;
+  }
+
+  /* ── Links · §9.1 ──────────────────────────────────────────────────────── */
+
   .link-subtle {
-    @apply text-sm text-ink-muted underline-offset-2 transition-colors duration-200;
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-xs);
+    color: var(--color-text-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color var(--duration-small) var(--ease-out);
   }
 
   .link-subtle:hover {
-    color: var(--color-text-primary);
-    text-decoration: underline;
+    color: var(--color-text-secondary);
   }
 
-  /** Single-choice cards (clarify, depth, lesson feel). */
+  /* ── Single-choice / quiz option · §9.6 ────────────────────────────────── */
+
   .option-card {
-    @apply w-full rounded-xl border px-4 py-4 text-left min-h-[52px];
-    border-color: var(--color-border-subtle);
-    background: var(--color-bg-secondary);
+    display: block;
+    width: 100%;
+    min-height: 52px;
+    padding: var(--space-4) var(--space-5);
+    text-align: left;
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-md);
+    font-weight: var(--weight-light);
+    color: var(--color-text-primary);
+    background: var(--color-bg-primary);
+    border: var(--border-subtle);
+    border-radius: var(--radius-none);
     transition:
-      border-color 0.2s var(--ease-spring),
-      background-color 0.2s var(--ease-spring),
-      transform 0.2s var(--ease-spring),
-      color 0.2s var(--ease-spring);
+      background-color var(--duration-small) var(--ease-out),
+      border-color var(--duration-small) var(--ease-out);
   }
 
   .option-card:hover:not(:disabled) {
-    border-color: color-mix(in srgb, var(--color-accent) 30%, var(--color-border-subtle));
-    background: var(--color-bg-primary);
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-border-strong);
   }
 
-  .option-card:active:not(:disabled) {
-    transform: scale(0.99);
-  }
-
+  /* Selected / correct = Ink fill. Never green (§9.6) */
   .option-card-selected {
-    border-color: var(--color-border-strong) !important;
     background: var(--color-bg-inverse) !important;
-    color: var(--color-text-inverse);
-    box-shadow: inset 0 -2px 0 var(--color-accent);
+    border-color: var(--color-bg-inverse) !important;
+    color: var(--color-text-inverse) !important;
   }
+
+  /* Incorrect = dimmed, never red (§9.6) */
+  .option-card-dimmed {
+    background: var(--color-bg-secondary) !important;
+    border-color: var(--color-border-subtle) !important;
+    color: var(--color-text-tertiary) !important;
+  }
+
+  /* Mono option letter; Vermilion only in the correct state */
+  .option-letter {
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-sm);
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .option-card-selected .option-letter {
+    color: var(--color-accent);
+  }
+
+  /* ── Badges · §9.4 ─────────────────────────────────────────────────────── */
+
+  .badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-4xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    background: var(--color-bg-secondary);
+    border: var(--border-subtle);
+    border-radius: var(--radius-none);
+  }
+
+  .badge-mono {
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-xs);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  /* ── Lesson reader · §11.1 ─────────────────────────────────────────────── */
+
+  /* Pull quote — the accent rule (§11.1) */
+  .pull-quote {
+    font-family: var(--font-display-stack);
+    font-size: var(--text-display-2xs);
+    font-weight: var(--weight-light);
+    font-style: italic;
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-primary);
+    padding-left: var(--space-6);
+    border-left: var(--border-accent);
+  }
+
+  /* Takeaway number — Vermilion (§11.1) */
+  .takeaway-number {
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-xs);
+    color: var(--color-accent);
+    flex-shrink: 0;
+    padding-top: var(--space-1);
+  }
+
+  /* ── Streak · §11.3 — display element, never a badge, never Vermilion ──── */
+
+  .streak-number {
+    font-family: var(--font-display-stack);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-none);
+    letter-spacing: var(--tracking-tighter);
+    color: var(--color-text-primary);
+    font-variation-settings:
+      "SOFT" 80,
+      "WONK" 1;
+  }
+
+  .streak-label {
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-sm);
+    font-style: italic;
+    font-weight: var(--weight-light);
+    color: var(--color-text-tertiary);
+  }
+
+  /* ── Layout · §8.9, §10.1 ──────────────────────────────────────────────── */
 
   .app-shell {
-    @apply mx-auto min-h-screen min-w-0 w-full max-w-lg overflow-x-hidden px-5;
+    @apply mx-auto min-h-screen w-full min-w-0 max-w-lg overflow-x-hidden;
+    padding-left: var(--grid-margin-mobile);
+    padding-right: var(--grid-margin-mobile);
     background: var(--color-bg-primary);
   }
 
-  /* Desktop / web prototype content pane */
   @media (min-width: 768px) {
     .app-shell {
-      @apply max-w-3xl px-8 py-6;
+      @apply max-w-3xl py-6;
+      padding-left: var(--grid-margin-tablet);
+      padding-right: var(--grid-margin-tablet);
     }
   }
 
   @media (min-width: 1024px) {
     .app-shell {
-      @apply max-w-4xl px-12;
+      @apply max-w-4xl;
+      padding-left: var(--grid-margin-desktop);
+      padding-right: var(--grid-margin-desktop);
     }
   }
 
-  @media (min-width: 1280px) {
-    .app-shell {
-      @apply px-14;
-    }
+  /* Lesson reading column (§11.1) */
+  .reader-column {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+  }
+
+  /* Modals, auth screens, forms (§8.9) */
+  .narrow-column {
+    max-width: var(--narrow-max-width);
+    margin: 0 auto;
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Motion — docs/BRAND.md §7
+   Gravity: things settle, never fly in. Patience: 300ms+ for meaning.
+   Restraint: one motion at a time. No spring, no bounce, no elastic (§7.1).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 .loader-ring {
   border-style: solid;
-  border-color: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  border-top-color: var(--color-accent);
-  animation: loader-spin 0.65s linear infinite;
+  border-color: var(--color-border-subtle);
+  border-top-color: var(--color-text-primary);
+  animation: loader-spin 0.8s linear infinite;
 }
 
 @keyframes loader-spin {
@@ -349,15 +721,20 @@ body {
   }
 }
 
+/* Content reveal — fade up, 900ms (§7.4) */
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.animate-fade-in {
+  animation: fade-in var(--duration-large) var(--ease-out) both;
 }
 
 @keyframes slide-up {
@@ -369,28 +746,51 @@ body {
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.4s var(--ease-spring) both;
-}
-
 .animate-slide-up {
-  animation: slide-up 0.35s var(--ease-spring) both;
+  animation: slide-up var(--duration-medium) var(--ease-out) both;
 }
 
+/* Wordmark underline draw-in (§7.4) */
+@keyframes underline-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.animate-underline-draw {
+  transform-origin: left;
+  animation: underline-draw var(--duration-xl) var(--ease-out) 700ms both;
+}
+
+/* Vermilion reveal line on hover (§7.4) */
+.reveal-line {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-medium) var(--ease-out);
+  background: var(--color-accent);
+  height: 2px;
+}
+
+.group:hover .reveal-line {
+  transform: scaleX(1);
+}
+
+/* Landing accent dot — opacity only, no glow ring (§16.2 no type/shape effects) */
 @keyframes landing-pulse-dot {
   0%,
   100% {
     opacity: 1;
-    box-shadow: 0 0 0 0 hsl(354 89% 44% / 0.4);
   }
   50% {
-    opacity: 0.55;
-    box-shadow: 0 0 0 4px hsl(354 89% 44% / 0);
+    opacity: 0.4;
   }
 }
 
 .landing-pulse-dot {
-  animation: landing-pulse-dot 2.4s ease-in-out infinite;
+  animation: landing-pulse-dot 2.4s var(--ease-standard) infinite;
 }
 
 /* ─── Generation warmup ─────────────────────────────────────────────────── */
@@ -398,45 +798,25 @@ body {
 @keyframes gen-pulse {
   0%,
   100% {
-    transform: scale(1);
     opacity: 1;
   }
   50% {
-    transform: scale(1.1);
-    opacity: 0.6;
+    opacity: 0.45;
   }
 }
 
 .generating-pulse {
-  animation: gen-pulse 1.8s ease-in-out infinite;
-}
-
-@keyframes gen-sparkle {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  25% {
-    transform: rotate(8deg) scale(1.08);
-  }
-  50% {
-    transform: rotate(0deg) scale(1);
-  }
-  75% {
-    transform: rotate(-8deg) scale(1.08);
-  }
-  100% {
-    transform: rotate(0deg) scale(1);
-  }
+  animation: gen-pulse 2s var(--ease-standard) infinite;
 }
 
 .generating-sparkle {
-  animation: gen-sparkle 2.4s ease-in-out infinite;
+  animation: gen-pulse 2.4s var(--ease-standard) infinite;
 }
 
 @keyframes gen-msg-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -445,44 +825,43 @@ body {
 }
 
 .generating-msg {
-  animation: gen-msg-in 0.35s var(--ease-spring) both;
+  animation: gen-msg-in var(--duration-medium) var(--ease-out) both;
 }
 
 @keyframes gen-bar-breathe {
   0% {
-    transform: translateX(-100%) scaleX(0.4);
-  }
-  50% {
-    transform: translateX(60%) scaleX(1.2);
+    transform: translateX(-100%);
   }
   100% {
-    transform: translateX(200%) scaleX(0.4);
+    transform: translateX(200%);
   }
 }
 
 .generating-bar-breathe {
   width: 50%;
-  animation: gen-bar-breathe 1.6s ease-in-out infinite;
+  animation: gen-bar-breathe 1.8s var(--ease-standard) infinite;
   transform-origin: left;
 }
+
+/* ─── Lesson ────────────────────────────────────────────────────────────── */
 
 @keyframes lesson-pop {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.99);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
 .lesson-reveal {
-  animation: lesson-pop 0.32s var(--ease-spring) both;
+  animation: lesson-pop var(--duration-medium) var(--ease-out) both;
 }
 
 .lesson-blurb {
-  animation: lesson-pop 0.36s var(--ease-spring) 0.08s both;
+  animation: lesson-pop var(--duration-medium) var(--ease-out) 130ms both;
 }
 
 .lesson-row-live {
@@ -493,28 +872,37 @@ body {
   content: "";
   position: absolute;
   left: 0;
-  top: 8px;
-  bottom: 8px;
+  top: var(--space-2);
+  bottom: var(--space-2);
   width: 2px;
-  border-radius: 99px;
-  background: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+  background: var(--color-border-strong);
 }
 
-@keyframes streak-pop {
-  0% {
+/* Streak toast — settles, does not overshoot (§7.1 gravity) */
+@keyframes streak-settle {
+  from {
     opacity: 0;
-    transform: translateY(12px) scale(0.92);
+    transform: translateY(12px);
   }
-  60% {
+  to {
     opacity: 1;
-    transform: translateY(-4px) scale(1.02);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
 .streak-toast {
-  animation: streak-pop 0.45s var(--ease-spring) both;
+  animation: streak-settle var(--duration-medium) var(--ease-out) both;
+}
+
+/* ─── Reduced motion · §7.5 ─────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -10,9 +10,9 @@ export function StreakMoment({ streak }: Props) {
   if (streak <= 0) return null;
 
   return (
-    <div className="streak-toast fixed bottom-6 left-1/2 z-[55] -translate-x-1/2 rounded-2xl border border-border bg-paper px-5 py-4 shadow-lg">
+    <div className="streak-toast fixed bottom-6 left-1/2 z-[55] -translate-x-1/2 rounded-none border border-border bg-paper px-5 py-4">
       <div className="flex items-center gap-3">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent text-paper">
+        <div className="grid h-9 w-9 shrink-0 place-items-center text-ink">
           <Flame size={16} aria-hidden />
         </div>
         <div>

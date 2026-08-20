@@ -6,12 +6,7 @@ import { linkedinShareUrl } from "@/lib/share/lesson-share";
 describe("CompleteSheet", () => {
   it("shows path mastered CTAs when pathMastered", () => {
     render(
-      <CompleteSheet
-        open
-        allPathsDoneToday
-        pathMastered
-        onClose={vi.fn()}
-      />,
+      <CompleteSheet open allPathsDoneToday pathMastered onClose={vi.fn()} />,
     );
     expect(screen.getByText("Path mastered")).toBeInTheDocument();
     expect(
@@ -23,9 +18,7 @@ describe("CompleteSheet", () => {
   });
 
   it("shows back to Today when more paths remain", () => {
-    render(
-      <CompleteSheet open allPathsDoneToday={false} onClose={vi.fn()} />,
-    );
+    render(<CompleteSheet open allPathsDoneToday={false} onClose={vi.fn()} />);
     expect(screen.getByText("Lesson complete.")).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Back to Today" }),
@@ -33,9 +26,7 @@ describe("CompleteSheet", () => {
   });
 
   it("shows Done when all paths done today", () => {
-    render(
-      <CompleteSheet open allPathsDoneToday onClose={vi.fn()} />,
-    );
+    render(<CompleteSheet open allPathsDoneToday onClose={vi.fn()} />);
     expect(screen.getByText("All caught up")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Done" })).toHaveAttribute(
       "href",
@@ -87,7 +78,9 @@ describe("CompleteSheet", () => {
       />,
     );
     expect(screen.queryByText("Today's insight")).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Share on X" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Share on X" }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows the insight section only when the lesson API shareable fact is provided", () => {
@@ -108,7 +101,9 @@ describe("CompleteSheet", () => {
       screen.getByText(/Generated fact from this lesson/),
     ).toBeInTheDocument();
     expect(screen.getByText("Generated reflection")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Share on X" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Share on X" }),
+    ).toBeInTheDocument();
   });
 
   describe("Share on LinkedIn", () => {
@@ -133,9 +128,7 @@ describe("CompleteSheet", () => {
           }}
         />,
       );
-      fireEvent.click(
-        screen.getByRole("link", { name: /share on linkedin/i }),
-      );
+      fireEvent.click(screen.getByRole("link", { name: /share on linkedin/i }));
 
       expect(writeText).toHaveBeenCalled();
       await waitFor(() =>

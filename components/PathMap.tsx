@@ -57,7 +57,7 @@ export function PathMap({ courseId, nodes, readOnly }: Props) {
                             />
                           </div>
                         ) : isToday ? (
-                          <div className="h-3.5 w-3.5 rounded-full border-2 border-paper/80 bg-paper/90 ring-2 ring-accent/40" />
+                          <div className="h-3.5 w-3.5 rounded-full border-2 border-paper/80 bg-paper/90 ring-2 ring-ink/30" />
                         ) : (
                           <div className="h-3.5 w-3.5 rounded-full border border-border bg-paper-tertiary/40" />
                         )}
@@ -109,10 +109,10 @@ export function PathMap({ courseId, nodes, readOnly }: Props) {
                       <li key={node.index}>
                         <Link
                           href={`/courses/${courseId}/lessons/${node.index}?from=library`}
-                          className={`group focus-ring relative block w-full rounded-xl px-4 py-3 text-left transition-all duration-150 ${
+                          className={`group focus-ring relative block w-full rounded-none px-4 py-3 text-left transition-all duration-150 ${
                             isToday
                               ? "bg-ink text-paper hover:bg-ink/95"
-                              : "hover:bg-paper-secondary hover:shadow-sm"
+                              : "hover:bg-paper-secondary hover:"
                           }`}
                         >
                           {inner}
@@ -124,7 +124,7 @@ export function PathMap({ courseId, nodes, readOnly }: Props) {
                   return (
                     <li
                       key={node.index}
-                      className={`relative rounded-xl px-4 py-3 ${
+                      className={`relative rounded-none px-4 py-3 ${
                         isLocked ? "cursor-default" : ""
                       }`}
                     >

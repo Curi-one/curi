@@ -63,7 +63,7 @@ export function ShareableFact({ topic, title, fact }: Props) {
               href={twitterIntentUrl(shareText)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-ink px-5 py-3 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
+              className="inline-flex min-h-11 items-center justify-center rounded-none bg-ink px-5 py-3 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
             >
               Share on X
             </a>
@@ -71,7 +71,7 @@ export function ShareableFact({ topic, title, fact }: Props) {
               href={linkedinShareUrl()}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-5 py-3 text-sm font-medium text-ink/80 transition-colors hover:border-accent/40 hover:text-accent"
+              className="inline-flex min-h-11 items-center justify-center rounded-none border border-border px-5 py-3 text-sm font-medium text-ink/80 transition-colors hover:border-ink hover:text-ink"
               onClick={(e) => {
                 e.preventDefault();
                 shareToLinkedIn();
@@ -82,7 +82,7 @@ export function ShareableFact({ topic, title, fact }: Props) {
             <button
               type="button"
               onClick={copyShareText}
-              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-5 py-3 text-sm font-medium text-ink/80 transition-colors hover:border-accent/40 hover:text-accent"
+              className="inline-flex min-h-11 items-center justify-center rounded-none border border-border px-5 py-3 text-sm font-medium text-ink/80 transition-colors hover:border-ink hover:text-ink"
             >
               {copied ? "Copied" : "Copy text"}
             </button>

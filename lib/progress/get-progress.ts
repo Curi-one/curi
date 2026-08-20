@@ -33,7 +33,9 @@ async function loadActivityDates(
   if (error) {
     throw new Error(`lesson_activity progress load failed: ${error.message}`);
   }
-  return [...new Set((data ?? []).map((row) => String(row.activity_date)))].sort();
+  return [
+    ...new Set((data ?? []).map((row) => String(row.activity_date))),
+  ].sort();
 }
 
 async function countCoursesByStatus(

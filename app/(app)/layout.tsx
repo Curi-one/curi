@@ -10,9 +10,7 @@ import { getMe, type UserSession } from "@/lib/api/client";
 /** Bottom tabs only on primary member destinations (mobile). */
 function showMemberTabBar(pathname: string): boolean {
   return (
-    pathname === "/today" ||
-    pathname === "/library" ||
-    pathname === "/explore"
+    pathname === "/today" || pathname === "/library" || pathname === "/explore"
   );
 }
 

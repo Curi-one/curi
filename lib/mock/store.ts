@@ -61,8 +61,7 @@ type SessionData = {
 };
 
 type StoreResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; code: string; message: string };
+  { ok: true; data: T } | { ok: false; code: string; message: string };
 
 export type CourseCreateResult =
   | { ok: true; data: CourseCreateResponse }
@@ -360,11 +359,7 @@ class MockStore {
     };
   }
 
-  getQuiz(
-    sessionId: string,
-    courseId: string,
-    index: number,
-  ): QuizResponse {
+  getQuiz(sessionId: string, courseId: string, index: number): QuizResponse {
     const data = this.getOrCreateSession(sessionId);
     const path = this.resolvePaths(data).find((p) => p.id === courseId);
     if (!path) {
@@ -468,12 +463,8 @@ class MockStore {
     const data = this.getOrCreateSession(sessionId);
     const paths = this.resolvePaths(data);
     return {
-      exploring: paths
-        .filter((p) => p.status === "active")
-        .map(pathToSummary),
-      mastered: paths
-        .filter((p) => p.status === "mastered")
-        .map(pathToSummary),
+      exploring: paths.filter((p) => p.status === "active").map(pathToSummary),
+      mastered: paths.filter((p) => p.status === "mastered").map(pathToSummary),
       shelved: paths.filter((p) => p.status === "shelved").map(pathToSummary),
     };
   }
@@ -486,7 +477,11 @@ class MockStore {
     topic: string;
     depth: MockPath["depth"];
     status: "active" | "completed" | "shelved";
-    nodes: { index: number; title: string; status: "read" | "today" | "locked" }[];
+    nodes: {
+      index: number;
+      title: string;
+      status: "read" | "today" | "locked";
+    }[];
   }> {
     const data = this.getOrCreateSession(sessionId);
     const path = this.resolvePaths(data).find((p) => p.id === courseId);
@@ -611,8 +606,9 @@ class MockStore {
       streak: computeStreak(dates),
       heatmap,
       activePaths: activePaths(this.resolvePaths(data)).length,
-      masteredPaths: this.resolvePaths(data).filter((p) => p.status === "mastered")
-        .length,
+      masteredPaths: this.resolvePaths(data).filter(
+        (p) => p.status === "mastered",
+      ).length,
     };
   }
 
@@ -651,8 +647,6 @@ export function getSessionIdFromCookieHeader(
   if (!cookieHeader) {
     return `guest-${Date.now()}`;
   }
-  const match = cookieHeader.match(
-    new RegExp(`${SESSION_COOKIE}=([^;]+)`),
-  );
+  const match = cookieHeader.match(new RegExp(`${SESSION_COOKIE}=([^;]+)`));
   return match?.[1] ?? `guest-${Date.now()}`;
 }

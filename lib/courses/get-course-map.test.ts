@@ -14,7 +14,10 @@ function mockAdmin(options: {
       if (table === "courses") {
         return {
           select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockImplementation(function (this: unknown, col: string) {
+            eq: vi.fn().mockImplementation(function (
+              this: unknown,
+              col: string,
+            ) {
               if (col === "id") {
                 return {
                   eq: vi.fn().mockReturnValue({

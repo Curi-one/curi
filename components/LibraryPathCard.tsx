@@ -16,7 +16,7 @@ export function LibraryPathCard({ path, tab }: Props) {
     return (
       <Link
         href={`/library/${path.id}`}
-        className="group focus-ring relative flex min-h-[200px] flex-col justify-between overflow-hidden rounded-2xl p-5 text-left text-paper transition hover:-translate-y-0.5 hover:brightness-[1.03] sm:min-h-[220px] sm:p-6"
+        className="group focus-ring relative flex min-h-[200px] flex-col justify-between overflow-hidden rounded-none p-5 text-left text-paper transition hover:brightness-125 sm:min-h-[220px] sm:p-6"
         style={{ background: bg }}
       >
         <div
@@ -57,7 +57,8 @@ export function LibraryPathCard({ path, tab }: Props) {
         )}
       </div>
       <p className="mt-2 font-meta">
-        {depthLabel(path.depth)} · {path.progress} of {path.totalLessons} lessons
+        {depthLabel(path.depth)} · {path.progress} of {path.totalLessons}{" "}
+        lessons
       </p>
       <PathProgressBar progress={path.progress} total={path.totalLessons} />
     </Link>

@@ -23,7 +23,7 @@ export function StepProgress({ step, totalSteps, label }: Props) {
                 key={i}
                 role="listitem"
                 aria-current={current ? "step" : undefined}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
+                className={`h-1.5 rounded-none transition-all duration-300 ${
                   current
                     ? "w-8 bg-ink"
                     : filled
@@ -35,9 +35,7 @@ export function StepProgress({ step, totalSteps, label }: Props) {
           })}
         </div>
         <span className="font-meta shrink-0 tabular-nums">
-          {label
-            ? `${label} · ${step}/${totalSteps}`
-            : `${step}/${totalSteps}`}
+          {label ? `${label} · ${step}/${totalSteps}` : `${step}/${totalSteps}`}
         </span>
       </div>
     </div>

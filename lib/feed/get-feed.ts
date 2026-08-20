@@ -150,8 +150,7 @@ export async function getFeed(deps?: GetFeedDeps): Promise<GetFeedResult> {
   const now = deps?.now?.() ?? new Date();
 
   const loadTimezone =
-    deps?.loadTimezone ??
-    ((id: string) => defaultLoadTimezone(id, admin));
+    deps?.loadTimezone ?? ((id: string) => defaultLoadTimezone(id, admin));
 
   const timezone = await loadTimezone(userId);
   const today = todayInTimezone(timezone, now);

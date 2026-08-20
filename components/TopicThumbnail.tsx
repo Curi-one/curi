@@ -11,7 +11,7 @@ export function TopicThumbnail({ topic, size = 64 }: Props) {
 
   return (
     <div
-      className="relative shrink-0 overflow-hidden rounded-xl"
+      className="relative shrink-0 overflow-hidden rounded-none"
       style={{ width: size, height: size, background: bg }}
       aria-hidden
     >
@@ -19,7 +19,7 @@ export function TopicThumbnail({ topic, size = 64 }: Props) {
         className="absolute inset-0 flex select-none items-center justify-center"
         style={{
           color: fg,
-          opacity: 0.28,
+          opacity: 0.42,
           fontSize: size * 0.62,
           fontWeight: 700,
           letterSpacing: "-0.04em",

@@ -31,9 +31,9 @@ function LibraryContent() {
   }, []);
 
   useEffect(() => {
-    getLibrary().then(setLib).catch(() =>
-      setLib({ exploring: [], mastered: [], shelved: [] }),
-    );
+    getLibrary()
+      .then(setLib)
+      .catch(() => setLib({ exploring: [], mastered: [], shelved: [] }));
   }, []);
 
   const paths = lib?.[tab] ?? [];
@@ -82,7 +82,9 @@ function LibraryContent() {
         />
       </div>
       <div className="mt-6">
-        {!lib && <LoadingState label="Loading library…" minHeight="min-h-[24vh]" />}
+        {!lib && (
+          <LoadingState label="Loading library…" minHeight="min-h-[24vh]" />
+        )}
         {lib && paths.length === 0 && (
           <EmptyState
             message={
@@ -124,7 +126,11 @@ function LibraryContent() {
 export default function LibraryPage() {
   return (
     <PageShell title="Library" withTabPad={false} className="pt-4">
-      <Suspense fallback={<LoadingState label="Loading library…" minHeight="min-h-[24vh]" />}>
+      <Suspense
+        fallback={
+          <LoadingState label="Loading library…" minHeight="min-h-[24vh]" />
+        }
+      >
         <LibraryContent />
       </Suspense>
     </PageShell>

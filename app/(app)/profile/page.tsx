@@ -114,9 +114,7 @@ export default function ProfilePage() {
   const [prefs, setPrefs] = useState<ProfilePreferences>(DEFAULT_PREFERENCES);
   const [prefsSaved, setPrefsSaved] = useState(false);
   const prefsSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const prefsFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const prefsFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("curi-theme") as Theme | null;
@@ -261,7 +259,7 @@ export default function ProfilePage() {
 
       <header className="mb-7 flex items-center gap-4">
         <div
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-border bg-paper-secondary text-base font-medium text-ink"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none border border-border bg-paper-secondary text-base font-medium text-ink"
           aria-hidden
         >
           {initial}
@@ -276,7 +274,7 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      <div className="flex overflow-x-auto rounded-full border border-border p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex overflow-x-auto rounded-none border border-border p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {(
           [
             ["account", "Account"],
@@ -289,10 +287,8 @@ export default function ProfilePage() {
             key={id}
             type="button"
             onClick={() => setTab(id)}
-            className={`min-h-11 shrink-0 rounded-full px-3 text-center text-xs transition-colors sm:text-sm ${
-              tab === id
-                ? "bg-ink text-paper"
-                : "text-ink-muted hover:text-ink"
+            className={`min-h-11 shrink-0 rounded-none px-3 text-center text-xs transition-colors sm:text-sm ${
+              tab === id ? "bg-ink text-paper" : "text-ink-muted hover:text-ink"
             }`}
           >
             {label}
@@ -347,7 +343,7 @@ export default function ProfilePage() {
                   key={t}
                   type="button"
                   onClick={() => onThemeChange(t)}
-                  className={`rounded-full px-4 py-2 text-sm capitalize ${
+                  className={`rounded-none px-4 py-2 text-sm capitalize ${
                     theme === t
                       ? "bg-ink text-paper"
                       : "border border-border text-ink"
@@ -365,7 +361,9 @@ export default function ProfilePage() {
         <section className="surface-card mt-5 p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h2 className="text-base font-medium text-ink">How you explore</h2>
+              <h2 className="text-base font-medium text-ink">
+                How you explore
+              </h2>
               <p className="mt-1 text-sm text-ink-muted">
                 Tell Curi how you think and it shapes every lesson around you.
               </p>
@@ -503,7 +501,7 @@ export default function ProfilePage() {
                 {isAcademy ? "Curi Academy · renews monthly" : "Free plan"}
               </p>
             </div>
-            <span className="shrink-0 rounded-full border border-border px-3 py-1 text-xs text-ink">
+            <span className="shrink-0 rounded-none border border-border px-3 py-1 text-xs text-ink">
               {isAcademy ? "Academy" : "Free"}
             </span>
           </div>
@@ -524,7 +522,7 @@ export default function ProfilePage() {
                 return (
                   <li key={row} className="flex items-center gap-2.5 text-sm">
                     <span
-                      className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-ink/10"
+                      className="flex h-4 w-4 shrink-0 items-center justify-center rounded-none bg-ink/10"
                       aria-hidden
                     >
                       <Check className="h-2.5 w-2.5 stroke-[2.5] text-ink/70" />
@@ -534,9 +532,12 @@ export default function ProfilePage() {
                 );
               }
               return (
-                <li key={row.label} className="flex items-center gap-2.5 text-sm">
+                <li
+                  key={row.label}
+                  className="flex items-center gap-2.5 text-sm"
+                >
                   <span
-                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-none ${
                       row.on ? "bg-ink/10" : "bg-paper-secondary"
                     }`}
                     aria-hidden
@@ -562,7 +563,10 @@ export default function ProfilePage() {
 
           <div className="mt-6 border-t border-border pt-5">
             {!isAcademy ? (
-              <Link href="/upgrade" className="btn-primary inline-flex w-full justify-center sm:w-auto">
+              <Link
+                href="/upgrade"
+                className="btn-primary inline-flex w-full justify-center sm:w-auto"
+              >
                 Upgrade to Academy
               </Link>
             ) : (

@@ -199,7 +199,13 @@ describe("TodayView", () => {
 
   it("shows welcome headline and full-width action rows when empty", () => {
     render(
-      <TodayView due={[]} done={[]} groups={[]} streak={0} streakAtRisk={false} />,
+      <TodayView
+        due={[]}
+        done={[]}
+        groups={[]}
+        streak={0}
+        streakAtRisk={false}
+      />,
     );
 
     expect(screen.getByText("Your daily founder fluency")).toBeInTheDocument();

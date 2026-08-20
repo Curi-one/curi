@@ -2,10 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { LessonFeel, Plan, UserSession } from "@/lib/api/schemas";
 import { LessonFeelSchema } from "@/lib/api/schemas";
 import { buildFingerprint } from "@/lib/cache/fingerprint";
-import {
-  clarificationsToMap,
-  normalizeTopic,
-} from "@/lib/courses/outline";
+import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
 import { getEnv } from "@/lib/env";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -138,7 +135,12 @@ function authEmailRedirectTo(returnTo?: string): string {
     base = "http://localhost:3000/auth/callback";
   }
   const safe = returnTo?.trim();
-  if (safe && safe.startsWith("/") && !safe.startsWith("//") && safe !== "/today") {
+  if (
+    safe &&
+    safe.startsWith("/") &&
+    !safe.startsWith("//") &&
+    safe !== "/today"
+  ) {
     const url = new URL(base);
     url.searchParams.set("next", safe);
     return url.toString();
@@ -154,7 +156,10 @@ export type RequestOtpResult = {
 export const OTP_RATE_LIMIT_NOTICE =
   "Supabase did not send a new email (hourly limit on the free mailer). Use a code from an earlier email, or wait about an hour and try again.";
 
-function isRateLimitedAuthError(error: { message?: string; status?: number }): boolean {
+function isRateLimitedAuthError(error: {
+  message?: string;
+  status?: number;
+}): boolean {
   if (error.status === 429) {
     return true;
   }
@@ -276,10 +281,7 @@ export function classifyAuthError(message: string): {
   ) {
     return { status: 429, code: "rate_limited" };
   }
-  if (
-    /otp|token|invalid|expired/.test(lower) ||
-    lower.includes("verify")
-  ) {
+  if (/otp|token|invalid|expired/.test(lower) || lower.includes("verify")) {
     return { status: 401, code: "invalid_code" };
   }
   return { status: 500, code: "auth_error" };
@@ -326,11 +328,7 @@ export async function migratePending(
 
   for (const row of pending) {
     const depth = row.depth;
-    if (
-      depth !== "essentials" &&
-      depth !== "fluent" &&
-      depth !== "thorough"
-    ) {
+    if (depth !== "essentials" && depth !== "fluent" && depth !== "thorough") {
       continue;
     }
 
@@ -429,10 +427,7 @@ export async function updateUserName(
   deps?: OtpDeps,
 ): Promise<void> {
   const admin = deps?.createAdminClient?.() ?? createAdminClient();
-  const { error } = await admin
-    .from("users")
-    .update({ name })
-    .eq("id", userId);
+  const { error } = await admin.from("users").update({ name }).eq("id", userId);
   if (error) {
     throw new Error(`users name update failed: ${error.message}`);
   }

@@ -7,7 +7,11 @@ describe("BrowseFilterChips", () => {
 
   it("renders an All chip plus one per category, marking the active one", () => {
     render(
-      <BrowseFilterChips categories={categories} active={null} onChange={vi.fn()} />,
+      <BrowseFilterChips
+        categories={categories}
+        active={null}
+        onChange={vi.fn()}
+      />,
     );
 
     expect(screen.getByRole("button", { name: "All" })).toHaveAttribute(

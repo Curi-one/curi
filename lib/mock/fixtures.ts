@@ -323,8 +323,7 @@ function defaultLessonContent(
     ],
     shareableFact: {
       fact: `The expensive mistakes in ${pathTopic} usually come from misunderstood incentives, not missing definitions.`,
-      reflection:
-        "A good lesson should make the next decision less reactive.",
+      reflection: "A good lesson should make the next decision less reactive.",
     },
     visuals: [
       {
@@ -343,7 +342,12 @@ function defaultLessonContent(
       {
         id: `mock-${lessonIndex}-q1`,
         prompt: `What is the main topic of lesson ${lessonIndex + 1}?`,
-        options: [pathTopic, "Unrelated topic", "Random trivia", "None of these"],
+        options: [
+          pathTopic,
+          "Unrelated topic",
+          "Random trivia",
+          "None of these",
+        ],
         correctIndex: 0,
         explanation: `This lesson continues your path on ${pathTopic}.`,
       },
@@ -512,9 +516,7 @@ export function createDefaultMemberPaths(today: string): MockPath[] {
   ];
 }
 
-export function createDefaultMemberActivity(
-  today: string,
-): ActivityRecord[] {
+export function createDefaultMemberActivity(today: string): ActivityRecord[] {
   const historical = seedActivityDates(today).map((date) => ({
     courseId: "mock-path-2",
     lessonIndex: 0,

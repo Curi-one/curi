@@ -23,10 +23,7 @@ import {
   type StoreQuizInput,
 } from "@/lib/cache/content-cache";
 import { stripMarkdownFences } from "@/lib/clarify/generate";
-import {
-  clarificationsToMap,
-  normalizeTopic,
-} from "@/lib/courses/outline";
+import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
 import {
   defaultLoadCourse,
   normalizeSources,
@@ -333,7 +330,9 @@ async function defaultPersistFeel(
       .eq("id", params.courseId)
       .eq("anonymous_id", params.sessionId);
     if (writeError) {
-      throw new Error(`pending_courses feel write failed: ${writeError.message}`);
+      throw new Error(
+        `pending_courses feel write failed: ${writeError.message}`,
+      );
     }
     return { isNew: !already };
   }
@@ -368,7 +367,9 @@ async function defaultPersistFeel(
     .eq("activity_date", today)
     .maybeSingle();
   if (todayError) {
-    throw new Error(`lesson_activity today lookup failed: ${todayError.message}`);
+    throw new Error(
+      `lesson_activity today lookup failed: ${todayError.message}`,
+    );
   }
   if (
     todayRow &&
@@ -519,8 +520,7 @@ export async function getQuiz(
 ): Promise<GetQuizResult> {
   const resolveAdmin = () => deps?.admin ?? createAdminClient();
   const loadCourse =
-    deps?.loadCourse ??
-    ((p) => defaultLoadCourse(p, resolveAdmin()));
+    deps?.loadCourse ?? ((p) => defaultLoadCourse(p, resolveAdmin()));
   const lookup = deps?.lookup ?? lookupQuiz;
   const store = deps?.store ?? storeQuiz;
   const complete = deps?.complete ?? chatCompletion;
@@ -592,9 +592,7 @@ export async function getQuiz(
     throw new QuizGenerationError();
   }
 
-  const sources = normalizeSources(
-    result.sources as PerplexitySource[],
-  );
+  const sources = normalizeSources(result.sources as PerplexitySource[]);
 
   await store({
     cacheKey,
@@ -631,22 +629,18 @@ export async function submitQuiz(
 ): Promise<SubmitQuizResult> {
   const resolveAdmin = () => deps?.admin ?? createAdminClient();
   const loadCourse =
-    deps?.loadCourse ??
-    ((p) => defaultLoadCourse(p, resolveAdmin()));
+    deps?.loadCourse ?? ((p) => defaultLoadCourse(p, resolveAdmin()));
   const lookup = deps?.lookup ?? lookupQuiz;
   const persistFeel =
-    deps?.persistFeel ??
-    ((p) => defaultPersistFeel(p, resolveAdmin()));
+    deps?.persistFeel ?? ((p) => defaultPersistFeel(p, resolveAdmin()));
   const bumpProgress =
-    deps?.bumpProgress ??
-    ((p) => defaultBumpProgress(p, resolveAdmin()));
+    deps?.bumpProgress ?? ((p) => defaultBumpProgress(p, resolveAdmin()));
   const loadActivityDates =
     deps?.loadActivityDates ??
     ((userId) => defaultLoadActivityDates(userId, resolveAdmin()));
   const countPathsStillDue =
     deps?.countPathsStillDue ??
-    ((userId, day) =>
-      defaultCountPathsStillDue(userId, day, resolveAdmin()));
+    ((userId, day) => defaultCountPathsStillDue(userId, day, resolveAdmin()));
 
   const course = await loadCourse({
     courseId: params.courseId,
@@ -723,9 +717,7 @@ export async function submitQuiz(
     response.streak = computeStreak(dates);
     const today =
       deps?.today?.() ??
-      todayInTimezone(
-        await loadUserTimezone(course.userId, resolveAdmin()),
-      );
+      todayInTimezone(await loadUserTimezone(course.userId, resolveAdmin()));
     response.pathsStillDue = await countPathsStillDue(course.userId, today);
   }
 

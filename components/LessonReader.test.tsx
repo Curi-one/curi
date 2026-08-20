@@ -77,7 +77,9 @@ describe("LessonReader", () => {
       />,
     );
 
-    expect(screen.queryByText(/things from this lesson/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/things from this lesson/i),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText("Shareable fact")).not.toBeInTheDocument();
     expect(screen.queryByText("Visual note")).not.toBeInTheDocument();
     expect(screen.queryByText("Working equation")).not.toBeInTheDocument();
@@ -131,12 +133,12 @@ describe("LessonReader", () => {
     const highlightedLink = screen.getByRole("link", {
       name: /a16z — Unit Economics/i,
     });
-    expect(highlightedLink).toHaveClass("border-accent");
+    expect(highlightedLink).toHaveClass("border-ink");
 
     const otherLink = screen.getByRole("link", {
       name: /First Round — Startup Metrics/i,
     });
-    expect(otherLink).not.toHaveClass("border-accent");
+    expect(otherLink).not.toHaveClass("border-ink");
   });
 
   it("shows API-provided takeaways, shareable fact, and visuals when present in the payload", () => {

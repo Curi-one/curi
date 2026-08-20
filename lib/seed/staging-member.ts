@@ -1,8 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import {
-  generateLessonTitles,
-  lessonCountForDepth,
-} from "@/lib/mock/fixtures";
+import { generateLessonTitles, lessonCountForDepth } from "@/lib/mock/fixtures";
 import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -146,8 +143,7 @@ async function insertSeedPath(
         user_id: userId,
         course_id: courseId,
         lesson_index: i,
-        activity_date:
-          isLatest && path.activityToday ? today : "2026-08-01",
+        activity_date: isLatest && path.activityToday ? today : "2026-08-01",
         lesson_feel: "just_right" as const,
       };
     });

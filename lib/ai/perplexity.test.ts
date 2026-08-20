@@ -27,7 +27,8 @@ const SUCCESS_FIXTURE = {
     {
       title: "Term Sheet Basics",
       url: "https://example.com/term-sheets",
-      snippet: "A term sheet outlines valuation, liquidation preference, and control.",
+      snippet:
+        "A term sheet outlines valuation, liquidation preference, and control.",
     },
     {
       url: "https://example.com/no-title",

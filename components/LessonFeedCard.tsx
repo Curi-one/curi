@@ -36,13 +36,16 @@ function actionLabel(status: FeedLessonItem["status"]): string {
   }
 }
 
-export function LessonFeedCard({ item, lockedCopy = "Unlocks tomorrow" }: Props) {
+export function LessonFeedCard({
+  item,
+  lockedCopy = "Unlocks tomorrow",
+}: Props) {
   const dimmed = item.status === "completed";
   const blurb = blurbFor(item, lockedCopy);
 
   if (item.status === "locked") {
     return (
-      <div className="flex w-full gap-3.5 rounded-lg border border-border/50 bg-paper-secondary p-4 opacity-55 sm:gap-4 sm:p-5">
+      <div className="flex w-full gap-3.5 rounded-none border border-border/50 bg-paper-secondary p-4 opacity-55 sm:gap-4 sm:p-5">
         <div className="opacity-40">
           <TopicThumbnail topic={item.topic} />
         </div>
@@ -68,15 +71,13 @@ export function LessonFeedCard({ item, lockedCopy = "Unlocks tomorrow" }: Props)
   return (
     <Link
       href={href}
-      className={`group interactive-card focus-ring relative flex w-full gap-3.5 overflow-hidden rounded-lg border border-border/50 bg-paper-secondary p-4 sm:gap-4 sm:p-5 ${
-        dimmed
-          ? "opacity-55 hover:opacity-70"
-          : "hover:border-accent/25"
+      className={`group interactive-card focus-ring relative flex w-full gap-3.5 overflow-hidden rounded-none border border-border/50 bg-paper-secondary p-4 sm:gap-4 sm:p-5 ${
+        dimmed ? "opacity-55 hover:opacity-70" : "hover:border-ink/30"
       }`}
     >
       {!dimmed && (
         <span
-          className="absolute bottom-4 left-0 top-4 w-0.5 rounded-full bg-accent/70"
+          className="absolute bottom-4 left-0 top-4 w-0.5 rounded-none bg-ink/30"
           aria-hidden
         />
       )}
@@ -84,7 +85,7 @@ export function LessonFeedCard({ item, lockedCopy = "Unlocks tomorrow" }: Props)
 
       <div className="min-w-0 flex-1">
         <h3
-          className={`font-display text-[17px] font-light leading-[1.15] tracking-[-0.02em] transition-colors sm:text-[18px] ${
+          className={`font-display text-[18px] font-light leading-[1.15] tracking-[-0.02em] transition-colors sm:text-[20px] ${
             dimmed
               ? "text-ink/55 group-hover:text-ink/70"
               : "text-ink group-hover:text-ink"
@@ -105,7 +106,7 @@ export function LessonFeedCard({ item, lockedCopy = "Unlocks tomorrow" }: Props)
             className={`text-[10px] font-semibold uppercase tracking-wider transition-colors ${
               dimmed
                 ? "text-ink-muted/45 group-hover:text-ink-muted/70"
-                : "text-accent group-hover:text-accent-dark"
+                : "text-ink group-hover:text-ink"
             }`}
           >
             {actionLabel(item.status)}

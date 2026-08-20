@@ -24,7 +24,10 @@ export function createStripeClient(secret = requireStripeSecret()): Stripe {
   return new Stripe(secret);
 }
 
-async function defaultGetUser(): Promise<{ id: string; email?: string } | null> {
+async function defaultGetUser(): Promise<{
+  id: string;
+  email?: string;
+} | null> {
   try {
     const supabase = await createServerClient();
     const {

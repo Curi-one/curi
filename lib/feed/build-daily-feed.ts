@@ -1,4 +1,8 @@
-import type { FeedDayGroup, FeedItemStatus, FeedLessonItem } from "@/lib/api/schemas";
+import type {
+  FeedDayGroup,
+  FeedItemStatus,
+  FeedLessonItem,
+} from "@/lib/api/schemas";
 
 export type DailyFeedCourseRow = {
   id: string;

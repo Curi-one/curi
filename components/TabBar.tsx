@@ -3,12 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType } from "react";
-import {
-  BookOpen,
-  Compass,
-  Library,
-  type LucideProps,
-} from "lucide-react";
+import { BookOpen, Compass, Library, type LucideProps } from "lucide-react";
 
 type LucideIcon = ComponentType<LucideProps>;
 
@@ -42,7 +37,7 @@ export function TabBar() {
             >
               {active && (
                 <span
-                  className="absolute inset-x-8 top-0 h-[2px] rounded-full bg-accent"
+                  className="absolute inset-x-8 top-0 h-[2px] rounded-none bg-ink"
                   aria-hidden
                 />
               )}

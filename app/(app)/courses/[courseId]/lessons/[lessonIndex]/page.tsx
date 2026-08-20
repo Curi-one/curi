@@ -78,7 +78,10 @@ function LessonContent() {
   }
 
   return (
-    <PageShell withTabPad={false} className="max-w-[724px] pt-4 md:max-w-[724px]">
+    <PageShell
+      withTabPad={false}
+      className="max-w-[724px] pt-4 md:max-w-[724px]"
+    >
       <LessonReader
         lesson={lesson}
         lessonIndex={Number(params.lessonIndex)}

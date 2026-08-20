@@ -73,7 +73,9 @@ export default function UpgradePage() {
           </span>
           <div className="flex flex-col gap-0.5">
             <span className="text-base font-medium text-ink/70">/ week</span>
-            <span className="text-sm text-ink-muted">billed as $10 / month</span>
+            <span className="text-sm text-ink-muted">
+              billed as $10 / month
+            </span>
           </div>
         </div>
         <div className="mt-6 flex items-center gap-3">
@@ -118,7 +120,10 @@ export default function UpgradePage() {
       <p className="mt-3 text-center text-xs text-ink-muted">
         Cancel anytime · No lock-in · Your progress stays
       </p>
-      <Link href="/today" className="btn-secondary mt-4 block w-full text-center">
+      <Link
+        href="/today"
+        className="btn-secondary mt-4 block w-full text-center"
+      >
         Back to Today
       </Link>
     </PageShell>

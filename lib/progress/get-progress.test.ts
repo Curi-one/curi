@@ -64,11 +64,7 @@ describe("getProgress", () => {
       getUserId: async () => "user-1",
     });
     expect(result.streak).toBe(3);
-    expect(result.heatmap).toEqual([
-      "2026-08-18",
-      "2026-08-19",
-      "2026-08-20",
-    ]);
+    expect(result.heatmap).toEqual(["2026-08-18", "2026-08-19", "2026-08-20"]);
     expect(result.activePaths).toBe(2);
     expect(result.masteredPaths).toBe(1);
   });

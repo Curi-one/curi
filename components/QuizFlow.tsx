@@ -6,7 +6,9 @@ import { StepProgress } from "@/components/StepProgress";
 
 type Props = {
   questions: QuizQuestion[];
-  onComplete: (answers: { questionId: string; selectedIndex: number }[]) => void;
+  onComplete: (
+    answers: { questionId: string; selectedIndex: number }[],
+  ) => void;
 };
 
 export function QuizFlow({ questions, onComplete }: Props) {
@@ -65,12 +67,12 @@ export function QuizFlow({ questions, onComplete }: Props) {
       </h1>
       <ul className="mt-8 space-y-3">
         {q.options.map((opt, optIndex) => {
-          let style = "border-border bg-paper-secondary hover:border-accent/30";
+          let style = "border-border bg-paper-secondary hover:border-ink";
           if (revealed && optIndex === q.correctIndex) {
-            style =
-              "border-ink bg-ink text-paper shadow-[inset_0_-2px_0_var(--color-accent)]";
+            style = "border-ink bg-ink text-paper";
           } else if (revealed && optIndex === selectedIndex && !correct) {
-            style = "border-border bg-paper-tertiary text-ink-muted line-through";
+            style =
+              "border-border bg-paper-tertiary text-ink-muted line-through";
           } else if (!revealed && selectedIndex === optIndex) {
             style = "border-ink bg-ink text-paper";
           }
@@ -80,7 +82,7 @@ export function QuizFlow({ questions, onComplete }: Props) {
                 type="button"
                 disabled={revealed}
                 onClick={() => choose(optIndex)}
-                className={`w-full rounded-xl border px-4 py-4 text-left text-[15px] min-h-[52px] transition-colors ${style}`}
+                className={`w-full rounded-none border px-4 py-4 text-left text-[15px] min-h-[52px] transition-colors ${style}`}
               >
                 {opt}
               </button>
@@ -90,7 +92,7 @@ export function QuizFlow({ questions, onComplete }: Props) {
       </ul>
       {revealed && (
         <div
-          className={`mt-8 rounded-xl border p-4 ${
+          className={`mt-8 rounded-none border p-4 ${
             correct
               ? "border-ink/20 bg-paper-secondary"
               : "border-border bg-paper-secondary"
@@ -103,12 +105,12 @@ export function QuizFlow({ questions, onComplete }: Props) {
           {q.source && (
             <p className="mt-3 text-sm text-ink-muted">
               <span className="font-meta text-ink-muted">Sources</span>
-              {" · "}
+              {" ·"}
               <a
                 href={q.source.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-ink underline decoration-border underline-offset-4 hover:decoration-accent"
+                className="text-ink underline decoration-border underline-offset-4 hover:decoration-ink"
               >
                 {q.source.title}
               </a>

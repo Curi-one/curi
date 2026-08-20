@@ -8,11 +8,7 @@ import {
 
 const TODAY = "2026-08-20";
 
-function course(
-  id: string,
-  progress: number,
-  total = 10,
-): FeedCourseRow {
+function course(id: string, progress: number, total = 10): FeedCourseRow {
   return {
     id,
     topic: `Topic ${id}`,

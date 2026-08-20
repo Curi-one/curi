@@ -134,7 +134,12 @@ export default function ExplorePage() {
         : filteredBooks.length === 0);
 
   return (
-    <PageShell title="Explore" kicker="Founder catalogue" withTabPad={false} className="pt-4">
+    <PageShell
+      title="Explore"
+      kicker="Founder catalogue"
+      withTabPad={false}
+      className="pt-4"
+    >
       <p className="mt-2 text-sm text-ink-muted">
         Curated paths for first-time founders. Every start runs clarify — no
         skipping onboarding.
@@ -169,9 +174,12 @@ export default function ExplorePage() {
       </div>
 
       {atLimit && (
-        <p className="mt-4 rounded-xl border border-border bg-paper-secondary px-4 py-3 text-sm text-ink-muted">
-          You have 2 active paths. Finish or shelve one in Library, or{" "}
-          <Link href="/upgrade" className="text-accent underline">
+        <p className="mt-4 rounded-none border border-border bg-paper-secondary px-4 py-3 text-sm text-ink-muted">
+          You have 2 active paths. Finish or shelve one in Library, or{""}
+          <Link
+            href="/upgrade"
+            className="text-ink underline underline-offset-2"
+          >
             upgrade
           </Link>
           .
@@ -200,7 +208,9 @@ export default function ExplorePage() {
       )}
 
       <div className="mt-6">
-        {loading && <LoadingState label="Loading catalogue…" minHeight="min-h-[24vh]" />}
+        {loading && (
+          <LoadingState label="Loading catalogue…" minHeight="min-h-[24vh]" />
+        )}
         {listEmpty && !q && (
           <EmptyState
             message="Nothing in the catalogue yet."
@@ -225,26 +235,28 @@ export default function ExplorePage() {
           </div>
         )}
 
-        {!loading && q && (filteredPaths.length > 0 || filteredBooks.length > 0) && (
-          <ul className="space-y-2">
-            {filteredPaths.map((item) => (
-              <li key={item.id}>
-                <PathSearchRow
-                  item={item}
-                  onClick={() => setPreviewPath(item)}
-                />
-              </li>
-            ))}
-            {filteredBooks.map((item) => (
-              <li key={item.id}>
-                <BookSearchRow
-                  item={item}
-                  onClick={() => setPreviewBook(item)}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
+        {!loading &&
+          q &&
+          (filteredPaths.length > 0 || filteredBooks.length > 0) && (
+            <ul className="space-y-2">
+              {filteredPaths.map((item) => (
+                <li key={item.id}>
+                  <PathSearchRow
+                    item={item}
+                    onClick={() => setPreviewPath(item)}
+                  />
+                </li>
+              ))}
+              {filteredBooks.map((item) => (
+                <li key={item.id}>
+                  <BookSearchRow
+                    item={item}
+                    onClick={() => setPreviewBook(item)}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
 
         {!loading && !q && tab === "paths" && filteredPaths.length > 0 && (
           <div className="space-y-8">
@@ -262,7 +274,7 @@ export default function ExplorePage() {
                 <button
                   type="button"
                   onClick={() => setPreviewPath(featured)}
-                  className="group interactive-card focus-ring mt-3 w-full overflow-hidden rounded-2xl border border-border bg-paper text-left hover:border-accent/20"
+                  className="group interactive-card focus-ring mt-3 w-full overflow-hidden rounded-none border border-border bg-paper text-left hover:border-ink/30"
                 >
                   <CourseCover topic={featured.topic} height={160} />
                   <div className="px-5 pb-5 pt-4">
@@ -273,8 +285,9 @@ export default function ExplorePage() {
                           {featured.topic}
                         </h3>
                       </div>
-                      <span className="w-fit shrink-0 rounded-full border border-border bg-paper-secondary px-3 py-1.5 font-meta normal-case">
-                        {lessonCountForDepth(featured.topic, featured.depth)}{" "}
+                      <span className="w-fit shrink-0 rounded-none border border-border bg-paper-secondary px-3 py-1.5 font-meta normal-case">
+                        {lessonCountForDepth(featured.topic, featured.depth)}
+                        {""}
                         lessons
                       </span>
                     </div>
@@ -366,7 +379,7 @@ function PathMarketCard({
     <button
       type="button"
       onClick={onClick}
-      className="group interactive-card focus-ring flex h-full w-full flex-col overflow-hidden rounded-xl border border-border bg-paper text-left hover:border-accent/20"
+      className="group interactive-card focus-ring flex h-full w-full flex-col overflow-hidden rounded-none border border-border bg-paper text-left hover:border-ink/30"
     >
       <CourseCover topic={item.topic} height={100} />
       <div className="flex flex-1 flex-col gap-1 p-3.5">
@@ -397,12 +410,14 @@ function PathSearchRow({
     <button
       type="button"
       onClick={onClick}
-      className="group interactive-card focus-ring flex w-full items-center gap-3.5 rounded-xl border border-border bg-paper p-3.5 text-left hover:border-accent/20"
+      className="group interactive-card focus-ring flex w-full items-center gap-3.5 rounded-none border border-border bg-paper p-3.5 text-left hover:border-ink/30"
     >
       <CourseCover topic={item.topic} height={54} width={54} />
       <div className="min-w-0 flex-1">
         <p className="font-meta">Founder path</p>
-        <p className="text-sm font-semibold leading-snug text-ink">{item.topic}</p>
+        <p className="text-sm font-semibold leading-snug text-ink">
+          {item.topic}
+        </p>
         <p className="mt-0.5 line-clamp-1 text-xs text-ink-muted">
           {item.description}
         </p>
@@ -413,7 +428,10 @@ function PathSearchRow({
       <span className="hidden shrink-0 font-meta normal-case sm:inline">
         {lessons} · {depthLabel(item.depth)}
       </span>
-      <ArrowRight className="h-4 w-4 shrink-0 text-ink-muted/40 transition-colors group-hover:text-accent" aria-hidden />
+      <ArrowRight
+        className="h-4 w-4 shrink-0 text-ink-muted/40 transition-colors group-hover:text-ink"
+        aria-hidden
+      />
     </button>
   );
 }
@@ -429,12 +447,14 @@ function BookSearchRow({
     <button
       type="button"
       onClick={onClick}
-      className="group interactive-card focus-ring flex w-full items-center gap-3.5 rounded-xl border border-border bg-paper p-3.5 text-left hover:border-accent/20"
+      className="group interactive-card focus-ring flex w-full items-center gap-3.5 rounded-none border border-border bg-paper p-3.5 text-left hover:border-ink/30"
     >
       <CourseCover topic={item.title} height={54} width={54} />
       <div className="min-w-0 flex-1">
         <p className="font-meta">Book</p>
-        <p className="text-sm font-semibold leading-snug text-ink">{item.title}</p>
+        <p className="text-sm font-semibold leading-snug text-ink">
+          {item.title}
+        </p>
         <p className="mt-0.5 line-clamp-1 text-xs text-ink-muted">
           {item.author} · {item.description}
         </p>
@@ -446,7 +466,7 @@ function BookSearchRow({
         {item.pathCount} paths
       </span>
       <ArrowRight
-        className="h-4 w-4 shrink-0 text-ink-muted/40 transition-colors group-hover:text-accent"
+        className="h-4 w-4 shrink-0 text-ink-muted/40 transition-colors group-hover:text-ink"
         aria-hidden
       />
     </button>

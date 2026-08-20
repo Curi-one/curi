@@ -43,9 +43,7 @@ export default function ProgressPage() {
     <PageShell
       back={{ href: "/today", label: "Today" }}
       title="Progress"
-      kicker={
-        streak > 0 ? `${streak}-day streak` : "Build your streak"
-      }
+      kicker={streak > 0 ? `${streak}-day streak` : "Build your streak"}
       withTabPad={false}
       className="pt-4"
     >
@@ -56,7 +54,9 @@ export default function ProgressPage() {
         </div>
         <div className="surface-card px-4 py-3">
           <p className="font-meta">Mastered</p>
-          <p className="mt-1 font-display text-2xl text-ink">{stats.mastered}</p>
+          <p className="mt-1 font-display text-2xl text-ink">
+            {stats.mastered}
+          </p>
         </div>
       </div>
       <div className="mt-8">
@@ -66,8 +66,11 @@ export default function ProgressPage() {
         <h2 className="type-kicker">Your paths</h2>
         {paths.length === 0 ? (
           <p className="mt-4 text-ink-muted">
-            No paths yet.{" "}
-            <Link href="/explore" className="link-subtle focus-ring inline-block rounded-sm">
+            No paths yet.{""}
+            <Link
+              href="/explore"
+              className="link-subtle focus-ring inline-block rounded-none"
+            >
               Explore founder paths
             </Link>
           </p>
@@ -79,7 +82,9 @@ export default function ProgressPage() {
                   href={`/library/${p.id}`}
                   className="surface-card surface-card-interactive interactive-card focus-ring group block px-4 py-3"
                 >
-                  <p className="font-medium text-ink transition-colors group-hover:text-ink">{p.topic}</p>
+                  <p className="font-medium text-ink transition-colors group-hover:text-ink">
+                    {p.topic}
+                  </p>
                   <p className="mt-1 font-meta">
                     {p.progress} / {p.totalLessons} · {depthLabel(p.depth)}
                   </p>

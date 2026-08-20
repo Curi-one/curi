@@ -7,11 +7,11 @@ type Props = {
   className?: string;
 };
 
-/** Colored cover swatch with atmospheric initial — marketplace cards. */
+/** Greyscale cover field with an oversized initial (BRAND.md §6.2). */
 export function CourseCover({ topic, height, width, className = "" }: Props) {
   const [bg, fg] = topicSwatch(topic);
   const initial = (topic || "?")[0]?.toUpperCase() ?? "?";
-  const rounded = width ? "rounded-xl" : "w-full";
+  const rounded = width ? "rounded-none" : "w-full";
 
   return (
     <div
@@ -23,7 +23,7 @@ export function CourseCover({ topic, height, width, className = "" }: Props) {
         className="pointer-events-none absolute inset-0 flex select-none items-end justify-end"
         style={{
           color: fg,
-          opacity: 0.18,
+          opacity: 0.4,
           fontSize: height * 1.55,
           fontWeight: 800,
           lineHeight: 0.78,

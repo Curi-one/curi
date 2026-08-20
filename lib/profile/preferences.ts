@@ -63,8 +63,7 @@ function mergeWithDefaults(raw: unknown): ProfilePreferences {
   if (!isPlainObject(raw)) return { ...DEFAULT_PREFERENCES };
 
   return {
-    goal:
-      typeof raw.goal === "string" ? raw.goal : DEFAULT_PREFERENCES.goal,
+    goal: typeof raw.goal === "string" ? raw.goal : DEFAULT_PREFERENCES.goal,
     curiosityContext:
       typeof raw.curiosityContext === "string"
         ? raw.curiosityContext

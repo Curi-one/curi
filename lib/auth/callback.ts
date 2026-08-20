@@ -74,7 +74,9 @@ export function postSignInRedirectPath(
   return sanitizeReturnTo(returnTo);
 }
 
-export function shouldCollectName(session: { name?: string } | undefined): boolean {
+export function shouldCollectName(
+  session: { name?: string } | undefined,
+): boolean {
   return !session?.name?.trim();
 }
 

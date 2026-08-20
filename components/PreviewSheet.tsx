@@ -3,10 +3,7 @@
 import { useEffect } from "react";
 import { ArrowRight, BookOpen, X } from "lucide-react";
 import type { CatalogueBook, CataloguePath } from "@/lib/mock/fixtures";
-import {
-  generateLessonTitles,
-  lessonCountForDepth,
-} from "@/lib/mock/fixtures";
+import { generateLessonTitles, lessonCountForDepth } from "@/lib/mock/fixtures";
 import { CourseCover } from "@/components/CourseCover";
 import { depthLabel } from "@/lib/ui/constants";
 
@@ -42,7 +39,10 @@ export function PreviewSheet({
 
   if (!open || !item) return null;
 
-  const title = itemType === "book" ? (item as CatalogueBook).title : (item as CataloguePath).topic;
+  const title =
+    itemType === "book"
+      ? (item as CatalogueBook).title
+      : (item as CataloguePath).topic;
   const description = item.description;
 
   let meta = "";
@@ -72,14 +72,17 @@ export function PreviewSheet({
         aria-label="Close preview"
         onClick={onClose}
       />
-      <div className="relative z-10 flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[1.75rem] border border-border bg-paper shadow-2xl animate-slide-up sm:max-h-[88vh] sm:max-w-[540px] sm:rounded-3xl">
-        <div className="flex shrink-0 justify-center pb-1 pt-2.5 sm:hidden" aria-hidden>
-          <div className="h-1 w-10 rounded-full bg-border" />
+      <div className="relative z-10 flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-none border border-border bg-paper animate-slide-up sm:max-h-[88vh] sm:max-w-[540px] sm:rounded-none">
+        <div
+          className="flex shrink-0 justify-center pb-1 pt-2.5 sm:hidden"
+          aria-hidden
+        >
+          <div className="h-1 w-10 rounded-none bg-border" />
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-3 top-3 z-10 flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border bg-paper/90 text-ink-muted shadow-sm transition hover:bg-paper-secondary hover:text-ink sm:right-4 sm:top-4"
+          className="absolute right-3 top-3 z-10 flex min-h-11 min-w-11 items-center justify-center rounded-none border border-border bg-paper/90 text-ink-muted transition hover:bg-paper-secondary hover:text-ink sm:right-4 sm:top-4"
           aria-label="Close"
         >
           <X className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden />
@@ -128,7 +131,7 @@ export function PreviewSheet({
         <div className="shrink-0 border-t border-border bg-paper-secondary/40 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-5 sm:pb-5">
           {atLimit ? (
             <>
-              <div className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-paper-secondary py-3 text-sm font-medium text-ink-muted">
+              <div className="flex w-full items-center justify-center gap-2 rounded-none border border-border bg-paper-secondary py-3 text-sm font-medium text-ink-muted">
                 <BookOpen className="h-4 w-4 shrink-0 opacity-50" aria-hidden />
                 2 active paths — at your limit
               </div>

@@ -20,12 +20,14 @@ describe("LandingPage", () => {
   it("offers Sign in and Sign up without blocking the topic start CTA", () => {
     render(<LandingPage />);
 
-    expect(
-      screen.getByRole("link", { name: "Sign in" }),
-    ).toHaveAttribute("href", "/auth?intent=signin&returnTo=%2F");
-    expect(
-      screen.getByRole("link", { name: "Sign up" }),
-    ).toHaveAttribute("href", "/auth?intent=signup&returnTo=%2F");
+    expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute(
+      "href",
+      "/auth?intent=signin&returnTo=%2F",
+    );
+    expect(screen.getByRole("link", { name: "Sign up" })).toHaveAttribute(
+      "href",
+      "/auth?intent=signup&returnTo=%2F",
+    );
     expect(
       screen.getByRole("button", { name: "Start exploring" }),
     ).toBeInTheDocument();

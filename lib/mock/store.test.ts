@@ -124,9 +124,9 @@ describe("MockStore", () => {
         depth: "essentials",
         clarifications: [],
       });
-      const pathB = store.getLibrary(session).exploring.find(
-        (p) => p.topic === "Path B",
-      );
+      const pathB = store
+        .getLibrary(session)
+        .exploring.find((p) => p.topic === "Path B");
       expect(pathB).toBeDefined();
 
       const quizB = store.getQuiz(session, pathB!.id, 0);

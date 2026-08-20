@@ -37,7 +37,9 @@ async function setPlanByCustomerId(
   }
 }
 
-function customerIdFrom(value: string | Stripe.Customer | Stripe.DeletedCustomer | null): string | null {
+function customerIdFrom(
+  value: string | Stripe.Customer | Stripe.DeletedCustomer | null,
+): string | null {
   if (!value) return null;
   if (typeof value === "string") return value;
   if ("deleted" in value && value.deleted) return null;
@@ -58,19 +60,12 @@ export async function handleStripeEvent(
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId =
-        session.client_reference_id ||
-        session.metadata?.curi_user_id ||
-        null;
+        session.client_reference_id || session.metadata?.curi_user_id || null;
       const customerId = customerIdFrom(session.customer);
       if (!userId) {
         return { handled: false };
       }
-      await setPlanByUserId(
-        admin,
-        userId,
-        "academy",
-        customerId ?? undefined,
-      );
+      await setPlanByUserId(admin, userId, "academy", customerId ?? undefined);
       captureEvent("upgrade_completed", { userId });
       return { handled: true };
     }
@@ -82,11 +77,7 @@ export async function handleStripeEvent(
         sub.status === "active" ||
         sub.status === "trialing" ||
         sub.status === "past_due";
-      await setPlanByCustomerId(
-        admin,
-        customerId,
-        active ? "academy" : "free",
-      );
+      await setPlanByCustomerId(admin, customerId, active ? "academy" : "free");
       return { handled: true };
     }
     case "customer.subscription.deleted": {

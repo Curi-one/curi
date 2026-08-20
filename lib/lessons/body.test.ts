@@ -1,10 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChatCompletionResult } from "@/lib/ai/perplexity";
 import { buildFingerprint } from "@/lib/cache/fingerprint";
-import {
-  clarificationsToMap,
-  normalizeTopic,
-} from "@/lib/courses/outline";
+import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
 import {
   feelToDifficultyModifier,
   getLessonBody,

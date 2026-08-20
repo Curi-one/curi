@@ -42,8 +42,7 @@ function AuthContent() {
     [params, fromQuiz, pendingTopic],
   );
 
-  const showPendingBanner =
-    (fromQuiz || intent === "save") && !!pendingTopic;
+  const showPendingBanner = (fromQuiz || intent === "save") && !!pendingTopic;
 
   const [step, setStep] = useState<Step>("email");
   const [booting, setBooting] = useState(true);
@@ -211,7 +210,7 @@ function AuthContent() {
     <div className="flex min-h-[70vh] flex-col animate-fade-in">
       <Wordmark />
       {showPendingBanner && (
-        <div className="mt-8 rounded-xl border border-border bg-paper-secondary px-4 py-3">
+        <div className="mt-8 rounded-none border border-border bg-paper-secondary px-4 py-3">
           <p className="font-meta">Pending path</p>
           <p className="mt-1 text-sm text-ink">
             {pendingTopic
@@ -242,8 +241,8 @@ function AuthContent() {
       )}
 
       {step === "link" && (
-        <div className="mt-8 flex items-center gap-4 rounded-xl border border-border bg-paper-secondary px-5 py-6">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+        <div className="mt-8 flex items-center gap-4 rounded-none border border-border bg-paper-secondary px-5 py-6">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-none bg-paper-secondary text-ink">
             <Mail className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0">
@@ -260,7 +259,9 @@ function AuthContent() {
         <input
           autoFocus
           value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+          onChange={(e) =>
+            setCode(e.target.value.replace(/\D/g, "").slice(0, 8))
+          }
           className="input-field mt-8 tracking-[0.35em]"
           placeholder="000000"
           inputMode="numeric"
@@ -281,7 +282,10 @@ function AuthContent() {
       )}
 
       {error && (
-        <p className="mt-4 text-[13px] leading-relaxed text-accent" role="alert">
+        <p
+          className="mt-4 text-[13px] leading-relaxed text-ink-faint"
+          role="alert"
+        >
           {error}
         </p>
       )}
@@ -362,7 +366,7 @@ function AuthContent() {
             <p className="mt-4 text-center text-sm text-ink-muted">
               {intent === "signup" ? (
                 <>
-                  Already have an account?{" "}
+                  Already have an account?{""}
                   <Link
                     href={`/auth?intent=signin&returnTo=${encodeURIComponent(returnTo)}`}
                     className="link-subtle inline"
@@ -372,7 +376,7 @@ function AuthContent() {
                 </>
               ) : (
                 <>
-                  New here?{" "}
+                  New here?{""}
                   <Link
                     href={`/auth?intent=signup&returnTo=${encodeURIComponent(returnTo)}`}
                     className="link-subtle inline"

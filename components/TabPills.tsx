@@ -12,12 +12,7 @@ type Props = {
   variant?: "pills" | "underline";
 };
 
-export function TabPills({
-  tabs,
-  active,
-  onChange,
-  variant = "pills",
-}: Props) {
+export function TabPills({ tabs, active, onChange, variant = "pills" }: Props) {
   if (variant === "underline") {
     return (
       <div className="flex border-b border-border" role="tablist">
@@ -58,9 +53,9 @@ export function TabPills({
           key={tab.id}
           type="button"
           onClick={() => onChange(tab.id)}
-          className={`min-h-11 rounded-full px-4 py-2 text-sm transition-colors focus-ring ${
+          className={`min-h-11 rounded-none px-4 py-2 text-sm transition-colors focus-ring ${
             active === tab.id
-              ? "bg-ink text-paper shadow-[inset_0_-2px_0_var(--color-accent)]"
+              ? "bg-ink text-paper"
               : "interactive-chip border border-border text-ink-muted hover:border-ink/30"
           }`}
         >

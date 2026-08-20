@@ -1,25 +1,19 @@
-/** Deterministic cover palette for catalogue / library topic art. */
-export function topicSwatch(topic: string): [bg: string, fg: string] {
-  const palette: Record<string, [string, string]> = {
-    "venture capital": ["#8BA0B8", "#102A43"],
-    "term sheets": ["#C7A27A", "#3B240D"],
-    "unit economics": ["#7FA88D", "#12351F"],
-    "safe notes": ["#9A86B8", "#2B1744"],
-    "cap tables": ["#B88D7A", "#3C190E"],
-    fundraising: ["#7C9FB0", "#0D2B36"],
-    "burn rate": ["#C18A6B", "#421A0B"],
-    "founder equity": ["#A6A06D", "#332F0B"],
-    "thinking, fast and slow": ["#8B9AB8", "#17233D"],
-    sapiens: ["#A887B5", "#33163F"],
-  };
-  const key = topic.toLowerCase();
-  if (palette[key]) return palette[key];
-  const hues = [25, 145, 200, 260, 45, 310, 18, 190];
-  const h =
-    hues[
-      topic.split("").reduce((s, c) => s + c.charCodeAt(0), 0) % hues.length
-    ]!;
-  return [`hsl(${h} 32% 60%)`, `hsl(${h} 60% 16%)`];
+/**
+ * Deterministic cover field for catalogue / library topic art.
+ *
+ * Greyscale only: imagery is never rendered in colour (BRAND.md §6.3) and the
+ * palette admits no second accent (§16.1). Topics stay distinguishable by
+ * tonal value rather than hue, on the dark field described in §6.2.
+ *
+ * Returns `[field, glyph]` — the field background and the colour of the
+ * oversized letterform set on it.
+ */
+export function topicSwatch(topic: string): [field: string, glyph: string] {
+  // Dark field, Ink through Ink 3 (§4.2)
+  const tones = [5, 8, 11, 14, 17, 9, 13, 16];
+  const i =
+    topic.split("").reduce((s, c) => s + c.charCodeAt(0), 0) % tones.length;
+  return [`hsl(0 0% ${tones[i]!}%)`, "#FFFFFF"];
 }
 
 /** Progress % with a slight endowment so early progress feels visible. */

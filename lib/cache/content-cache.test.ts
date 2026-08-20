@@ -25,7 +25,9 @@ function createMockAdmin(handlers: {
   updateResult?: { data: unknown; error: unknown };
   upsertResult?: { data: unknown; error: unknown };
 }) {
-  const updateEq = vi.fn().mockResolvedValue(handlers.updateResult ?? { data: null, error: null });
+  const updateEq = vi
+    .fn()
+    .mockResolvedValue(handlers.updateResult ?? { data: null, error: null });
   const update = vi.fn().mockReturnValue({ eq: updateEq });
 
   const maybeSingle = vi

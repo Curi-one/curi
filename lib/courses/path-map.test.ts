@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildPathMapNodes,
-  isLessonReadable,
-} from "@/lib/courses/path-map";
+import { buildPathMapNodes, isLessonReadable } from "@/lib/courses/path-map";
 
 const lessons = [
   { index: 0, title: "Lesson 1" },
@@ -61,9 +58,9 @@ describe("buildPathMapNodes", () => {
 
 describe("isLessonReadable", () => {
   it("allows re-reading any lesson before progress", () => {
-    expect(isLessonReadable({ index: 0, progress: 2, hasActivityToday: true })).toBe(
-      true,
-    );
+    expect(
+      isLessonReadable({ index: 0, progress: 2, hasActivityToday: true }),
+    ).toBe(true);
     expect(
       isLessonReadable({ index: 1, progress: 2, hasActivityToday: false }),
     ).toBe(true);

@@ -77,7 +77,9 @@ describe("requestOtp", () => {
       auth: {
         signInWithOtp: vi
           .fn()
-          .mockResolvedValue({ error: { message: "Too Many Requests", status: 429 } }),
+          .mockResolvedValue({
+            error: { message: "Too Many Requests", status: 429 },
+          }),
       },
     });
 
@@ -111,7 +113,9 @@ describe("staging OTP bypass", () => {
 
   it("signs in via admin magic link on staging", async () => {
     vi.stubEnv("APP_ENV", "staging");
-    const createUser = vi.fn().mockResolvedValue({ data: { user: {} }, error: null });
+    const createUser = vi
+      .fn()
+      .mockResolvedValue({ data: { user: {} }, error: null });
     const generateLink = vi.fn().mockResolvedValue({
       data: { properties: { hashed_token: "hash-token" } },
       error: null,

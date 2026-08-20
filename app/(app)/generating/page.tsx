@@ -3,13 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import {
-  ArrowRight,
-  Check,
-  Loader2,
-  Lock,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, Check, Loader2, Lock, Sparkles } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { Wordmark } from "@/components/Wordmark";
 import { getMe, postCourse } from "@/lib/api/client";
@@ -75,7 +69,8 @@ function lessonBlurb(
   ) {
     return "A frame you can carry into investor calls, diligence, and internal decisions.";
   }
-  if (pos < 0.25) return "The foundations: the concepts that carry the rest of the path.";
+  if (pos < 0.25)
+    return "The foundations: the concepts that carry the rest of the path.";
   if (pos < 0.5) {
     return "The mechanism: what makes the term, metric, or financing structure move.";
   }
@@ -158,7 +153,7 @@ export default function GeneratingPage() {
   if (error) {
     return (
       <PageShell withTabPad={false}>
-        <Wordmark href="/" />
+        <Wordmark href="/" underline={false} />
         <p className="mt-8 text-ink-muted">{error}</p>
         <Link href="/clarify" className="btn-primary mt-4 inline-block">
           Back to clarify
@@ -176,10 +171,10 @@ export default function GeneratingPage() {
         {isWarmup ? (
           <div className="flex flex-col items-center gap-8 py-12 text-center sm:py-20">
             <div className="relative">
-              <div className="generating-pulse h-24 w-24 rounded-full border border-accent/20 bg-accent/5" />
+              <div className="generating-pulse h-24 w-24 rounded-none border border-border bg-paper-secondary" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <Sparkles
-                  className="generating-sparkle h-9 w-9 text-accent"
+                  className="generating-sparkle h-9 w-9 text-ink"
                   strokeWidth={1.5}
                   aria-hidden
                 />
@@ -195,14 +190,14 @@ export default function GeneratingPage() {
               <p className="text-sm text-ink-muted">{topic}</p>
             </div>
             <div
-              className="w-40 overflow-hidden rounded-full bg-paper-tertiary"
+              className="w-40 overflow-hidden rounded-none bg-paper-tertiary"
               style={{ height: "3px" }}
             >
-              <div className="generating-bar-breathe h-full rounded-full bg-accent/60" />
+              <div className="generating-bar-breathe h-full rounded-none bg-accent" />
             </div>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-border bg-paper">
+          <div className="overflow-hidden rounded-none border border-border bg-paper">
             <div className="border-b border-border px-6 py-6 sm:px-8 sm:py-7">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
@@ -217,7 +212,7 @@ export default function GeneratingPage() {
                   </h1>
                 </div>
                 <div
-                  className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border ${
+                  className={`grid h-10 w-10 shrink-0 place-items-center rounded-none border ${
                     complete
                       ? "border-ink/20 bg-ink/5 text-ink/70"
                       : "border-border bg-paper-secondary text-ink-muted"
@@ -241,9 +236,9 @@ export default function GeneratingPage() {
                     {streamed.length} / {totalLessons}
                   </span>
                 </div>
-                <div className="h-1 overflow-hidden rounded-full bg-paper-tertiary">
+                <div className="h-1 overflow-hidden rounded-none bg-paper-tertiary">
                   <div
-                    className="h-full rounded-full bg-ink/55 transition-[width] duration-500 ease-out"
+                    className="h-full rounded-none bg-ink/55 transition-[width] duration-500 ease-out"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
@@ -254,9 +249,7 @@ export default function GeneratingPage() {
               {Array.from({ length: totalLessons }, (_, index) => {
                 const lesson = streamed[index];
                 const isLive =
-                  Boolean(lesson) &&
-                  index === streamed.length - 1 &&
-                  !complete;
+                  Boolean(lesson) && index === streamed.length - 1 && !complete;
                 const num = String(index + 1).padStart(2, "0");
 
                 if (complete && lesson) {
@@ -271,7 +264,7 @@ export default function GeneratingPage() {
                         className="group w-full border-b border-border/60 px-6 py-4 text-left transition-colors hover:bg-paper-secondary sm:px-8 sm:py-5"
                       >
                         <div className="lesson-reveal flex items-start gap-4 sm:gap-5">
-                          <span className="w-7 shrink-0 select-none pt-px font-display text-sm tabular-nums text-ink/60">
+                          <span className="w-7 shrink-0 select-none pt-px font-meta text-mono-sm tabular-nums text-ink-muted">
                             {num}
                           </span>
                           <div className="min-w-0 flex-1">
@@ -301,7 +294,7 @@ export default function GeneratingPage() {
                       className="border-b border-border/60 px-6 py-4 opacity-30 last:border-b-0 sm:px-8 sm:py-5"
                     >
                       <div className="flex items-start gap-4 sm:gap-5">
-                        <span className="w-7 shrink-0 select-none pt-px font-display text-sm tabular-nums text-ink-muted">
+                        <span className="w-7 shrink-0 select-none pt-px font-meta text-mono-sm tabular-nums text-ink-muted">
                           {num}
                         </span>
                         <div className="min-w-0 flex-1">
@@ -335,7 +328,7 @@ export default function GeneratingPage() {
                   >
                     {lesson ? (
                       <div className="lesson-reveal flex gap-4 sm:gap-5">
-                        <span className="w-7 shrink-0 select-none pt-px font-display text-sm tabular-nums text-ink-muted">
+                        <span className="w-7 shrink-0 select-none pt-px font-meta text-mono-sm tabular-nums text-ink-muted">
                           {num}
                         </span>
                         <div className="min-w-0 flex-1">
@@ -354,7 +347,7 @@ export default function GeneratingPage() {
                       </div>
                     ) : (
                       <div className="flex gap-4 sm:gap-5" aria-hidden>
-                        <span className="w-7 shrink-0 select-none pt-px font-display text-sm tabular-nums text-ink-muted/30">
+                        <span className="w-7 shrink-0 select-none pt-px font-meta text-mono-sm tabular-nums text-ink-faint">
                           {num}
                         </span>
                         <div className="flex-1 space-y-2.5 pt-1">

@@ -3,7 +3,10 @@
  * North-star events: path_created, lesson_completed, auth_completed, upgrade_started.
  */
 
-type CaptureProps = Record<string, string | number | boolean | null | undefined>;
+type CaptureProps = Record<
+  string,
+  string | number | boolean | null | undefined
+>;
 
 const NORTH_STAR = [
   "path_created",

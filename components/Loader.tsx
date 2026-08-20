@@ -12,7 +12,7 @@ const SIZE: Record<NonNullable<Props["size"]>, string> = {
   lg: "h-12 w-12 border-2",
 };
 
-/** Branded accent ring spinner — use for async page and section loads. */
+/** Ink ring spinner — use for async page and section loads. */
 export function Loader({ size = "md", label, className = "" }: Props) {
   return (
     <div

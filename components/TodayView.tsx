@@ -30,7 +30,9 @@ export function TodayView({
     return (
       <div className="mx-auto w-full max-w-[580px] pb-4 pt-2">
         <div className="mb-10 border-b border-border pb-10">
-          <h1 className="type-display-xl text-ink">Your daily founder fluency</h1>
+          <h1 className="type-display-xl text-ink">
+            Your daily founder fluency
+          </h1>
           <p className="type-lede mt-4 max-w-md">
             One lesson a day on the concepts that matter when you&apos;re
             building and raising. Three minutes, every morning.
@@ -40,11 +42,14 @@ export function TodayView({
         <div className="space-y-3">
           <Link
             href="/explore"
-            className="group interactive-card focus-ring flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left hover:border-accent/20"
+            className="group interactive-card focus-ring flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left hover:border-ink/30"
           >
             <div>
               <div className="flex items-center gap-2 font-medium text-ink">
-                <Library className="h-4 w-4 shrink-0 text-accent/80" aria-hidden />
+                <Library
+                  className="h-4 w-4 shrink-0 text-ink-muted"
+                  aria-hidden
+                />
                 Browse founder paths
               </div>
               <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
@@ -53,18 +58,21 @@ export function TodayView({
               </p>
             </div>
             <ArrowRight
-              className="ml-4 h-4 w-4 shrink-0 text-ink-muted/40 transition group-hover:text-accent"
+              className="ml-4 h-4 w-4 shrink-0 text-ink-muted/40 transition group-hover:text-ink"
               aria-hidden
             />
           </Link>
 
           <Link
             href="/new"
-            className="group interactive-card focus-ring flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left hover:border-accent/20"
+            className="group interactive-card focus-ring flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left hover:border-ink/30"
           >
             <div>
               <div className="flex items-center gap-2 font-medium text-ink">
-                <Sparkles className="h-4 w-4 shrink-0 text-accent/80" aria-hidden />
+                <Sparkles
+                  className="h-4 w-4 shrink-0 text-ink-muted"
+                  aria-hidden
+                />
                 Create a custom path
               </div>
               <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
@@ -73,7 +81,7 @@ export function TodayView({
               </p>
             </div>
             <ArrowRight
-              className="ml-4 h-4 w-4 shrink-0 text-ink-muted/40 transition group-hover:text-accent"
+              className="ml-4 h-4 w-4 shrink-0 text-ink-muted/40 transition group-hover:text-ink"
               aria-hidden
             />
           </Link>
@@ -89,15 +97,17 @@ export function TodayView({
           <div>
             <h1 className="type-display-xl text-ink">Today</h1>
             {due.length > 0 && (
-              <p className="type-kicker-accent mt-4 normal-case tracking-[0.14em] text-ink-muted">
+              <p className="type-kicker-mark mt-4 normal-case tracking-[0.14em] text-ink-muted">
                 {due.length} of {total} still to read
               </p>
             )}
           </div>
           <Link
             href="/progress"
-            className={`focus-ring inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full px-2 font-meta transition-colors hover:bg-ink/[0.04] ${
-              streakAtRisk ? "text-accent hover:text-accent-dark" : "hover:text-ink"
+            className={`focus-ring inline-flex min-h-11 shrink-0 items-center gap-1 rounded-none px-2 font-meta transition-colors hover:bg-ink/[0.04] ${
+              streakAtRisk
+                ? "text-ink hover:text-ink"
+                : "text-ink-muted hover:text-ink"
             }`}
           >
             {streak} day streak
@@ -109,7 +119,7 @@ export function TodayView({
 
       {groups.map((group) => (
         <section key={group.daysAgo} className="mb-10 last:mb-6">
-          <h2 className="type-kicker-accent mb-4">{group.label}</h2>
+          <h2 className="type-kicker-mark mb-4">{group.label}</h2>
           <ul className="space-y-3">
             {group.items.map((item) => (
               <li key={item.id}>
@@ -129,7 +139,10 @@ export function TodayView({
       ))}
 
       <div className="mt-12 text-center">
-        <Link href="/new" className="link-subtle focus-ring inline-block rounded-sm">
+        <Link
+          href="/new"
+          className="link-subtle focus-ring inline-block rounded-none"
+        >
           Create a new path
         </Link>
       </div>

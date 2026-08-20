@@ -107,7 +107,11 @@ export type CourseMapResponse = {
   id: string;
   topic: string;
   depth: PathSummary["depth"];
-  nodes: { index: number; title: string; status: "read" | "today" | "locked" }[];
+  nodes: {
+    index: number;
+    title: string;
+    status: "read" | "today" | "locked";
+  }[];
 };
 
 export function getCourseMap(courseId: string) {

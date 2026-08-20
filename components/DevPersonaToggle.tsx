@@ -14,12 +14,20 @@ export function DevPersonaToggle() {
   }
 
   return (
-    <div className="fixed right-3 top-3 z-[100] flex gap-1 rounded-full border border-border bg-paper px-2 py-1 text-xs shadow-sm">
+    <div className="fixed right-3 top-3 z-[100] flex gap-1 rounded-none border border-border bg-paper px-2 py-1 text-xs">
       <span className="px-1 text-ink-muted">Dev:</span>
-      <button type="button" onClick={() => void setPersona("guest")} className="px-2 py-1">
+      <button
+        type="button"
+        onClick={() => void setPersona("guest")}
+        className="px-2 py-1"
+      >
         Guest
       </button>
-      <button type="button" onClick={() => void setPersona("member")} className="px-2 py-1">
+      <button
+        type="button"
+        onClick={() => void setPersona("member")}
+        className="px-2 py-1"
+      >
         Member
       </button>
     </div>

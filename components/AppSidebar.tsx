@@ -14,7 +14,12 @@ import {
   type LucideProps,
 } from "lucide-react";
 import { Wordmark } from "@/components/Wordmark";
-import { getFeed, getMe, getProgress, type UserSession } from "@/lib/api/client";
+import {
+  getFeed,
+  getMe,
+  getProgress,
+  type UserSession,
+} from "@/lib/api/client";
 
 type LucideIcon = ComponentType<LucideProps>;
 
@@ -34,7 +39,7 @@ function SidebarNavBtn({
       href={href}
       aria-label={label}
       aria-current={active ? "page" : undefined}
-      className={`focus-ring flex w-full flex-col items-center gap-1.5 rounded-xl px-1.5 py-2.5 transition-colors ${
+      className={`focus-ring flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 transition-colors ${
         active
           ? "bg-ink/[0.08] text-ink"
           : "text-ink-muted/60 hover:bg-ink/[0.05] hover:text-ink/80"
@@ -92,9 +97,7 @@ export function AppSidebar() {
   const streakAtRisk = streak > 0 && dueCount > 0;
   const isAcademy = session?.plan === "academy";
   const displayName =
-    session?.name?.trim() ||
-    session?.email?.split("@")[0] ||
-    "You";
+    session?.name?.trim() || session?.email?.split("@")[0] || "You";
   const initial = displayName.slice(0, 1).toUpperCase();
   const firstName = displayName.split(/\s+/)[0];
 
@@ -104,7 +107,7 @@ export function AppSidebar() {
       aria-label="Primary"
     >
       <div className="flex justify-center px-3 pb-4 pt-5">
-        <Wordmark href="/today" size="sm" />
+        <Wordmark href="/today" size="sm" underline={false} />
       </div>
 
       <div className="mx-3 h-px bg-border/60" aria-hidden />
@@ -156,10 +159,10 @@ export function AppSidebar() {
                 ? `${streak}-day streak — get curious today to keep it`
                 : `${streak}-day streak`
             }
-            className={`flex w-full flex-col items-center gap-1.5 rounded-xl px-1.5 py-2.5 transition-colors ${
+            className={`flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 transition-colors ${
               streakAtRisk
-                ? "text-accent hover:bg-accent/10"
-                : "text-amber-600 hover:bg-amber-500/10"
+                ? "font-medium text-ink hover:bg-ink/[0.04]"
+                : "text-ink-muted hover:bg-ink/[0.04] hover:text-ink"
             }`}
           >
             <Flame
@@ -167,9 +170,8 @@ export function AppSidebar() {
               strokeWidth={streakAtRisk ? 2.2 : 1.8}
               aria-hidden
             />
-            <span className="text-[10px] font-semibold tabular-nums leading-none">
+            <span className="font-meta text-mono-sm tabular-nums leading-none">
               {streak}
-              {streakAtRisk ? "!" : ""}
             </span>
           </Link>
         )}
@@ -177,7 +179,7 @@ export function AppSidebar() {
         {!isAcademy && (
           <Link
             href="/upgrade"
-            className="flex w-full flex-col items-center gap-1.5 rounded-xl px-1.5 py-2.5 text-violet-500/70 transition hover:bg-violet-500/10 hover:text-violet-600"
+            className="flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 text-ink-muted transition hover:bg-ink/[0.04] hover:text-ink"
           >
             <ArrowUp size={18} strokeWidth={1.8} aria-hidden />
             <span className="text-[10px] font-medium leading-none opacity-80">
@@ -190,7 +192,7 @@ export function AppSidebar() {
           href="/profile"
           aria-label={displayName}
           title={displayName}
-          className="flex w-full flex-col items-center gap-1.5 rounded-xl px-1.5 py-2.5 transition hover:bg-ink/[0.05]"
+          className="flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 transition hover:bg-ink/[0.05]"
         >
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-ink text-[11px] font-semibold text-paper">
             {initial}

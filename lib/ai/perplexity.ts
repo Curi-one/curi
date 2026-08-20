@@ -88,7 +88,9 @@ type RawChatCompletionResponse = {
   search_results?: RawSearchResult[];
 };
 
-function parseSources(results: RawSearchResult[] | undefined): PerplexitySource[] {
+function parseSources(
+  results: RawSearchResult[] | undefined,
+): PerplexitySource[] {
   if (!Array.isArray(results)) {
     return [];
   }

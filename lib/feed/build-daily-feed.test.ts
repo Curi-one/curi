@@ -81,7 +81,11 @@ describe("buildDailyFeedItems", () => {
 
   it("does not add a locked item when the next lesson would be out of bounds", () => {
     const courses = [
-      course({ id: "p1", progress: 6, lessonTitles: Array.from({ length: 7 }, (_, i) => `L${i + 1}`) }),
+      course({
+        id: "p1",
+        progress: 6,
+        lessonTitles: Array.from({ length: 7 }, (_, i) => `L${i + 1}`),
+      }),
     ];
     const items = buildDailyFeedItems(courses, [], TODAY);
     expect(items.some((i) => i.status === "locked")).toBe(false);
@@ -101,7 +105,9 @@ describe("buildDailyFeedItems", () => {
   });
 
   it("adds an overdue item for the current lesson when a day was missed", () => {
-    const courses = [course({ id: "p1", progress: 2, createdAt: "2026-08-15" })];
+    const courses = [
+      course({ id: "p1", progress: 2, createdAt: "2026-08-15" }),
+    ];
     const activity: DailyFeedActivityRow[] = [
       { courseId: "p1", lessonIndex: 0, activityDate: "2026-08-17" },
       { courseId: "p1", lessonIndex: 1, activityDate: "2026-08-18" },
@@ -119,7 +125,11 @@ describe("buildDailyFeedItems", () => {
 
   it("skips available/locked/overdue items for a fully completed path", () => {
     const courses = [
-      course({ id: "p1", progress: 7, lessonTitles: Array.from({ length: 7 }, (_, i) => `L${i + 1}`) }),
+      course({
+        id: "p1",
+        progress: 7,
+        lessonTitles: Array.from({ length: 7 }, (_, i) => `L${i + 1}`),
+      }),
     ];
     const items = buildDailyFeedItems(courses, [], TODAY);
     expect(items).toEqual([]);
@@ -128,7 +138,9 @@ describe("buildDailyFeedItems", () => {
 
 describe("groupFeedItems", () => {
   it("groups and sorts tomorrow, today, then past ascending", () => {
-    const courses = [course({ id: "p1", progress: 2, createdAt: "2026-08-10" })];
+    const courses = [
+      course({ id: "p1", progress: 2, createdAt: "2026-08-10" }),
+    ];
     const activity: DailyFeedActivityRow[] = [
       { courseId: "p1", lessonIndex: 0, activityDate: "2026-08-18" },
       { courseId: "p1", lessonIndex: 1, activityDate: "2026-08-19" },

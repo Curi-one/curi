@@ -35,11 +35,11 @@ function completion(content: string): ChatCompletionResult {
 
 describe("stripMarkdownFences", () => {
   it("removes json fences", () => {
-    expect(stripMarkdownFences("```json\n{\"a\":1}\n```")).toBe('{"a":1}');
+    expect(stripMarkdownFences('```json\n{"a":1}\n```')).toBe('{"a":1}');
   });
 
   it("returns trimmed content when no fences", () => {
-    expect(stripMarkdownFences("  {\"a\":1}  ")).toBe('{"a":1}');
+    expect(stripMarkdownFences('  {"a":1}  ')).toBe('{"a":1}');
   });
 });
 

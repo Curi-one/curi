@@ -51,7 +51,7 @@ export function LandingHeadline() {
           className="ml-px inline-block w-[2px]"
           style={{
             height: "0.82em",
-            background: "#C1121F",
+            background: "var(--color-text-primary)",
             opacity: cursorOn ? 1 : 0,
             transition: "opacity 80ms",
             verticalAlign: "middle",

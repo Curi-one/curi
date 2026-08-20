@@ -16,9 +16,10 @@ Canonical product and engineering spec for **Curi**. The production app lives at
 | 8 | [ENVIRONMENTS.md](./ENVIRONMENTS.md) | local · staging · production |
 | 9 | [ROADMAP.md](./ROADMAP.md) | Implementation slices |
 | 10 | [TDD.md](./TDD.md) | Test-driven development |
-| 11 | [UX-PRINCIPLES.md](./UX-PRINCIPLES.md) | Mental models, behavioural UX |
-| 12 | [AGENT-ROSTER.md](./AGENT-ROSTER.md) | Cursor / Claude agents |
-| 13 | [TRACKING.md](./TRACKING.md) | Linear project & issue map |
+| 11 | [BRAND.md](./BRAND.md) | Brand, design tokens, component specs |
+| 12 | [UX-PRINCIPLES.md](./UX-PRINCIPLES.md) | Mental models, behavioural UX |
+| 13 | [AGENT-ROSTER.md](./AGENT-ROSTER.md) | Cursor / Claude agents |
+| 14 | [TRACKING.md](./TRACKING.md) | Linear project & issue map |
 
 Agents: [`../AGENTS.md`](../AGENTS.md) · skills in [`.cursor/skills/`](../.cursor/skills/)
 
@@ -36,4 +37,4 @@ If a prototype conflicts with this folder, **`docs/` wins**.
 
 ## Brand assets
 
-Visual system: [`../prototypes/web/curi-brand-guidelines-v2.md`](../prototypes/web/curi-brand-guidelines-v2.md)
+Visual system: [BRAND.md](./BRAND.md) — brand, tokens, and component specs. Binding on all UI.

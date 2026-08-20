@@ -18,9 +18,7 @@ describe("resolveAuthLanding", () => {
   });
 
   it("forwards token_hash magic links to the callback route", () => {
-    const search = new URLSearchParams(
-      "token_hash=abc&type=magiclink",
-    );
+    const search = new URLSearchParams("token_hash=abc&type=magiclink");
     expect(resolveAuthLanding(search)).toEqual({
       action: "consume-link",
       callbackPath: "/auth/callback?token_hash=abc&type=magiclink",
@@ -36,9 +34,7 @@ describe("resolveAuthLanding", () => {
 
   it("preserves returnTo after link exchange", () => {
     expect(
-      resolveAuthLanding(
-        new URLSearchParams("from=link&returnTo=%2Fprofile"),
-      ),
+      resolveAuthLanding(new URLSearchParams("from=link&returnTo=%2Fprofile")),
     ).toEqual({
       action: "named-step",
       returnTo: "/profile",
@@ -75,7 +71,10 @@ describe("completeEmailLink", () => {
 
   it("throws when the URL has neither code nor token_hash", async () => {
     await expect(
-      completeEmailLink({}, { exchangeCodeForSession: vi.fn(), verifyOtp: vi.fn() }),
+      completeEmailLink(
+        {},
+        { exchangeCodeForSession: vi.fn(), verifyOtp: vi.fn() },
+      ),
     ).rejects.toThrow(/missing/i);
   });
 });

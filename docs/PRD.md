@@ -110,4 +110,4 @@ Perplexity sets exact lesson count inside the band and produces lesson titles fo
 
 White / ink / vermilion `#C1121F`. Fraunces wordmark, Plus Jakarta Sans body, JetBrains Mono metadata. Calm and editorial — no gamified clutter.
 
-Full spec: [`prototypes/web/curi-brand-guidelines-v2.md`](../prototypes/web/curi-brand-guidelines-v2.md).
+Full spec: [`docs/BRAND.md`](./BRAND.md).

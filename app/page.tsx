@@ -3,12 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import {
-  ArrowUp,
-  BookOpen,
-  Clock3,
-  SlidersHorizontal,
-} from "lucide-react";
+import { ArrowUp, BookOpen, Clock3, SlidersHorizontal } from "lucide-react";
 import { LandingHeadline } from "@/components/LandingHeadline";
 import { Wordmark } from "@/components/Wordmark";
 import { FOUNDER_TOPIC_SUGGESTIONS } from "@/lib/content/founder-catalogue";
@@ -88,7 +83,7 @@ export default function LandingPage() {
           </Link>
           <Link
             href={SIGNUP_HOME}
-            className="btn-secondary inline-flex min-h-11 items-center rounded-full px-4 text-sm"
+            className="btn-secondary inline-flex min-h-11 items-center rounded-none px-4 text-sm"
           >
             Sign up
           </Link>
@@ -98,7 +93,7 @@ export default function LandingPage() {
       <div className="mx-auto mt-10 w-full max-w-xl sm:mt-14">
         <p className="mb-4 flex items-center gap-2 font-meta">
           <span
-            className="landing-pulse-dot h-1.5 w-1.5 rounded-full bg-accent"
+            className="landing-pulse-dot h-1.5 w-1.5 rounded-full bg-ink-muted"
             aria-hidden
           />
           Personalized learning paths
@@ -115,7 +110,7 @@ export default function LandingPage() {
 
         <form onSubmit={onSubmit} className="mb-3 mt-8">
           <div
-            className="flex cursor-text items-center gap-3 rounded-2xl border border-transparent px-5 py-[15px] transition-[background-color,border-color,box-shadow] duration-200 hover:border-border/80"
+            className="flex cursor-text items-center gap-3 rounded-none border border-transparent px-5 py-[15px] transition-[background-color,border-color] duration-200 hover:border-border/80"
             style={{
               background: inputFocused
                 ? "color-mix(in srgb, var(--color-ink) 4.5%, transparent)"
@@ -146,7 +141,7 @@ export default function LandingPage() {
             <button
               type="submit"
               disabled={!topic.trim()}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-paper transition-all duration-150 hover:scale-[1.07] active:scale-95 disabled:opacity-20"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-none bg-ink text-paper transition-all duration-150 hover:scale-[1.07] active:scale-95 disabled:opacity-20"
               aria-label="Start exploring"
             >
               <ArrowUp className="h-4 w-4" aria-hidden />
@@ -180,7 +175,7 @@ export default function LandingPage() {
                 key={suggestion}
                 type="button"
                 onClick={() => start(suggestion)}
-                className="interactive-chip focus-ring min-h-11 shrink-0 rounded-full px-3.5 py-2 text-[13px] text-ink-muted"
+                className="interactive-chip focus-ring min-h-11 shrink-0 rounded-none px-3.5 py-2 text-[13px] text-ink-muted"
                 style={{
                   background:
                     "color-mix(in srgb, var(--color-ink) 4%, transparent)",
