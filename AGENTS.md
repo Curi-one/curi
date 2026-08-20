@@ -48,5 +48,13 @@ Auth after first quiz · one lesson/path/day · multi-path Today · cache before
 
 ## Current status
 
-**Slice 1b ✓** — frontend + mock APIs on [stage.curi.one](https://stage.curi.one).  
+**Slice 1b ✓** — frontend + mock APIs on [stage.curi.one](https://stage.curi.one). 
 Track work in Linear **Curi v1** — [`docs/TRACKING.md`](./docs/TRACKING.md). Slice 2+ replaces mock backends.
+
+## Cursor Cloud specific instructions
+
+Single Next.js monolith at repo root. Standard commands live in `package.json` and `README.md` (`pnpm dev` · `pnpm build` · `pnpm test` · `pnpm lint` · `pnpm typecheck`); the update script already runs `pnpm install`. Uses pnpm (pinned via `packageManager`) through corepack; prefix commands with `corepack` (e.g. `corepack pnpm dev`).
+
+- `USE_MOCK_API=true` runs everything against the in-memory mock store (`lib/mock/store.ts`) — no Supabase/Perplexity/Stripe keys are needed for local dev/test/build. `.env.local` (copy from `.env.example`) is optional; empty secret values are fine while mocks are on.
+- Mock state is a process-memory singleton keyed by the `curi_session` cookie, seeded with a `member-default` session on construction. It is NOT shared across the dev server and the browser reliably on the *first* hit to a route: `next dev` re-evaluates shared modules the first time a given route is compiled, which resets the singleton. Symptom: a fresh guest "create path → read first lesson" can fail once with "Could not load lesson." right after a cold start because the `/courses/[courseId]/lessons/[index]` route compiles and drops the just-created pending course. Warm the routes first (hit them once, or reload) and the full flow works end-to-end. Prod/staging (a single warm Node/lambda instance) do not hit this because no recompilation occurs.
+- `/api/dev/persona` and `/api/dev/seed` are development-only helpers; note `/api/dev/persona` does not set the `curi_session` cookie, so drive persona switching through the UI dev toggle rather than a raw request when you need the cookie to stick.
