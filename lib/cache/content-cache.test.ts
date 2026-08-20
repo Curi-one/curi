@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
+  lookupLessonBody,
   lookupPathOutline,
+  storeLessonBody,
   storePathOutline,
   type PathOutlinePayload,
 } from "@/lib/cache/content-cache";
@@ -117,6 +119,71 @@ describe("storePathOutline", () => {
         depth: "essentials",
         payload: SAMPLE_PAYLOAD,
         sources: [],
+      }),
+      expect.objectContaining({ onConflict: "cache_key" }),
+    );
+  });
+});
+
+describe("lookupLessonBody", () => {
+  it("returns null on cache miss", async () => {
+    const mock = createMockAdmin({
+      selectResult: { data: null, error: null },
+    });
+
+    const result = await lookupLessonBody("body-miss", { admin: mock.client });
+
+    expect(result).toBeNull();
+    expect(mock.eqCacheType).toHaveBeenCalledWith("cache_type", "lesson_body");
+  });
+
+  it("returns payload and increments hit_count on hit", async () => {
+    const mock = createMockAdmin({
+      selectResult: {
+        data: {
+          id: "body-1",
+          payload: { body: ["Hello."] },
+          sources: [{ title: "S", url: "https://example.com" }],
+          hit_count: 0,
+        },
+        error: null,
+      },
+    });
+
+    const result = await lookupLessonBody("body-hit", { admin: mock.client });
+
+    expect(result).toEqual({
+      payload: { body: ["Hello."] },
+      sources: [{ title: "S", url: "https://example.com" }],
+    });
+    expect(mock.update).toHaveBeenCalledWith({ hit_count: 1 });
+  });
+});
+
+describe("storeLessonBody", () => {
+  it("upserts lesson_body row with difficulty modifier", async () => {
+    const mock = createMockAdmin({});
+
+    await storeLessonBody(
+      {
+        cacheKey: "fp-body",
+        topicNormalized: "term sheets",
+        depth: "essentials",
+        lessonIndex: 0,
+        difficultyModifier: "baseline",
+        payload: { body: ["Para."] },
+        sources: [],
+      },
+      { admin: mock.client },
+    );
+
+    expect(mock.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        cache_key: "fp-body",
+        cache_type: "lesson_body",
+        lesson_index: 0,
+        difficulty_modifier: "baseline",
+        payload: { body: ["Para."] },
       }),
       expect.objectContaining({ onConflict: "cache_key" }),
     );
