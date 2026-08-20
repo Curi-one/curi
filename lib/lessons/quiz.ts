@@ -11,8 +11,9 @@ import type {
   QuizResponse,
   QuizSubmitRequest,
   QuizSubmitResponse,
+  Source,
 } from "@/lib/api/schemas";
-import { QuizQuestionSchema } from "@/lib/api/schemas";
+import { QuizQuestionSchema, SourceSchema } from "@/lib/api/schemas";
 import { buildFingerprint } from "@/lib/cache/fingerprint";
 import {
   lookupQuiz,
@@ -136,15 +137,37 @@ async function loadUserTimezone(
   return typeof tz === "string" && tz.length > 0 ? tz : DEFAULT_TIMEZONE;
 }
 
+function sourceFromRefs(refs: unknown): Source | undefined {
+  if (refs == null) return undefined;
+  const candidates = Array.isArray(refs) ? refs : [refs];
+  for (const item of candidates) {
+    if (!item || typeof item !== "object") continue;
+    const obj = item as Record<string, unknown>;
+    const title =
+      typeof obj.title === "string"
+        ? obj.title
+        : typeof obj.name === "string"
+          ? obj.name
+          : undefined;
+    const url = typeof obj.url === "string" ? obj.url : undefined;
+    if (!title || !url) continue;
+    const parsed = SourceSchema.safeParse({ title, url });
+    if (parsed.success) return parsed.data;
+  }
+  return undefined;
+}
+
 function toQuizResponse(questions: QuizQuestionPayload[]): QuizResponse {
   return {
     questions: questions.map((q) => {
+      const source = sourceFromRefs(q.source_refs);
       const item = {
         id: q.id,
         prompt: q.prompt,
         options: q.options,
         correctIndex: q.correctIndex,
         ...(q.explanation ? { explanation: q.explanation } : {}),
+        ...(source ? { source } : {}),
       };
       const parsed = QuizQuestionSchema.safeParse(item);
       if (!parsed.success) {

@@ -28,4 +28,30 @@ describe("QuizFlow", () => {
       screen.getByRole("button", { name: "How did that land?" }),
     ).toBeInTheDocument();
   });
+
+  it("shows a Sources link after why when source is provided", () => {
+    render(
+      <QuizFlow
+        questions={[
+          {
+            id: "q1",
+            prompt: "Who posed the paradox?",
+            options: ["Sagan", "Fermi", "Drake"],
+            correctIndex: 1,
+            explanation: "Enrico Fermi posed the question in 1950.",
+            source: {
+              title: "NASA — Astrobiology",
+              url: "https://astrobiology.nasa.gov/",
+            },
+          },
+        ]}
+        onComplete={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Fermi" }));
+    expect(screen.getByText("Sources")).toBeInTheDocument();
+    const link = screen.getByRole("link", { name: "NASA — Astrobiology" });
+    expect(link).toHaveAttribute("href", "https://astrobiology.nasa.gov/");
+  });
 });

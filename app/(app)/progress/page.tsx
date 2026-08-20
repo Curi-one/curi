@@ -31,7 +31,9 @@ export default function ProgressPage() {
     <PageShell
       back={{ href: "/today", label: "Today" }}
       title="Progress"
-      kicker="Streak & paths"
+      kicker={
+        streak > 0 ? `${streak}-day streak` : "Build your streak"
+      }
       withTabPad={false}
       className="pt-4"
     >

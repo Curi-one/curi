@@ -287,6 +287,7 @@ class MockStore {
       index,
       path.lessonTitles[index] ?? `Lesson ${index + 1}`,
     );
+    const lessonSource = content.sources[0];
     return {
       questions: content.quiz.map((q) => ({
         id: q.id,
@@ -294,6 +295,7 @@ class MockStore {
         options: q.options,
         correctIndex: q.correctIndex,
         explanation: q.explanation,
+        ...(lessonSource ? { source: lessonSource } : {}),
       })),
     };
   }

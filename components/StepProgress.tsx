@@ -4,25 +4,41 @@ type Props = {
   label?: string;
 };
 
-/** Thin progress bar for multi-step clarify / quiz flows. */
+/** Pip strip for multi-step clarify / depth / quiz flows (prototype onboarding). */
 export function StepProgress({ step, totalSteps, label }: Props) {
-  const pct =
-    totalSteps > 0 ? Math.min(100, Math.round((step / totalSteps) * 100)) : 0;
   return (
     <div className="mb-8">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="font-meta">
-          {label ?? `${step} of ${totalSteps}`}
-        </span>
-        <span className="text-xs text-ink-muted">
-          {step}/{totalSteps}
-        </span>
-      </div>
-      <div className="h-1 overflow-hidden rounded-full bg-paper-tertiary">
+      <div className="flex items-center justify-between gap-3">
         <div
-          className="h-full rounded-full bg-accent transition-all duration-400"
-          style={{ width: `${pct}%` }}
-        />
+          className="flex items-center gap-1.5"
+          role="list"
+          aria-label={label ? `${label} progress` : "Progress"}
+        >
+          {Array.from({ length: Math.max(totalSteps, 0) }, (_, i) => {
+            const n = i + 1;
+            const current = n === step;
+            const filled = n < step;
+            return (
+              <span
+                key={i}
+                role="listitem"
+                aria-current={current ? "step" : undefined}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  current
+                    ? "w-8 bg-ink"
+                    : filled
+                      ? "w-3 bg-ink/30"
+                      : "w-3 bg-border"
+                }`}
+              />
+            );
+          })}
+        </div>
+        <span className="font-meta shrink-0 tabular-nums">
+          {label
+            ? `${label} · ${step}/${totalSteps}`
+            : `${step}/${totalSteps}`}
+        </span>
       </div>
     </div>
   );

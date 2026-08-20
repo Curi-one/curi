@@ -100,6 +100,20 @@ export function QuizFlow({ questions, onComplete }: Props) {
             {correct ? "Right" : "Not quite"}
           </p>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">{why}</p>
+          {q.source && (
+            <p className="mt-3 text-sm text-ink-muted">
+              <span className="font-meta text-ink-muted">Sources</span>
+              {" · "}
+              <a
+                href={q.source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-ink underline decoration-border underline-offset-4 hover:decoration-accent"
+              >
+                {q.source.title}
+              </a>
+            </p>
+          )}
         </div>
       )}
       {revealed && (

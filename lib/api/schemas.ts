@@ -97,6 +97,8 @@ export const QuizQuestionSchema = z.object({
   correctIndex: z.number().int().nonnegative(),
   /** Optional per-answer why copy for QuizFlow (also returned on submit feedback). */
   explanation: z.string().optional(),
+  /** Optional citation shown after why text (FLOWS: right/wrong + why + source). */
+  source: SourceSchema.optional(),
 });
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
 

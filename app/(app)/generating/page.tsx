@@ -27,13 +27,14 @@ function lessonBlurb(
   title: string,
   index: number,
   total: number,
-  _topic: string,
+  topic: string,
 ): string {
   const t = title.toLowerCase();
   const pos = index / Math.max(total - 1, 1);
+  const topicLabel = topic.trim() || "this path";
 
   if (pos === 0) {
-    return "The first foothold: the definition, pressure, and founder decision this path is built around.";
+    return `The first foothold on ${topicLabel}: the definition, pressure, and founder decision this path is built around.`;
   }
   if (pos >= 0.92) {
     return "The synthesis: what you can now explain before a raise, negotiation, or board-level decision.";

@@ -45,7 +45,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <AppSidebar />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
         <div className="md:hidden">
-          <AppTopBar compact={!showTabBar} />
+          {/* Compact only: Progress/New live in sidebar (md+) and tabs/routes. */}
+          <AppTopBar compact />
         </div>
         <div
           className={
