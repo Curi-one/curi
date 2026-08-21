@@ -1,9 +1,5 @@
 import type { LessonVisualBlock } from "@/lib/api/schemas";
-import {
-  topicAlignClass,
-  topicArt,
-  topicPatternStyle,
-} from "@/lib/ui/topic-swatch";
+import { topicArt, topicPatternStyle } from "@/lib/ui/topic-swatch";
 
 type Props = {
   /** Visual returned by the lesson API / Perplexity. */
@@ -33,24 +29,25 @@ export function LessonImage({ visual }: Props) {
               aria-hidden
             >
               <div
-                className={`absolute inset-0 flex select-none font-display ${topicAlignClass(art.align)}`}
+                className="absolute inset-0 opacity-[0.16]"
+                style={topicPatternStyle(art.pattern)}
+              />
+              <div
+                className="absolute inset-0 flex select-none items-end justify-end font-display"
                 style={{
                   color: art.glyphColor,
-                  opacity: 0.38,
+                  opacity: 0.9,
                   fontSize: "7.5rem",
-                  fontWeight: 800,
+                  fontWeight: 300,
                   lineHeight: 0.78,
                   fontStyle: "italic",
-                  letterSpacing: "-0.04em",
-                  padding: art.align === "center" ? 0 : "8%",
+                  letterSpacing: "-0.02em",
+                  paddingRight: "8%",
+                  paddingBottom: "4%",
                 }}
               >
                 {art.glyph}
               </div>
-              <div
-                className="absolute inset-0"
-                style={topicPatternStyle(art.pattern)}
-              />
             </div>
           )}
         </div>

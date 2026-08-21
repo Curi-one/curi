@@ -9,6 +9,8 @@ import { PageShell } from "@/components/PageShell";
 import { LoadingState } from "@/components/LoadingState";
 import { SettingChips } from "@/components/SettingChips";
 import { SettingToggle } from "@/components/SettingToggle";
+import { UserAvatar } from "@/components/UserAvatar";
+import { Button } from "@/components/Button";
 import {
   getLibrary,
   getMe,
@@ -33,7 +35,6 @@ import {
   RIGOR_OPTIONS,
   SEQ_OPTIONS,
 } from "@/lib/profile/preview-samples";
-import { Button } from "@/components/Button";
 
 type Theme = "system" | "light" | "dark";
 type ProfileTab = "account" | "learning" | "email" | "plan";
@@ -238,7 +239,6 @@ export default function ProfilePage() {
 
   const isAcademy = session.plan === "academy";
   const displayName = name.trim() || session.name || "Learner";
-  const initial = displayName.slice(0, 1).toUpperCase();
   const streak = progress?.streak ?? 0;
 
   return (
@@ -262,12 +262,7 @@ export default function ProfilePage() {
       </div>
 
       <header className="mb-7 flex items-center gap-4">
-        <div
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none border border-border bg-paper-secondary text-base font-medium text-ink"
-          aria-hidden
-        >
-          {initial}
-        </div>
+        <UserAvatar name={displayName} size={56} />
         <div className="min-w-0">
           <p className="truncate text-xl font-medium leading-none tracking-tight text-ink">
             {displayName}

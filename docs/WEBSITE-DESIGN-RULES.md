@@ -2,6 +2,8 @@
 
 ### Quick reference · derived from Brand Guidelines & Design System v2.0
 
+**Also:** [INTERACTIONS.md](./INTERACTIONS.md) · [TRACK-MARKS.md](./TRACK-MARKS.md)
+
 ---
 
 ## 1. Colour
@@ -205,6 +207,8 @@ The one permitted visual-depth trick: a 2px Vermilion bottom border on the activ
 
 ## 5. Motion
 
+Binding rules live in **[INTERACTIONS.md](./INTERACTIONS.md)** (exact tokens, hover one-property, reveals, never-list). HTML: [`references/interactions-guide.html`](./references/interactions-guide.html).
+
 Three principles: **Gravity** (things settle into place, never fly in), **Patience** (300ms minimum for meaningful transitions), **Restraint** (one motion at a time).
 
 No spring physics, no bounce, no elastic, no parallax scrolling.
@@ -217,11 +221,11 @@ No spring physics, no bounce, no elastic, no parallax scrolling.
 
 | Token | Value | Use |
 |---|---|---|
-| `duration.micro` | 80–120ms | Hover fills, focus rings |
-| `duration.small` | 180–220ms | Colour/opacity transitions |
-| `duration.medium` | 300–400ms | Component entrances, modals |
-| `duration.large` | 600–900ms | Page transitions, staggered reveals |
-| `duration.xl` | 1000–1200ms | Wordmark draw-in, hero entrances |
+| `duration.micro` | **100ms** | Hover fills, focus rings |
+| `duration.small` | **200ms** | Colour/opacity transitions |
+| `duration.medium` | **350ms** | Component entrances, modals |
+| `duration.large` | **750ms** | Page transitions, staggered reveals |
+| `duration.xl` | **1100ms** | Wordmark draw-in, hero entrances |
 
 Always respect `prefers-reduced-motion`:
 
@@ -231,7 +235,7 @@ Always respect `prefers-reduced-motion`:
 }
 ```
 
----
+**Track marks & avatars:** [TRACK-MARKS.md](./TRACK-MARKS.md).
 
 ## 6. Buttons — the only permitted types
 

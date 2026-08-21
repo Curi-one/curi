@@ -177,10 +177,10 @@
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
-  --duration-micro: 120ms;
+  --duration-micro: 100ms;
   --duration-small: 200ms;
   --duration-medium: 350ms;
-  --duration-large: 900ms;
+  --duration-large: 750ms;
   --duration-xl: 1100ms;
 
   /* Legacy alias — `--ease-spring` is `--ease-out`. Prefer --ease-out. */
@@ -360,10 +360,7 @@ body {
     text-align: center;
     border-radius: var(--radius-none);
     transition:
-      background-color var(--duration-small) var(--ease-out),
-      border-color var(--duration-small) var(--ease-out),
-      color var(--duration-small) var(--ease-out),
-      transform var(--duration-micro) var(--ease-out),
+      background-color var(--duration-micro) var(--ease-out),
       opacity var(--duration-small) var(--ease-out);
   }
 
@@ -415,6 +412,7 @@ body {
 
   .btn-primary:active:not(:disabled) {
     transform: translateY(1px);
+    transition: none;
   }
 
   .btn-primary:disabled {
@@ -432,11 +430,11 @@ body {
 
   .btn-secondary:hover:not(:disabled) {
     background: var(--color-bg-tertiary);
-    border-color: var(--color-border-strong);
   }
 
   .btn-secondary:active:not(:disabled) {
     transform: translateY(1px);
+    transition: none;
   }
 
   .btn-secondary:disabled {
@@ -453,7 +451,13 @@ body {
   }
 
   .btn-ghost:hover:not(:disabled) {
-    color: var(--color-text-primary);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+  }
+
+  .btn-ghost:active:not(:disabled) {
+    transform: translateY(1px);
+    transition: none;
   }
 
   .btn-ghost:disabled {
@@ -469,9 +473,12 @@ body {
   }
 
   .btn-danger:hover:not(:disabled) {
-    color: var(--color-text-primary);
-    border-color: var(--color-border-strong);
-    background: transparent;
+    background: var(--color-bg-tertiary);
+  }
+
+  .btn-danger:active:not(:disabled) {
+    transform: translateY(1px);
+    transition: none;
   }
 
   .btn-danger:disabled {
@@ -558,31 +565,26 @@ body {
     background: var(--color-bg-secondary);
     border: var(--border-subtle);
     border-radius: var(--radius-none);
-    transition:
-      background-color var(--duration-medium) var(--ease-out),
-      border-color var(--duration-medium) var(--ease-out);
+    transition: background-color 300ms var(--ease-out);
   }
 
   .surface-card-interactive {
     cursor: pointer;
+    transition: background-color 300ms var(--ease-out);
   }
 
   .surface-card-interactive:hover {
     background: var(--color-bg-tertiary);
-    border-color: var(--color-border-strong);
   }
 
-  /* Clickable rows and cards — no shadow, no lift (§16.3) */
+  /* Clickable rows and cards — Paper→Pale bg only, no lift (§16.3 / INTERACTIONS) */
   .interactive-card {
     border-radius: var(--radius-none);
-    transition:
-      background-color var(--duration-medium) var(--ease-out),
-      border-color var(--duration-medium) var(--ease-out);
+    transition: background-color 300ms var(--ease-out);
   }
 
   .interactive-card:hover {
     background: var(--color-bg-tertiary);
-    border-color: var(--color-border-strong);
   }
 
   /* Dark feature card (§9.3) */
@@ -1208,7 +1210,38 @@ body {
   animation: streak-settle var(--duration-medium) var(--ease-out) both;
 }
 
-/* ─── Reduced motion · §7.5 ─────────────────────────────────────────────── */
+/* ─── Interactions · docs/INTERACTIONS.md ───────────────────────────────── */
+
+.stagger-item {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 700ms var(--ease-out),
+    transform 700ms var(--ease-out);
+}
+
+.stagger-item.on,
+.stagger-item[data-on="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.skeleton-pulse {
+  background: var(--color-bg-tertiary);
+  animation: skeleton-pulse 1600ms ease-in-out infinite;
+}
+
+/* ─── Reduced motion · §7.5 / INTERACTIONS.md ───────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   *,

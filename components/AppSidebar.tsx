@@ -14,6 +14,7 @@ import {
   type LucideProps,
 } from "lucide-react";
 import { Wordmark } from "@/components/Wordmark";
+import { UserAvatar } from "@/components/UserAvatar";
 import {
   getFeed,
   getMe,
@@ -99,7 +100,6 @@ export function AppSidebar() {
   const isAcademy = session?.plan === "academy";
   const displayName =
     session?.name?.trim() || session?.email?.split("@")[0] || "You";
-  const initial = displayName.slice(0, 1).toUpperCase();
   const firstName = displayName.split(/\s+/)[0];
 
   return (
@@ -193,11 +193,9 @@ export function AppSidebar() {
           href="/profile"
           aria-label={displayName}
           title={displayName}
-          className="flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 transition hover:bg-ink/[0.05]"
+          className="flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 transition-[background-color] duration-micro ease-out hover:bg-ink/[0.05]"
         >
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-ink text-ui-3xs font-semibold text-paper">
-            {initial}
-          </div>
+          <UserAvatar name={displayName} size={28} />
           <span className="max-w-full truncate text-ui-4xs font-medium leading-none text-ink-muted/60">
             {firstName}
           </span>
