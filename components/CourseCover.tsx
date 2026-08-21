@@ -1,4 +1,8 @@
-import { topicSwatch } from "@/lib/ui/topic-swatch";
+import {
+  topicAlignClass,
+  topicArt,
+  topicPatternStyle,
+} from "@/lib/ui/topic-swatch";
 
 type Props = {
   topic: string;
@@ -7,37 +11,45 @@ type Props = {
   className?: string;
 };
 
-/** Greyscale cover field with an oversized initial (BRAND.md §6.2). */
+/** Greyscale cover field with oversized glyph + pattern (BRAND.md §6.2–6.4). */
 export function CourseCover({ topic, height, width, className = "" }: Props) {
-  const [bg, fg] = topicSwatch(topic);
-  const initial = (topic || "?")[0]?.toUpperCase() ?? "?";
+  const art = topicArt(topic);
   const rounded = width ? "rounded-none" : "w-full";
+  const pad =
+    art.align === "center"
+      ? undefined
+      : art.align.endsWith("r")
+        ? { paddingRight: "6%" }
+        : { paddingLeft: "6%" };
 
   return (
     <div
-      className={`relative shrink-0 overflow-hidden ${rounded} ${className}`}
-      style={{ height, width: width ?? undefined, background: bg }}
+      className={`group/cover relative shrink-0 overflow-hidden ${rounded} ${className}`}
+      style={{ height, width: width ?? undefined, background: art.field }}
       aria-hidden
     >
       <div
-        className="pointer-events-none absolute inset-0 flex select-none items-end justify-end"
+        className={`pointer-events-none absolute inset-0 flex select-none font-display ${topicAlignClass(art.align)}`}
         style={{
-          color: fg,
+          color: art.glyphColor,
           opacity: 0.4,
           fontSize: height * 1.55,
           fontWeight: 800,
           lineHeight: 0.78,
-          paddingRight: "6%",
+          fontStyle: "italic",
+          letterSpacing: "-0.04em",
+          ...pad,
         }}
       >
-        {initial}
+        {art.glyph}
       </div>
       <div
         className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(138deg, transparent, transparent 5px, rgba(255,255,255,0.045) 5px, rgba(255,255,255,0.045) 6px)",
-        }}
+        style={topicPatternStyle(art.pattern)}
+      />
+      {/* Vermilion reveal — 2px bottom edge on hover only (BRAND §6.4) */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-[#C1121F] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/cover:scale-x-100"
       />
     </div>
   );

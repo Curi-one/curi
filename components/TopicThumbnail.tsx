@@ -1,4 +1,8 @@
-import { topicSwatch } from "@/lib/ui/topic-swatch";
+import {
+  topicAlignClass,
+  topicArt,
+  topicPatternStyle,
+} from "@/lib/ui/topic-swatch";
 
 type Props = {
   topic: string;
@@ -6,35 +10,34 @@ type Props = {
 };
 
 export function TopicThumbnail({ topic, size = 64 }: Props) {
-  const [bg, fg] = topicSwatch(topic);
-  const initial = (topic || "?").slice(0, 1).toUpperCase();
+  const art = topicArt(topic);
 
   return (
     <div
-      className="relative shrink-0 overflow-hidden rounded-none"
-      style={{ width: size, height: size, background: bg }}
+      className="group/thumb relative shrink-0 overflow-hidden rounded-none"
+      style={{ width: size, height: size, background: art.field }}
       aria-hidden
     >
       <div
-        className="absolute inset-0 flex select-none items-center justify-center"
+        className={`absolute inset-0 flex select-none font-display ${topicAlignClass(art.align)}`}
         style={{
-          color: fg,
+          color: art.glyphColor,
           opacity: 0.42,
           fontSize: size * 0.62,
           fontWeight: 700,
           letterSpacing: "-0.04em",
           lineHeight: 1,
+          fontStyle: "italic",
+          padding: art.align === "center" ? 0 : "6%",
         }}
       >
-        {initial}
+        {art.glyph}
       </div>
       <div
         className="absolute inset-0"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(140deg, transparent, transparent 5px, rgba(255,255,255,0.05) 5px, rgba(255,255,255,0.05) 6px)",
-        }}
+        style={topicPatternStyle(art.pattern)}
       />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-[#C1121F] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/thumb:scale-x-100" />
     </div>
   );
 }

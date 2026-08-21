@@ -1,4 +1,9 @@
 import type { LessonVisualBlock } from "@/lib/api/schemas";
+import {
+  topicAlignClass,
+  topicArt,
+  topicPatternStyle,
+} from "@/lib/ui/topic-swatch";
 
 type Props = {
   /** Visual returned by the lesson API / Perplexity. */
@@ -7,6 +12,7 @@ type Props = {
 
 export function LessonImage({ visual }: Props) {
   const { title, caption, imageUrl } = visual;
+  const art = topicArt(title);
 
   return (
     <figure className="my-10 border-y border-border py-6">
@@ -20,17 +26,32 @@ export function LessonImage({ visual }: Props) {
               className="absolute inset-0 h-full w-full object-cover"
             />
           ) : (
-            <>
-              <div className="absolute inset-0 bg-gradient-to-br from-paper via-paper-secondary to-paper-tertiary" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(193,18,31,0.08),transparent_42%)]" />
-              <div className="absolute left-8 top-8 h-24 w-24 rounded-none border border-border" />
-              <div className="absolute bottom-8 right-8 h-32 w-32 rounded-none border border-border/70" />
-              <div className="absolute bottom-10 left-8 right-8 grid grid-cols-5 gap-3">
-                {[1, 2, 3, 4, 5].map((item) => (
-                  <div key={item} className="h-20 border-x border-border/50" />
-                ))}
+            <div
+              className="absolute inset-0"
+              style={{ background: art.field }}
+              data-testid="lesson-image-fallback"
+              aria-hidden
+            >
+              <div
+                className={`absolute inset-0 flex select-none font-display ${topicAlignClass(art.align)}`}
+                style={{
+                  color: art.glyphColor,
+                  opacity: 0.38,
+                  fontSize: "7.5rem",
+                  fontWeight: 800,
+                  lineHeight: 0.78,
+                  fontStyle: "italic",
+                  letterSpacing: "-0.04em",
+                  padding: art.align === "center" ? 0 : "8%",
+                }}
+              >
+                {art.glyph}
               </div>
-            </>
+              <div
+                className="absolute inset-0"
+                style={topicPatternStyle(art.pattern)}
+              />
+            </div>
           )}
         </div>
         <figcaption className="flex flex-col justify-end border-l-0 pl-0 pt-4 lg:border-l lg:border-border lg:pl-6 lg:pt-0">
