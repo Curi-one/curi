@@ -2,26 +2,13 @@ import Link from "next/link";
 import { Lock } from "lucide-react";
 import type { FeedLessonItem } from "@/lib/api/schemas";
 import { TopicThumbnail } from "@/components/TopicThumbnail";
+import { lessonBlurb } from "@/lib/ui/lesson-blurb";
 
 type Props = {
   item: FeedLessonItem;
   /** Copy for a locked (tomorrow) card — depends on whether today's lesson is still due. */
   lockedCopy?: string;
 };
-
-function blurbFor(item: FeedLessonItem, lockedCopy: string): string {
-  const position = `Lesson ${item.lessonNumber} of ${item.totalLessons}`;
-  switch (item.status) {
-    case "available":
-      return `${position} · continue your path on ${item.topic}.`;
-    case "completed":
-      return `${position} · completed. Tap to re-read.`;
-    case "overdue":
-      return `${position} · missed yesterday. Catch up on ${item.topic}.`;
-    case "locked":
-      return `${position} · ${lockedCopy}`;
-  }
-}
 
 function actionLabel(status: FeedLessonItem["status"]): string {
   switch (status) {
@@ -36,12 +23,21 @@ function actionLabel(status: FeedLessonItem["status"]): string {
   }
 }
 
+function positionLabel(item: FeedLessonItem): string {
+  return `Lesson ${item.lessonNumber} of ${item.totalLessons}`;
+}
+
 export function LessonFeedCard({
   item,
   lockedCopy = "Unlocks tomorrow",
 }: Props) {
   const dimmed = item.status === "completed";
-  const blurb = blurbFor(item, lockedCopy);
+  const preview = lessonBlurb(
+    item.title,
+    item.lessonIndex,
+    item.totalLessons,
+    item.topic,
+  );
 
   if (item.status === "locked") {
     return (
@@ -50,16 +46,22 @@ export function LessonFeedCard({
           <TopicThumbnail topic={item.topic} />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-ui-sm font-semibold leading-snug tracking-tight text-ink/50 sm:text-ui-md">
+          <h3 className="font-display text-ui-xl font-light leading-tight tracking-tight text-ink/50 sm:text-display-2xs">
             {item.title}
           </h3>
+          <p className="mt-1 font-meta text-ink-muted/60">{item.topic}</p>
           <p className="mt-1.5 line-clamp-2 text-ui-2xs leading-relaxed text-ink-muted/70 sm:text-ui-xs">
-            {blurb}
+            {preview}
           </p>
           <div className="mt-3 h-px bg-border/40" aria-hidden />
-          <div className="mt-2 flex items-center justify-end gap-1.5 text-ui-4xs font-semibold uppercase tracking-wider text-ink-muted/50">
-            <Lock className="h-3 w-3" aria-hidden />
-            {lockedCopy}
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <span className="text-ui-4xs font-medium tracking-wide text-ink-muted/45">
+              {positionLabel(item)}
+            </span>
+            <div className="flex items-center gap-1.5 text-ui-4xs font-semibold uppercase tracking-wider text-ink-muted/50">
+              <Lock className="h-3 w-3" aria-hidden />
+              {lockedCopy}
+            </div>
           </div>
         </div>
       </div>
@@ -95,12 +97,19 @@ export function LessonFeedCard({
         </h3>
         <p className="mt-1 font-meta">{item.topic}</p>
         <p className="mt-1.5 line-clamp-2 text-ui-2xs leading-relaxed text-ink-muted sm:text-ui-xs">
-          {blurb}
+          {preview}
         </p>
 
         <div className="mt-3 h-px bg-border/55" aria-hidden />
 
-        <div className="mt-2 flex items-center justify-end">
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <span
+            className={`text-ui-4xs font-medium tracking-wide ${
+              dimmed ? "text-ink-muted/40" : "text-ink-muted/70"
+            }`}
+          >
+            {positionLabel(item)}
+          </span>
           <span
             className={`text-ui-4xs font-semibold uppercase tracking-wider transition-colors ${
               dimmed
