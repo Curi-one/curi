@@ -1,640 +1,461 @@
 "use client";
 
-import { useState } from "react";
-import { BrowseFilterChips } from "@/components/BrowseFilterChips";
-import { EmptyState } from "@/components/EmptyState";
+import Link from "next/link";
+import { useMemo, useState, type ReactNode } from "react";
+import {
+  ArrowRight,
+  BookOpen,
+  Check,
+  ChevronRight,
+  Heart,
+  Moon,
+  Plus,
+  Search,
+  Settings,
+  Sparkles,
+  Sun,
+} from "lucide-react";
+import { Button } from "@/components/Button";
 import { Heatmap } from "@/components/Heatmap";
-import { LessonFeedCard } from "@/components/LessonFeedCard";
-import { LibraryPathCard } from "@/components/LibraryPathCard";
-import { Loader } from "@/components/Loader";
-import { PageShell } from "@/components/PageShell";
-import { PathMap } from "@/components/PathMap";
-import { PathProgressBar } from "@/components/PathProgressBar";
-import { ProgressRing } from "@/components/ProgressRing";
 import { SettingChips } from "@/components/SettingChips";
-import { SettingToggle } from "@/components/SettingToggle";
-import { StepProgress } from "@/components/StepProgress";
 import { TabPills } from "@/components/TabPills";
-import { TopicThumbnail } from "@/components/TopicThumbnail";
-import { Wordmark } from "@/components/Wordmark";
-import type { FeedLessonItem, PathSummary } from "@/lib/api/schemas";
+import { BrowseFilterChips } from "@/components/BrowseFilterChips";
 
-type Props = {
-  env: "local" | "staging" | "production";
-};
+type PanelTone = "light" | "muted" | "dark";
 
-const GREYSCALE = [
-  { name: "Ink", token: "--color-ink", tw: "bg-ink", hex: "#0D0D0D" },
-  { name: "Ink 2", token: "--color-ink-2", tw: "bg-ink-2", hex: "#1F1F1F" },
-  { name: "Ink 3", token: "--color-ink-3", tw: "bg-ink-3", hex: "#2A2A2A" },
-  { name: "Mid", token: "--color-mid", tw: "bg-mid", hex: "#666666" },
-  {
-    name: "Silver",
-    token: "--color-silver",
-    tw: "bg-silver",
-    hex: "#A3A3A3",
-  },
-  { name: "Light", token: "--color-light", tw: "bg-light", hex: "#E2E2E2" },
-  {
-    name: "Paper",
-    token: "--color-paper-tone",
-    tw: "bg-paper-secondary",
-    hex: "#FAFAFA",
-  },
-  {
-    name: "White",
-    token: "--color-white-tone",
-    tw: "bg-paper",
-    hex: "#FFFFFF",
-  },
-] as const;
-
-const SPACES = [1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 24, 32] as const;
-
-const FEED_ITEMS: FeedLessonItem[] = [
-  {
-    id: "avail",
-    courseId: "demo-path",
-    topic: "Term sheets",
-    lessonIndex: 2,
-    title: "How a SAFE converts to equity",
-    lessonNumber: 3,
-    totalLessons: 12,
-    daysAgo: 0,
-    status: "available",
-  },
-  {
-    id: "done",
-    courseId: "demo-path",
-    topic: "Term sheets",
-    lessonIndex: 1,
-    title: "Pre-money vs post-money",
-    lessonNumber: 2,
-    totalLessons: 12,
-    daysAgo: 0,
-    status: "completed",
-  },
-  {
-    id: "over",
-    courseId: "demo-path",
-    topic: "Term sheets",
-    lessonIndex: 0,
-    title: "The anatomy of a term sheet",
-    lessonNumber: 1,
-    totalLessons: 12,
-    daysAgo: 1,
-    status: "overdue",
-  },
-  {
-    id: "lock",
-    courseId: "demo-path",
-    topic: "Term sheets",
-    lessonIndex: 3,
-    title: "Priced rounds and pro-rata",
-    lessonNumber: 4,
-    totalLessons: 12,
-    daysAgo: -1,
-    status: "locked",
-  },
-];
-
-const SAMPLE_PATH: PathSummary = {
-  id: "demo-path",
-  topic: "Startup fundraising",
-  progress: 3,
-  totalLessons: 12,
-  depth: "fluent",
-};
-
-const PATH_NODES = [
-  { index: 0, title: "Why raise at all", status: "read" as const },
-  { index: 1, title: "SAFE basics", status: "read" as const },
-  { index: 2, title: "Valuation caps", status: "today" as const },
-  { index: 3, title: "Dilution math", status: "locked" as const },
-  { index: 4, title: "Board seats", status: "locked" as const },
-];
-
-const HEATMAP_DATES = Array.from({ length: 18 }, (_, i) => {
-  const d = new Date("2026-08-21T12:00:00Z");
-  d.setUTCDate(d.getUTCDate() - i);
-  return d.toISOString().slice(0, 10);
-});
-
-function Section({
-  id,
+function Panel({
+  tone,
+  eyebrow,
   title,
   children,
 }: {
-  id: string;
+  tone: PanelTone;
+  eyebrow: string;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-8 border-t border-border pt-10">
-      <p className="type-kicker-mark">{title}</p>
-      <div className="mt-6 space-y-8">{children}</div>
+    <section className={`ds-panel-${tone} border-b border-border px-5 py-10 sm:px-8 sm:py-14`}>
+      <div className="mx-auto max-w-narrow">
+        <p className="font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
+          {eyebrow}
+        </p>
+        <h2 className="mt-2 font-display text-display-2xs font-semibold tracking-tight">
+          {title}
+        </h2>
+        <div className="mt-8 space-y-8">{children}</div>
+      </div>
     </section>
   );
 }
 
-function Sub({ title, children }: { title: string; children: React.ReactNode }) {
+function Swatch({
+  name,
+  token,
+  onDark,
+}: {
+  name: string;
+  token: string;
+  onDark?: boolean;
+}) {
+  return (
+    <div className="group min-w-0 flex-1 basis-[7.5rem]">
+      <div
+        className="h-16 border border-border transition-transform duration-small ease-out group-hover:-translate-y-0.5"
+        style={{ background: `var(${token})` }}
+        title={token}
+      />
+      <p
+        className={`mt-2 font-meta text-mono-xs uppercase tracking-wider ${
+          onDark ? "text-ink-muted" : "text-ink-faint"
+        }`}
+      >
+        {name}
+      </p>
+      <p className={`font-meta text-mono-md ${onDark ? "text-ink-faint" : "text-ink-muted"}`}>
+        {token.replace(/^--/, "")}
+      </p>
+    </div>
+  );
+}
+
+function TypeRow({
+  label,
+  sample,
+  className,
+  note,
+}: {
+  label: string;
+  sample: string;
+  className: string;
+  note: string;
+}) {
+  return (
+    <div className="border-b border-border py-5 transition-colors duration-small last:border-b-0 hover:bg-[color-mix(in_srgb,var(--color-accent)_5%,transparent)]">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="font-meta text-mono-xs uppercase tracking-wider text-ink-faint">{label}</p>
+        <p className="font-meta text-mono-xs text-ink-faint">{note}</p>
+      </div>
+      <p className={`mt-2 ${className}`}>{sample}</p>
+    </div>
+  );
+}
+
+function InteractiveDemo({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
   return (
     <div>
-      <h3 className="font-meta mb-3 text-ink">{title}</h3>
+      <p className="mb-3 font-meta text-mono-xs uppercase tracking-wider text-ink-faint">{label}</p>
       {children}
     </div>
   );
 }
 
-const NAV = [
-  { href: "#colours", label: "Colours" },
-  { href: "#typography", label: "Type" },
-  { href: "#space", label: "Space" },
-  { href: "#buttons", label: "Buttons" },
-  { href: "#forms", label: "Forms" },
-  { href: "#surfaces", label: "Surfaces" },
-  { href: "#components", label: "Components" },
-  { href: "#feed", label: "Feed" },
-  { href: "#motion", label: "Motion" },
-] as const;
+function demoDates(): string[] {
+  const out: string[] = [];
+  const today = new Date();
+  const pattern = [1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1];
+  for (let i = 0; i < 90; i++) {
+    if (pattern[i % pattern.length]) {
+      const d = new Date(today);
+      d.setUTCDate(today.getUTCDate() - i);
+      out.push(d.toISOString().slice(0, 10));
+    }
+  }
+  return out;
+}
 
-export function DesignSystemShowcase({ env }: Props) {
-  const [toggleOn, setToggleOn] = useState(true);
-  const [chip, setChip] = useState("morning");
-  const [tabPills, setTabPills] = useState("exploring");
-  const [tabUnderline, setTabUnderline] = useState("paths");
-  const [browse, setBrowse] = useState<string | null>(null);
-  const [optionSel, setOptionSel] = useState("b");
+export function DesignSystemShowcase() {
+  const heatDates = useMemo(() => demoDates(), []);
+  const [pace, setPace] = useState("Balanced");
+  const [depth, setDepth] = useState("Applied");
+  const [tone, setTone] = useState("Curious");
+  const [tab, setTab] = useState("overview");
+  const [filter, setFilter] = useState<string | null>(null);
+  const [liked, setLiked] = useState(false);
+  const [count, setCount] = useState(0);
 
   return (
-    <PageShell
-      withTabPad={false}
-      kicker={`Design system · ${env}`}
-      title="Curi design system"
-      className="max-w-3xl"
-    >
-      <p className="type-lede mt-3 max-w-xl">
-        Tokens and components from{" "}
-        <code className="font-meta normal-case tracking-normal text-ink">
-          docs/BRAND.md
-        </code>
-        . Staging and local only — hidden in production.
-      </p>
+    <div className="min-h-dvh bg-paper text-ink">
+      {/* Hero — light */}
+      <header className="ds-panel-light relative overflow-hidden border-b border-border px-5 pb-14 pt-10 sm:px-8 sm:pb-16 sm:pt-12">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent opacity-80"
+        />
+        <div className="relative mx-auto max-w-narrow">
+          <p className="font-meta text-mono-xs uppercase tracking-widest text-ink-faint">
+            Internal · stage / local
+          </p>
+          <p className="mt-5 font-display text-[clamp(2.75rem,12vw,4.5rem)] font-semibold leading-none tracking-tighter text-ink">
+            Curi
+          </p>
+          <p className="mt-4 max-w-md font-sans text-ui-md leading-relaxed text-ink-muted">
+            Design system — tokens, type rules, and live components. Under{" "}
+            <span className="font-meta text-mono-md text-accent">20px</span> we use sans or mono
+            only.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button href="/today" icon={<BookOpen aria-hidden />}>
+              Open Today
+            </Button>
+            <Button
+              variant="secondary"
+              href="/"
+              iconRight={<ArrowRight aria-hidden />}
+            >
+              Home
+            </Button>
+            <Button
+              variant="ghost"
+              iconOnly
+              onClick={() => setLiked((v) => !v)}
+              icon={
+                <Heart
+                  className={`transition-colors duration-small ${
+                    liked ? "fill-accent text-accent" : ""
+                  }`}
+                  aria-hidden
+                />
+              }
+            >
+              {liked ? "Unlike" : "Like"}
+            </Button>
+          </div>
+        </div>
+      </header>
 
-      <nav
-        aria-label="Design system sections"
-        className="mt-8 flex flex-wrap gap-2 border-b border-border pb-4"
-      >
-        {NAV.map((item) => (
-          <a
-            key={item.href}
-            href={item.href}
-            className="interactive-chip focus-ring rounded-none border border-border px-3 py-2 text-xs font-medium text-ink-muted hover:border-ink/40 hover:text-ink"
-          >
-            {item.label}
-          </a>
-        ))}
-      </nav>
+      {/* Colour — muted */}
+      <Panel tone="muted" eyebrow="01 · Colour" title="Palette with room to breathe">
+        <div className="flex flex-wrap gap-4">
+          <Swatch name="Ink" token="--color-ink" />
+          <Swatch name="Paper" token="--color-paper-tone" />
+          <Swatch name="Light" token="--color-light" />
+          <Swatch name="Vermilion" token="--color-accent" />
+          <Swatch name="Mid" token="--color-mid" />
+        </div>
+        <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
+          Accent is for emphasis — primary CTA underline, peak heatmap days, active filters, and a
+          few clear signals. Hover the swatches.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <span className="badge-accent transition-transform duration-small hover:-translate-y-px">
+            New path
+          </span>
+          <span className="inline-flex items-center border border-border px-2.5 py-1 font-meta text-mono-xs uppercase tracking-wider text-ink-muted transition-colors duration-small hover:border-ink hover:text-ink">
+            On track
+          </span>
+          <span className="inline-flex items-center bg-paper-tertiary px-2.5 py-1 font-meta text-mono-xs uppercase tracking-wider text-ink-muted transition-colors duration-small hover:bg-light hover:text-ink">
+            Draft
+          </span>
+        </div>
+      </Panel>
 
-      <div className="mt-10 space-y-14 pb-16">
-        {/* ── Colours ─────────────────────────────────────────────── */}
-        <Section id="colours" title="Colour tokens">
-          <Sub title="Greyscale · eight tones">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {GREYSCALE.map((c) => (
-                <div key={c.token} className="space-y-2">
-                  <div
-                    className={`h-16 border border-border ${c.tw}`}
-                    style={
-                      c.name === "White"
-                        ? { boxShadow: "inset 0 0 0 1px #E2E2E2" }
-                        : undefined
-                    }
-                  />
-                  <p className="text-sm font-medium text-ink">{c.name}</p>
-                  <p className="font-meta normal-case tracking-normal">{c.hex}</p>
-                  <p className="font-meta text-[9px] normal-case tracking-normal opacity-70">
-                    {c.token}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </Sub>
+      {/* Type — dark */}
+      <Panel tone="dark" eyebrow="02 · Typography" title="Three fonts, one rule">
+        <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
+          Fraunces for display (≥20px). Plus Jakarta Sans and JetBrains Mono for everything smaller
+          — links, buttons, badges, tabs, chips.
+        </p>
+        <div>
+          <TypeRow
+            label="Display · Fraunces"
+            sample="Today’s lesson"
+            className="font-display text-[28px] font-semibold tracking-tight"
+            note="≥20px"
+          />
+          <TypeRow
+            label="UI · Plus Jakarta Sans"
+            sample="Continue where you left off — five minutes is enough."
+            className="font-sans text-ui-md leading-relaxed"
+            note="Body & UI"
+          />
+          <TypeRow
+            label="Meta · JetBrains Mono"
+            sample="DAY 12 · 5 MIN · STREAK 4"
+            className="font-meta text-mono-md uppercase tracking-wider"
+            note="Labels"
+          />
+          <TypeRow
+            label="Link · sans under 20px"
+            sample="Read the full path outline →"
+            className="font-sans text-ui-sm text-accent underline-offset-4 transition-[text-decoration] duration-small hover:underline"
+            note="14px"
+          />
+        </div>
+      </Panel>
 
-          <Sub title="Accent · one use per screen">
-            <div className="flex flex-wrap gap-4">
-              <div className="space-y-2">
-                <div className="h-16 w-28 bg-accent" />
-                <p className="text-sm font-medium">Vermilion</p>
-                <p className="font-meta normal-case tracking-normal">#C1121F</p>
-              </div>
-              <div className="space-y-2">
-                <div className="h-16 w-28 bg-accent-dark" />
-                <p className="text-sm font-medium">Vermilion dark</p>
-                <p className="font-meta normal-case tracking-normal">#A30F1B</p>
-              </div>
-              <div className="flex max-w-xs items-end border-l-2 border-accent pl-4">
-                <p className="font-display text-lg font-light italic leading-snug text-ink">
-                  Pull-quote rule uses Vermilion once.
-                </p>
-              </div>
-            </div>
-          </Sub>
+      {/* Buttons — light */}
+      <Panel tone="light" eyebrow="03 · Buttons" title="Same type recipe, every variant">
+        <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
+          All buttons share UI sans, 12px, uppercase, medium weight — primary, secondary, ghost,
+          danger, icon-only. Icons don’t change the type.
+        </p>
 
-          <Sub title="Semantic">
-            <div className="flex flex-wrap gap-3">
-              <span className="inline-flex items-center gap-2 border border-border px-3 py-2 text-sm">
-                <span className="h-4 w-4 bg-ink" /> Correct = Ink
-              </span>
-              <span className="inline-flex items-center gap-2 border border-border px-3 py-2 text-sm text-silver">
-                Error text = Silver
-              </span>
-              <span className="inline-flex items-center gap-2 border border-border px-3 py-2 text-sm text-streak">
-                Streak = Ink (never Vermilion)
-              </span>
-            </div>
-          </Sub>
-
-          <Sub title="Background & text roles">
-            <div className="grid gap-2 sm:grid-cols-3">
-              <div className="border border-border bg-paper p-4 text-sm text-ink">
-                bg-paper · text-ink
-              </div>
-              <div className="border border-border bg-paper-secondary p-4 text-sm text-ink-muted">
-                bg-paper-secondary · muted
-              </div>
-              <div className="bg-ink p-4 text-sm text-paper">
-                bg-ink · text-paper
-              </div>
-            </div>
-          </Sub>
-        </Section>
-
-        {/* ── Typography ──────────────────────────────────────────── */}
-        <Section id="typography" title="Typography">
-          <Sub title="Families · three only">
-            <div className="space-y-4">
-              <p
-                className="font-display text-3xl font-light tracking-tight"
-                style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
-              >
-                Fraunces — display
-              </p>
-              <p className="font-ui text-base font-light text-ink-muted">
-                Plus Jakarta Sans — UI & body
-              </p>
-              <p className="font-meta">JetBrains Mono — metadata</p>
-            </div>
-          </Sub>
-
-          <Sub title="Display scale">
-            <div className="space-y-3">
-              <p className="type-display text-display-sm">type-display · 38px</p>
-              <p
-                className="font-display text-display-xs font-light"
-                style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
-              >
-                display-xs · 28px
-              </p>
-              <p
-                className="font-display text-display-2xs font-normal"
-                style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 0" }}
-              >
-                display-2xs · 22px
-              </p>
-              <p className="type-lede">
-                type-lede — supporting copy at UI md, light weight.
-              </p>
-            </div>
-          </Sub>
-
-          <Sub title="Wordmark">
-            <div className="flex flex-wrap items-end gap-8">
-              <Wordmark size="sm" href="" />
-              <Wordmark size="md" href="" />
-              <Wordmark size="sm" underline={false} href="" />
-            </div>
-          </Sub>
-
-          <Sub title="Kickers & labels">
-            <p className="type-kicker">type-kicker</p>
-            <p className="type-kicker-mark mt-4">type-kicker-mark</p>
-            <label className="type-label mt-4">type-label · form</label>
-          </Sub>
-        </Section>
-
-        {/* ── Space / radius ──────────────────────────────────────── */}
-        <Section id="space" title="Space, radius, borders">
-          <Sub title="Spacing scale">
-            <div className="flex flex-wrap items-end gap-3">
-              {SPACES.map((n) => (
-                <div key={n} className="flex flex-col items-center gap-1">
-                  <div
-                    className="bg-ink"
-                    style={{ width: `var(--space-${n})`, height: 24 }}
-                  />
-                  <span className="font-meta normal-case tracking-normal text-[9px]">
-                    {n}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Sub>
-
-          <Sub title="Radius · sharp by default">
-            <div className="flex flex-wrap gap-3">
-              <div className="flex h-16 w-16 items-center justify-center border border-border bg-paper-secondary text-xs">
-                none
-              </div>
-              <div className="flex h-16 w-16 items-center justify-center rounded-sm border border-border bg-paper-secondary text-xs">
-                sm
-              </div>
-              <div className="flex h-16 w-16 items-center justify-center rounded-md border border-border bg-paper-secondary text-xs">
-                md
-              </div>
-              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-border bg-paper-secondary text-xs">
-                full
-              </div>
-            </div>
-          </Sub>
-
-          <Sub title="Borders">
-            <div className="space-y-2">
-              <div className="border border-border p-3 text-sm">border</div>
-              <div className="border border-border-default p-3 text-sm">
-                border-default
-              </div>
-              <div className="border border-border-strong p-3 text-sm">
-                border-strong
-              </div>
-              <div className="editorial-rule" />
-              <div className="editorial-rule-bold" />
-            </div>
-          </Sub>
-        </Section>
-
-        {/* ── Buttons ─────────────────────────────────────────────── */}
-        <Section id="buttons" title="Buttons">
+        <InteractiveDemo label="Variants">
           <div className="flex flex-wrap items-center gap-3">
-            <button type="button" className="btn-primary">
-              Primary
-            </button>
-            <button type="button" className="btn-secondary">
-              Secondary
-            </button>
-            <button type="button" className="btn-ghost">
-              Ghost
-            </button>
-            <button type="button" className="btn-danger">
-              Danger
-            </button>
-            <button type="button" className="btn-primary" disabled>
-              Disabled
-            </button>
+            <Button onClick={() => setCount((c) => c + 1)}>Primary · {count}</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="ghost">Ghost</Button>
+            <Button variant="danger">Danger</Button>
           </div>
-          <p className="mt-3 text-xs text-ink-muted">
-            Primary uses Vermilion bottom border — the one accent on this
-            section.
-          </p>
-        </Section>
+        </InteractiveDemo>
 
-        {/* ── Forms ───────────────────────────────────────────────── */}
-        <Section id="forms" title="Forms & controls">
-          <Sub title="Inputs">
-            <div className="max-w-md space-y-4">
-              <div>
-                <label className="type-label" htmlFor="ds-input">
-                  Email
-                </label>
-                <input
-                  id="ds-input"
-                  className="input-field"
-                  placeholder="you@example.com"
-                  defaultValue=""
-                />
-              </div>
-              <div>
-                <label className="type-label" htmlFor="ds-input-err">
-                  With error
-                </label>
-                <input
-                  id="ds-input-err"
-                  className="input-field input-error"
-                  defaultValue="bad"
-                />
-                <p className="mt-1 text-xs text-silver">Enter a valid email.</p>
-              </div>
-            </div>
-          </Sub>
-
-          <Sub title="SettingToggle">
-            <div className="max-w-md surface-card p-4">
-              <SettingToggle
-                label="Send daily email"
-                hint="Morning delivery in your timezone"
-                checked={toggleOn}
-                onChange={setToggleOn}
-              />
-            </div>
-          </Sub>
-
-          <Sub title="SettingChips">
-            <div className="max-w-md surface-card p-4">
-              <SettingChips
-                label="Delivery time"
-                value={chip}
-                onChange={setChip}
-                options={[
-                  { value: "early-morning", label: "Early morning" },
-                  { value: "morning", label: "Morning" },
-                  { value: "evening", label: "Evening" },
-                ]}
-              />
-            </div>
-          </Sub>
-
-          <Sub title="Quiz / clarify options">
-            <ul className="max-w-md space-y-2">
-              {[
-                { id: "a", label: "Too easy — I already knew this" },
-                { id: "b", label: "Just right" },
-                { id: "c", label: "Too hard — slow down", dimmed: true },
-              ].map((opt, i) => (
-                <li key={opt.id}>
-                  <button
-                    type="button"
-                    onClick={() => setOptionSel(opt.id)}
-                    className={`option-card focus-ring flex w-full items-center gap-3 text-left text-[15px] ${
-                      optionSel === opt.id ? "option-card-selected" : ""
-                    } ${opt.dimmed && optionSel !== opt.id ? "option-card-dimmed" : ""}`}
-                  >
-                    <span className="option-letter">
-                      {String.fromCharCode(65 + i)}
-                    </span>
-                    {opt.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </Sub>
-        </Section>
-
-        {/* ── Surfaces ────────────────────────────────────────────── */}
-        <Section id="surfaces" title="Surfaces & badges">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="surface-card p-4 text-sm">surface-card</div>
-            <div className="surface-card surface-card-interactive interactive-card cursor-pointer p-4 text-sm">
-              surface-card-interactive
-            </div>
-            <div className="surface-card-dark p-4 text-sm text-paper">
-              surface-card-dark
-            </div>
-            <div className="flex flex-wrap items-center gap-2 p-4">
-              <span className="badge">Badge</span>
-              <span className="badge-mono">Badge mono</span>
-              <span className="interactive-chip border border-border px-3 py-1.5 text-xs">
-                interactive-chip
-              </span>
-            </div>
+        <InteractiveDemo label="With icons">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button icon={<Plus aria-hidden />}>New path</Button>
+            <Button variant="secondary" icon={<Search aria-hidden />}>
+              Search
+            </Button>
+            <Button variant="ghost" iconRight={<ChevronRight aria-hidden />}>
+              Continue
+            </Button>
+            <Button
+              variant="secondary"
+              icon={<Sparkles aria-hidden />}
+              iconRight={<ArrowRight aria-hidden />}
+            >
+              Generate
+            </Button>
           </div>
-          <blockquote className="pull-quote mt-4">
-            Pull quote — Fraunces italic with Vermilion rule.
-          </blockquote>
-          <div className="mt-4 flex gap-3">
-            <span className="takeaway-number">01</span>
-            <span className="text-sm">Takeaway number (Vermilion mono)</span>
-          </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="streak-number">8</span>
-            <span className="streak-label">day streak</span>
-          </div>
-        </Section>
+        </InteractiveDemo>
 
-        {/* ── Components ──────────────────────────────────────────── */}
-        <Section id="components" title="Components">
-          <Sub title="TabPills · pills">
+        <InteractiveDemo label="Icon only">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="primary" iconOnly icon={<Plus aria-hidden />}>
+              Add
+            </Button>
+            <Button variant="secondary" iconOnly icon={<Search aria-hidden />}>
+              Search
+            </Button>
+            <Button variant="ghost" iconOnly icon={<Settings aria-hidden />}>
+              Settings
+            </Button>
+            <Button variant="danger" iconOnly icon={<Heart aria-hidden />}>
+              Remove
+            </Button>
+          </div>
+        </InteractiveDemo>
+
+        <InteractiveDemo label="States">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button disabled>Disabled</Button>
+            <Button variant="secondary" disabled icon={<Check aria-hidden />}>
+              Disabled + icon
+            </Button>
+            <Button loading>Loading</Button>
+            <Link
+              href="#type"
+              className="font-sans text-ui-xs text-accent underline-offset-4 transition-all duration-small hover:underline"
+            >
+              Text link (sans)
+            </Link>
+          </div>
+        </InteractiveDemo>
+      </Panel>
+
+      {/* Chips / tabs — dark */}
+      <Panel tone="dark" eyebrow="04 · Chips & tabs" title="Meta type, tactile feedback">
+        <InteractiveDemo label="Setting chips · mono labels">
+          <div className="space-y-5 border border-border bg-paper p-5 transition-colors duration-medium hover:border-accent/40">
+            <SettingChips
+              label="Pace"
+              options={["Quick", "Balanced", "Deep"]}
+              value={pace}
+              onChange={setPace}
+            />
+            <SettingChips
+              label="Depth"
+              options={["Overview", "Applied", "Expert"]}
+              value={depth}
+              onChange={setDepth}
+            />
+            <SettingChips
+              label="Tone"
+              options={["Curious", "Practical", "Playful"]}
+              value={tone}
+              onChange={setTone}
+            />
+          </div>
+        </InteractiveDemo>
+
+        <InteractiveDemo label="Tab pills">
+          <div className="border border-border bg-paper px-4 pt-2">
             <TabPills
               tabs={[
-                { id: "exploring", label: "Exploring", count: 2 },
-                { id: "mastered", label: "Mastered", count: 1 },
-                { id: "shelved", label: "Shelved" },
+                { id: "overview", label: "Overview" },
+                { id: "sources", label: "Sources" },
+                { id: "notes", label: "Notes" },
               ]}
-              active={tabPills}
-              onChange={setTabPills}
+              active={tab}
+              onChange={setTab}
             />
-          </Sub>
-
-          <Sub title="TabPills · underline">
-            <TabPills
-              variant="underline"
-              tabs={[
-                { id: "paths", label: "Paths" },
-                { id: "books", label: "Books" },
-              ]}
-              active={tabUnderline}
-              onChange={setTabUnderline}
-            />
-          </Sub>
-
-          <Sub title="BrowseFilterChips">
-            <BrowseFilterChips
-              categories={["Fundraising", "Product", "Growth"]}
-              active={browse}
-              onChange={setBrowse}
-            />
-          </Sub>
-
-          <Sub title="StepProgress">
-            <StepProgress step={2} totalSteps={4} label="Clarify" />
-          </Sub>
-
-          <Sub title="Loader">
-            <div className="flex flex-wrap items-end gap-8">
-              <Loader size="sm" label="sm" />
-              <Loader size="md" label="md" />
-              <Loader size="lg" label="lg" />
-            </div>
-          </Sub>
-
-          <Sub title="Progress">
-            <div className="flex flex-wrap items-center gap-8">
-              <ProgressRing percent={42} />
-              <div className="w-48 space-y-2">
-                  <PathProgressBar progress={3} total={12} />
-                <p className="font-meta">3 / 12</p>
-              </div>
-            </div>
-          </Sub>
-
-          <Sub title="TopicThumbnail">
-            <div className="flex gap-3">
-              <TopicThumbnail topic="Term sheets" />
-              <TopicThumbnail topic="Macroeconomics" size={48} />
-              <TopicThumbnail topic="Cryptography" size={32} />
-            </div>
-          </Sub>
-
-          <Sub title="Heatmap">
-            <Heatmap dates={HEATMAP_DATES} streak={8} />
-            <div className="mt-6">
-              <Heatmap dates={HEATMAP_DATES.slice(0, 3)} streak={3} atRisk />
-            </div>
-          </Sub>
-
-          <Sub title="EmptyState">
-            <EmptyState
-              message="Nothing due today. Explore a new path or revisit Library."
-              actionHref="/explore"
-              actionLabel="Explore"
-              secondaryHref="/library"
-              secondaryLabel="Library"
-            />
-          </Sub>
-
-          <Sub title="LibraryPathCard">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <LibraryPathCard path={SAMPLE_PATH} tab="exploring" />
-              <LibraryPathCard
-                path={{ ...SAMPLE_PATH, progress: 12, topic: "Game theory" }}
-                tab="mastered"
-              />
-            </div>
-          </Sub>
-
-          <Sub title="PathMap">
-            <PathMap courseId="demo-path" nodes={PATH_NODES} readOnly />
-          </Sub>
-        </Section>
-
-        {/* ── Feed cards ──────────────────────────────────────────── */}
-        <Section id="feed" title="Lesson feed cards">
-          <div className="space-y-3">
-            {FEED_ITEMS.map((item) => (
-              <LessonFeedCard key={item.id} item={item} />
-            ))}
+            <p className="pb-4 pt-3 font-sans text-ui-sm text-ink-muted">
+              Active: <span className="text-accent">{tab}</span>
+            </p>
           </div>
-        </Section>
+        </InteractiveDemo>
 
-        {/* ── Motion ──────────────────────────────────────────────── */}
-        <Section id="motion" title="Motion">
-          <div className="flex flex-wrap gap-4">
-            <div className="animate-fade-in surface-card px-4 py-3 text-sm">
-              animate-fade-in
-            </div>
-            <div className="animate-slide-up surface-card px-4 py-3 text-sm">
-              animate-slide-up
-            </div>
-            <div className="flex items-center gap-2 surface-card px-4 py-3 text-sm">
-              <span className="landing-pulse-dot h-1.5 w-1.5 rounded-full bg-ink-muted" />
-              landing-pulse-dot
-            </div>
+        <InteractiveDemo label="Browse filters">
+          <BrowseFilterChips
+            categories={["Science", "History", "Design"]}
+            active={filter}
+            onChange={setFilter}
+          />
+        </InteractiveDemo>
+      </Panel>
+
+      {/* Heatmap — muted */}
+      <Panel tone="muted" eyebrow="05 · Heatmap" title="Colourful activity">
+        <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
+          Intensity from neighbour density. The ramp moves ink → vermilion. Hover a cell for the
+          date label.
+        </p>
+        <div className="border border-border bg-paper p-5 transition-colors duration-medium hover:border-accent/35">
+          <Heatmap dates={heatDates} streak={12} />
+        </div>
+      </Panel>
+
+      {/* Surfaces — light */}
+      <Panel tone="light" eyebrow="06 · Surfaces" title="Light and ink for variety">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="group border border-border bg-paper p-5 transition-transform duration-medium ease-out hover:-translate-y-1">
+            <Sun className="size-4 text-accent" aria-hidden />
+            <p className="mt-3 font-display text-display-2xs font-semibold tracking-tight">Paper</p>
+            <p className="mt-1 font-sans text-ui-xs leading-relaxed text-ink-muted">
+              Default reading surface. Soft lift on hover.
+            </p>
           </div>
-          <p className="mt-4 text-xs text-ink-muted">
-            Durations: micro → xl. Easing settles (no spring/bounce). Respects
-            prefers-reduced-motion.
+          <div className="group border border-border bg-paper-secondary p-5 transition-transform duration-medium ease-out hover:-translate-y-1">
+            <Moon className="size-4 text-ink-muted" aria-hidden />
+            <p className="mt-3 font-display text-display-2xs font-semibold tracking-tight">Fog</p>
+            <p className="mt-1 font-sans text-ui-xs leading-relaxed text-ink-muted">
+              Nested panels and quiet chrome.
+            </p>
+          </div>
+        </div>
+        <div className="border border-ink-3 bg-ink p-6 text-inverse transition-colors duration-medium hover:bg-ink-2">
+          <p className="font-meta text-mono-xs uppercase tracking-wider text-silver">Ink panel</p>
+          <p className="mt-2 font-display text-display-2xs font-semibold tracking-tight">
+            Dark for emphasis
           </p>
-        </Section>
-      </div>
-    </PageShell>
+          <p className="mt-2 max-w-sm font-sans text-ui-sm leading-relaxed text-silver">
+            Alternate light and dark sections so the page has rhythm — not a flat dashboard.
+          </p>
+          <div className="mt-5">
+            <Button
+              variant="secondary"
+              className="!border-silver/40 !text-inverse hover:!border-accent hover:!text-inverse"
+            >
+              On ink
+            </Button>
+          </div>
+        </div>
+      </Panel>
+
+      {/* Radius / motion — muted */}
+      <Panel tone="muted" eyebrow="07 · Motion & radius" title="Presence, not noise">
+        <div className="flex flex-wrap items-end gap-6">
+          {(
+            [
+              ["sm", "2px"],
+              ["md", "4px"],
+              ["full", "pill"],
+            ] as const
+          ).map(([name, px]) => (
+            <div key={name} className="text-center">
+              <div
+                className={`mx-auto size-14 border border-border bg-paper transition-transform duration-medium ease-out hover:scale-110 hover:border-accent ${
+                  name === "full" ? "rounded-full" : name === "md" ? "rounded-md" : "rounded-sm"
+                }`}
+              />
+              <p className="mt-2 font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
+                {name} · {px}
+              </p>
+            </div>
+          ))}
+        </div>
+        <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
+          Transitions use brand easing. Interactive targets lift, scale, or shift colour — never
+          decorative bounce.
+        </p>
+      </Panel>
+
+      <footer className="ds-panel-dark border-t border-border px-5 py-10 sm:px-8">
+        <div className="mx-auto flex max-w-narrow flex-wrap items-center justify-between gap-4">
+          <p className="font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
+            Source · docs/BRAND.md
+          </p>
+          <Button variant="ghost" href="/today" iconRight={<ArrowRight aria-hidden />}>
+            Back to app
+          </Button>
+        </div>
+      </footer>
+    </div>
   );
 }
