@@ -180,6 +180,10 @@ export function getPreferences() {
   return apiFetch<UserPreferencesResponse>("/api/me/preferences");
 }
 
+export function getEmailPreview() {
+  return apiFetch<{ subject: string; html: string }>("/api/me/email-preview");
+}
+
 export function patchPreferences(
   body: Partial<UserPreferencesResponse["preferences"]>,
 ) {

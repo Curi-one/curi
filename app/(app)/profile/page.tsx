@@ -526,8 +526,18 @@ export default function ProfilePage() {
               onChange={(v) => patchPrefs("emailWeeklyDigest", v)}
             />
 
+            <div className="h-px bg-border" aria-hidden />
+
+            <Link
+              href="/email-preview"
+              className="inline-flex min-h-11 items-center text-sm text-ink underline decoration-border-strong underline-offset-4 hover:decoration-ink"
+            >
+              Preview today&apos;s email
+            </Link>
+
             <p className="text-xs leading-relaxed text-ink-muted">
-              Delivery starts when digests ship — your choices are saved.
+              Daily emails send once per day at your chosen time when you have
+              lessons due. Weekly digest delivery is coming soon.
             </p>
           </div>
         </section>

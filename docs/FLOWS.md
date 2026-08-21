@@ -169,7 +169,7 @@ Until Stripe: enforce limit in API; plan toggle via seed/admin on staging only.
 
 **Progress:** streak count, 26-week heatmap, active and mastered paths.
 
-**Profile:** name, email, theme (system), plan, sign out. Learning and email-schedule preferences are collected in Profile (local persistence); daily email delivery itself remains deferred.
+**Profile:** name, email, theme (system), plan, sign out. Learning and email preferences persist in `user_preferences`. Daily lesson email sends via hourly cron when `email_enabled`, respecting delivery time, weekends, and format.
 
 ---
 

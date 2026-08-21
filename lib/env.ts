@@ -14,6 +14,8 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().default(""),
   SENTRY_DSN: z.string().default(""),
   CRON_SECRET: z.string().default(""),
+  RESEND_API_KEY: z.string().default(""),
+  EMAIL_FROM: z.string().default(""),
 });
 
 export type AppEnv = z.infer<typeof envSchema>;
@@ -30,6 +32,8 @@ function readRawEnv(): Record<string, string | undefined> {
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     SENTRY_DSN: process.env.SENTRY_DSN,
     CRON_SECRET: process.env.CRON_SECRET,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    EMAIL_FROM: process.env.EMAIL_FROM,
   };
 }
 
