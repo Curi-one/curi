@@ -6,7 +6,7 @@ export type ShareTextOptions = {
   lessonTitle?: string;
 };
 
-/** Builds the "Today I learned" share copy used across ShareableFact and CompleteSheet. */
+/** Builds the "Today I learned" share copy used by ShareableFact. */
 export function buildShareText({
   fact,
   topic,
