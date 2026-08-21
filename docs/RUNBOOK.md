@@ -2,9 +2,13 @@
 
 Deploy, rollback, rotate secrets, and launch checklist for [stage.curi.one](https://stage.curi.one) / production.
 
-## Deploy
+## Design system showcase
 
-### Staging (`staging` branch → stage.curi.one)
+Staging / local only: [https://stage.curi.one/design-system](https://stage.curi.one/design-system)
+
+Gated by `APP_ENV` (`local` \| `staging`). Production returns 404.
+
+
 
 ```bash
 git push origin staging
