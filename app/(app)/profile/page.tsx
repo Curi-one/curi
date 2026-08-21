@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Check, Minus } from "lucide-react";
+import { ArrowLeft, Check, LogOut, Minus } from "lucide-react";
 import { LearningProfilePreview } from "@/components/LearningProfilePreview";
 import { PageShell } from "@/components/PageShell";
 import { LoadingState } from "@/components/LoadingState";
@@ -251,7 +251,12 @@ export default function ProfilePage() {
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Today
         </Link>
-        <Button variant="secondary" size="small" onClick={() => void signOut()}>
+        <Button
+          variant="danger"
+          size="small"
+          icon={<LogOut className="h-3.5 w-3.5" aria-hidden />}
+          onClick={() => void signOut()}
+        >
           Sign out
         </Button>
       </div>

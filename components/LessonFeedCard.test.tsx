@@ -72,7 +72,7 @@ describe("LessonFeedCard", () => {
     expect(screen.queryByText(/missed yesterday/i)).not.toBeInTheDocument();
   });
 
-  it("renders a locked lesson with preview, locked copy, and no link", () => {
+  it("renders a locked lesson with display title type, preview, and no link", () => {
     render(
       <LessonFeedCard
         item={item({
@@ -84,6 +84,9 @@ describe("LessonFeedCard", () => {
       />,
     );
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    const title = screen.getByText("Opening the path");
+    expect(title.className).toContain("font-display");
+    expect(title.className).not.toContain("font-semibold");
     expect(screen.getByText(FOOTHOLD)).toBeInTheDocument();
     expect(screen.getByText("Unlocks tomorrow")).toBeInTheDocument();
     expect(screen.getByText("Lesson 1 of 7")).toBeInTheDocument();
