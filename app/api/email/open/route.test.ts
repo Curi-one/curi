@@ -18,7 +18,6 @@ describe("GET /api/email/open", () => {
   it("redirects to the lesson after establishing a session", async () => {
     const path = lessonPagePath("course-1", 2);
     const openUrl = buildSignedEmailOpenUrl("learner@example.com", path);
-    const req = new Request(openUrl);
     const res = await GET(new Request(openUrl));
 
     expect(res.status).toBe(307);
