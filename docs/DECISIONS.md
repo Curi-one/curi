@@ -149,3 +149,12 @@ Adopted from [WEBSITE-DESIGN-RULES.md](./WEBSITE-DESIGN-RULES.md). Eight warm gr
 - Never pure black (`#000000`) or pure white (`#FFFFFF`).
 - Vermilion once per screen.
 - Full token table and pairings: [BRAND.md](./BRAND.md) §4; quick reference: [WEBSITE-DESIGN-RULES.md](./WEBSITE-DESIGN-RULES.md).
+
+---
+
+## Lesson generation (Aug 2026)
+
+- Clarify may collect optional free-text **details** (max 500 chars) → passed to outline/body prompts and cache fingerprint as `learner_details`.
+- Depth **slugs/bands** stay fixed (`essentials` / `fluent` / `thorough`); **labels/subcopy** are topic-dynamic (never promise unrealistic mastery, e.g. Mandarin ≠ “Fluent” in two weeks).
+- Lesson body is markdown (GFM + math); reader themes apply to the full page while reading.
+- Learning profile personalises **path outline** and **lesson body** (members: DB prefs; guests: localStorage when creating a path).
