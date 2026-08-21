@@ -15,6 +15,10 @@ import {
   startClarifySession,
   type ClarifyAnswer,
 } from "@/lib/clarify-store";
+import {
+  canRestoreClarifySession,
+  shouldFetchClarifyQuestions,
+} from "@/lib/clarify/session";
 
 function ClarifyContent() {
   const router = useRouter();
@@ -48,20 +52,34 @@ function ClarifyContent() {
   }, []);
 
   useEffect(() => {
-    const existing = loadClarifySession();
-    if (existing?.questions.length) {
-      setQuestions(existing.questions);
-      setAnswers(existing.answers);
-      setDepth(existing.depth);
-      setLoading(false);
-      return;
-    }
     if (!topicParam) {
       router.replace("/");
       return;
     }
-    startClarifySession(topicParam);
-    void loadQuestions(topicParam);
+
+    const existing = loadClarifySession();
+
+    if (canRestoreClarifySession(existing, topicParam)) {
+      setQuestions(existing!.questions);
+      setAnswers(existing!.answers);
+      setDepth(existing!.depth);
+      setStepIndex(
+        existing!.answers.length >= existing!.questions.length
+          ? existing!.questions.length
+          : existing!.answers.length,
+      );
+      setLoading(false);
+      return;
+    }
+
+    if (shouldFetchClarifyQuestions(existing, topicParam)) {
+      startClarifySession(topicParam);
+      setQuestions([]);
+      setAnswers([]);
+      setStepIndex(0);
+      setDepth(undefined);
+      void loadQuestions(topicParam);
+    }
   }, [topicParam, router, loadQuestions]);
 
   function persist(nextAnswers: ClarifyAnswer[], nextDepth?: DepthSlug) {
