@@ -557,7 +557,7 @@ Rules:
 - Stay on the lesson title; use the path topic for broader context only.
 - takeaways: exactly 3 memorable, concrete insights from THIS lesson (not generic advice).
 - shareableFact: one punchy fact + short reflection clearly related to the lesson and/or broader path topic — suitable to share on social.
-- visuals: omit or [] when text alone is enough. When helpful, include title+caption; add equation/formulaNote for formulas; imageUrl only if a real public https image URL would help (never invent broken URLs).
+- visuals: omit or [] when text alone is enough. When helpful, include title+caption; add equation/formulaNote for formulas. For visuals[].equation use bare TeX only (e.g. \\frac{a}{b} or E=mc^2) — do NOT wrap in \\[ \\], \\( \\), or $ delimiters. imageUrl only if a real public https image URL would help (never invent broken URLs).
 - Prefer accurate, source-backed claims.`,
     },
     { role: "user", content: lines.join("\n") },

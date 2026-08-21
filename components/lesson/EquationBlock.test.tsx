@@ -36,17 +36,24 @@ describe("EquationBlock", () => {
     expect(screen.getByText("Mass-energy")).toBeInTheDocument();
   });
 
-  it("renders KaTeX for symbolic equations including plain identities", () => {
+  it("renders KaTeX when equation is wrapped in \\[...\\] delimiters", () => {
     const { container } = render(
       <EquationBlock
         visual={{
-          title: "API",
-          caption: "cap",
-          equation: "Deal = Economics + Control",
+          title: "GDP",
+          caption: "deflator",
+          equation:
+            "\\[\\text{Real GDP} = \\frac{\\text{Nominal GDP}}{\\text{GDP deflator}}\\]",
+          formulaNote: "Removes inflation from nominal GDP.",
         }}
       />,
     );
     expect(container.querySelector(".katex")).toBeTruthy();
+    expect(
+      screen.getByText("Removes inflation from nominal GDP."),
+    ).toBeInTheDocument();
+    // Must not show raw delimiters
+    expect(container.textContent).not.toMatch(/\\\[/);
   });
 
   it("falls back to plain text when KaTeX cannot parse the equation", () => {

@@ -45,6 +45,14 @@ This has **bold emphasis** in a paragraph.`}
     expect(container.querySelector(".katex")).toBeTruthy();
   });
 
+  it("renders math wrapped in \\[...\\] after delimiter normalization", () => {
+    const { container } = render(
+      <LessonMarkdown markdown={"See \\[E = mc^2\\] in physics."} />,
+    );
+    expect(container.querySelector(".katex")).toBeTruthy();
+    expect(container.textContent).not.toMatch(/\\\[/);
+  });
+
   it("applies bionic reading only to plain text segments", () => {
     const { container } = render(
       <LessonMarkdown markdown="Reading helps learning." bionic />,

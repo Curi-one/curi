@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { renderTextWithCitations } from "@/components/lesson/text-with-citations";
+import { normalizeMarkdownMathDelimiters } from "@/lib/lessons/tex";
 import "katex/dist/katex.min.css";
 
 type Props = {
@@ -51,6 +52,7 @@ export function LessonMarkdown({
 }: Props) {
   const wrap = (nodes: ReactNode) =>
     mapTextChildren(nodes, bionic, onCitationClick);
+  const normalized = normalizeMarkdownMathDelimiters(markdown);
 
   return (
     <div className={className} style={style}>
@@ -122,7 +124,7 @@ export function LessonMarkdown({
           ),
         }}
       >
-        {markdown}
+        {normalized}
       </ReactMarkdown>
     </div>
   );

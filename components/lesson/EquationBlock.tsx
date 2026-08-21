@@ -1,5 +1,6 @@
 import katex from "katex";
 import type { LessonVisualBlock } from "@/lib/api/schemas";
+import { stripLatexDelimiters } from "@/lib/lessons/tex";
 import "katex/dist/katex.min.css";
 
 type Props = {
@@ -8,7 +9,7 @@ type Props = {
 };
 
 function renderEquationHtml(equation: string): string | null {
-  const tex = equation.trim().replace(/^\$+|\$+$/g, "");
+  const tex = stripLatexDelimiters(equation);
   if (!tex) return null;
   // Prefer KaTeX whenever it parses; conceptual slogans fall back to display type.
   try {
@@ -41,7 +42,7 @@ export function EquationBlock({ visual }: Props) {
         />
       ) : (
         <div className="mt-4 font-display text-3xl font-light leading-tight tracking-tight text-ink sm:text-4xl">
-          {equation}
+          {stripLatexDelimiters(equation) || equation}
         </div>
       )}
       {formulaNote && (
