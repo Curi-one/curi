@@ -137,3 +137,15 @@ Stateless app on Vercel, pooled Postgres, indexes on hot paths, rate limits on a
 ### Streak
 
 Computed from `lesson_activity`. At most **one streak day per user per local calendar date**.
+
+---
+
+## Brand
+
+### Warm greyscale palette (Aug 2026)
+
+Adopted from [WEBSITE-DESIGN-RULES.md](./WEBSITE-DESIGN-RULES.md). Eight warm greyscale tones plus Vermilion (`#C1121F`) as the only chromatic accent. Supersedes the previous neutral equal-RGB greys in [BRAND.md](./BRAND.md) §4.
+
+- Never pure black (`#000000`) or pure white (`#FFFFFF`).
+- Vermilion once per screen.
+- Full token table and pairings: [BRAND.md](./BRAND.md) §4; quick reference: [WEBSITE-DESIGN-RULES.md](./WEBSITE-DESIGN-RULES.md).
