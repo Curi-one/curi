@@ -117,15 +117,21 @@ export function CompleteSheet({
                 Up next · Tomorrow
               </div>
               <div className="flex items-start gap-4">
-                {courseTopic ? (
-                  <TopicThumbnail topic={courseTopic} size={72} />
-                ) : null}
+                {(nextLessonTitle || courseTopic) && (
+                  <TopicThumbnail
+                    topic={nextLessonTitle ?? courseTopic!}
+                    size={72}
+                  />
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="font-display text-xl font-light leading-snug tracking-tight text-ink">
                     {nextLessonTitle ?? "Your next lesson"}
                   </div>
-                  <p className="mt-2 text-ui-3xs text-ink-muted">
+                  <p className="mt-2 text-ui-3xs leading-relaxed text-ink-muted">
                     {nextMeta}
+                  </p>
+                  <p className="mt-3 text-ui-sm leading-relaxed text-ink-muted/80">
+                    A short look ahead so you know what tomorrow holds.
                   </p>
                 </div>
                 <Lock

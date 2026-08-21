@@ -97,6 +97,12 @@ describe("CompleteSheet", () => {
       />,
     );
     expect(screen.getByText("Cap tables")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Lesson 2 of 8 · unlocks tomorrow/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/A short look ahead so you know what tomorrow holds/),
+    ).toBeInTheDocument();
     // TopicThumbnail is aria-hidden; assert the cover field is present via glyph art container
     const thumb = container.querySelector('[aria-hidden="true"]');
     expect(thumb).toBeTruthy();
