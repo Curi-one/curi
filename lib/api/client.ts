@@ -172,6 +172,23 @@ export function patchMe(body: { name?: string }) {
   });
 }
 
+export type UserPreferencesResponse = {
+  preferences: import("@/lib/profile/user-preferences").UserPreferences;
+};
+
+export function getPreferences() {
+  return apiFetch<UserPreferencesResponse>("/api/me/preferences");
+}
+
+export function patchPreferences(
+  body: Partial<UserPreferencesResponse["preferences"]>,
+) {
+  return apiFetch<UserPreferencesResponse>("/api/me/preferences", {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
 export function postCheckout() {
   return apiFetch<BillingCheckoutResponse>("/api/billing/checkout", {
     method: "POST",

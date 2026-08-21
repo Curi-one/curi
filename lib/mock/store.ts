@@ -41,6 +41,11 @@ import {
   type ActivityRecord,
   type MockPath,
 } from "@/lib/mock/fixtures";
+import {
+  DEFAULT_USER_PREFERENCES,
+  type UserPreferences,
+} from "@/lib/profile/user-preferences";
+import { normalizeLearningProfile } from "@/lib/profile/learning-profile";
 import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
 
 export const SESSION_COOKIE = "curi_session";
@@ -58,6 +63,7 @@ type SessionData = {
   activity: ActivityRecord[];
   pendingCourse: PendingCourse | null;
   timezone: string;
+  preferences: UserPreferences;
 };
 
 type StoreResult<T> =
@@ -144,6 +150,7 @@ function seedDefaultMember(today: string): SessionData {
     activity: createDefaultMemberActivity(today),
     pendingCourse: null,
     timezone: DEFAULT_TIMEZONE,
+    preferences: { ...DEFAULT_USER_PREFERENCES },
   };
 }
 
@@ -176,6 +183,7 @@ class MockStore {
       activity: [],
       pendingCourse: null,
       timezone: DEFAULT_TIMEZONE,
+      preferences: { ...DEFAULT_USER_PREFERENCES },
     };
     this.sessions.set(sessionId, created);
     return created;
@@ -580,6 +588,7 @@ class MockStore {
       activity: [],
       pendingCourse: null,
       timezone: DEFAULT_TIMEZONE,
+      preferences: { ...DEFAULT_USER_PREFERENCES },
     });
     return guest;
   }
@@ -624,7 +633,32 @@ class MockStore {
       activity: [],
       pendingCourse: null,
       timezone: DEFAULT_TIMEZONE,
+      preferences: { ...DEFAULT_USER_PREFERENCES },
     });
+  }
+
+  getPreferences(sessionId: string): UserPreferences {
+    const data = this.getOrCreateSession(sessionId);
+    return { ...data.preferences };
+  }
+
+  updatePreferences(
+    sessionId: string,
+    patch: Partial<UserPreferences>,
+  ): UserPreferences {
+    const data = this.getOrCreateSession(sessionId);
+    const learning = normalizeLearningProfile({ ...data.preferences, ...patch });
+    const merged: UserPreferences = {
+      ...learning,
+      emailEnabled: patch.emailEnabled ?? data.preferences.emailEnabled,
+      emailTime: patch.emailTime ?? data.preferences.emailTime,
+      emailFormat: patch.emailFormat ?? data.preferences.emailFormat,
+      emailWeekends: patch.emailWeekends ?? data.preferences.emailWeekends,
+      emailWeeklyDigest:
+        patch.emailWeeklyDigest ?? data.preferences.emailWeeklyDigest,
+    };
+    data.preferences = merged;
+    return { ...merged };
   }
 }
 

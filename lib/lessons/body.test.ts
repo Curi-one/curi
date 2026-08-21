@@ -8,6 +8,7 @@ import {
   markdownToParagraphs,
   type GetLessonBodyDeps,
 } from "@/lib/lessons/body";
+import { DEFAULT_LEARNING_PROFILE } from "@/lib/profile/learning-profile";
 
 vi.mock("@/lib/ai/perplexity", () => ({
   lessonBodyModel: () => "sonar-pro",
@@ -34,6 +35,13 @@ function completion(content: string): ChatCompletionResult {
 function fingerprintFor(
   lessonIndex: number,
   difficultyModifier: string,
+  learningProfile?: {
+    seq: string;
+    anchor: string;
+    length: string;
+    rigor: string;
+    jargon: string;
+  },
 ): string {
   return buildFingerprint({
     topicNormalized: normalizeTopic(TOPIC),
@@ -42,6 +50,7 @@ function fingerprintFor(
     cacheType: "lesson_body",
     lessonIndex,
     difficultyModifier,
+    learningProfile,
   });
 }
 
@@ -93,6 +102,7 @@ describe("getLessonBody", () => {
   const store = vi.fn();
   const loadCourse = vi.fn();
   const loadPriorFeel = vi.fn();
+  const loadLearningProfile = vi.fn();
   const upsertLessonContent = vi.fn();
 
   const baseDeps: GetLessonBodyDeps = {
@@ -100,6 +110,7 @@ describe("getLessonBody", () => {
     store,
     loadCourse,
     loadPriorFeel,
+    loadLearningProfile,
     upsertLessonContent,
     complete: chatCompletion,
   };
@@ -110,6 +121,7 @@ describe("getLessonBody", () => {
     store.mockReset().mockResolvedValue(undefined);
     loadCourse.mockReset();
     loadPriorFeel.mockReset().mockResolvedValue(null);
+    loadLearningProfile.mockReset().mockResolvedValue(DEFAULT_LEARNING_PROFILE);
     upsertLessonContent.mockReset().mockResolvedValue(undefined);
   });
 
@@ -244,6 +256,58 @@ describe("getLessonBody", () => {
     ).rejects.toThrow(/Failed to generate lesson body/);
   });
 
+  it("includes member learning profile in Perplexity prompt and cache key", async () => {
+    loadCourse.mockResolvedValueOnce({
+      kind: "member",
+      topic: TOPIC,
+      depth: DEPTH,
+      clarifications: CLARIFICATIONS,
+      lessons: LESSONS,
+      userId: "user-1",
+      progress: 1,
+      hasActivityToday: false,
+    });
+    loadLearningProfile.mockResolvedValueOnce({
+      seq: "broad",
+      anchor: "data",
+      length: "long",
+      rigor: "edges",
+      jargon: "skip",
+    });
+    lookup.mockResolvedValueOnce(null);
+    vi.mocked(chatCompletion).mockResolvedValueOnce(
+      completion(sampleLessonJson()),
+    );
+
+    await getLessonBody(
+      { courseId: "c1", lessonIndex: 0, sessionId: "sess" },
+      baseDeps,
+    );
+
+    expect(loadLearningProfile).toHaveBeenCalledWith({ userId: "user-1" });
+    const call = vi.mocked(chatCompletion).mock.calls[0]?.[0];
+    const userMessage = call?.messages.find((m) => m.role === "user")?.content;
+    expect(userMessage).toContain("broad picture");
+    expect(userMessage).toContain("~10 minute");
+
+    const expectedKey = buildFingerprint({
+      topicNormalized: normalizeTopic(TOPIC),
+      depth: DEPTH,
+      clarifications: clarificationsToMap(CLARIFICATIONS),
+      cacheType: "lesson_body",
+      lessonIndex: 0,
+      difficultyModifier: "baseline",
+      learningProfile: {
+        seq: "broad",
+        anchor: "data",
+        length: "long",
+        rigor: "edges",
+        jargon: "skip",
+      },
+    });
+    expect(lookup).toHaveBeenCalledWith(expectedKey);
+  });
+
   it("maps prior too_hard feel to easier modifier for lesson 2", async () => {
     loadCourse.mockResolvedValueOnce({
       kind: "member",
@@ -270,7 +334,15 @@ describe("getLessonBody", () => {
       priorLessonIndex: 0,
       userId: "user-1",
     });
-    expect(lookup).toHaveBeenCalledWith(fingerprintFor(1, "easier"));
+    expect(lookup).toHaveBeenCalledWith(
+      fingerprintFor(1, "easier", {
+        seq: DEFAULT_LEARNING_PROFILE.seq,
+        anchor: DEFAULT_LEARNING_PROFILE.anchor,
+        length: DEFAULT_LEARNING_PROFILE.length,
+        rigor: DEFAULT_LEARNING_PROFILE.rigor,
+        jargon: DEFAULT_LEARNING_PROFILE.jargon,
+      }),
+    );
   });
 
   it("uses baseline for guests on lesson index > 0 when no feel stored", async () => {
