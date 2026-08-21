@@ -7,6 +7,8 @@
 
 **Quick reference:** [docs/WEBSITE-DESIGN-RULES.md](./WEBSITE-DESIGN-RULES.md) — warm greyscale palette, Vermilion rule, type floors, and don'ts in one place.
 
+**Component & pattern HTML:** [docs/COMPONENT-LIBRARY.md](./COMPONENT-LIBRARY.md) — binding rules plus `docs/references/component-library.html` and `geometric-patterns.html`.
+
 **Motion & marks:** [INTERACTIONS.md](./INTERACTIONS.md) (duration tokens, hover one-property, never-list) · [TRACK-MARKS.md](./TRACK-MARKS.md) (domain glyph / call number / size tiers).
 
 ---
@@ -202,7 +204,7 @@ Most products compete on colour. Curi competes on contrast.
 | `color.mid` | Mid | `#6B6760` | 107, 103, 96 | Secondary text, supporting copy |
 | `color.silver` | Silver | `#9E9B94` | 158, 155, 148 | Labels, captions, metadata |
 | `color.light` | Light | `#D4D0C8` | 212, 208, 200 | Borders, rules, subtle backgrounds |
-| `color.paper` | Paper | `#F5F4F0` | 245, 244, 240 | Secondary background, cards |
+| `color.paper` | Paper | `#F4F1E8` | 244, 241, 232 | Secondary background, cards |
 | `color.white` | White | `#FAF9F5` | 250, 249, 245 | Primary background |
 
 Never use pure black (`#000000`) or pure white (`#FFFFFF`) — the warmth is intentional. Vermilion is the only chromatic value in the entire palette.
@@ -550,8 +552,8 @@ Design tokens are the single source of truth for all visual values. They must be
 ```css
 /* ── Background ── */
 --color-bg-primary:     #FAF9F5;   /* White — page background */
---color-bg-secondary:   #F5F4F0;   /* Paper — cards, secondary */
---color-bg-tertiary:    #EEEDE9;   /* Pale — hover states, subtle (between paper and light) */
+--color-bg-secondary:   #F4F1E8;   /* Paper — cards, secondary (component library --paper) */
+--color-bg-tertiary:    #E8E5DC;   /* Pale — hover states (component library --pale) */
 --color-bg-inverse:     #0A0908;   /* Ink — dark panels, footer */
 --color-bg-inverse-2:   #1C1A18;   /* Ink 2 — hover on dark */
 

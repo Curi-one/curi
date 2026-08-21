@@ -214,14 +214,16 @@ export function DesignSystemShowcase() {
         <div className="flex flex-wrap gap-4">
           <Swatch name="Ink" token="--color-ink" />
           <Swatch name="Paper" token="--color-paper-tone" />
+          <Swatch name="Pale" token="--color-pale" />
           <Swatch name="White" token="--color-white-tone" />
           <Swatch name="Light" token="--color-light" />
           <Swatch name="Mid" token="--color-mid" />
           <Swatch name="Vermilion" token="--color-accent" />
         </div>
         <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
-          Near-white surfaces (Paper #F5F4F0, White #FAF9F5). Vermilion is the
-          only chromatic colour — one beat per screen. Hover the swatches.
+          Near-white surfaces (Paper #F4F1E8, White #FAF9F5, Pale #E8E5DC).
+          Vermilion is the only chromatic colour — one beat per screen. Hover the
+          swatches.
         </p>
         <div className="flex flex-wrap gap-2">
           <span className="badge-accent transition-colors duration-small hover:bg-accent/90">
@@ -306,9 +308,10 @@ export function DesignSystemShowcase() {
         title="Same type recipe, every size"
       >
         <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
-          All buttons share UI sans, uppercase, medium weight, and tracking —
-          primary carries the Vermilion bottom border. Size changes padding and
-          type size only.
+          Primary: Ink fill + 2px Vermilion underline. Ghost: Light border → Ink
+          / Pale on hover. Danger: Mid text, ghost-like — destruction is
+          signalled by words, not colour. Size changes padding and type size
+          only.
         </p>
 
         <InteractiveDemo label="Sizes">
@@ -320,14 +323,20 @@ export function DesignSystemShowcase() {
           </div>
         </InteractiveDemo>
 
-        <InteractiveDemo label="Variants">
+        <InteractiveDemo label="Variants · library">
           <div className="flex flex-wrap items-center gap-3">
             <Button onClick={() => setCount((c) => c + 1)}>
               Primary · {count}
             </Button>
-            <Button variant="secondary">Secondary</Button>
+            <Button variant="secondary">Ghost outline</Button>
             <Button variant="ghost">Ghost</Button>
-            <Button variant="danger">Danger</Button>
+            <Button variant="danger">Cancel subscription</Button>
+            <button
+              type="button"
+              className="font-sans text-[13px] font-normal text-ink underline underline-offset-[3px] transition-colors hover:text-mid"
+            >
+              Link
+            </button>
           </div>
         </InteractiveDemo>
 
@@ -391,12 +400,66 @@ export function DesignSystemShowcase() {
             <Button loading>Loading</Button>
             <Link
               href="#type"
-              className="font-sans text-ui-xs text-accent underline-offset-4 transition-all duration-small hover:underline"
+              className="font-sans text-ui-xs text-ink underline-offset-4 transition-all duration-small hover:underline"
             >
               Text link (sans)
             </Link>
           </div>
         </InteractiveDemo>
+      </Panel>
+
+      {/* Patterns — muted */}
+      <Panel
+        tone="muted"
+        eyebrow="03b · Patterns"
+        title="Geometric library"
+      >
+        <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
+          Greyscale ruled lines, hatch, and blueprint fills. Vermilion appears
+          only as the reveal line. Production screens get Vermilion once;
+          this catalogue may show several tiles with a reveal for reference.
+        </p>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {(
+            [
+              ["Ledger", "pattern-ledger bg-paper"],
+              ["Hatch", "pattern-hatch bg-paper"],
+              ["Cross on ink", "pattern-cross bg-ink"],
+              ["Blueprint", "pattern-blueprint bg-paper"],
+              ["Reveal", "pattern-reveal bg-paper"],
+              ["Columns", "pattern-columns bg-paper"],
+            ] as const
+          ).map(([name, classes]) => (
+            <div key={name} className="min-w-0">
+              <div
+                className={`relative h-28 border border-border ${classes}`}
+                aria-hidden
+              >
+                {name === "Reveal" ? (
+                  <span className="absolute bottom-3 left-3 z-[1] font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
+                    Reveal line
+                  </span>
+                ) : null}
+              </div>
+              <p className="mt-2 font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
+                {name}
+              </p>
+            </div>
+          ))}
+          <div className="min-w-0">
+            <div
+              className="pattern-vitrine relative h-28 border border-border bg-paper"
+              aria-hidden
+            >
+              <span className="r r1" />
+              <span className="r r2" />
+              <span className="r r3" />
+            </div>
+            <p className="mt-2 font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
+              Vitrine
+            </p>
+          </div>
+        </div>
       </Panel>
 
       {/* Chips / tabs — dark */}

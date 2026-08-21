@@ -41,7 +41,7 @@ export function LessonFeedCard({
 
   if (item.status === "locked") {
     return (
-      <div className="flex w-full gap-3.5 rounded-none border border-border/50 bg-paper-secondary p-4 opacity-55 sm:gap-4 sm:p-5">
+      <div className="flex w-full gap-3.5 rounded-none border border-border bg-paper-secondary p-4 opacity-55 sm:gap-4 sm:p-5">
         <div className="opacity-40">
           <TopicThumbnail topic={item.topic} size={48} />
         </div>
@@ -73,8 +73,8 @@ export function LessonFeedCard({
   return (
     <Link
       href={href}
-      className={`group interactive-card focus-ring relative flex w-full gap-3.5 overflow-hidden rounded-none border border-border/50 bg-paper-secondary p-4 sm:gap-4 sm:p-5 ${
-        dimmed ? "opacity-55" : ""
+      className={`group interactive-card focus-ring relative flex w-full gap-3.5 overflow-hidden rounded-none border border-border bg-paper-secondary p-4 shadow-none sm:gap-4 sm:p-5 ${
+        dimmed ? "opacity-55 hover:opacity-70" : ""
       }`}
     >
       {!dimmed && (

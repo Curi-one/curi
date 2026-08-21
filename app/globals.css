@@ -20,13 +20,14 @@
   --color-mid: #6b6760;
   --color-silver: #9e9b94;
   --color-light: #d4d0c8;
-  --color-paper-tone: #f5f4f0; /* paper — secondary surfaces, barely warm */
+  --color-paper-tone: #f4f1e8; /* paper — secondary surfaces (library --paper) */
   --color-white-tone: #faf9f5; /* white — primary page bg */
+  --color-pale: #e8e5dc; /* pale — tertiary / hover (library --pale) */
 
   /* Background */
   --color-bg-primary: var(--color-white-tone);
   --color-bg-secondary: var(--color-paper-tone);
-  --color-bg-tertiary: #eeede9; /* pale — between paper and light */
+  --color-bg-tertiary: var(--color-pale);
   --color-bg-inverse: var(--color-ink);
   --color-bg-inverse-2: var(--color-ink-2);
   --color-bg-inverse-3: var(--color-ink-3);
@@ -443,16 +444,18 @@ body {
     cursor: not-allowed;
   }
 
-  /* Tertiary / inline action — same type as primary */
+  /* Ghost — Light border → Ink border + Pale fill (component library) */
   .btn-ghost {
-    color: var(--color-text-secondary);
+    color: var(--color-text-primary);
     background: transparent;
-    border: none;
+    border: var(--border-subtle);
+    font-weight: var(--weight-regular);
   }
 
   .btn-ghost:hover:not(:disabled) {
+    color: var(--color-text-primary);
+    border-color: var(--color-border-strong);
     background: var(--color-bg-tertiary);
-    color: var(--color-text-secondary);
   }
 
   .btn-ghost:active:not(:disabled) {
@@ -462,14 +465,18 @@ body {
 
   .btn-ghost:disabled {
     color: var(--color-text-disabled);
+    border-color: var(--color-text-disabled);
+    background: transparent;
     cursor: not-allowed;
   }
 
-  /* Destructive — resolved through copy, never colour (§9.1) */
+  /* Destructive — Mid text, ghost-like outline. No vermilion/red:
+     destruction is signalled by words, not colour (component library). */
   .btn-danger {
     color: var(--color-text-secondary);
     background: transparent;
     border: var(--border-subtle);
+    font-weight: var(--weight-regular);
   }
 
   .btn-danger:hover:not(:disabled) {
@@ -479,6 +486,10 @@ body {
   .btn-danger:active:not(:disabled) {
     transform: translateY(1px);
     transition: none;
+  }
+
+  .btn-danger:active:not(:disabled) {
+    transform: translateY(1px);
   }
 
   .btn-danger:disabled {
@@ -1015,6 +1026,217 @@ body {
   .narrow-column {
     max-width: var(--narrow-max-width);
     margin: 0 auto;
+  }
+
+  /* ── Quiz options · component library `.quiz-opt` ──────────────────────── */
+
+  .quiz-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    width: 100%;
+    padding: 16px 20px;
+    text-align: left;
+    border: var(--border-subtle);
+    border-radius: var(--radius-none);
+    background: var(--color-bg-primary);
+    transition:
+      background-color var(--duration-small) var(--ease-out),
+      border-color var(--duration-small) var(--ease-out);
+  }
+
+  .quiz-opt:hover:not(:disabled) {
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-border-strong);
+  }
+
+  .quiz-opt .letter {
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-sm);
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .quiz-opt .text {
+    font-size: var(--text-ui-md);
+    font-weight: var(--weight-light);
+    color: var(--color-text-primary);
+  }
+
+  .quiz-opt.correct {
+    background: var(--color-bg-inverse);
+    border-color: var(--color-bg-inverse);
+  }
+
+  .quiz-opt.correct .letter {
+    color: var(--color-accent);
+  }
+
+  .quiz-opt.correct .text {
+    color: var(--color-text-inverse);
+  }
+
+  .quiz-opt.incorrect {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-border-subtle);
+  }
+
+  .quiz-opt.incorrect .text {
+    color: var(--color-text-tertiary);
+  }
+
+  /* ── Brand geometric patterns · docs/references/geometric-patterns.html ─
+     Greyscale only. Vermilion appears solely on `.pattern-reveal`. */
+
+  .pattern-ledger {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      var(--color-light) 0 1px,
+      transparent 1px 34px
+    );
+  }
+
+  .pattern-columns {
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--color-light) 0 1px,
+      transparent 1px calc(100% / 12)
+    );
+  }
+
+  .pattern-hatch {
+    background-image: repeating-linear-gradient(
+      115deg,
+      var(--color-mid) 0 1px,
+      transparent 1px 9px
+    );
+  }
+
+  .pattern-hatch-fine {
+    position: relative;
+  }
+
+  .pattern-hatch-fine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.16;
+    background-image: repeating-linear-gradient(
+      115deg,
+      var(--color-ink) 0 1px,
+      transparent 1px 9px
+    );
+    pointer-events: none;
+  }
+
+  /* Cross hatch — intended on Ink fields */
+  .pattern-cross {
+    position: relative;
+  }
+
+  .pattern-cross::before,
+  .pattern-cross::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  .pattern-cross::before {
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--color-white-tone) 0 1px,
+      transparent 1px 12px
+    );
+  }
+
+  .pattern-cross::after {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--color-white-tone) 0 1px,
+      transparent 1px 12px
+    );
+  }
+
+  .pattern-blueprint {
+    position: relative;
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        var(--color-light) 0 1px,
+        transparent 1px 16px
+      ),
+      repeating-linear-gradient(
+        to right,
+        var(--color-light) 0 1px,
+        transparent 1px 16px
+      );
+  }
+
+  .pattern-blueprint::before,
+  .pattern-blueprint::after {
+    content: "";
+    position: absolute;
+    height: 1px;
+    width: 141.4%;
+    top: 50%;
+    left: 50%;
+    background: var(--color-ink);
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .pattern-blueprint::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  .pattern-blueprint::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+
+  .pattern-vitrine {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pattern-vitrine > .r {
+    position: absolute;
+    border: 1px solid var(--color-light);
+    pointer-events: none;
+  }
+
+  .pattern-vitrine > .r1 {
+    inset: 12%;
+  }
+
+  .pattern-vitrine > .r2 {
+    inset: 24%;
+  }
+
+  .pattern-vitrine > .r3 {
+    inset: 36%;
+    border-color: var(--color-ink);
+  }
+
+  /* Vermilion only as reveal line — never woven into pattern fills */
+  .pattern-reveal {
+    position: relative;
+  }
+
+  .pattern-reveal::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--color-accent);
+    transform: scaleX(0.42);
+    transform-origin: left;
+    pointer-events: none;
   }
 }
 
