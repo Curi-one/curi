@@ -7,16 +7,6 @@ type Props = {
   visual: LessonVisualBlock;
 };
 
-/** Heuristic: TeX markers or a short symbolic expression, not prose. */
-export function looksLikeMath(equation: string): boolean {
-  const s = equation.trim();
-  if (!s) return false;
-  if (/\\[a-zA-Z]+|[\^_{}$]/.test(s)) return true;
-  const longWords = s.match(/[A-Za-z]{5,}/g) ?? [];
-  if (longWords.length >= 2) return false;
-  return /^[\w\s.+\-*/=()]+$/.test(s) && /=/.test(s) && s.length <= 48;
-}
-
 function renderEquationHtml(equation: string): string | null {
   const tex = equation.trim().replace(/^\$+|\$+$/g, "");
   if (!tex) return null;
