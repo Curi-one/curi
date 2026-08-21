@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { memberSignInPath } from "@/lib/auth/member-gate";
 
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/auth/callback")) {
@@ -30,7 +31,16 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user && request.nextUrl.pathname === "/today") {
+    return NextResponse.redirect(
+      new URL(memberSignInPath("/today"), request.url),
+    );
+  }
+
   return response;
 }
 

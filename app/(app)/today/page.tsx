@@ -1,42 +1,60 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { LoadingState } from "@/components/LoadingState";
 import { TodayView } from "@/components/TodayView";
-import { getFeed, getProgress } from "@/lib/api/client";
+import { getFeed, getMe, getProgress } from "@/lib/api/client";
+import { memberSignInPath } from "@/lib/auth/member-gate";
 import type { FeedResponse } from "@/lib/api/schemas";
 
 export default function TodayPage() {
+  const router = useRouter();
   const [feed, setFeed] = useState<FeedResponse | null>(null);
   const [streak, setStreak] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    function load() {
-      Promise.all([getFeed(), getProgress()])
-        .then(([f, p]) => {
-          setFeed(f);
-          setStreak(p.streak);
-        })
-        .catch(() => setError("Could not load Today."));
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const me = await getMe();
+        if (cancelled) return;
+        if (me.session.kind !== "member") {
+          router.replace(memberSignInPath("/today"));
+          return;
+        }
+
+        const [f, p] = await Promise.all([getFeed(), getProgress()]);
+        if (cancelled) return;
+        setFeed(f);
+        setStreak(p.streak);
+        setReady(true);
+      } catch {
+        if (cancelled) return;
+        router.replace(memberSignInPath("/today"));
+      }
     }
 
-    load();
+    void load();
 
     /** Re-reading a lesson elsewhere shouldn't leave Today stale (CUR-46). */
     function onFocus() {
-      load();
+      void load();
     }
     window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
-  }, []);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [router]);
 
   return (
     <PageShell withTabPad={false} className="pt-4">
-      {error && <p className="text-ink-muted">{error}</p>}
-      {!feed && !error && <LoadingState label="Loading your feed…" />}
-      {feed && (
+      {!ready && <LoadingState label="Loading your feed…" />}
+      {feed && ready && (
         <TodayView
           {...feed}
           streak={streak}
