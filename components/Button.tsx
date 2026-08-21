@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, MouseEventHandler, ReactNode } from "react";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "large" | "default" | "small" | "compact";
@@ -27,6 +27,8 @@ type ButtonAsButton = Shared &
 type ButtonAsLink = Shared & {
   href: string;
   disabled?: boolean;
+  /** Fires alongside navigation — e.g. dismissing the sheet the link sits in. */
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 };
 
 export type ButtonProps = ButtonAsButton | ButtonAsLink;
@@ -102,7 +104,7 @@ export function Button(props: ButtonProps) {
   );
 
   if ("href" in props && props.href) {
-    const { href, disabled } = props;
+    const { href, disabled, onClick } = props;
     if (disabled || loading) {
       return (
         <span
@@ -118,6 +120,7 @@ export function Button(props: ButtonProps) {
       <Link
         href={href}
         className={classes}
+        onClick={onClick}
         aria-label={iconOnly ? label : undefined}
       >
         {content}

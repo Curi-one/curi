@@ -36,12 +36,12 @@ export function DepthPicker({
       </div>
       <StepProgress step={step} totalSteps={totalSteps} label="Depth" />
       <h1
-        className="font-display text-[1.75rem] font-light leading-snug tracking-tight text-ink"
+        className="font-display text-display-xs font-light leading-snug tracking-tight text-ink"
         style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
       >
         How far should this path go?
       </h1>
-      <p className="mt-2 text-[15px] font-light text-ink-muted">
+      <p className="mt-2 text-ui-md font-light text-ink-muted">
         We&apos;ll pick the exact lesson count within the band.
       </p>
       <ul className="mt-8 space-y-3">
@@ -50,11 +50,11 @@ export function DepthPicker({
             <button
               type="button"
               onClick={() => onSelect(opt.slug)}
-              className={`option-card focus-ring text-[16px] ${
+              className={`option-card focus-ring text-ui-lg ${
                 selected === opt.slug ? "option-card-selected" : ""
               }`}
             >
-              <span className="block font-medium text-[16px]">{opt.label}</span>
+              <span className="block font-medium text-ui-lg">{opt.label}</span>
               <span
                 className={`mt-1 block text-sm ${
                   selected === opt.slug ? "text-paper/80" : "text-ink-muted"

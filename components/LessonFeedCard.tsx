@@ -50,14 +50,14 @@ export function LessonFeedCard({
           <TopicThumbnail topic={item.topic} />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-[14px] font-semibold leading-snug tracking-tight text-ink/50 sm:text-[15px]">
+          <h3 className="text-ui-sm font-semibold leading-snug tracking-tight text-ink/50 sm:text-ui-md">
             {item.title}
           </h3>
-          <p className="mt-1.5 line-clamp-2 text-[12px] leading-relaxed text-ink-muted/70 sm:text-[13px]">
+          <p className="mt-1.5 line-clamp-2 text-ui-2xs leading-relaxed text-ink-muted/70 sm:text-ui-xs">
             {blurb}
           </p>
           <div className="mt-3 h-px bg-border/40" aria-hidden />
-          <div className="mt-2 flex items-center justify-end gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-ink-muted/50">
+          <div className="mt-2 flex items-center justify-end gap-1.5 text-ui-4xs font-semibold uppercase tracking-wider text-ink-muted/50">
             <Lock className="h-3 w-3" aria-hidden />
             {lockedCopy}
           </div>
@@ -85,7 +85,7 @@ export function LessonFeedCard({
 
       <div className="min-w-0 flex-1">
         <h3
-          className={`font-display text-[18px] font-light leading-[1.15] tracking-[-0.02em] transition-colors sm:text-[20px] ${
+          className={`font-display text-ui-xl font-light leading-tight tracking-tight transition-colors sm:text-display-2xs ${
             dimmed
               ? "text-ink/55 group-hover:text-ink/70"
               : "text-ink group-hover:text-ink"
@@ -95,7 +95,7 @@ export function LessonFeedCard({
           {item.title}
         </h3>
         <p className="mt-1 font-meta">{item.topic}</p>
-        <p className="mt-1.5 line-clamp-2 text-[12px] leading-relaxed text-ink-muted sm:text-[13px]">
+        <p className="mt-1.5 line-clamp-2 text-ui-2xs leading-relaxed text-ink-muted sm:text-ui-xs">
           {blurb}
         </p>
 
@@ -103,7 +103,7 @@ export function LessonFeedCard({
 
         <div className="mt-2 flex items-center justify-end">
           <span
-            className={`text-[10px] font-semibold uppercase tracking-wider transition-colors ${
+            className={`text-ui-4xs font-semibold uppercase tracking-wider transition-colors ${
               dimmed
                 ? "text-ink-muted/45 group-hover:text-ink-muted/70"
                 : "text-ink group-hover:text-ink"

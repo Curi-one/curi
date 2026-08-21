@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowRight, Check, Loader2, Lock, Sparkles } from "lucide-react";
@@ -8,6 +7,7 @@ import { PageShell } from "@/components/PageShell";
 import { Wordmark } from "@/components/Wordmark";
 import { getMe, postCourse } from "@/lib/api/client";
 import { loadClarifySession, saveClarifySession } from "@/lib/clarify-store";
+import { Button } from "@/components/Button";
 
 const WARMUP_MSGS = [
   "Analysing your choices…",
@@ -155,9 +155,9 @@ export default function GeneratingPage() {
       <PageShell withTabPad={false}>
         <Wordmark href="/" underline={false} />
         <p className="mt-8 text-ink-muted">{error}</p>
-        <Link href="/clarify" className="btn-primary mt-4 inline-block">
+        <Button href="/clarify" className="mt-4">
           Back to clarify
-        </Link>
+        </Button>
       </PageShell>
     );
   }
@@ -268,7 +268,7 @@ export default function GeneratingPage() {
                             {num}
                           </span>
                           <div className="min-w-0 flex-1">
-                            <p className="font-display text-[1.05rem] font-light leading-snug text-ink sm:text-lg">
+                            <p className="font-sans text-ui-lg font-light leading-snug text-ink">
                               {lesson.title}
                             </p>
                             <p className="lesson-blurb mt-1.5 text-sm leading-relaxed text-ink-muted">
@@ -298,7 +298,7 @@ export default function GeneratingPage() {
                           {num}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="font-display text-[1.05rem] font-light leading-snug text-ink sm:text-lg">
+                          <p className="font-sans text-ui-lg font-light leading-snug text-ink">
                             {lesson.title}
                           </p>
                           <p className="lesson-blurb mt-1.5 text-sm leading-relaxed text-ink-muted">
@@ -332,7 +332,7 @@ export default function GeneratingPage() {
                           {num}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="font-display text-[1.05rem] font-light leading-snug text-ink sm:text-lg">
+                          <p className="font-sans text-ui-lg font-light leading-snug text-ink">
                             {lesson.title}
                           </p>
                           <p className="lesson-blurb mt-1.5 text-sm leading-relaxed text-ink-muted">

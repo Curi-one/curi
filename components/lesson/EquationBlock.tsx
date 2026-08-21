@@ -11,10 +11,10 @@ export function EquationBlock({ visual }: Props) {
 
   return (
     <div className="my-10 border-y border-border py-6">
-      <div className="text-xs uppercase tracking-[0.24em] text-ink-muted">
+      <div className="text-xs uppercase tracking-widest text-ink-muted">
         Working equation
       </div>
-      <div className="mt-4 font-display text-3xl font-light leading-tight tracking-[-0.03em] text-ink sm:text-4xl">
+      <div className="mt-4 font-display text-3xl font-light leading-tight tracking-tight text-ink sm:text-4xl">
         {equation}
       </div>
       {formulaNote && (

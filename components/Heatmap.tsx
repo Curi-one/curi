@@ -84,7 +84,11 @@ export function Heatmap({ dates, streak, atRisk }: Props) {
         <span className="ml-1.5">active days</span>
       </p>
       <div className="mt-4 overflow-x-auto">
-        <div className="inline-flex gap-1" role="img" aria-label="Activity heatmap">
+        <div
+          className="inline-flex gap-1"
+          role="img"
+          aria-label="Activity heatmap"
+        >
           {grid.map((week, wi) => (
             <div key={wi} className="flex flex-col gap-1">
               {week.map((cell) => (
@@ -109,7 +113,7 @@ export function Heatmap({ dates, streak, atRisk }: Props) {
       </div>
       <div className="mt-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-1">
-          <span className="font-meta normal-case tracking-normal text-[9px]">
+          <span className="font-meta normal-case tracking-normal text-mono-xs">
             Less
           </span>
           {[0, 1, 2, 3, 4].map((level) => (
@@ -119,11 +123,11 @@ export function Heatmap({ dates, streak, atRisk }: Props) {
               aria-hidden
             />
           ))}
-          <span className="font-meta normal-case tracking-normal text-[9px]">
+          <span className="font-meta normal-case tracking-normal text-mono-xs">
             More
           </span>
         </div>
-        <p className="font-meta min-h-[1rem] normal-case tracking-normal text-[10px] text-ink-muted">
+        <p className="font-meta min-h-[1rem] normal-case tracking-normal text-ui-4xs text-ink-muted">
           {hover ?? "Hover a day"}
         </p>
       </div>

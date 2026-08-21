@@ -33,6 +33,7 @@ import {
   RIGOR_OPTIONS,
   SEQ_OPTIONS,
 } from "@/lib/profile/preview-samples";
+import { Button } from "@/components/Button";
 
 type Theme = "system" | "light" | "dark";
 type ProfileTab = "account" | "learning" | "email" | "plan";
@@ -46,7 +47,6 @@ function applyTheme(theme: Theme) {
   }
   localStorage.setItem("curi-theme", theme);
 }
-
 
 const EMAIL_TIME_OPTIONS = [
   { value: "early-morning", label: "Early morning · 6 AM" },
@@ -144,7 +144,8 @@ export default function ProfilePage() {
         .then((res) => {
           setPrefs(res.preferences);
           setPrefsSaved(true);
-          if (prefsFeedbackTimer.current) clearTimeout(prefsFeedbackTimer.current);
+          if (prefsFeedbackTimer.current)
+            clearTimeout(prefsFeedbackTimer.current);
           prefsFeedbackTimer.current = setTimeout(
             () => setPrefsSaved(false),
             1500,
@@ -228,12 +229,9 @@ export default function ProfilePage() {
         withTabPad={false}
       >
         <p className="mt-6 text-ink-muted">Sign in to manage your account.</p>
-        <Link
-          href="/auth?intent=signin&returnTo=%2Fprofile"
-          className="btn-primary mt-6 inline-block"
-        >
+        <Button href="/auth?intent=signin&returnTo=%2Fprofile" className="mt-6">
           Sign in
-        </Link>
+        </Button>
       </PageShell>
     );
   }
@@ -253,13 +251,9 @@ export default function ProfilePage() {
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Today
         </Link>
-        <button
-          type="button"
-          onClick={() => void signOut()}
-          className="btn-secondary h-9 px-3 text-sm"
-        >
+        <Button variant="secondary" size="small" onClick={() => void signOut()}>
           Sign out
-        </button>
+        </Button>
       </div>
 
       <header className="mb-7 flex items-center gap-4">
@@ -317,14 +311,16 @@ export default function ProfilePage() {
                   className="input-field flex-1"
                   autoComplete="name"
                 />
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="small"
                   disabled={saving || !name.trim()}
+                  loading={saving}
                   onClick={() => void saveName()}
-                  className="btn-secondary shrink-0 px-4 disabled:opacity-40"
+                  className="shrink-0"
                 >
-                  {saving ? "…" : "Save"}
-                </button>
+                  Save
+                </Button>
               </div>
             </label>
             {saveMessage && (
@@ -368,8 +364,8 @@ export default function ProfilePage() {
             <span className="font-display italic text-accent">×</span>
             <span>
               This applies to every course you&apos;re taking. What you&apos;re
-              working toward, and where you&apos;re starting, is asked separately
-              each time you add a course.
+              working toward, and where you&apos;re starting, is asked
+              separately each time you add a course.
             </span>
           </p>
 
@@ -381,8 +377,9 @@ export default function ProfilePage() {
                     How you like things explained
                   </h2>
                   <p className="mt-2 text-sm text-ink-muted">
-                    Not what you&apos;re learning — how Curi should teach it. Set
-                    it once; the preview shows it on three unrelated subjects.
+                    Not what you&apos;re learning — how Curi should teach it.
+                    Set it once; the preview shows it on three unrelated
+                    subjects.
                   </p>
                 </div>
                 {prefsSaved && (
@@ -455,7 +452,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={resetLearningDefaults}
-                  className="border-b border-border-strong pb-0.5 font-meta text-[11px] uppercase tracking-wider text-ink hover:border-ink"
+                  className="border-b border-border-strong pb-0.5 font-meta text-ui-3xs uppercase tracking-wider text-ink hover:border-ink"
                 >
                   Reset to defaults
                 </button>
@@ -603,7 +600,7 @@ export default function ProfilePage() {
                     {row.label}
                   </span>
                   {"note" in row && row.note && (
-                    <span className="ml-auto font-meta text-[10px] uppercase tracking-wider text-ink-muted/60">
+                    <span className="ml-auto font-meta text-ui-4xs uppercase tracking-wider text-ink-muted/60">
                       {row.note}
                     </span>
                   )}
@@ -614,21 +611,18 @@ export default function ProfilePage() {
 
           <div className="mt-6 border-t border-border pt-5">
             {!isAcademy ? (
-              <Link
-                href="/upgrade"
-                className="btn-primary inline-flex w-full justify-center sm:w-auto"
-              >
+              <Button href="/upgrade" className="w-full sm:w-auto">
                 Upgrade to Academy
-              </Link>
+              </Button>
             ) : (
-              <button
-                type="button"
-                disabled={portalLoading}
+              <Button
+                variant="secondary"
+                loading={portalLoading}
                 onClick={() => void openPortal()}
-                className="btn-secondary w-full disabled:opacity-40 sm:w-auto"
+                className="w-full sm:w-auto"
               >
-                {portalLoading ? "Opening…" : "Billing & invoices"}
-              </button>
+                Billing &amp; invoices
+              </Button>
             )}
             {portalMessage && (
               <p className="mt-2 text-sm text-ink-muted">{portalMessage}</p>

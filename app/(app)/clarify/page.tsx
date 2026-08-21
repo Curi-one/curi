@@ -15,6 +15,7 @@ import {
   startClarifySession,
   type ClarifyAnswer,
 } from "@/lib/clarify-store";
+import { Button } from "@/components/Button";
 
 function ClarifyContent() {
   const router = useRouter();
@@ -111,13 +112,9 @@ function ClarifyContent() {
     return (
       <div>
         <p className="text-ink-muted">{error}</p>
-        <button
-          type="button"
-          className="btn-primary mt-4"
-          onClick={() => void loadQuestions(topicParam)}
-        >
+        <Button onClick={() => void loadQuestions(topicParam)} className="mt-4">
           Retry
-        </button>
+        </Button>
       </div>
     );
   }

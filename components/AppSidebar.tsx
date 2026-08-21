@@ -47,7 +47,7 @@ function SidebarNavBtn({
     >
       <Icon size={18} strokeWidth={active ? 2.1 : 1.6} aria-hidden />
       <span
-        className={`text-[10px] font-medium leading-none tracking-wide ${
+        className={`text-ui-4xs font-medium leading-none tracking-wide ${
           active ? "opacity-100" : "opacity-70"
         }`}
       >
@@ -182,7 +182,7 @@ export function AppSidebar() {
             className="flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 text-ink-muted transition hover:bg-ink/[0.04] hover:text-ink"
           >
             <ArrowUp size={18} strokeWidth={1.8} aria-hidden />
-            <span className="text-[10px] font-medium leading-none opacity-80">
+            <span className="text-ui-4xs font-medium leading-none opacity-80">
               Upgrade
             </span>
           </Link>
@@ -194,10 +194,10 @@ export function AppSidebar() {
           title={displayName}
           className="flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 transition hover:bg-ink/[0.05]"
         >
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-ink text-[11px] font-semibold text-paper">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-ink text-ui-3xs font-semibold text-paper">
             {initial}
           </div>
-          <span className="max-w-full truncate text-[10px] font-medium leading-none text-ink-muted/60">
+          <span className="max-w-full truncate text-ui-4xs font-medium leading-none text-ink-muted/60">
             {firstName}
           </span>
         </Link>

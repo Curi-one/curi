@@ -97,7 +97,7 @@ export function TodayView({
           <div>
             <h1 className="type-display-xl text-ink">Today</h1>
             {due.length > 0 && (
-              <p className="type-kicker-mark mt-4 normal-case tracking-[0.14em] text-ink-muted">
+              <p className="type-kicker-mark mt-4 normal-case tracking-wider text-ink-muted">
                 {due.length} of {total} still to read
               </p>
             )}

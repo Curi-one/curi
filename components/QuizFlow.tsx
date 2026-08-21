@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { QuizQuestion } from "@/lib/api/schemas";
 import { StepProgress } from "@/components/StepProgress";
+import { Button } from "@/components/Button";
 
 type Props = {
   questions: QuizQuestion[];
@@ -60,7 +61,7 @@ export function QuizFlow({ questions, onComplete }: Props) {
         label="Quiz"
       />
       <h1
-        className="mt-2 font-display text-[1.65rem] font-light leading-snug text-ink"
+        className="mt-2 font-display text-display-xs font-light leading-snug text-ink"
         style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
       >
         {q.prompt}
@@ -82,7 +83,7 @@ export function QuizFlow({ questions, onComplete }: Props) {
                 type="button"
                 disabled={revealed}
                 onClick={() => choose(optIndex)}
-                className={`w-full rounded-none border px-4 py-4 text-left text-[15px] min-h-[52px] transition-colors ${style}`}
+                className={`w-full rounded-none border px-4 py-4 text-left text-ui-md min-h-[52px] transition-colors ${style}`}
               >
                 {opt}
               </button>
@@ -121,9 +122,9 @@ export function QuizFlow({ questions, onComplete }: Props) {
       {revealed && (
         <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md md:left-[84px]">
           <div className="mx-auto max-w-lg md:max-w-xl lg:max-w-2xl">
-            <button type="button" onClick={next} className="btn-primary w-full">
+            <Button onClick={next} className="w-full">
               {isLast ? "How did that land?" : "Next question"}
-            </button>
+            </Button>
           </div>
         </div>
       )}

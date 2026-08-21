@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowUp, BookOpen, Clock3, SlidersHorizontal } from "lucide-react";
@@ -8,6 +7,7 @@ import { LandingHeadline } from "@/components/LandingHeadline";
 import { Wordmark } from "@/components/Wordmark";
 import { FOUNDER_TOPIC_SUGGESTIONS } from "@/lib/content/founder-catalogue";
 import { getMe } from "@/lib/api/client";
+import { Button } from "@/components/Button";
 
 const AUTH_HOME = "/auth?intent=signin&returnTo=%2F";
 const SIGNUP_HOME = "/auth?intent=signup&returnTo=%2F";
@@ -78,15 +78,12 @@ export default function LandingPage() {
       <header className="flex items-center justify-between">
         <Wordmark />
         <nav className="flex items-center gap-1" aria-label="Account">
-          <Link href={AUTH_HOME} className="btn-ghost">
+          <Button href={AUTH_HOME} variant="ghost" size="small">
             Sign in
-          </Link>
-          <Link
-            href={SIGNUP_HOME}
-            className="btn-secondary inline-flex min-h-11 items-center rounded-none px-4 text-sm"
-          >
+          </Button>
+          <Button href={SIGNUP_HOME} variant="secondary" size="small">
             Sign up
-          </Link>
+          </Button>
         </nav>
       </header>
 
@@ -101,7 +98,7 @@ export default function LandingPage() {
 
         <LandingHeadline />
 
-        <p className="mt-6 text-[15px] font-light leading-[1.7] text-ink-muted">
+        <p className="mt-6 text-ui-md font-light leading-loose text-ink-muted">
           Type any topic and get a path built for you.
           <br className="hidden sm:block" />
           You choose the depth — one lesson a day. Free to start — no account
@@ -133,7 +130,7 @@ export default function LandingPage() {
               onFocus={() => setInputFocused(true)}
               onBlur={() => setInputFocused(false)}
               placeholder="What do you want to learn..."
-              className="min-w-0 flex-1 border-0 bg-transparent text-[17px] leading-snug text-ink outline-none placeholder:text-ink-muted/40 focus-visible:ring-0"
+              className="min-w-0 flex-1 border-0 bg-transparent text-ui-xl leading-snug text-ink outline-none placeholder:text-ink-muted/40 focus-visible:ring-0"
               autoComplete="off"
               autoFocus
               aria-label="What do you want to explore?"
@@ -153,7 +150,7 @@ export default function LandingPage() {
           {DEPTH_TEASERS.map(({ label, icon: Icon }) => (
             <span
               key={label}
-              className="flex items-center gap-1.5 text-[12px] text-ink-muted/80"
+              className="flex items-center gap-1.5 text-ui-2xs text-ink-muted/80"
             >
               <Icon className="h-3 w-3 shrink-0 opacity-50" aria-hidden />
               {label}
@@ -175,7 +172,7 @@ export default function LandingPage() {
                 key={suggestion}
                 type="button"
                 onClick={() => start(suggestion)}
-                className="interactive-chip focus-ring min-h-11 shrink-0 rounded-none px-3.5 py-2 text-[13px] text-ink-muted"
+                className="interactive-chip focus-ring min-h-11 shrink-0 rounded-none px-3.5 py-2 text-ui-xs text-ink-muted"
                 style={{
                   background:
                     "color-mix(in srgb, var(--color-ink) 4%, transparent)",

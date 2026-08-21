@@ -6,6 +6,7 @@ import type { CatalogueBook, CataloguePath } from "@/lib/mock/fixtures";
 import { generateLessonTitles, lessonCountForDepth } from "@/lib/mock/fixtures";
 import { CourseCover } from "@/components/CourseCover";
 import { depthLabel } from "@/lib/ui/constants";
+import { Button } from "@/components/Button";
 
 type Props = {
   item: CataloguePath | CatalogueBook | null;
@@ -95,10 +96,10 @@ export function PreviewSheet({
               {itemType === "book" ? "Book" : "Founder path"}
               {meta ? ` · ${meta}` : ""}
             </p>
-            <h2 className="mt-1 font-display text-2xl leading-snug text-ink sm:text-[1.65rem]">
+            <h2 className="mt-1 font-display text-2xl leading-snug text-ink sm:text-display-xs">
               {title}
             </h2>
-            <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-3 text-ui-md leading-relaxed text-ink-muted">
               {description}
             </p>
           </div>
@@ -139,24 +140,19 @@ export function PreviewSheet({
                 Finish or shelve an active path in Library, or upgrade to start
                 another.
               </p>
-              <button
-                type="button"
-                onClick={onStart}
-                className="btn-primary mt-4 w-full"
-              >
+              <Button onClick={onStart} className="mt-4 w-full">
                 Upgrade
-              </button>
+              </Button>
             </>
           ) : (
             <>
-              <button
-                type="button"
+              <Button
                 onClick={onStart}
-                className="btn-primary flex w-full items-center justify-center gap-2"
+                icon={<ArrowRight aria-hidden />}
+                className="w-full"
               >
-                <ArrowRight className="h-4 w-4" aria-hidden />
                 Start this path
-              </button>
+              </Button>
               <p className="mt-2 text-center text-xs text-ink-muted">
                 Clarify first · ~5 min per lesson
               </p>

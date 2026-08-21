@@ -17,7 +17,7 @@ export function BrowseFilterChips({ categories, active, onChange }: Props) {
         type="button"
         onClick={() => onChange(null)}
         aria-pressed={active === null}
-        className={`inline-flex min-h-11 shrink-0 items-center rounded-none border px-3.5 py-2 font-meta text-[10px] leading-none transition-all duration-200 focus-ring ${
+        className={`inline-flex min-h-11 shrink-0 items-center rounded-none border px-3.5 py-2 font-meta text-ui-4xs leading-none transition-all duration-200 focus-ring ${
           active === null
             ? "border-ink bg-ink text-paper"
             : "interactive-chip border-border bg-paper text-ink-muted hover:border-ink/40 hover:text-ink"
@@ -33,7 +33,7 @@ export function BrowseFilterChips({ categories, active, onChange }: Props) {
             type="button"
             onClick={() => onChange(category)}
             aria-pressed={selected}
-            className={`inline-flex min-h-11 shrink-0 items-center rounded-none border px-3.5 py-2 font-meta text-[10px] leading-none transition-all duration-200 focus-ring ${
+            className={`inline-flex min-h-11 shrink-0 items-center rounded-none border px-3.5 py-2 font-meta text-ui-4xs leading-none transition-all duration-200 focus-ring ${
               selected
                 ? "border-ink bg-ink text-paper"
                 : "interactive-chip border-border bg-paper text-ink-muted hover:border-ink/40 hover:text-ink"

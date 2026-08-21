@@ -25,7 +25,7 @@ export function TabPills({ tabs, active, onChange, variant = "pills" }: Props) {
               role="tab"
               aria-selected={isActive}
               onClick={() => onChange(tab.id)}
-              className={`relative mr-5 min-h-11 pb-3 font-meta text-[11px] transition-colors duration-200 focus-ring ${
+              className={`relative mr-5 min-h-11 pb-3 font-meta text-ui-3xs transition-colors duration-200 focus-ring ${
                 isActive ? "text-ink" : "text-ink-muted hover:text-ink"
               }`}
             >

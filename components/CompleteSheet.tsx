@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { Flame, Lock } from "lucide-react";
 import type { ShareableFactPayload } from "@/lib/api/schemas";
+import { Button } from "@/components/Button";
 import {
   buildShareText,
   copyAndOpenLinkedIn,
@@ -91,7 +91,7 @@ export function CompleteSheet({
       }}
     >
       <div
-        className="relative flex max-h-[90dvh] w-full max-w-[480px] flex-col animate-slide-up bg-paper sm:mx-4 sm:rounded-none"
+        className="relative flex max-h-[90dvh] w-full max-w-narrow flex-col animate-slide-up bg-paper sm:mx-4 sm:rounded-none"
         style={{ borderTop: "2px solid var(--color-accent)" }}
         role="dialog"
         aria-modal="true"
@@ -111,7 +111,7 @@ export function CompleteSheet({
           )}
           <h2
             id="complete-sheet-title"
-            className="font-display text-[2rem] font-light leading-tight text-ink"
+            className="font-display text-display-xs font-light leading-tight text-ink"
             style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
           >
             {title}
@@ -124,7 +124,7 @@ export function CompleteSheet({
               {lessonTitle}
             </p>
           ) : (
-            <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-2 text-ui-md leading-relaxed text-ink-muted">
               {body}
             </p>
           )}
@@ -135,7 +135,7 @@ export function CompleteSheet({
             </div>
           )}
           {lessonTitle && (
-            <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-3 text-ui-md leading-relaxed text-ink-muted">
               {body}
             </p>
           )}
@@ -150,7 +150,7 @@ export function CompleteSheet({
                 Today&apos;s insight
               </div>
               <blockquote
-                className="font-display text-xl font-light leading-snug tracking-[-0.02em] text-ink"
+                className="font-display text-xl font-light leading-snug tracking-tight text-ink"
                 style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 1" }}
               >
                 &ldquo;{insight.fact}&rdquo;
@@ -202,7 +202,7 @@ export function CompleteSheet({
                     <div className="font-ui text-base font-light leading-snug text-ink-faint">
                       {nextLessonTitle ?? "Your next lesson"}
                     </div>
-                    <p className="mt-1.5 text-[11px] text-ink-muted/70">
+                    <p className="mt-1.5 text-ui-3xs text-ink-muted/70">
                       {lessonNumber != null && totalLessons != null
                         ? `Lesson ${lessonNumber + 1} of ${totalLessons} · ~5 min · unlocks tomorrow`
                         : "~5 min · unlocks tomorrow"}
@@ -221,35 +221,26 @@ export function CompleteSheet({
         <div className="shrink-0 space-y-3 border-t border-border px-7 py-5 pb-[max(1rem,env(safe-area-inset-bottom))]">
           {pathMastered ? (
             <>
-              <Link
-                href="/library?tab=mastered"
-                className="btn-primary block w-full text-center"
-              >
+              <Button href="/library?tab=mastered" className="w-full">
                 View in Library
-              </Link>
-              <Link
+              </Button>
+              <Button
                 href="/today"
+                variant="secondary"
                 onClick={onClose}
-                className="btn-secondary block w-full text-center"
+                className="w-full"
               >
                 Back to Today
-              </Link>
+              </Button>
             </>
           ) : allPathsDoneToday ? (
-            <Link
-              href="/today"
-              className="btn-primary block w-full text-center"
-            >
+            <Button href="/today" className="w-full">
               Done
-            </Link>
+            </Button>
           ) : (
-            <Link
-              href="/today"
-              onClick={onClose}
-              className="btn-primary block w-full text-center"
-            >
+            <Button href="/today" onClick={onClose} className="w-full">
               Back to Today
-            </Link>
+            </Button>
           )}
         </div>
       </div>

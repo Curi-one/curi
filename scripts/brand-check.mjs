@@ -61,7 +61,7 @@ const FOREIGN_COLOR =
   /\b(?:bg|text|border|ring|from|to|via|decoration)-(?:green|emerald|lime|teal|red|rose|orange|amber|yellow|blue|indigo|violet|purple|pink|sky|cyan)-\d{2,3}\b/g;
 /** Fraunces is never used below 18px (product rule: sans/mono under 18px). */
 const SMALL_DISPLAY =
-  /font-display[^"`]*?\b(?:text-(?:xs|sm|base)|text-\[(?:1[0-7]|[0-9])px\])\b/g;
+  /font-display[^"`]*?(?:text-(?:xs|sm|base)\b|text-\[(?:1[0-7]|\d)(?:\.\d+)?px\]|text-\[(?:0?\.\d+|1\.0\d*)rem\])/g;
 /**
  * Product surface may only name the brand trio (§5.1). System role fallbacks
  * (Georgia, system-ui, Courier New) are allowed beside them.
@@ -69,18 +69,51 @@ const SMALL_DISPLAY =
 const FOREIGN_FONT =
   /(?:font-family\s*:\s*|fontFamily\s*:\s*['"`]|family\s*:\s*['"`])[^;}"'`]*\b(?:Inter|Roboto|Arial|Helvetica|Cormorant|Instrument|Geist|ui-sans-serif|ui-serif|ui-monospace|SFMono-Regular|Menlo|Monaco|Consolas)\b/gi;
 
+/**
+ * Buttons come from `components/Button.tsx` (§9.1). Hand-rolling the classes
+ * re-implements the design system and drifts from its size recipe.
+ */
+const RAW_BUTTON =
+  /className=[^>]*?\bbtn-(?:primary|secondary|ghost|danger)\b/g;
+/**
+ * Type and tracking come off the scale in `tailwind.config.ts` (§5.5, §8.2).
+ * An arbitrary value here is a token that does not exist.
+ */
+const OFF_SCALE_TYPE = /\b(?:text|tracking|leading)-\[[^\]]+\]/g;
+
 const RULES = [
   ["§8.4 · rounded container (use rounded-none)", BAD_RADIUS, "tsx"],
   ["§8.5 · box shadow (depth comes from surface + rule)", SHADOW, "tsx"],
-  ["§17.04 · hardcoded hex (use a token or allowlisted warm tone)", HEX, "palette"],
+  [
+    "§17.04 · hardcoded hex (use a token or allowlisted warm tone)",
+    HEX,
+    "palette",
+  ],
   [
     "§9.6 · non-brand colour (correct = Ink, error = Silver)",
     FOREIGN_COLOR,
     "all",
   ],
   ["§5.2 · Fraunces below 18px", SMALL_DISPLAY, "tsx"],
-  ["§5.1 · non-brand typeface (use Fraunces / Plus Jakarta / JetBrains)", FOREIGN_FONT, "all"],
+  [
+    "§5.1 · non-brand typeface (use Fraunces / Plus Jakarta / JetBrains)",
+    FOREIGN_FONT,
+    "all",
+  ],
+  ["§9.1 · hand-rolled button (use <Button>)", RAW_BUTTON, "button"],
+  ["§5.5 · off-scale type value (use a token)", OFF_SCALE_TYPE, "type"],
 ];
+
+/**
+ * Exempt from the type-scale rule: the wordmark carries its own sizing rules
+ * (§3.5), and the reader crops oversized letterforms optically (§6.2).
+ * The showcase demonstrates fluid type deliberately.
+ */
+const TYPE_EXEMPT = new Set([
+  join("components", "Wordmark.tsx"),
+  join("components", "LessonReader.tsx"),
+  join("components", "design-system", "DesignSystemShowcase.tsx"),
+]);
 
 function expandHex(hex) {
   const h = hex.toLowerCase();
@@ -133,12 +166,15 @@ const report = (file, i, label, hits) => {
 for (const file of files) {
   const isTsx = file.endsWith(".tsx");
   const isPalette = PALETTE_FILES.has(file);
+  const isButtonSource = file === join("components", "Button.tsx");
   const lines = readFileSync(join(process.cwd(), file), "utf8").split("\n");
 
   lines.forEach((line, i) => {
     for (const [label, re, scope] of RULES) {
       if (scope === "tsx" && !isTsx) continue;
       if (scope === "palette" && isPalette) continue;
+      if (scope === "button" && (!isTsx || isButtonSource)) continue;
+      if (scope === "type" && (!isTsx || TYPE_EXEMPT.has(file))) continue;
       re.lastIndex = 0;
       let hits = line.match(re);
       // §17.04 — allowlisted warm / accent hexes are permitted; banned reported separately
@@ -155,7 +191,12 @@ for (const file of files) {
 
     const { banned, other } = hexViolations(line);
     if (banned.length) {
-      report(file, i, "§4.2 · pure black/white banned (use warm ink / white-tone)", banned);
+      report(
+        file,
+        i,
+        "§4.2 · pure black/white banned (use warm ink / white-tone)",
+        banned,
+      );
     }
     // Palette files: non-allowlisted hexes fail (warm greys must be the defined set)
     if (isPalette && other.length) {

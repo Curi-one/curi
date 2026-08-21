@@ -20,6 +20,7 @@ import {
   sanitizeReturnTo,
 } from "@/lib/auth/intent";
 import { loadClarifySession } from "@/lib/clarify-store";
+import { Button } from "@/components/Button";
 
 type Step = "email" | "link" | "code" | "name";
 
@@ -220,7 +221,7 @@ function AuthContent() {
         </div>
       )}
       <h1
-        className={`type-display text-[2rem] sm:text-[2.25rem] text-ink ${
+        className={`type-display text-display-xs sm:text-display-sm text-ink ${
           showPendingBanner ? "mt-8" : "mt-12"
         }`}
       >
@@ -262,7 +263,7 @@ function AuthContent() {
           onChange={(e) =>
             setCode(e.target.value.replace(/\D/g, "").slice(0, 8))
           }
-          className="input-field mt-8 tracking-[0.35em]"
+          className="input-field mt-8 tracking-ultra"
           placeholder="000000"
           inputMode="numeric"
           autoComplete="one-time-code"
@@ -283,7 +284,7 @@ function AuthContent() {
 
       {error && (
         <p
-          className="mt-4 text-[13px] leading-relaxed text-ink-faint"
+          className="mt-4 text-ui-xs leading-relaxed text-ink-faint"
           role="alert"
         >
           {error}
@@ -292,8 +293,7 @@ function AuthContent() {
 
       <div className="mt-auto pt-8">
         {(step === "email" || step === "code" || step === "name") && (
-          <button
-            type="button"
+          <Button
             disabled={
               loading ||
               (step === "email" && !email.trim()) ||
@@ -301,32 +301,32 @@ function AuthContent() {
               (step === "name" && !name.trim())
             }
             onClick={() => void submit()}
-            className="btn-primary w-full disabled:opacity-40"
+            className="w-full"
           >
             {step === "name" ? "Finish" : "Continue"}
-          </button>
+          </Button>
         )}
 
         {step === "link" && (
           <div className="space-y-3">
-            <button
-              type="button"
-              disabled={loading}
+            <Button
+              variant="secondary"
+              loading={loading}
               onClick={() => void submit()}
-              className="btn-secondary w-full disabled:opacity-40"
+              className="w-full"
             >
-              {loading ? "Sending…" : "Resend sign-in link"}
-            </button>
-            <button
-              type="button"
+              Resend sign-in link
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => {
                 setError(null);
                 setStep("code");
               }}
-              className="btn-ghost w-full justify-center text-sm"
+              className="w-full justify-center"
             >
               Enter a code instead
-            </button>
+            </Button>
             <button
               type="button"
               onClick={() => {

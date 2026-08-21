@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { postCheckout } from "@/lib/api/client";
+import { Button } from "@/components/Button";
 
 const FEATURES = [
   {
@@ -53,12 +53,12 @@ export default function UpgradePage() {
       <p className="font-meta">Curi Academy</p>
 
       <h1
-        className="mt-5 font-display text-[2.1rem] font-light leading-[1.08] tracking-[-0.04em] text-ink sm:text-5xl"
+        className="mt-5 font-display text-display-xs font-light leading-tight tracking-tighter text-ink sm:text-display-md"
         style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
       >
         Unlimited curiosity. Every path open.
       </h1>
-      <p className="mt-4 text-[15px] font-light leading-relaxed text-ink-muted">
+      <p className="mt-4 text-ui-md font-light leading-relaxed text-ink-muted">
         Follow multiple curiosities in parallel. One lesson per path, every day
         — with your full history always accessible.
       </p>
@@ -66,7 +66,7 @@ export default function UpgradePage() {
       <div className="mt-10 border-y border-border py-8">
         <div className="flex items-baseline gap-3">
           <span
-            className="font-display text-[3.5rem] leading-[0.9] tracking-[-0.05em] text-ink sm:text-[5.5rem]"
+            className="font-display text-display-md leading-none tracking-tighter text-ink sm:text-display-xl"
             style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 1" }}
           >
             $2.50
@@ -109,23 +109,19 @@ export default function UpgradePage() {
 
       {message && <p className="mt-4 text-sm text-ink-muted">{message}</p>}
 
-      <button
-        type="button"
-        disabled={loading}
+      <Button
+        loading={loading}
         onClick={() => void checkout()}
-        className="btn-primary mt-10 w-full disabled:opacity-40"
+        className="mt-10 w-full"
       >
-        {loading ? "Starting checkout…" : "Start Academy — $2.50 a week"}
-      </button>
+        Start Academy — $2.50 a week
+      </Button>
       <p className="mt-3 text-center text-xs text-ink-muted">
         Cancel anytime · No lock-in · Your progress stays
       </p>
-      <Link
-        href="/today"
-        className="btn-secondary mt-4 block w-full text-center"
-      >
+      <Button href="/today" variant="secondary" className="mt-4 w-full">
         Back to Today
-      </Link>
+      </Button>
     </PageShell>
   );
 }

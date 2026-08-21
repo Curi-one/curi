@@ -80,7 +80,7 @@ function LessonContent() {
   return (
     <PageShell
       withTabPad={false}
-      className="max-w-[724px] pt-4 md:max-w-[724px]"
+      className="max-w-content pt-4 md:max-w-content"
     >
       <LessonReader
         lesson={lesson}
