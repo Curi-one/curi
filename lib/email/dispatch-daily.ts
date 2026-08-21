@@ -39,6 +39,10 @@ export type DailyEmailDispatchDeps = {
   admin?: SupabaseClient;
   now?: () => Date;
   send?: typeof sendEmail;
+  /** Manual test: skip hour, weekend, and already-sent-today gates. */
+  force?: boolean;
+  /** Manual test: send only to this address (case-insensitive). */
+  onlyEmail?: string;
 };
 
 export async function dispatchDailyLessonEmails(
@@ -86,10 +90,17 @@ export async function dispatchDailyLessonEmails(
     (userRows ?? []).map((row) => [String(row.id), row as UserRow]),
   );
 
+  const onlyEmail = deps?.onlyEmail?.trim().toLowerCase();
+
   for (const pref of prefs) {
     result.scanned++;
     const user = usersById.get(pref.user_id);
     if (!user?.email) {
+      result.skipped++;
+      continue;
+    }
+
+    if (onlyEmail && user.email.toLowerCase() !== onlyEmail) {
       result.skipped++;
       continue;
     }
@@ -99,8 +110,9 @@ export async function dispatchDailyLessonEmails(
         ? user.timezone
         : DEFAULT_TIMEZONE;
 
-    if (
-      !shouldSendDailyEmail(
+    const eligibleNow =
+      deps?.force === true ||
+      shouldSendDailyEmail(
         {
           emailEnabled: pref.email_enabled,
           emailTime: pref.email_time,
@@ -109,8 +121,9 @@ export async function dispatchDailyLessonEmails(
         pref.last_email_sent_at,
         timezone,
         now,
-      )
-    ) {
+      );
+
+    if (!eligibleNow) {
       result.skipped++;
       continue;
     }

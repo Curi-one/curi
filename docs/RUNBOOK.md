@@ -67,9 +67,11 @@ Requires [PR #20](https://github.com/Curi-one/curi/pull/20) merged and Vercel en
 Vercel runs `/api/cron/daily-email` hourly (`vercel.json`). Manual test:
 
 ```bash
-curl -s https://stage.curi.one/api/cron/daily-email \
+curl -s "https://stage.curi.one/api/cron/daily-email?force=1&email=you@example.com" \
   -H "Authorization: Bearer $CRON_SECRET"
 ```
+
+`force=1` skips delivery hour, weekend, and already-sent-today checks (for manual QA). Optional `email=` limits to one inbox.
 
 User must have **Email → Send daily email** on, a due lesson today, and the current hour must match their delivery time (user timezone).
 
