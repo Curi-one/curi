@@ -5,16 +5,18 @@ import {
   useEffect,
   useRef,
   useState,
-  type CSSProperties,
   type ReactNode,
 } from "react";
 import { ArrowLeft, ChevronDown, Globe2, X } from "lucide-react";
 import { Button } from "@/components/Button";
 import { EquationBlock } from "@/components/lesson/EquationBlock";
 import { LessonImage } from "@/components/lesson/LessonImage";
+import { LessonMarkdown } from "@/components/lesson/LessonMarkdown";
 import { ShareableFact } from "@/components/lesson/ShareableFact";
 import type { LessonResponse } from "@/lib/api/schemas";
 import {
+  applyReaderThemeToDocument,
+  clearReaderThemeFromDocument,
   DEFAULT_READER_SETTINGS,
   loadReaderSettings,
   READER_FONTS,
@@ -34,13 +36,6 @@ type Props = {
   isGuest?: boolean;
 };
 
-function stripInlineMarkdown(text: string): string {
-  return text
-    .replace(/\*\*([^*]+)\*\*/g, "$1")
-    .replace(/\*([^*]+)\*/g, "$1")
-    .trim();
-}
-
 function estimateReadMinutes(body: string[]): number {
   const words = body.join("").split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
@@ -57,81 +52,6 @@ function domainInitials(title: string, url: string): string {
       .slice(0, 2)
       .toUpperCase();
   }
-}
-
-function applyBionic(text: string): ReactNode[] {
-  return text.split(/(\s+)/).map((token, i) => {
-    if (/^\s+$/.test(token) || token.length < 2) {
-      return <span key={i}>{token}</span>;
-    }
-    const cut = Math.ceil(token.length * 0.4);
-    return (
-      <span key={i}>
-        <strong className="font-semibold">{token.slice(0, cut)}</strong>
-        {token.slice(cut)}
-      </span>
-    );
-  });
-}
-
-const CITATION_REGEX = /(\[\d+\])/g;
-
-/** Splits plain text on`[n]` citation markers and renders each as a tappable button. */
-function renderTextWithCitations(
-  text: string,
-  bionic: boolean,
-  onCitationClick?: (sourceIndex: number) => void,
-): ReactNode[] {
-  const segments = text.split(CITATION_REGEX);
-  return segments.map((segment, i) => {
-    const match = /^\[(\d+)\]$/.exec(segment);
-    if (match) {
-      const n = Number(match[1]);
-      return (
-        <button
-          key={`citation-${i}`}
-          type="button"
-          onClick={() => onCitationClick?.(n - 1)}
-          aria-label={`View source ${n}`}
-          className="citation-ref relative mx-0.5 inline-flex align-baseline text-[0.7em] font-medium text-ink hover:text-ink-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-default before:absolute before:-inset-3 before:content-['']"
-        >
-          [{n}]
-        </button>
-      );
-    }
-    return <span key={i}>{bionic ? applyBionic(segment) : segment}</span>;
-  });
-}
-
-function renderParagraph(
-  text: string,
-  bionic: boolean,
-  onCitationClick?: (sourceIndex: number) => void,
-) {
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      const inner = part.slice(2, -2);
-      return (
-        <strong key={i} className="font-medium text-ink">
-          {renderTextWithCitations(inner, bionic, onCitationClick)}
-        </strong>
-      );
-    }
-    if (part.startsWith("*") && part.endsWith("*")) {
-      const inner = part.slice(1, -1);
-      return (
-        <em key={i} className="italic text-ink/90">
-          {renderTextWithCitations(inner, bionic, onCitationClick)}
-        </em>
-      );
-    }
-    return (
-      <span key={i}>
-        {renderTextWithCitations(part, bionic, onCitationClick)}
-      </span>
-    );
-  });
 }
 
 function findScrollParent(el: HTMLElement | null): HTMLElement | null {
@@ -179,10 +99,10 @@ export function LessonReader({
   const takeaways = lesson.takeaways ?? [];
   const readMins = estimateReadMinutes(lesson.body);
   const total = totalLessons ?? Math.max(lessonIndex + 1, 1);
-  const showEditorial = lesson.body.length >= 3;
   const apiVisuals = lesson.visuals ?? [];
   const useApiVisuals = apiVisuals.length > 0;
   const shareable = lesson.shareableFact;
+  const bodyMarkdown = lesson.body.join("\n\n");
 
   const theme =
     READER_THEMES.find((t) => t.id === settings.theme) ?? READER_THEMES[0];
@@ -199,6 +119,16 @@ export function LessonReader({
   useEffect(() => {
     saveReaderSettings(settings);
   }, [settings]);
+
+  useEffect(() => {
+    applyReaderThemeToDocument(settings.theme);
+  }, [settings.theme]);
+
+  useEffect(() => {
+    return () => {
+      clearReaderThemeFromDocument();
+    };
+  }, []);
 
   useEffect(() => {
     const article = articleRef.current;
@@ -277,97 +207,32 @@ export function LessonReader({
     setShowSources(true);
   }
 
-  const mainParas = lesson.body;
-
-  /** Insert LessonImage after first para; ShareableFact near end. */
-  function renderBody() {
-    if (mainParas.length === 0) return null;
-
+  function renderVisualsAndShareable(): ReactNode[] {
     const nodes: ReactNode[] = [];
-    const imageAfter = showEditorial ? 0 : -1;
-    const shareAfter =
-      showEditorial && mainParas.length >= 2 ? mainParas.length - 1 : -1;
-
-    mainParas.forEach((para, i) => {
-      const clean = stripInlineMarkdown(para);
-      const firstLetter = clean.charAt(0);
-      const rest = clean.slice(1);
-      const isFirst = i === 0;
-
-      nodes.push(
-        <p key={`p-${i}`}>
-          {isFirst && firstLetter ? (
-            <>
-              <span
-                className="float-left mr-3 mt-1 font-display text-5xl font-light leading-[0.78] text-ink sm:text-7xl"
-                aria-hidden
-              >
-                {firstLetter}
-              </span>
-              {settings.bionic
-                ? renderTextWithCitations(rest, true, handleCitationClick)
-                : renderParagraph(
-                    para.startsWith(firstLetter)
-                      ? para.slice(firstLetter.length)
-                      : rest,
-                    false,
-                    handleCitationClick,
-                  )}
-            </>
-          ) : (
-            renderParagraph(para, settings.bionic, handleCitationClick)
-          )}
-        </p>,
-      );
-
-      if (i === imageAfter) {
-        if (useApiVisuals) {
-          apiVisuals.forEach((visual, vi) => {
-            nodes.push(
-              <LessonImage key={`lesson-image-${vi}`} visual={visual} />,
-            );
-            if (visual.equation) {
-              nodes.push(
-                <EquationBlock key={`equation-block-${vi}`} visual={visual} />,
-              );
-            }
-          });
-        }
-      }
-      if (i === shareAfter && shareable) {
+    if (useApiVisuals) {
+      apiVisuals.forEach((visual, vi) => {
         nodes.push(
-          <ShareableFact
-            key="shareable"
-            topic={topicLabel || lesson.title}
-            title={lesson.title}
-            fact={shareable}
-          />,
+          <LessonImage key={`lesson-image-${vi}`} visual={visual} />,
         );
-      }
-    });
-
+        if (visual.equation) {
+          nodes.push(
+            <EquationBlock key={`equation-block-${vi}`} visual={visual} />,
+          );
+        }
+      });
+    }
+    if (shareable) {
+      nodes.push(
+        <ShareableFact
+          key="shareable"
+          topic={topicLabel || lesson.title}
+          title={lesson.title}
+          fact={shareable}
+        />,
+      );
+    }
     return nodes;
   }
-
-  const articleStyle: CSSProperties =
-    settings.theme === "light"
-      ? {}
-      : {
-          background: theme.bg,
-          color: theme.fg,
-          // Local token remap — keeps app chrome untouched
-          ["--color-ink" as string]: theme.fg,
-          ["--color-ink-muted" as string]: theme.muted,
-          ["--color-border" as string]: theme.border,
-          ["--color-paper" as string]: theme.bg,
-          ["--color-paper-secondary" as string]: theme.card,
-          ["--color-paper-tertiary" as string]: theme.border,
-          ["--color-bg-primary" as string]: theme.bg,
-          ["--color-bg-secondary" as string]: theme.card,
-          ["--color-text-primary" as string]: theme.fg,
-          ["--color-text-secondary" as string]: theme.muted,
-          ["--color-border-subtle" as string]: theme.border,
-        };
 
   return (
     <>
@@ -384,7 +249,6 @@ export function LessonReader({
       <div
         ref={wrapperRef}
         className="mx-auto w-full max-w-content animate-fade-in"
-        style={articleStyle}
       >
         {/* Top nav: back (optional) · Aa settings · counter */}
         <div className="mb-8 flex items-center justify-between gap-3">
@@ -739,7 +603,14 @@ export function LessonReader({
               lineHeight: sizeCfg.leading,
             }}
           >
-            {renderBody()}
+            {bodyMarkdown ? (
+              <LessonMarkdown
+                markdown={bodyMarkdown}
+                bionic={settings.bionic}
+                onCitationClick={handleCitationClick}
+              />
+            ) : null}
+            {renderVisualsAndShareable()}
           </div>
         </article>
 

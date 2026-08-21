@@ -137,3 +137,105 @@ export function saveReaderSettings(settings: ReaderSettings) {
     /* ignore quota */
   }
 }
+
+export type ReaderThemeTokens = (typeof READER_THEMES)[number];
+
+const THEME_CSS_VAR_KEYS = [
+  "--color-ink",
+  "--color-ink-muted",
+  "--color-border",
+  "--color-paper",
+  "--color-paper-secondary",
+  "--color-paper-tertiary",
+  "--color-bg-primary",
+  "--color-bg-secondary",
+  "--color-text-primary",
+  "--color-text-secondary",
+  "--color-border-subtle",
+] as const;
+
+type ThemeCssVarKey = (typeof THEME_CSS_VAR_KEYS)[number];
+
+export function resolveReaderTheme(
+  theme: ReaderTheme | ReaderThemeTokens,
+): ReaderThemeTokens {
+  if (typeof theme === "string") {
+    return READER_THEMES.find((t) => t.id === theme) ?? READER_THEMES[0];
+  }
+  return theme;
+}
+
+/** Map a reader theme to CSS custom properties for the document / reader chrome. */
+export function themeToCssVars(
+  theme: ReaderTheme | ReaderThemeTokens,
+): Record<ThemeCssVarKey, string> {
+  const t = resolveReaderTheme(theme);
+  return {
+    "--color-ink": t.fg,
+    "--color-ink-muted": t.muted,
+    "--color-border": t.border,
+    "--color-paper": t.bg,
+    "--color-paper-secondary": t.card,
+    "--color-paper-tertiary": t.border,
+    "--color-bg-primary": t.bg,
+    "--color-bg-secondary": t.card,
+    "--color-text-primary": t.fg,
+    "--color-text-secondary": t.muted,
+    "--color-border-subtle": t.border,
+  };
+}
+
+type SavedThemeStyles = {
+  vars: Partial<Record<ThemeCssVarKey, string>>;
+  rootBackground: string;
+  bodyBackground: string;
+};
+
+let savedThemeStyles: SavedThemeStyles | null = null;
+
+/** Apply reader theme tokens to `document.documentElement` (and body background). */
+export function applyReaderThemeToDocument(
+  theme: ReaderTheme | ReaderThemeTokens,
+): void {
+  if (typeof document === "undefined") return;
+  const t = resolveReaderTheme(theme);
+  const vars = themeToCssVars(t);
+  const root = document.documentElement;
+
+  if (!savedThemeStyles) {
+    const prevVars: Partial<Record<ThemeCssVarKey, string>> = {};
+    for (const key of THEME_CSS_VAR_KEYS) {
+      prevVars[key] = root.style.getPropertyValue(key);
+    }
+    savedThemeStyles = {
+      vars: prevVars,
+      rootBackground: root.style.backgroundColor,
+      bodyBackground: document.body.style.backgroundColor,
+    };
+  }
+
+  for (const key of THEME_CSS_VAR_KEYS) {
+    root.style.setProperty(key, vars[key]);
+  }
+  root.style.backgroundColor = t.bg;
+  document.body.style.backgroundColor = t.bg;
+}
+
+/** Restore document styles saved before the first `applyReaderThemeToDocument`. */
+export function clearReaderThemeFromDocument(): void {
+  if (typeof document === "undefined") return;
+  if (!savedThemeStyles) return;
+
+  const root = document.documentElement;
+  for (const key of THEME_CSS_VAR_KEYS) {
+    const prev = savedThemeStyles.vars[key];
+    if (prev) {
+      root.style.setProperty(key, prev);
+    } else {
+      root.style.removeProperty(key);
+    }
+  }
+  root.style.backgroundColor = savedThemeStyles.rootBackground;
+  document.body.style.backgroundColor = savedThemeStyles.bodyBackground;
+  savedThemeStyles = null;
+}

@@ -1,8 +1,8 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { LessonReader } from "@/components/LessonReader";
 import type { LessonResponse } from "@/lib/api/schemas";
-
+import { clearReaderThemeFromDocument } from "@/lib/lessons/reader-settings";
 const lesson: LessonResponse = {
   title: "Why unit economics matter before you scale",
   body: [
@@ -24,6 +24,12 @@ const lesson: LessonResponse = {
 };
 
 describe("LessonReader", () => {
+  afterEach(() => {
+    clearReaderThemeFromDocument();
+    localStorage.clear();
+    document.documentElement.removeAttribute("style");
+    document.body.removeAttribute("style");
+  });
   it("renders title, Sources, and Take the quiz from API data alone", () => {
     render(
       <LessonReader
@@ -48,10 +54,18 @@ describe("LessonReader", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders all body paragraphs in order with no peeled-off 'So what?' section", () => {
+  it("renders markdown body content in order with no peeled-off 'So what?' section", () => {
     const { container } = render(
       <LessonReader
-        lesson={lesson}
+        lesson={{
+          ...lesson,
+          body: [
+            "The first useful thing to know about unit economics is that growth without contribution margin is just a more expensive way to fail. [1]",
+            "## Two doors",
+            "Think of unit economics as a room with two doors — explanation and judgment.",
+            "Do not ask only what this means. Ask what decision this changes.",
+          ],
+        }}
         lessonIndex={0}
         topic="Unit Economics"
         onStartQuiz={vi.fn()}
@@ -61,10 +75,40 @@ describe("LessonReader", () => {
     const text = container.textContent ?? "";
     expect(text).toMatch(/room with two doors/);
     expect(text).toMatch(/Do not ask only what this means/);
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Two doors" }),
+    ).toBeInTheDocument();
     const lastParaIndex = text.indexOf("Do not ask only what this means");
     const firstParaIndex = text.indexOf("growth without contribution margin");
     expect(lastParaIndex).toBeGreaterThan(firstParaIndex);
     expect(screen.queryByText("So what?")).not.toBeInTheDocument();
+  });
+
+  it("applies the selected reader theme to documentElement while mounted", async () => {
+    localStorage.setItem(
+      "curi-reader-settings",
+      JSON.stringify({ size: "m", font: "sans", theme: "dark", bionic: false }),
+    );
+
+    const { unmount } = render(
+      <LessonReader
+        lesson={lesson}
+        lessonIndex={0}
+        topic="Unit Economics"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        document.documentElement.style.getPropertyValue("--color-ink").trim(),
+      ).toBe("#FAF9F5");
+    });
+
+    unmount();
+    expect(
+      document.documentElement.style.getPropertyValue("--color-ink"),
+    ).toBe("");
   });
 
   it("hides takeaways, shareable fact, and visuals when the API omits them", () => {
@@ -176,7 +220,7 @@ describe("LessonReader", () => {
       screen.getByText(/API shareable fact about this lesson/),
     ).toBeInTheDocument();
     expect(screen.getByText("API visual title")).toBeInTheDocument();
-    expect(screen.getByText("API = Visual × Equation")).toBeInTheDocument();
+    expect(screen.getByText("Working equation")).toBeInTheDocument();
   });
 
   it("does not show any visual when the API returns no visuals, regardless of topic", () => {

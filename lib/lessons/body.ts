@@ -487,9 +487,9 @@ function buildMessages(input: {
     `Modifier instruction: ${MODIFIER_HINTS[input.modifier]}`,
     lengthHint,
     ...learningProfilePromptLines(input.learningProfile),
-    "Write the lesson body as markdown paragraphs separated by blank lines.",
+    "Write the lesson body as proper markdown (paragraphs separated by blank lines; short ##/### headings sparingly; lists when useful; inline $...$ and block $$...$$ for equations when helpful).",
     "Also return exactly 3 takeaways and 1 shareableFact tied to this lesson and the broader path topic.",
-    "Add visuals (0–3) only when a figure, diagram caption, or equation materially helps understanding.",
+    "Add visuals (0–3) only when a figure, diagram caption, or equation materially helps understanding (visuals[].equation can accompany in-body math).",
     "Return ONLY valid JSON matching the schema in the system message.",
   ];
 
@@ -514,7 +514,7 @@ Return ONLY valid JSON (no markdown fences, no commentary) matching:
 }
 
 Rules:
-- body is the teaching content: markdown with short paragraphs separated by blank lines. The app displays body as you write it (only blank-line splitting). Do not put takeaways inside body.
+- body is the teaching content: proper markdown. Use short ## / ### headings sparingly, lists when useful, and inline $...$ / block $$...$$ for equations when helpful (in addition to visuals[].equation). Separate short paragraphs with blank lines. The app renders markdown (GFM + math). Do not put takeaways inside body.
 - Stay on the lesson title; use the path topic for broader context only.
 - takeaways: exactly 3 memorable, concrete insights from THIS lesson (not generic advice).
 - shareableFact: one punchy fact + short reflection clearly related to the lesson and/or broader path topic — suitable to share on social.
