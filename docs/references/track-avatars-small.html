@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curi · Track Avatars — Small Sizes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white:#FAF9F5; --paper:#F4F1E8; --pale:#E8E5DC; --light:#D4D0C8;
+  --silver:#9E9B94; --mid:#6B6760; --ink3:#2E2C28; --ink2:#1C1A18; --ink:#0A0908;
+  --vermilion:#C1121F;
+  --display:'Fraunces',Georgia,serif; --ui:'Plus Jakarta Sans',system-ui,sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+  --margin:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{ background:var(--white); color:var(--ink); font-family:var(--ui); font-weight:300; -webkit-font-smoothing:antialiased }
+:focus-visible{ outline:2px solid var(--silver); outline-offset:2px }
+
+.masthead{ display:flex; align-items:center; justify-content:space-between; height:52px; padding:0 var(--margin);
+  border-bottom:2px solid var(--ink); position:sticky; top:0; background:var(--white); z-index:30 }
+.wordmark{ font-family:var(--display); font-size:22px; letter-spacing:-.02em } .wordmark i{ font-style:italic }
+.masthead .meta{ font-family:var(--mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--silver) }
+
+.intro{ padding:64px var(--margin) 44px; max-width:800px; border-bottom:1px solid var(--light) }
+.intro h1{ font-family:var(--display); font-weight:300; font-size:44px; line-height:1.12; letter-spacing:-.02em; margin-bottom:18px }
+.intro p{ font-size:15px; line-height:1.65; color:var(--mid); max-width:60ch }
+.intro p+p{ margin-top:12px }
+
+.section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:24px; padding:56px var(--margin) 20px; border-bottom:1px solid var(--light) }
+.section-head .label{ font-size:10px; font-weight:500; letter-spacing:.3em; text-transform:uppercase; color:var(--silver) }
+.section-head .num{ font-family:var(--mono); font-size:9px; color:var(--white); background:var(--ink); padding:3px 8px; letter-spacing:.12em }
+.section-note{ padding:20px var(--margin) 0; max-width:64ch; font-size:14px; line-height:1.65; color:var(--mid) }
+
+/* ── Size ruler ── */
+.ruler{ padding:36px var(--margin) 12px; display:flex; align-items:flex-end; gap:40px; flex-wrap:wrap }
+.ruler-item{ display:flex; flex-direction:column; align-items:center; gap:12px }
+.ruler-box{ background:var(--ink); position:relative; overflow:hidden; flex-shrink:0 }
+.ruler-box .g{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--display);
+  font-style:italic; color:var(--white); }
+.ruler-cap{ font-family:var(--mono); font-size:10px; color:var(--mid); text-align:center; line-height:1.5 }
+.ruler-cap b{ color:var(--ink); display:block; font-size:11px; margin-bottom:2px }
+
+/* ── Table ── */
+.table{ margin:32px var(--margin) 8px; border-top:1px solid var(--ink); border-bottom:1px solid var(--light) }
+.trow{ display:grid; grid-template-columns:110px 90px 1fr 1fr; gap:20px; padding:16px 0; border-bottom:1px solid var(--light); align-items:start }
+.trow.head{ font-family:var(--mono); font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--silver); border-bottom:1px solid var(--ink); padding-bottom:12px }
+.trow div{ font-size:13px; line-height:1.55; color:var(--mid) }
+.trow .tier{ font-family:var(--display); font-size:17px; color:var(--ink); font-style:italic }
+@media (max-width:760px){ .trow{ grid-template-columns:1fr 1fr; } .trow div:nth-child(3),.trow div:nth-child(4){ grid-column:1/-1 } }
+
+/* ── Generator ── */
+.gen{ padding:32px var(--margin) 8px }
+.gen-input label{ font-family:var(--mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--silver); display:block; margin-bottom:10px }
+.gen-input input{ font-family:var(--ui); font-size:18px; font-weight:300; font-style:italic; color:var(--ink);
+  background:transparent; border:none; border-bottom:1px solid var(--ink); padding:8px 0; width:100%; max-width:420px; outline:none }
+.gen-tiers{ display:flex; gap:36px; align-items:flex-end; margin-top:28px; flex-wrap:wrap }
+
+/* generated mark base */
+.tavatar{ background:var(--ink); position:relative; overflow:hidden; flex-shrink:0; container-type:size }
+.tavatar .field{ position:absolute; inset:0; opacity:.16 }
+.tavatar .glyph{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:var(--display); font-style:italic; color:var(--white); }
+.tavatar .dot{ position:absolute; top:8%; right:8%; width:14%; height:14%; border-radius:9999px; background:var(--vermilion); }
+.tavatar.silent .dot{ background:var(--silver) }
+
+.pat-blueprint{ background-image:repeating-linear-gradient(to bottom, var(--white) 0 1px, transparent 1px 14px), repeating-linear-gradient(to right, var(--white) 0 1px, transparent 1px 14px) }
+.pat-ledger{ background-image:repeating-linear-gradient(to bottom, var(--white) 0 1px, transparent 1px 22px) }
+.pat-columns{ background-image:repeating-linear-gradient(to right, var(--white) 0 1px, transparent 1px calc(100%/9)) }
+.pat-hatch{ background-image:repeating-linear-gradient(115deg, var(--white) 0 1px, transparent 1px 10px) }
+.pat-cross{ background-image:repeating-linear-gradient(45deg, var(--white) 0 1px, transparent 1px 13px), repeating-linear-gradient(-45deg, var(--white) 0 1px, transparent 1px 13px) }
+.pat-vitrine{ background: repeating-linear-gradient(0deg, transparent, transparent 15%, var(--white) 15%, var(--white) calc(15% + 1px)), repeating-linear-gradient(90deg, transparent, transparent 15%, var(--white) 15%, var(--white) calc(15% + 1px)); }
+.pat-radiate{ background: conic-gradient(from 0deg, transparent 0 28deg, var(--white) 28deg 29deg, transparent 29deg 58deg, var(--white) 58deg 59deg, transparent 59deg 88deg, var(--white) 88deg 89deg, transparent 89deg 118deg, var(--white) 118deg 119deg, transparent 119deg 148deg, var(--white) 148deg 149deg, transparent 149deg 178deg, var(--white) 178deg 179deg, transparent 179deg 208deg, var(--white) 208deg 209deg, transparent 209deg 238deg, var(--white) 238deg 239deg, transparent 239deg 268deg, var(--white) 268deg 269deg, transparent 269deg 298deg, var(--white) 298deg 299deg, transparent 299deg 328deg, var(--white) 328deg 329deg, transparent 329deg 360deg); }
+
+.tier-cap{ font-family:var(--mono); font-size:10px; color:var(--silver); margin-top:10px; text-align:center }
+
+/* ── List demo (vermilion budget) ── */
+.listdemo{ margin:32px var(--margin) 8px; max-width:520px; border-top:1px solid var(--light) }
+.lrow{ display:flex; align-items:center; gap:14px; padding:12px 4px; border-bottom:1px solid var(--light); cursor:pointer; transition:background 200ms ease }
+.lrow:hover{ background:var(--pale) }
+.lrow .meta{ flex:1 }
+.lrow .title{ font-size:14px; color:var(--ink) }
+.lrow .sub{ font-family:var(--mono); font-size:9px; color:var(--silver); letter-spacing:.1em; margin-top:2px }
+
+/* ── Shape rule demo ── */
+.shapebay{ display:flex; gap:48px; padding:32px var(--margin) 8px; flex-wrap:wrap; align-items:center }
+.shapecard{ display:flex; flex-direction:column; align-items:center; gap:14px }
+.circleavatar{ width:56px; height:56px; border-radius:9999px; background:var(--ink); color:var(--white);
+  display:flex; align-items:center; justify-content:center; font-family:var(--display); font-style:italic; font-size:20px }
+.shapecap{ font-family:var(--mono); font-size:10px; color:var(--mid); text-align:center; max-width:160px; line-height:1.5 }
+
+.rules{ background:var(--ink); color:var(--white); padding:56px var(--margin) 64px; margin-top:56px }
+.rules h2{ font-family:var(--display); font-weight:300; font-size:32px; letter-spacing:-.02em; margin-bottom:28px }
+.rules ul{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)) }
+.rules li{ list-style:none; padding:18px 32px 18px 0; border-top:1px solid var(--ink3) }
+.rules .k{ font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--vermilion); display:block; margin-bottom:6px }
+.rules .v{ font-size:13.5px; line-height:1.6; color:var(--silver) }
+
+.colophon{ padding:28px var(--margin) 56px; font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--silver) }
+@media (max-width:720px){ :root{ --margin:20px } .intro h1{ font-size:32px } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wordmark">Cu<i>ri</i></div>
+  <div class="meta">Track avatars · small sizes</div>
+</header>
+
+<section class="intro">
+  <h1>The same mark, compressed honestly.</h1>
+  <p>The full Track Mark carries three layers: a glyph, a call number, and a pattern field. Almost none of the product shows a track at full size, most of the time it's a 32px square in a list, a switcher, or a sidebar. This guide sets what survives at each size, rather than shrinking the full card and hoping it still reads.</p>
+  <p>One rule governs all of it: never fake detail that isn't legible. A pattern nobody can see is not texture, it's noise, so it gets removed rather than shrunk.</p>
+</section>
+
+<div class="section-head"><span class="label">The four tiers, to scale</span><span class="num">01</span></div>
+<p class="section-note">Rendered at their real pixel sizes. Notice where the pattern disappears and where the glyph itself stops being legible.</p>
+
+<div class="ruler">
+  <div class="ruler-item">
+    <div class="ruler-box pat-blueprint" style="width:96px;height:96px"><div class="g" style="font-size:44px">ℵ</div></div>
+    <div class="ruler-cap"><b>Large · 96px</b>dashboard tile<br>full three-layer mark</div>
+  </div>
+  <div class="ruler-item">
+    <div class="ruler-box pat-blueprint" style="width:56px;height:56px"><div class="g" style="font-size:26px">ℵ</div></div>
+    <div class="ruler-cap"><b>Medium · 56px</b>track switcher<br>glyph + field, no call number</div>
+  </div>
+  <div class="ruler-item">
+    <div class="ruler-box" style="width:32px;height:32px"><div class="g" style="font-size:16px">ℵ</div></div>
+    <div class="ruler-cap"><b>Small · 32px</b>list rows<br>glyph only, flat field</div>
+  </div>
+  <div class="ruler-item">
+    <div class="ruler-box" style="width:18px;height:18px"></div>
+    <div class="ruler-cap"><b>Micro · 18px</b>notifications, breadcrumbs<br>flat Ink square, no glyph</div>
+  </div>
+</div>
+
+<div class="section-head"><span class="label">What survives at each tier</span><span class="num">02</span></div>
+
+<div class="table">
+  <div class="trow head"><div>Tier</div><div>Size</div><div>Keeps</div><div>Drops</div></div>
+  <div class="trow">
+    <div class="tier">Large</div><div>80–120px</div>
+    <div>Glyph, pattern field, domain label, call number. This is the dashboard tile and exhibition grid card from the full Track Mark system.</div>
+    <div>Nothing. This is the reference size everything else is compressing from.</div>
+  </div>
+  <div class="trow">
+    <div class="tier">Medium</div><div>48–64px</div>
+    <div>Glyph at reduced size, pattern field at the same 16% opacity. Enough room for the texture to still read as a family, not just noise.</div>
+    <div>Domain label and call number, both illegible in Mono below roughly 40px of available width.</div>
+  </div>
+  <div class="trow">
+    <div class="tier">Small</div><div>28–40px</div>
+    <div>Glyph only, on a flat Ink field. This is the size that has to work hardest, it's the one most people see most often, in lists and switchers.</div>
+    <div>The pattern field. A hatch or grid at 32px reads as visual dust, not texture, so it's removed rather than kept at a size where it can't do its job.</div>
+  </div>
+  <div class="trow">
+    <div class="tier">Micro</div><div>16–20px</div>
+    <div>A flat Ink (or Paper, on dark surfaces) square. Nothing else.</div>
+    <div>The glyph itself. The Brand Guidelines already rule out Fraunces below 18px, a glyph forced smaller than that stops being a symbol and starts being a smudge. At this size the topic name sitting next to it in text is doing the identification, the mark is only a rhythm marker.</div>
+  </div>
+</div>
+
+<div class="section-head"><span class="label">Generator · type a topic, see all four tiers</span><span class="num">03</span></div>
+<p class="section-note">Uses the same domain classifier, glyph assignment, and hash from the full Track Mark system, so a topic's small avatar and its full-size card are always the same identity, just less of it shown.</p>
+
+<div class="gen">
+  <div class="gen-input">
+    <label for="topicInput">Type a subject</label>
+    <input id="topicInput" type="text" value="Set Theory" spellcheck="false">
+  </div>
+  <div class="gen-tiers" id="genTiers"></div>
+</div>
+
+<div class="section-head"><span class="label">The Vermilion budget in a list</span><span class="num">04</span></div>
+<p class="section-note">A list of small avatars is still one screen, so the one-accent rule still applies across the whole list, not per row. Only the active or selected track may show its glyph in Vermilion, every sibling row stays in Silver on Ink. Click a row to make it active.</p>
+
+<div class="listdemo" id="listDemo"></div>
+
+<div class="section-head"><span class="label">Square is subject, circle is person</span><span class="num">05</span></div>
+<p class="section-note">The token system carves out exactly one radius exception, for user avatars. Track marks never borrow it, keeping the shapes distinct means a glance at a corner tells you what kind of thing you're looking at before you've read anything.</p>
+
+<div class="shapebay">
+  <div class="shapecard">
+    <div class="tavatar" style="width:56px;height:56px"><div class="field pat-vitrine"></div><div class="glyph" style="font-size:24px">Æ</div></div>
+    <div class="shapecap">Track mark, square, zero radius. Represents a subject.</div>
+  </div>
+  <div class="shapecard">
+    <div class="circleavatar">JM</div>
+    <div class="shapecap">User avatar, full radius, initials only. Represents a person.</div>
+  </div>
+</div>
+
+<section class="rules">
+  <h2>Checklist for a new small-avatar context</h2>
+  <ul>
+    <li><span class="k">Pick the tier by size</span><span class="v">Don't invent a fifth size. If the slot is 36px, that's Small. If it's 20px, that's Micro. The tier defines what's allowed to render, not the other way round.</span></li>
+    <li><span class="k">Never scale down the full card</span><span class="v">Shrinking the 96px mark with all three layers to 32px produces illegible text at a small size instead of a considered small mark. Always render the tier's own reduced spec.</span></li>
+    <li><span class="k">One Vermilion per screen, even in a list</span><span class="v">A list of fifteen tracks is one composition. Only the selected or active row spends the accent, the rest sit in Silver.</span></li>
+    <li><span class="k">Square stays square</span><span class="v">Zero radius at every tier, including Micro. The only circular avatar in the product belongs to a person, never a subject.</span></li>
+    <li><span class="k">Determinism travels with the mark</span><span class="v">The same topic must resolve to the same glyph and pattern at every tier. If the dashboard tile and the sidebar row disagree, the identity system has failed at its one job.</span></li>
+    <li><span class="k">Micro has no glyph, and that's fine</span><span class="v">Don't fight the 18px Fraunces floor by using a different, smaller-safe typeface just for this one case. A flat square next to a text label is a legitimate, honest answer at this size.</span></li>
+  </ul>
+</section>
+
+<p class="colophon">Curi · Brand system v2.0 · Track avatars, small sizes</p>
+
+<script>
+var DOMAINS = {
+  PHIL: { name:'Philosophy', glyphs:['∞','∴'], pattern:'pat-vitrine', kw:['philosophy','ethic','stoic','moral','existential','meaning','virtue','logic'] },
+  MATH: { name:'Mathematics', glyphs:['ℵ','∮'], pattern:'pat-blueprint', kw:['math','algebra','geometry','calculus','set theory','number','equation','quantum','physics'] },
+  HIST: { name:'History', glyphs:['Æ','I'], pattern:'pat-vitrine', kw:['history','war','empire','roman','ancient','revolution','medieval','dynasty','conquest'] },
+  SCI:  { name:'Science', glyphs:['⊕','∮'], pattern:'pat-cross', kw:['science','biology','chemistry','physics','astronomy','genetics','neuro','ecology'] },
+  LANG: { name:'Language & Writing', glyphs:['¶','Æ'], pattern:'pat-ledger', kw:['language','writing','grammar','linguistic','poetry','literature','rhetoric'] },
+  ECON: { name:'Economics & Business', glyphs:['§','¶'], pattern:'pat-columns', kw:['econom','finance','business','market','trade','money','pricing','negotiat','startup','invest'] },
+  LAW:  { name:'Law & Policy', glyphs:['§','†'], pattern:'pat-ledger', kw:['law','legal','policy','constitution','regulation','government','court'] },
+  GEN:  { name:'General Knowledge', glyphs:['†','∴'], pattern:'pat-radiate', kw:[] }
+};
+function hashStr(s){ var h=5381; for(var i=0;i<s.length;i++){ h=((h<<5)+h)+s.charCodeAt(i); h|=0; } return Math.abs(h); }
+function classify(topic){
+  var t = topic.toLowerCase();
+  var keys = Object.keys(DOMAINS).filter(function(k){ return k!=='GEN'; });
+  for (var i=0;i<keys.length;i++){ var d=DOMAINS[keys[i]]; for(var j=0;j<d.kw.length;j++){ if(t.indexOf(d.kw[j])!==-1) return keys[i]; } }
+  return 'GEN';
+}
+function buildMark(topic){
+  var domainKey = classify(topic); var domain = DOMAINS[domainKey]; var h = hashStr(topic);
+  var glyph = domain.glyphs[h % domain.glyphs.length];
+  return { domainKey:domainKey, domainName:domain.name, glyph:glyph, pattern:domain.pattern };
+}
+
+function renderTiers(topic){
+  var m = buildMark(topic);
+  var wrap = document.getElementById('genTiers');
+  wrap.innerHTML =
+    tierHTML(96, m, true, true, 'Large · 96px') +
+    tierHTML(56, m, true, false, 'Medium · 56px') +
+    tierHTML(32, m, false, false, 'Small · 32px') +
+    tierHTML(18, null, false, false, 'Micro · 18px');
+}
+function tierHTML(size, m, showPattern, showMeta, label){
+  var fontSize = Math.round(size*0.46);
+  var inner = '';
+  if(m){
+    inner += showPattern ? '<div class="field '+m.pattern+'"></div>' : '';
+    inner += '<div class="glyph" style="font-size:'+fontSize+'px">'+m.glyph+'</div>';
+  }
+  var meta = showMeta && m ? '<div class="tier-cap">'+m.domainName+'</div>' : '<div class="tier-cap">'+label+'</div>';
+  return '<div style="display:flex;flex-direction:column;align-items:center">' +
+    '<div class="tavatar" style="width:'+size+'px;height:'+size+'px">'+inner+'</div>' + meta +
+    '</div>';
+}
+var input = document.getElementById('topicInput');
+input.addEventListener('input', function(){ renderTiers(input.value.trim() || 'Untitled'); });
+renderTiers(input.value);
+
+var TOPICS = ['Behavioural Economics','The Roman Republic','Set Theory','Cellular Biology','Contract Law','Rhetoric & Persuasion'];
+var activeIndex = 0;
+function renderList(){
+  var wrap = document.getElementById('listDemo');
+  wrap.innerHTML = '';
+  TOPICS.forEach(function(topic, i){
+    var m = buildMark(topic);
+    var active = i === activeIndex;
+    var row = document.createElement('div');
+    row.className = 'lrow';
+    row.innerHTML =
+      '<div class="tavatar '+(active?'':'silent')+'" style="width:32px;height:32px">' +
+        '<div class="glyph" style="font-size:15px;'+(active?'':'color:var(--silver)')+'">'+m.glyph+'</div>' +
+      '</div>' +
+      '<div class="meta"><div class="title">'+topic+'</div><div class="sub">'+m.domainName+'</div></div>';
+    row.addEventListener('click', function(){ activeIndex = i; renderList(); });
+    wrap.appendChild(row);
+  });
+}
+renderList();
+</script>
+
+</body>
+</html>

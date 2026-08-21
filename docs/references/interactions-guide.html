@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curi · Interactions &amp; Micro-interactions Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white:#FAF9F5; --paper:#F4F1E8; --pale:#E8E5DC; --light:#D4D0C8;
+  --silver:#9E9B94; --mid:#6B6760; --ink3:#2E2C28; --ink2:#1C1A18; --ink:#0A0908;
+  --vermilion:#C1121F;
+  --display:'Fraunces',Georgia,serif; --ui:'Plus Jakarta Sans',system-ui,sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+  --ease-out:cubic-bezier(.16,1,.3,1); --ease-in:cubic-bezier(.4,0,1,1); --ease-standard:cubic-bezier(.4,0,.2,1);
+  --margin:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{ background:var(--white); color:var(--ink); font-family:var(--ui); font-weight:300; -webkit-font-smoothing:antialiased }
+:focus-visible{ outline:2px solid var(--silver); outline-offset:2px }
+
+.masthead{ display:flex; align-items:center; justify-content:space-between; height:52px; padding:0 var(--margin);
+  border-bottom:2px solid var(--ink); position:sticky; top:0; background:var(--white); z-index:30 }
+.wordmark{ font-family:var(--display); font-size:22px; letter-spacing:-.02em } .wordmark i{ font-style:italic }
+.masthead .meta{ font-family:var(--mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--silver) }
+
+.intro{ padding:64px var(--margin) 44px; max-width:800px; border-bottom:1px solid var(--light) }
+.intro h1{ font-family:var(--display); font-weight:300; font-size:44px; line-height:1.12; letter-spacing:-.02em; margin-bottom:18px }
+.intro p{ font-size:15px; line-height:1.65; color:var(--mid); max-width:60ch }
+.intro p+p{ margin-top:12px }
+
+.section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:24px; padding:56px var(--margin) 20px; border-bottom:1px solid var(--light) }
+.section-head .label{ font-size:10px; font-weight:500; letter-spacing:.3em; text-transform:uppercase; color:var(--silver) }
+.section-head .num{ font-family:var(--mono); font-size:9px; color:var(--white); background:var(--ink); padding:3px 8px; letter-spacing:.12em }
+.section-note{ padding:20px var(--margin) 0; max-width:64ch; font-size:14px; line-height:1.65; color:var(--mid) }
+
+.bay{ padding:32px var(--margin) 8px; display:grid; gap:32px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); align-items:start }
+.bay.single{ grid-template-columns:1fr; max-width:920px }
+.spec{ display:flex; flex-direction:column; gap:14px }
+.spec-label{ font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--silver) }
+.spec-note{ font-size:13px; line-height:1.6; color:var(--mid); max-width:50ch }
+.stage{ border:1px solid var(--light); padding:28px; background:var(--white); display:flex; flex-wrap:wrap; gap:16px; align-items:center; min-height:88px }
+.stage.col{ flex-direction:column; align-items:stretch; gap:14px }
+.stage.dark{ background:var(--ink); border-color:var(--ink); color:var(--white) }
+
+.code{ font-family:var(--mono); font-size:11px; line-height:1.7; color:var(--ink); background:var(--paper);
+  border:1px solid var(--light); padding:12px 14px; white-space:pre-wrap }
+
+/* ── Duration scale bars ── */
+.durbar{ display:flex; align-items:center; gap:16px; padding:10px 0; border-top:1px solid var(--light) }
+.durbar:first-child{ border-top:none }
+.durbar .name{ font-family:var(--mono); font-size:10px; color:var(--mid); width:150px; flex-shrink:0 }
+.durbar .track{ flex:1; height:6px; background:var(--pale); position:relative; overflow:hidden }
+.durbar .fill{ position:absolute; left:0; top:0; height:100%; width:0%; background:var(--ink); }
+.durbar .val{ font-family:var(--mono); font-size:10px; color:var(--silver); width:90px; text-align:right; flex-shrink:0 }
+
+/* ── Easing curve plots ── */
+.curve{ display:flex; flex-direction:column; gap:8px }
+.curve svg{ width:100%; height:110px; background:var(--paper); border:1px solid var(--light) }
+.curve-label{ font-family:var(--mono); font-size:10px; color:var(--mid) }
+
+/* ── Buttons for demo ── */
+.btn{ font-family:var(--ui); text-transform:uppercase; letter-spacing:.06em; cursor:pointer; border-radius:0;
+  padding:12px 24px; font-size:12px; font-weight:500; color:var(--white); background:var(--ink); border:none; border-bottom:2px solid var(--vermilion);
+  transition:background 120ms ease }
+.btn:hover{ background:var(--ink2) }
+.btn:active{ transform:translateY(1px) }
+.btn-ghost{ font-family:var(--ui); text-transform:uppercase; letter-spacing:.06em; cursor:pointer; border-radius:0;
+  padding:12px 24px; font-size:12px; font-weight:400; color:var(--ink); background:transparent; border:1px solid var(--light) }
+.btn-ghost:hover{ border-color:var(--ink); background:var(--pale) }
+
+/* ── Hover/press demo objects ── */
+.demo-card{ background:var(--paper); border:1px solid var(--light); padding:20px 24px; cursor:pointer; transition:background 300ms ease; width:100%; }
+.demo-card:hover{ background:var(--pale) }
+.demo-card .t{ font-family:var(--display); font-size:20px; margin-bottom:4px }
+.demo-card .m{ font-family:var(--mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--silver) }
+
+.demo-link{ font-size:14px; color:var(--ink); text-decoration:underline; text-underline-offset:3px; transition:color 180ms ease }
+.demo-link:hover{ color:var(--mid) }
+
+.demo-quiz{ padding:16px 20px; border:1px solid var(--light); background:var(--white); cursor:pointer;
+  transition:all 200ms ease; display:flex; gap:14px; align-items:center; width:100% }
+.demo-quiz:hover{ background:var(--pale); border-color:var(--ink) }
+.demo-quiz .l{ font-family:var(--mono); font-size:10px; color:var(--silver) }
+
+/* ── Stagger reveal demo ── */
+.stagger-row{ display:flex; flex-direction:column; gap:1px; }
+.stagger-item{ background:var(--paper); border:1px solid var(--light); padding:14px 18px; font-size:14px;
+  opacity:0; transform:translateY(16px); transition:opacity 700ms var(--ease-out), transform 700ms var(--ease-out) }
+.stagger-item.on{ opacity:1; transform:translateY(0) }
+
+/* ── Curriculum generation demo ── */
+.gen-list{ display:flex; flex-direction:column; gap:0; }
+.gen-item{ padding:10px 0; border-bottom:1px solid var(--light); font-family:var(--display); font-size:16px;
+  opacity:0; transform:translateX(-8px); transition:opacity 420ms var(--ease-out), transform 420ms var(--ease-out) }
+.gen-item.on{ opacity:1; transform:translateX(0) }
+.gen-item .n{ font-family:var(--mono); font-size:9px; color:var(--silver); margin-right:12px }
+
+/* ── Progress fill demo ── */
+.progress{ height:2px; background:var(--light); width:100% }
+.progress .fill{ height:100%; background:var(--ink); width:0%; transition:width 600ms var(--ease-out) }
+.progress-frac{ font-family:var(--mono); font-size:10px; color:var(--silver); margin-bottom:8px; display:block }
+
+/* ── Streak count-up ── */
+.streak{ display:flex; align-items:baseline; gap:14px }
+.streak .n{ font-family:var(--display); font-size:64px; font-weight:300; line-height:1; letter-spacing:-.03em }
+.streak .l{ font-size:13px; font-style:italic; color:var(--silver) }
+
+/* ── Quiz resolve demo ── */
+.qopt{ padding:16px 20px; border:1px solid var(--light); background:var(--white); cursor:pointer; transition:all 200ms ease;
+  display:flex; gap:14px; align-items:center; width:100% }
+.qopt:hover{ background:var(--pale); border-color:var(--ink) }
+.qopt .l{ font-family:var(--mono); font-size:10px; color:var(--silver) }
+.qopt.correct{ background:var(--ink); border-color:var(--ink) }
+.qopt.correct .l{ color:var(--vermilion) }
+.qopt.correct span:last-child{ color:var(--white) }
+.qopt.incorrect{ background:var(--paper) }
+.qopt.incorrect span:last-child{ color:var(--silver) }
+
+/* ── Toast ── */
+#toastDemo{ position:fixed; right:24px; bottom:24px; z-index:50; background:var(--ink); color:var(--white); padding:16px 24px;
+  max-width:300px; font-size:13px; line-height:1.5; opacity:0; transform:translateY(8px); transition:opacity 300ms var(--ease-out), transform 300ms var(--ease-out); pointer-events:none }
+#toastDemo.on{ opacity:1; transform:translateY(0) }
+
+/* ── Modal ── */
+#overlayDemo{ position:fixed; inset:0; background:rgba(10,9,8,0); backdrop-filter:blur(0px); z-index:40; display:none;
+  align-items:center; justify-content:center; padding:24px; transition:background 350ms var(--ease-out), backdrop-filter 350ms var(--ease-out) }
+#overlayDemo.on{ display:flex; background:rgba(10,9,8,.72); backdrop-filter:blur(4px) }
+.modal-box{ background:var(--white); border-top:2px solid var(--ink); padding:36px; max-width:420px; width:100%;
+  opacity:0; transform:translateY(16px); transition:opacity 350ms var(--ease-out), transform 350ms var(--ease-out) }
+#overlayDemo.on .modal-box{ opacity:1; transform:translateY(0) }
+.modal-box h4{ font-family:var(--display); font-size:24px; font-weight:400; margin-bottom:12px }
+.modal-box p{ font-size:13px; color:var(--mid); line-height:1.6; margin-bottom:24px }
+
+/* ── Loading / skeleton pulse ── */
+.skeleton{ display:flex; flex-direction:column; gap:10px; }
+.sk-line{ height:14px; background:var(--pale); position:relative; overflow:hidden }
+.sk-line::after{ content:''; position:absolute; inset:0; background:var(--light); animation:pulseLine 1600ms ease-in-out infinite }
+@keyframes pulseLine{ 0%,100%{opacity:.15} 50%{opacity:.55} }
+.sk-line.w60{ width:60% } .sk-line.w80{ width:80% } .sk-line.w40{ width:40% }
+
+/* ── Cursor dot demo ── */
+.cursor-field{ position:relative; height:160px; background:var(--ink); overflow:hidden; cursor:none; display:flex; align-items:center; justify-content:center }
+.cursor-field span{ font-family:var(--mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--silver) }
+.cursor-dot{ position:absolute; width:8px; height:8px; border-radius:9999px; background:var(--vermilion); pointer-events:none;
+  transform:translate(-50%,-50%); transition:width 200ms var(--ease-out), height 200ms var(--ease-out), opacity 200ms ease; opacity:0 }
+
+/* ── Field-shake NEVER demo strike ── */
+.never-row{ display:flex; align-items:center; gap:16px; padding:14px 0; border-top:1px solid var(--light) }
+.never-row:first-child{ border-top:none }
+.never-row .x{ font-family:var(--mono); color:var(--vermilion); font-size:12px; flex-shrink:0 }
+.never-row .desc{ font-size:13px; color:var(--mid); line-height:1.55 }
+
+.rules{ background:var(--ink); color:var(--white); padding:56px var(--margin) 64px; margin-top:56px }
+.rules h2{ font-family:var(--display); font-weight:300; font-size:32px; letter-spacing:-.02em; margin-bottom:28px }
+.rules ul{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)) }
+.rules li{ list-style:none; padding:18px 32px 18px 0; border-top:1px solid var(--ink3) }
+.rules .k{ font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--vermilion); display:block; margin-bottom:6px }
+.rules .v{ font-size:13.5px; line-height:1.6; color:var(--silver) }
+
+.colophon{ padding:28px var(--margin) 56px; font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--silver) }
+@media (max-width:720px){ :root{ --margin:20px } .intro h1{ font-size:32px } }
+@media (prefers-reduced-motion:reduce){ *{ animation-duration:.01ms!important; transition-duration:.01ms!important } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wordmark">Cu<i>ri</i></div>
+  <div class="meta">Interactions &amp; micro-interactions · v1</div>
+</header>
+
+<section class="intro">
+  <h1>Motion as a second voice.</h1>
+  <p>The Brand Guidelines already set three laws: Gravity, things settle, never fly in. Patience, 300ms minimum for anything meaningful. Restraint, one motion at a time. Everything below is that law applied to every real moment in the product, live and triggerable, so there is one place to check instead of guessing per screen.</p>
+  <p>The test for any new interaction: would a calm, well-edited magazine ever do this? If the honest answer is "only to grab attention," it does not belong here.</p>
+</section>
+
+<div class="section-head"><span class="label">Timing &amp; easing</span><span class="num">01</span></div>
+<p class="section-note">Five durations, three curves. Nothing in the product should use a value outside this set. Press the button to see the scale run.</p>
+
+<div class="bay">
+  <div class="spec">
+    <span class="spec-label">Duration scale</span>
+    <div class="stage col">
+      <div id="durbars">
+        <div class="durbar"><span class="name">micro · 100ms</span><div class="track"><div class="fill" data-ms="100"></div></div><span class="val">hover, focus</span></div>
+        <div class="durbar"><span class="name">small · 200ms</span><div class="track"><div class="fill" data-ms="200"></div></div><span class="val">colour, opacity</span></div>
+        <div class="durbar"><span class="name">medium · 350ms</span><div class="track"><div class="fill" data-ms="350"></div></div><span class="val">entrances, modals</span></div>
+        <div class="durbar"><span class="name">large · 750ms</span><div class="track"><div class="fill" data-ms="750"></div></div><span class="val">page, stagger</span></div>
+        <div class="durbar"><span class="name">xl · 1100ms</span><div class="track"><div class="fill" data-ms="1100"></div></div><span class="val">wordmark draw-in</span></div>
+      </div>
+      <button class="btn-ghost" onclick="runDurations()">Run the scale</button>
+    </div>
+    <p class="spec-note">If a duration doesn't match one of these five numbers, it's a bug, not a design choice. Never animate below 100ms, the eye reads it as a glitch rather than a transition.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">The three curves</span>
+    <div class="stage col">
+      <div class="curve">
+        <svg viewBox="0 0 100 40"><path d="M2,38 C 16,38 30,2 98,2" fill="none" stroke="#0A0908" stroke-width="1.5"/></svg>
+        <span class="curve-label">ease-out · cubic-bezier(.16,1,.3,1) — settling in. Default for anything entering.</span>
+      </div>
+      <div class="curve">
+        <svg viewBox="0 0 100 40"><path d="M2,38 C 70,38 84,2 98,2" fill="none" stroke="#6B6760" stroke-width="1.5"/></svg>
+        <span class="curve-label">ease-in · cubic-bezier(.4,0,1,1) — leaving. Reserved for exits.</span>
+      </div>
+      <div class="curve">
+        <svg viewBox="0 0 100 40"><path d="M2,38 C 34,38 66,2 98,2" fill="none" stroke="#9E9B94" stroke-width="1.5"/></svg>
+        <span class="curve-label">ease-standard · cubic-bezier(.4,0,.2,1) — both directions, colour and hover states.</span>
+      </div>
+    </div>
+    <p class="spec-note">No spring, no bounce, no elastic overshoot, ever. All three curves are monotonic, nothing crosses its own endpoint.</p>
+  </div>
+</div>
+
+<div class="section-head"><span class="label">Hover &amp; press</span><span class="num">02</span></div>
+<p class="section-note">Every interactive surface gets exactly one property change on hover, background, border colour, or text colour, never more than one at once, always at small (200ms) or micro (100ms) duration.</p>
+
+<div class="bay">
+  <div class="spec">
+    <span class="spec-label">Card · background step</span>
+    <div class="stage"><div class="demo-card"><div class="m">Lesson 06 · Rhetoric</div><div class="t">The rule of three, and why it works</div></div></div>
+    <p class="spec-note">Paper to Pale, 300ms, background only. No lift, no shadow, no scale.</p>
+  </div>
+  <div class="spec">
+    <span class="spec-label">Text link · colour step</span>
+    <div class="stage"><a class="demo-link" href="#" onclick="return false">Change delivery time</a></div>
+    <p class="spec-note">Ink to Mid, 180ms. The underline never moves or changes weight.</p>
+  </div>
+  <div class="spec">
+    <span class="spec-label">Quiz option · pre-answer</span>
+    <div class="stage"><button class="demo-quiz"><span class="l">B</span><span>A prisoner's dilemma</span></button></div>
+    <p class="spec-note">Background and border move together at 200ms, the only component allowed to change two properties on hover, because both read as one "this is selectable" signal.</p>
+  </div>
+  <div class="spec">
+    <span class="spec-label">Button · press</span>
+    <div class="stage"><button class="btn">Begin reading →</button></div>
+    <p class="spec-note">On press, translateY(1px), no duration, it should feel instant, like a physical key. Hover is background only, 120ms.</p>
+  </div>
+</div>
+
+<div class="section-head"><span class="label">Reveals</span><span class="num">03</span></div>
+<p class="section-note">How groups of things arrive. Never all at once, never with a bounce, always bottom to top.</p>
+
+<div class="bay">
+  <div class="spec">
+    <span class="spec-label">Content stagger · dashboard, lists</span>
+    <div class="stage col">
+      <div class="stagger-row" id="staggerRow">
+        <div class="stagger-item">Behavioural Economics</div>
+        <div class="stagger-item">Set Theory</div>
+        <div class="stagger-item">The Roman Republic</div>
+      </div>
+      <button class="btn-ghost" onclick="runStagger()">Replay reveal</button>
+    </div>
+    <p class="spec-note">translateY(16px)+opacity 0 → resting, 700ms ease-out, 130ms stagger between items. This is the large-duration token, used because multiple things are settling into a shared rhythm.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Curriculum generation · title by title</span>
+    <div class="stage col">
+      <div class="gen-list" id="genList">
+        <div class="gen-item"><span class="n">01</span>Why the Stoics thought about death daily</div>
+        <div class="gen-item"><span class="n">02</span>The dichotomy of control</div>
+        <div class="gen-item"><span class="n">03</span>Amor fati, and loving what happens</div>
+        <div class="gen-item"><span class="n">04</span>The view from above</div>
+      </div>
+      <button class="btn-ghost" onclick="runGen()">Replay generation</button>
+    </div>
+    <p class="spec-note">Each title arrives at 420ms with a 260ms stagger, sliding in from the left rather than up, so it reads as being typed into a list rather than falling into place. This is the single most important reveal in the product, the curriculum reveal is the first aha moment.</p>
+  </div>
+</div>
+
+<div class="section-head"><span class="label">Feedback</span><span class="num">04</span></div>
+<p class="section-note">Confirmation that something happened. These should feel certain, never showy.</p>
+
+<div class="bay">
+  <div class="spec">
+    <span class="spec-label">Progress fill</span>
+    <div class="stage col">
+      <div><span class="progress-frac" id="progFrac">3 / 14 lessons</span><div class="progress"><div class="fill" id="progFill"></div></div></div>
+      <button class="btn-ghost" onclick="runProgress()">Advance one lesson</button>
+    </div>
+    <p class="spec-note">Width transition only, 600ms ease-out. The bar never overshoots past its target, and never animates on page load, only on an actual change.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Streak count-up</span>
+    <div class="stage col">
+      <div class="streak"><span class="n" id="streakNum">0</span><span class="l">days in a row</span></div>
+      <button class="btn-ghost" onclick="runStreak()">Count up to 21</button>
+    </div>
+    <p class="spec-note">Digits count from 0 to the target over 700ms with ease-out, easing so the counting visibly slows into its landing number. No confetti, no burst, no colour change. The number arriving is the whole reward.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Quiz resolve</span>
+    <div class="stage col">
+      <button class="qopt" id="qA" onclick="resolveQuiz(false)"><span class="l">A</span><span>A monopoly forming</span></button>
+      <button class="qopt" id="qB" onclick="resolveQuiz(true)"><span class="l">B</span><span>A prisoner's dilemma</span></button>
+      <button class="btn-ghost" onclick="resetQuiz()">Reset</button>
+    </div>
+    <p class="spec-note">State changes at 200ms, no delay before the correct answer resolves, no suspense beat. The product never makes someone wait to find out if they were right.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Toast</span>
+    <div class="stage col"><button class="btn-ghost" onclick="fireToast()">Fire a toast</button></div>
+    <p class="spec-note">Enters from 8px below at 300ms ease-out, holds 3.2s, exits at 200ms ease-in. Bottom right, never centre, centre is reserved for modals that need a decision.</p>
+  </div>
+</div>
+
+<div class="section-head"><span class="label">Overlays</span><span class="num">05</span></div>
+<p class="section-note">Modal and backdrop move together but the backdrop leads by roughly 50ms, so the world dims a beat before the content arrives.</p>
+
+<div class="bay single">
+  <div class="spec">
+    <span class="spec-label">Modal open</span>
+    <div class="stage"><button class="btn-ghost" onclick="openModal()">Open a modal</button></div>
+    <p class="spec-note">Backdrop: 0 → rgba(ink,.72) with a 4px blur, 350ms ease-out. Box: translateY(16px)+opacity 0 → resting, 350ms ease-out, starting slightly after the backdrop. Exit reverses at 200ms ease-in with no blur fade, blur removal is expensive and reads as a stutter on lower-end phones.</p>
+  </div>
+</div>
+
+<div class="section-head"><span class="label">Loading &amp; the cursor dot</span><span class="num">06</span></div>
+<p class="section-note">Two things the Brand Guidelines name but don't fully specify. Defined here so they stay consistent wherever they're built.</p>
+
+<div class="bay">
+  <div class="spec">
+    <span class="spec-label">Loading state</span>
+    <div class="stage col">
+      <div class="skeleton"><div class="sk-line w80"></div><div class="sk-line w60"></div><div class="sk-line w40"></div></div>
+    </div>
+    <p class="spec-note">Flat Pale blocks with a slow 1600ms opacity pulse between 15% and 55%, never a moving gradient sweep. A shimmer is a gradient in motion, which the brand already rules out on type and containers alike, this keeps that rule intact under load.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Cursor tracking dot</span>
+    <div class="stage" style="padding:0"><div class="cursor-field" id="cursorField"><span>Move here on desktop</span><div class="cursor-dot" id="cursorDot"></div></div></div>
+    <p class="spec-note">8px Vermilion circle, follows the pointer with no easing lag inside dark, fully interactive fields only, exhibition grids, the homepage hero. Fades in at 200ms on enter, out at 200ms on leave. It is the one context where Vermilion can appear continuously rather than once, because it is attached to the pointer, not to the composition.</p>
+  </div>
+</div>
+
+<div class="section-head"><span class="label">What never animates</span><span class="num">07</span></div>
+<p class="section-note">Failure modes seen in most learning products. Ruled out explicitly so nobody reaches for them under deadline pressure.</p>
+
+<div class="bay single">
+  <div class="stage col">
+    <div class="never-row"><span class="x">NEVER</span><span class="desc">Confetti, bursts, or particle effects on streaks, correct answers, or track completion. The number or the certificate is the reward, not a screen effect layered on top of it.</span></div>
+    <div class="never-row"><span class="x">NEVER</span><span class="desc">A shake or red flash on an error or wrong answer. Errors already avoid red entirely, shaking the element reintroduces the alarm the colour rule was designed to remove.</span></div>
+    <div class="never-row"><span class="x">NEVER</span><span class="desc">Spring or bounce easing anywhere, including button presses, toasts, and modal entrances. If it overshoots its resting position, it's wrong.</span></div>
+    <div class="never-row"><span class="x">NEVER</span><span class="desc">Parallax scrolling. Named explicitly in the Guidelines and worth repeating here since it's the first thing a new engineer tries on a marketing page.</span></div>
+    <div class="never-row"><span class="x">NEVER</span><span class="desc">Auto-playing or looping animation competing with reading. The marquee is the one sanctioned exception, and it sits below the masthead, never inside the lesson column.</span></div>
+    <div class="never-row"><span class="x">NEVER</span><span class="desc">A gradient sweep for loading states. Use the opacity pulse instead, see section 06.</span></div>
+    <div class="never-row"><span class="x">NEVER</span><span class="desc">More than one element animating into view at the exact same moment outside a defined stagger group. Restraint means one motion at a time is legible, two competing motions read as noise.</span></div>
+  </div>
+</div>
+
+<section class="rules">
+  <h2>Before shipping any motion</h2>
+  <ul>
+    <li><span class="k">Duration check</span><span class="v">Does the number match one of the five tokens exactly? A hand-tuned 250ms or 450ms is a sign the token set is being ignored, not that this case is special.</span></li>
+    <li><span class="k">Curve check</span><span class="v">Entering uses ease-out. Leaving uses ease-in. Everything else uses ease-standard. There is no fourth option.</span></li>
+    <li><span class="k">Property check</span><span class="v">One property animating per element under normal interaction. Two is reserved for the quiz option's combined background and border, which is a named exception, not a precedent.</span></li>
+    <li><span class="k">Reward check</span><span class="v">If a success state needs an effect beyond a number changing or a state resolving to feel rewarding, the underlying moment is too small to be a real reward. Fix the moment, not the motion.</span></li>
+    <li><span class="k">Reduced motion</span><span class="v">Every transition and animation on this page collapses to 0.01ms under prefers-reduced-motion. That query is not optional per component, it belongs in the global stylesheet once.</span></li>
+    <li><span class="k">Say it in words first</span><span class="v">If you can't describe the motion in one plain sentence ("the bar fills to the new width over 600ms"), it's already too complicated to belong in this system.</span></li>
+  </ul>
+</section>
+
+<p class="colophon">Curi · Brand system v2.0 · Interactions &amp; micro-interactions guide</p>
+
+<div id="toastDemo">Delivery time saved. Tomorrow's lesson arrives at 06:30.</div>
+
+<div id="overlayDemo" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <h4>Lesson 4 arrives tomorrow</h4>
+    <p>You've read three lessons today. Paid readers move at their own pace.</p>
+    <button class="btn-ghost" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+function runDurations(){
+  document.querySelectorAll('#durbars .fill').forEach(function(f){
+    f.style.transition = 'none'; f.style.width = '0%';
+    void f.offsetWidth;
+    var ms = f.dataset.ms;
+    f.style.transition = 'width ' + ms + 'ms cubic-bezier(.16,1,.3,1)';
+    f.style.width = '100%';
+  });
+}
+runDurations();
+
+function runStagger(){
+  var items = document.querySelectorAll('#staggerRow .stagger-item');
+  items.forEach(function(el){ el.classList.remove('on'); });
+  void document.getElementById('staggerRow').offsetWidth;
+  items.forEach(function(el,i){ setTimeout(function(){ el.classList.add('on'); }, i*130); });
+}
+runStagger();
+
+function runGen(){
+  var items = document.querySelectorAll('#genList .gen-item');
+  items.forEach(function(el){ el.classList.remove('on'); });
+  void document.getElementById('genList').offsetWidth;
+  items.forEach(function(el,i){ setTimeout(function(){ el.classList.add('on'); }, i*260); });
+}
+runGen();
+
+var progStep = 3;
+function runProgress(){
+  progStep = progStep >= 14 ? 1 : progStep + 1;
+  document.getElementById('progFrac').textContent = progStep + ' / 14 lessons';
+  document.getElementById('progFill').style.width = (progStep/14*100) + '%';
+}
+runProgress();
+
+function runStreak(){
+  var el = document.getElementById('streakNum');
+  var target = 21, start = 0, duration = 700, t0 = null;
+  function ease(x){ return 1 - Math.pow(1-x, 3); }
+  function step(ts){
+    if(!t0) t0 = ts;
+    var p = Math.min((ts - t0)/duration, 1);
+    el.textContent = Math.round(start + (target-start) * ease(p));
+    if(p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function resolveQuiz(correct){
+  document.getElementById('qA').className = 'qopt ' + (correct ? 'incorrect' : 'correct');
+  document.getElementById('qB').className = 'qopt ' + (correct ? 'correct' : 'incorrect');
+}
+function resetQuiz(){ document.getElementById('qA').className='qopt'; document.getElementById('qB').className='qopt'; }
+
+var toastTimer;
+function fireToast(){
+  var t = document.getElementById('toastDemo');
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('on'); }, 3200);
+}
+
+function openModal(){ document.getElementById('overlayDemo').classList.add('on'); }
+function closeModal(e){ document.getElementById('overlayDemo').classList.remove('on'); }
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+var field = document.getElementById('cursorField');
+var dot = document.getElementById('cursorDot');
+field.addEventListener('mousemove', function(e){
+  var r = field.getBoundingClientRect();
+  dot.style.left = (e.clientX - r.left) + 'px';
+  dot.style.top = (e.clientY - r.top) + 'px';
+  dot.style.opacity = '1'; dot.style.width='8px'; dot.style.height='8px';
+});
+field.addEventListener('mouseleave', function(){ dot.style.opacity = '0'; });
+field.addEventListener('mousedown', function(){ dot.style.width='14px'; dot.style.height='14px'; });
+field.addEventListener('mouseup', function(){ dot.style.width='8px'; dot.style.height='8px'; });
+</script>
+
+</body>
+</html>

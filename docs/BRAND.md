@@ -9,6 +9,8 @@
 
 **Component & pattern HTML:** [docs/COMPONENT-LIBRARY.md](./COMPONENT-LIBRARY.md) — binding rules plus `docs/references/component-library.html` and `geometric-patterns.html`.
 
+**Motion & marks:** [INTERACTIONS.md](./INTERACTIONS.md) (duration tokens, hover one-property, never-list) · [TRACK-MARKS.md](./TRACK-MARKS.md) (domain glyph / call number / size tiers).
+
 ---
 
 ## Contents
@@ -402,6 +404,8 @@ METADATA (JetBrains Mono)
 
 ## 6. Imagery & Visual Language
 
+> **Track marks:** [TRACK-MARKS.md](./TRACK-MARKS.md) — domain classifier, glyphs, call numbers, pattern fields, and size tiers. HTML refs: [`references/track-marks.html`](./references/track-marks.html), [`references/track-avatars-small.html`](./references/track-avatars-small.html).
+
 ### 6.1 The Approach
 
 Curi uses no photography of people. No stock imagery. No AI-generated illustration. The visual language is constructed entirely from typography, geometry, and texture — the raw material of knowledge itself. Photographs insert demographic signals into a brand that should feel universal. Curi's imagery should feel like it could only have been made for Curi.
@@ -456,6 +460,8 @@ The single permitted use of colour in imagery: a 2–4px Vermilion rule appearin
 ---
 
 ## 7. Motion & Animation
+
+> **Binding product rules:** [INTERACTIONS.md](./INTERACTIONS.md) — exact duration tokens (100 / 200 / 350 / 750 / 1100ms), hover one-property, reveals, skeleton pulse, and the never-list. HTML ref: [`references/interactions-guide.html`](./references/interactions-guide.html).
 
 ### 7.1 Principles
 

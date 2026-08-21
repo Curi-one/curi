@@ -43,7 +43,7 @@ export function LessonFeedCard({
     return (
       <div className="flex w-full gap-3.5 rounded-none border border-border bg-paper-secondary p-4 opacity-55 sm:gap-4 sm:p-5">
         <div className="opacity-40">
-          <TopicThumbnail topic={item.topic} />
+          <TopicThumbnail topic={item.topic} size={48} />
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="font-display text-ui-xl font-light leading-tight tracking-tight text-ink/50 sm:text-display-2xs">
@@ -83,14 +83,12 @@ export function LessonFeedCard({
           aria-hidden
         />
       )}
-      <TopicThumbnail topic={item.topic} />
+      <TopicThumbnail topic={item.topic} size={48} />
 
       <div className="min-w-0 flex-1">
         <h3
-          className={`font-display text-ui-xl font-light leading-tight tracking-tight transition-colors sm:text-display-2xs ${
-            dimmed
-              ? "text-ink/55 group-hover:text-ink/70"
-              : "text-ink group-hover:text-ink"
+          className={`font-display text-ui-xl font-light leading-tight tracking-tight sm:text-display-2xs ${
+            dimmed ? "text-ink/55" : "text-ink"
           }`}
         >
           {item.title}
@@ -111,10 +109,8 @@ export function LessonFeedCard({
             {positionLabel(item)}
           </span>
           <span
-            className={`text-ui-4xs font-semibold uppercase tracking-wider transition-colors ${
-              dimmed
-                ? "text-ink-muted/45 group-hover:text-ink-muted/70"
-                : "text-ink group-hover:text-ink"
+            className={`text-ui-4xs font-semibold uppercase tracking-wider ${
+              dimmed ? "text-ink-muted/45" : "text-ink"
             }`}
           >
             {actionLabel(item.status)}

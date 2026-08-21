@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { UserAvatar } from "@/components/UserAvatar";
 import { Wordmark } from "@/components/Wordmark";
 import { getMe } from "@/lib/api/client";
 
@@ -19,17 +20,16 @@ export function AppTopBar({
   profileHref = "/profile",
   compact = false,
 }: Props) {
-  const [initial, setInitial] = useState("?");
+  const [label, setLabel] = useState("?");
 
   useEffect(() => {
     getMe()
       .then((m) => {
         const name = m.session.name?.trim();
         const email = m.session.email?.trim();
-        const source = name || email || "?";
-        setInitial(source.slice(0, 1).toUpperCase());
+        setLabel(name || email || "?");
       })
-      .catch(() => setInitial("?"));
+      .catch(() => setLabel("?"));
   }, []);
 
   return (
@@ -55,10 +55,10 @@ export function AppTopBar({
         )}
         <Link
           href={profileHref}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-paper-secondary text-xs font-medium text-ink transition-colors hover:border-ink/30 hover:bg-paper-tertiary focus-ring"
+          className="focus-ring rounded-full transition-[opacity] duration-micro ease-out hover:opacity-80"
           aria-label="Open profile"
         >
-          {initial}
+          <UserAvatar name={label} size={32} variant="paper" />
         </Link>
       </nav>
     </header>

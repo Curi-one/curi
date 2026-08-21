@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curi · Track Marks — Variety Without Imagery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white:#FAF9F5; --paper:#F4F1E8; --pale:#E8E5DC; --light:#D4D0C8;
+  --silver:#9E9B94; --mid:#6B6760; --ink3:#2E2C28; --ink2:#1C1A18; --ink:#0A0908;
+  --vermilion:#C1121F;
+  --display:'Fraunces',Georgia,serif; --ui:'Plus Jakarta Sans',system-ui,sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+  --margin:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{ background:var(--white); color:var(--ink); font-family:var(--ui); font-weight:300; -webkit-font-smoothing:antialiased }
+
+.masthead{ display:flex; align-items:center; justify-content:space-between; height:52px; padding:0 var(--margin);
+  border-bottom:2px solid var(--ink); position:sticky; top:0; background:var(--white); z-index:30 }
+.wordmark{ font-family:var(--display); font-size:22px; letter-spacing:-.02em } .wordmark i{ font-style:italic }
+.masthead .meta{ font-family:var(--mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--silver) }
+
+.intro{ padding:64px var(--margin) 44px; max-width:800px; border-bottom:1px solid var(--light) }
+.intro h1{ font-family:var(--display); font-weight:300; font-size:44px; line-height:1.12; letter-spacing:-.02em; margin-bottom:18px }
+.intro p{ font-size:15px; line-height:1.65; color:var(--mid); max-width:60ch }
+.intro p+p{ margin-top:12px }
+
+.section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:24px; padding:56px var(--margin) 20px; border-bottom:1px solid var(--light) }
+.section-head .label{ font-size:10px; font-weight:500; letter-spacing:.3em; text-transform:uppercase; color:var(--silver) }
+.section-head .num{ font-family:var(--mono); font-size:9px; color:var(--white); background:var(--ink); padding:3px 8px; letter-spacing:.12em }
+.section-note{ padding:20px var(--margin) 0; max-width:64ch; font-size:14px; line-height:1.65; color:var(--mid) }
+
+/* ── Generator ── */
+.gen{ padding:32px var(--margin) 8px; display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start }
+@media (max-width:860px){ .gen{ grid-template-columns:1fr } }
+.gen-input label{ font-family:var(--mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--silver); display:block; margin-bottom:10px }
+.gen-input input{ font-family:var(--ui); font-size:20px; font-weight:300; font-style:italic; color:var(--ink);
+  background:transparent; border:none; border-bottom:1px solid var(--ink); padding:10px 0; width:100%; outline:none }
+.gen-input .chips{ margin-top:18px; display:flex; flex-wrap:wrap; gap:8px }
+.chip{ font-family:var(--mono); font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--mid);
+  border:1px solid var(--light); background:var(--paper); padding:6px 12px; cursor:pointer }
+.chip:hover{ border-color:var(--ink); color:var(--ink) }
+.gen-breakdown{ margin-top:28px; display:flex; flex-direction:column; gap:14px }
+.bd-row{ display:flex; gap:16px; padding:14px 0; border-top:1px solid var(--light) }
+.bd-k{ font-family:var(--mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--silver); width:110px; flex-shrink:0; padding-top:2px }
+.bd-v{ font-size:14px; line-height:1.5; color:var(--ink) }
+.bd-v b{ font-weight:500 }
+
+/* ── Track Mark card ── */
+.mark{ aspect-ratio:1/1; background:var(--ink); position:relative; overflow:hidden; border:1px solid var(--ink) }
+.mark .field{ position:absolute; inset:0; opacity:.16 }
+.mark .glyph{ position:absolute; font-family:var(--display); font-style:italic; font-weight:300; line-height:.78;
+  color:var(--white); opacity:.9; font-size:38cqw; right:6%; bottom:-6%; container-type:size }
+.mark-inner{ position:relative; z-index:2; height:100%; padding:9%; display:flex; flex-direction:column; justify-content:space-between; container-type:size }
+.mark .domain{ font-family:var(--mono); font-size:2.6cqw; letter-spacing:.25em; text-transform:uppercase; color:var(--vermilion) }
+.mark .call{ font-family:var(--mono); font-size:2.6cqw; letter-spacing:.1em; color:var(--silver); align-self:flex-start }
+.mark .topicname{ font-family:var(--display); font-style:italic; font-weight:300; font-size:5.4cqw; color:var(--white);
+  line-height:1.1; max-width:80% }
+
+/* pattern families, used at low opacity inside .field */
+.pat-blueprint{ background-image:repeating-linear-gradient(to bottom, var(--white) 0 1px, transparent 1px 14px), repeating-linear-gradient(to right, var(--white) 0 1px, transparent 1px 14px) }
+.pat-ledger{ background-image:repeating-linear-gradient(to bottom, var(--white) 0 1px, transparent 1px 22px) }
+.pat-columns{ background-image:repeating-linear-gradient(to right, var(--white) 0 1px, transparent 1px calc(100%/9)) }
+.pat-hatch{ background-image:repeating-linear-gradient(115deg, var(--white) 0 1px, transparent 1px 10px) }
+.pat-cross{ background-image:repeating-linear-gradient(45deg, var(--white) 0 1px, transparent 1px 13px), repeating-linear-gradient(-45deg, var(--white) 0 1px, transparent 1px 13px) }
+.pat-radiate{ background:
+    conic-gradient(from 0deg, transparent 0 28deg, var(--white) 28deg 29deg, transparent 29deg 58deg,
+      var(--white) 58deg 59deg, transparent 59deg 88deg, var(--white) 88deg 89deg, transparent 89deg 118deg,
+      var(--white) 118deg 119deg, transparent 119deg 148deg, var(--white) 148deg 149deg, transparent 149deg 178deg,
+      var(--white) 178deg 179deg, transparent 179deg 208deg, var(--white) 208deg 209deg, transparent 209deg 238deg,
+      var(--white) 238deg 239deg, transparent 239deg 268deg, var(--white) 268deg 269deg, transparent 269deg 298deg,
+      var(--white) 298deg 299deg, transparent 299deg 328deg, var(--white) 328deg 329deg, transparent 329deg 360deg); }
+.pat-vitrine{ background:
+    repeating-linear-gradient(0deg, transparent, transparent 15%, var(--white) 15%, var(--white) calc(15% + 1px)),
+    repeating-linear-gradient(90deg, transparent, transparent 15%, var(--white) 15%, var(--white) calc(15% + 1px)); }
+
+/* ── Grid of generated marks ── */
+.markgrid{ display:grid; gap:1px; background:var(--light); padding:1px var(--margin) 8px;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); margin:32px calc(var(--margin) * -1) 0; padding-left:var(--margin); padding-right:var(--margin) }
+.markslot{ background:var(--white); display:flex; flex-direction:column }
+.markslot .cap{ padding:10px 2px; font-family:var(--mono); font-size:9px; letter-spacing:.08em; color:var(--mid) }
+
+/* ── User avatar ── */
+.avatarbay{ padding:32px var(--margin) 8px; display:flex; gap:40px; flex-wrap:wrap; align-items:flex-end }
+.avatar{ border-radius:9999px; background:var(--ink); color:var(--white); display:flex; align-items:center; justify-content:center;
+  font-family:var(--display); font-style:italic; font-weight:400; flex-shrink:0 }
+.av-xl{ width:96px; height:96px; font-size:34px }
+.av-lg{ width:64px; height:64px; font-size:22px }
+.av-md{ width:40px; height:40px; font-size:14px }
+.av-sm{ width:28px; height:28px; font-size:10px }
+.avatar.alt{ background:var(--paper); color:var(--ink); border:1px solid var(--light) }
+
+/* ── Variety levers list ── */
+.levers{ padding:32px var(--margin) 8px; display:grid; gap:0; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); border-top:1px solid var(--light) }
+.lever{ padding:24px 28px 24px 0; border-bottom:1px solid var(--light) }
+.lever .n{ font-family:var(--mono); font-size:9px; letter-spacing:.2em; color:var(--silver); display:block; margin-bottom:8px }
+.lever h4{ font-family:var(--display); font-size:20px; font-weight:400; letter-spacing:-.01em; margin-bottom:8px }
+.lever p{ font-size:13px; line-height:1.6; color:var(--mid) }
+
+.rules{ background:var(--ink); color:var(--white); padding:56px var(--margin) 64px; margin-top:56px }
+.rules h2{ font-family:var(--display); font-weight:300; font-size:32px; letter-spacing:-.02em; margin-bottom:28px }
+.rules ul{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)) }
+.rules li{ list-style:none; padding:18px 32px 18px 0; border-top:1px solid var(--ink3) }
+.rules .k{ font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--vermilion); display:block; margin-bottom:6px }
+.rules .v{ font-size:13.5px; line-height:1.6; color:var(--silver) }
+
+.colophon{ padding:28px var(--margin) 56px; font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--silver) }
+@media (max-width:720px){ :root{ --margin:20px } .intro h1{ font-size:32px } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wordmark">Cu<i>ri</i></div>
+  <div class="meta">Track marks · variety without imagery</div>
+</header>
+
+<section class="intro">
+  <h1>No photography. No illustration. Still never identical.</h1>
+  <p>Variety at Curi cannot come from pictures, so it has to come from a system: a small set of rules applied consistently, producing a result that looks different for every topic without ever hand-drawing anything. Every track, every avatar, every card gets an identity built from three things already inside the brand: a glyph, a typographic call number, and a geometry family.</p>
+  <p>Type any subject below to see the system work.</p>
+</section>
+
+<div class="section-head"><span class="label">The track mark generator</span><span class="num">01</span></div>
+<p class="section-note">Three deterministic layers. The same topic always produces the same mark, so it can act as a real visual identity, not a random decoration that changes on reload.</p>
+
+<div class="gen">
+  <div class="gen-input">
+    <label for="topicInput">Type a subject</label>
+    <input id="topicInput" type="text" value="Behavioural Economics" spellcheck="false">
+    <div class="chips">
+      <span class="chip" data-t="Quantum Mechanics">Quantum Mechanics</span>
+      <span class="chip" data-t="The Roman Republic">The Roman Republic</span>
+      <span class="chip" data-t="Negotiation Tactics">Negotiation Tactics</span>
+      <span class="chip" data-t="Set Theory">Set Theory</span>
+      <span class="chip" data-t="Wine Chemistry">Wine Chemistry</span>
+      <span class="chip" data-t="Constitutional Law">Constitutional Law</span>
+    </div>
+    <div class="gen-breakdown" id="breakdown"></div>
+  </div>
+  <div class="mark" id="liveMark">
+    <div class="field" id="liveField"></div>
+    <div class="glyph" id="liveGlyph"></div>
+    <div class="mark-inner">
+      <div>
+        <span class="domain" id="liveDomain"></span>
+      </div>
+      <div>
+        <div class="topicname" id="liveName"></div>
+        <span class="call" id="liveCall"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-head"><span class="label">Twenty tracks, twenty marks</span><span class="num">02</span></div>
+<p class="section-note">The same rules run across a real spread of subjects. Nothing here is hand-picked for effect, it is what the classifier and hash produce automatically. This is the view that matters: a dashboard with many tracks should never look like the same three cards repeated.</p>
+
+<div class="markgrid" id="markGrid"></div>
+
+<div class="section-head"><span class="label">User avatars</span><span class="num">03</span></div>
+<p class="section-note">The one circular exception in the whole token system exists for exactly this. Initials on an Ink field, set in Fraunces italic, never a photo, never an illustrated character.</p>
+
+<div class="avatarbay">
+  <div class="avatar av-xl">AH</div>
+  <div class="avatar av-lg">JM</div>
+  <div class="avatar av-md">RK</div>
+  <div class="avatar av-sm">S</div>
+  <div class="avatar av-lg alt">TW</div>
+</div>
+
+<div class="section-head"><span class="label">Other variety levers already in the system</span><span class="num">04</span></div>
+<div class="levers">
+  <div class="lever"><span class="n">01</span><h4>Asymmetric grid</h4><p>The exhibition grid rule already bans two adjacent panels of the same size. A dashboard of ten tracks in identical boxes reads as a spreadsheet. Vary the span, not just the mark inside it.</p></div>
+  <div class="lever"><span class="n">02</span><h4>Fraunces axes</h4><p>WONK and SOFT are variable, not fixed. A slightly higher WONK on a philosophy card and a lower one on a finance card is a legitimate, brand-safe way to give two subjects a different feel from the same typeface.</p></div>
+  <div class="lever"><span class="n">03</span><h4>Ghost numerals</h4><p>The dark feature card already places a giant, near-invisible number in the corner. Use the lesson count or the day count here instead of a static ornament, so the texture itself carries real information.</p></div>
+  <div class="lever"><span class="n">04</span><h4>Motion stagger</h4><p>Ten identical cards animate in with a 130ms stagger and instantly read as ten different things arriving, even before anyone reads a word.</p></div>
+  <div class="lever"><span class="n">05</span><h4>The marquee</h4><p>An always-different, always-scrolling list of real subject names is doing a lot of the "this place is full of variety" work for zero design cost.</p></div>
+  <div class="lever"><span class="n">06</span><h4>Field vs glyph contrast</h4><p>Ink field with a Paper glyph, or the reverse, is enough of a swap to make two cards on the same page read as distinct without touching colour.</p></div>
+</div>
+
+<section class="rules">
+  <h2>How the generator actually works</h2>
+  <ul>
+    <li><span class="k">Domain</span><span class="v">Keyword match against the topic string picks one of eight domains (Philosophy, Mathematics, History, Science, Language, Economics, Law, General). This is the only step that should eventually be a real classifier field set at curriculum generation, not client-side guessing.</span></li>
+    <li><span class="k">Glyph</span><span class="v">Each domain maps to two or three glyphs from the approved set in the Brand Guidelines. A hash of the topic string picks which one, so two philosophy tracks can still look different from each other.</span></li>
+    <li><span class="k">Call number</span><span class="v">A three-letter domain code plus a hashed three-digit number, styled like a library call number. It is meaningless as data but reads as precise and cataloguing, which fits the museum-and-library metaphor already in the brand foundations.</span></li>
+    <li><span class="k">Field</span><span class="v">Domain also selects one of six geometry families from the pattern library at low opacity. Mathematics gets the blueprint grid, history gets the vitrine frame, and so on, so the texture itself is doing semantic work, not just decoration.</span></li>
+    <li><span class="k">No Vermilion spend</span><span class="v">The domain label is the only Vermilion on each mark, and a mark is one component on a page, not the page itself. Whatever page holds these still gets exactly one accent overall, not one per card.</span></li>
+    <li><span class="k">Stability</span><span class="v">The same topic string always produces the same mark. That determinism is what makes this an identity system rather than a randomiser, users should be able to recognise a track by its mark over time.</span></li>
+  </ul>
+</section>
+
+<p class="colophon">Curi · Brand system v2.0 · Track mark reference</p>
+
+<script>
+var DOMAINS = {
+  PHIL: { name:'Philosophy', glyphs:['∞','∴'], pattern:'pat-vitrine', kw:['philosophy','ethic','stoic','moral','existential','meaning','virtue','logic'] },
+  MATH: { name:'Mathematics', glyphs:['ℵ','∮'], pattern:'pat-blueprint', kw:['math','algebra','geometry','calculus','set theory','number','equation','quantum','physics'] },
+  HIST: { name:'History', glyphs:['Æ','I'], pattern:'pat-vitrine', kw:['history','war','empire','roman','ancient','revolution','medieval','dynasty','conquest'] },
+  SCI:  { name:'Science', glyphs:['⊕','∮'], pattern:'pat-cross', kw:['science','biology','chemistry','physics','astronomy','genetics','neuro','ecology'] },
+  LANG: { name:'Language & Writing', glyphs:['¶','Æ'], pattern:'pat-ledger', kw:['language','writing','grammar','linguistic','poetry','literature','rhetoric'] },
+  ECON: { name:'Economics & Business', glyphs:['§','¶'], pattern:'pat-columns', kw:['econom','finance','business','market','trade','money','pricing','negotiat','startup','invest'] },
+  LAW:  { name:'Law & Policy', glyphs:['§','†'], pattern:'pat-ledger', kw:['law','legal','policy','constitution','regulation','government','court'] },
+  GEN:  { name:'General Knowledge', glyphs:['†','∴'], pattern:'pat-radiate', kw:[] }
+};
+
+function hashStr(s){
+  var h = 5381;
+  for (var i=0;i<s.length;i++){ h = ((h << 5) + h) + s.charCodeAt(i); h |= 0; }
+  return Math.abs(h);
+}
+
+function classify(topic){
+  var t = topic.toLowerCase();
+  var keys = Object.keys(DOMAINS).filter(function(k){ return k!=='GEN'; });
+  for (var i=0;i<keys.length;i++){
+    var d = DOMAINS[keys[i]];
+    for (var j=0;j<d.kw.length;j++){ if (t.indexOf(d.kw[j]) !== -1) return keys[i]; }
+  }
+  return 'GEN';
+}
+
+function buildMark(topic){
+  var domainKey = classify(topic);
+  var domain = DOMAINS[domainKey];
+  var h = hashStr(topic);
+  var glyph = domain.glyphs[h % domain.glyphs.length];
+  var callNum = (h % 900 + 100);
+  var callDec = (h % 9) + 1;
+  var call = domainKey + ' · ' + callNum + '.' + callDec;
+  return { domainKey:domainKey, domainName:domain.name, glyph:glyph, pattern:domain.pattern, call:call };
+}
+
+function renderLive(topic){
+  if(!topic) topic = 'Untitled';
+  var m = buildMark(topic);
+  document.getElementById('liveField').className = 'field ' + m.pattern;
+  document.getElementById('liveGlyph').textContent = m.glyph;
+  document.getElementById('liveDomain').textContent = m.domainName;
+  document.getElementById('liveName').textContent = topic;
+  document.getElementById('liveCall').textContent = m.call;
+
+  document.getElementById('breakdown').innerHTML =
+    '<div class="bd-row"><span class="bd-k">Domain</span><span class="bd-v">Matched to <b>' + m.domainName + '</b> from keywords in the subject string.</span></div>' +
+    '<div class="bd-row"><span class="bd-k">Glyph</span><span class="bd-v">Assigned <b>' + m.glyph + '</b>, one of this domain\'s approved symbols, chosen by a hash of the exact topic text.</span></div>' +
+    '<div class="bd-row"><span class="bd-k">Call number</span><span class="bd-v"><b>' + m.call + '</b> · a stable, cataloguing-style fingerprint unique to this string.</span></div>' +
+    '<div class="bd-row"><span class="bd-k">Field</span><span class="bd-v">Rendered with the <b>' + m.pattern.replace('pat-','') + '</b> geometry family associated with this domain.</span></div>';
+}
+
+var input = document.getElementById('topicInput');
+input.addEventListener('input', function(){ renderLive(input.value.trim()); });
+document.querySelectorAll('.chip').forEach(function(c){
+  c.addEventListener('click', function(){ input.value = c.dataset.t; renderLive(c.dataset.t); });
+});
+renderLive(input.value);
+
+var SAMPLE_TOPICS = [
+  'Stoic Philosophy','Set Theory','The Roman Republic','Cellular Biology','Poetic Meter',
+  'Startup Fundraising','Constitutional Law','Behavioural Economics','Quantum Mechanics','Medieval Trade Routes',
+  'Rhetoric & Persuasion','Astrophysics','Contract Law','Game Theory','Ancient Egypt',
+  'Neuroscience Basics','Grammar & Syntax','Monetary Policy','Existentialism','Climate Science'
+];
+var grid = document.getElementById('markGrid');
+SAMPLE_TOPICS.forEach(function(topic){
+  var m = buildMark(topic);
+  var slot = document.createElement('div');
+  slot.className = 'markslot';
+  slot.innerHTML =
+    '<div class="mark">' +
+      '<div class="field ' + m.pattern + '"></div>' +
+      '<div class="glyph">' + m.glyph + '</div>' +
+      '<div class="mark-inner">' +
+        '<span class="domain">' + m.domainName + '</span>' +
+        '<div><div class="topicname">' + topic + '</div><span class="call">' + m.call + '</span></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="cap">' + topic + '</div>';
+  grid.appendChild(slot);
+});
+</script>
+
+</body>
+</html>

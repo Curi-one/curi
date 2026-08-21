@@ -20,6 +20,9 @@ import { Heatmap } from "@/components/Heatmap";
 import { SettingChips } from "@/components/SettingChips";
 import { TabPills } from "@/components/TabPills";
 import { BrowseFilterChips } from "@/components/BrowseFilterChips";
+import { TopicThumbnail } from "@/components/TopicThumbnail";
+import { UserAvatar } from "@/components/UserAvatar";
+import { buildTrackMark } from "@/lib/ui/topic-swatch";
 
 type PanelTone = "light" | "muted" | "dark";
 
@@ -63,7 +66,7 @@ function Swatch({
   return (
     <div className="group min-w-0 flex-1 basis-[7.5rem]">
       <div
-        className="h-16 border border-border transition-transform duration-small ease-out group-hover:-translate-y-0.5"
+        className="h-16 border border-border transition-[background-color] duration-small ease-out group-hover:brightness-95"
         style={{ background: `var(${token})` }}
         title={token}
       />
@@ -223,13 +226,13 @@ export function DesignSystemShowcase() {
           swatches.
         </p>
         <div className="flex flex-wrap gap-2">
-          <span className="badge-accent transition-transform duration-small hover:-translate-y-px">
+          <span className="badge-accent transition-colors duration-small hover:bg-accent/90">
             New path
           </span>
-          <span className="inline-flex items-center border border-border px-2.5 py-1 font-meta text-mono-xs uppercase tracking-wider text-ink-muted transition-colors duration-small hover:border-ink hover:text-ink">
+          <span className="inline-flex items-center border border-border px-2.5 py-1 font-meta text-mono-xs uppercase tracking-wider text-ink-muted transition-colors duration-small hover:border-ink">
             On track
           </span>
-          <span className="inline-flex items-center bg-paper-tertiary px-2.5 py-1 font-meta text-mono-xs uppercase tracking-wider text-ink-muted transition-colors duration-small hover:bg-light hover:text-ink">
+          <span className="inline-flex items-center bg-paper-tertiary px-2.5 py-1 font-meta text-mono-xs uppercase tracking-wider text-ink-muted transition-colors duration-small hover:bg-light">
             Draft
           </span>
         </div>
@@ -532,22 +535,22 @@ export function DesignSystemShowcase() {
         title="Light and ink for variety"
       >
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="group border border-border bg-paper p-5 transition-transform duration-medium ease-out hover:-translate-y-1">
+          <div className="border border-border bg-paper p-5 transition-[background-color] duration-[300ms] ease-out hover:bg-[var(--color-bg-tertiary)]">
             <Sun className="size-4 text-accent" aria-hidden />
             <p className="mt-3 font-display text-display-2xs  tracking-tight">
               Paper
             </p>
             <p className="mt-1 font-sans text-ui-xs leading-relaxed text-ink-muted">
-              Default reading surface. Soft lift on hover.
+              Default reading surface. Paper → Pale on hover — background only.
             </p>
           </div>
-          <div className="group border border-border bg-paper-secondary p-5 transition-transform duration-medium ease-out hover:-translate-y-1">
+          <div className="border border-border bg-paper-secondary p-5 transition-[background-color] duration-[300ms] ease-out hover:bg-[var(--color-bg-tertiary)]">
             <Moon className="size-4 text-ink-muted" aria-hidden />
             <p className="mt-3 font-display text-display-2xs  tracking-tight">
               Fog
             </p>
             <p className="mt-1 font-sans text-ui-xs leading-relaxed text-ink-muted">
-              Nested panels and quiet chrome.
+              Nested panels and quiet chrome. No lift, shadow, or scale.
             </p>
           </div>
         </div>
@@ -573,46 +576,140 @@ export function DesignSystemShowcase() {
         </div>
       </Panel>
 
-      {/* Radius / motion — muted */}
+      {/* Motion — muted */}
       <Panel
         tone="muted"
-        eyebrow="07 · Motion & radius"
-        title="Presence, not noise"
+        eyebrow="07 · Interactions"
+        title="One property, exact durations"
       >
-        <div className="flex flex-wrap items-end gap-6">
+        <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
+          Five durations only: 100 / 200 / 350 / 750 / 1100ms. Hover changes
+          background, border, or colour — never more than one. Cards: Paper →
+          Pale, 300ms, no lift.
+        </p>
+        <div className="flex flex-wrap gap-3">
           {(
             [
-              ["sm", "2px"],
-              ["md", "4px"],
-              ["full", "pill"],
+              ["micro", "100ms"],
+              ["small", "200ms"],
+              ["medium", "350ms"],
+              ["large", "750ms"],
+              ["xl", "1100ms"],
             ] as const
-          ).map(([name, px]) => (
-            <div key={name} className="text-center">
-              <div
-                className={`mx-auto size-14 border border-border bg-paper transition-transform duration-medium ease-out hover:scale-110 hover:border-accent ${
-                  name === "full"
-                    ? "rounded-full"
-                    : name === "md"
-                      ? "rounded-md"
-                      : "rounded-sm"
-                }`}
-              />
-              <p className="mt-2 font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
-                {name} · {px}
+          ).map(([name, ms]) => (
+            <div
+              key={name}
+              className="border border-border bg-paper px-3 py-2"
+            >
+              <p className="font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
+                {name}
               </p>
+              <p className="mt-1 font-meta text-mono-md text-ink">{ms}</p>
             </div>
           ))}
         </div>
+        <InteractiveDemo label="Card hover · Paper → Pale">
+          <div className="border border-border bg-paper p-4 transition-[background-color] duration-[300ms] ease-out hover:bg-[var(--color-bg-tertiary)]">
+            <p className="font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
+              Lesson 06 · Rhetoric
+            </p>
+            <p className="mt-1 font-display text-display-2xs tracking-tight">
+              The rule of three, and why it works
+            </p>
+          </div>
+        </InteractiveDemo>
+        <InteractiveDemo label="Skeleton · opacity pulse (never shimmer)">
+          <div className="flex flex-col gap-2.5">
+            <div className="skeleton-pulse h-3 w-[80%]" />
+            <div className="skeleton-pulse h-3 w-[60%]" />
+            <div className="skeleton-pulse h-3 w-[40%]" />
+          </div>
+        </InteractiveDemo>
         <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
-          Transitions use brand easing. Interactive targets lift, scale, or
-          shift colour — never decorative bounce.
+          Never: confetti, shake, spring/bounce, parallax, gradient loading
+          sweep, or simultaneous non-staggered entrances.{" "}
+          <span className="font-meta text-mono-md">prefers-reduced-motion</span>{" "}
+          collapses everything globally.
         </p>
       </Panel>
 
-      {/* Museum devices — light */}
+      {/* Track marks — light */}
       <Panel
         tone="light"
-        eyebrow="08 · Museum devices"
+        eyebrow="08 · Track marks"
+        title="Identity without imagery"
+      >
+        <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
+          Domain + glyph + call number + pattern from the topic string. Square =
+          subject; circle = person. Never scale the full card to small sizes.
+        </p>
+        <InteractiveDemo label="Tiers · same topic">
+          <div className="flex flex-wrap items-end gap-6">
+            {(
+              [
+                [96, "Large"],
+                [56, "Medium"],
+                [32, "Small"],
+                [18, "Micro"],
+              ] as const
+            ).map(([size, label]) => (
+              <div key={size} className="text-center">
+                <TopicThumbnail topic="Stoic Ethics" size={size} />
+                <p className="mt-2 font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
+                  {label} · {size}px
+                </p>
+              </div>
+            ))}
+          </div>
+        </InteractiveDemo>
+        <InteractiveDemo label="Domain spread">
+          <div className="flex flex-wrap gap-3">
+            {[
+              "Constitutional Law",
+              "Calculus",
+              "Roman History",
+              "Formal Logic",
+              "English Language",
+              "Behavioural Economics",
+            ].map((topic) => {
+              const m = buildTrackMark(topic);
+              return (
+                <div key={topic} className="w-[7.5rem]">
+                  <TopicThumbnail topic={topic} size={64} />
+                  <p className="mt-2 truncate font-meta text-mono-xs text-ink">
+                    {m.call}
+                  </p>
+                  <p className="truncate font-meta text-mono-xs text-ink-faint">
+                    {topic}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </InteractiveDemo>
+        <InteractiveDemo label="User avatar · circle only">
+          <div className="flex flex-wrap items-end gap-4">
+            <UserAvatar name="Jordan Miles" size={64} />
+            <UserAvatar name="Jordan Miles" size={40} />
+            <UserAvatar name="Jordan Miles" size={28} variant="paper" />
+            <div className="flex items-center gap-3 border border-border px-3 py-2">
+              <TopicThumbnail topic="Set Theory" size={32} />
+              <span className="font-meta text-mono-xs text-ink-muted">
+                square subject
+              </span>
+              <UserAvatar name="JM" size={32} />
+              <span className="font-meta text-mono-xs text-ink-muted">
+                circle person
+              </span>
+            </div>
+          </div>
+        </InteractiveDemo>
+      </Panel>
+
+      {/* Museum devices — muted */}
+      <Panel
+        tone="muted"
+        eyebrow="09 · Museum devices"
         title="Editorial modernism, four moves"
       >
         <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
