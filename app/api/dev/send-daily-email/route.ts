@@ -26,6 +26,7 @@ export async function POST(request: Request) {
 
   const url = new URL(request.url);
   const force = url.searchParams.get("force") !== "0";
+  const sample = url.searchParams.get("sample") === "1";
   let onlyEmail = url.searchParams.get("email") ?? undefined;
   if (!onlyEmail) {
     try {
@@ -40,10 +41,12 @@ export async function POST(request: Request) {
     const result = await dispatchDailyLessonEmails({
       force,
       onlyEmail,
+      sample,
     });
     return NextResponse.json({
       ok: true,
       force,
+      sample,
       onlyEmail: onlyEmail ?? null,
       ...result,
     });

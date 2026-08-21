@@ -167,16 +167,20 @@ export async function buildDailyLessonEmailPayload(
   },
   admin: SupabaseClient,
   now = new Date(),
+  /** QA: treat active paths as due even if already completed today. */
+  sample = false,
 ): Promise<DailyLessonEmailPayload | null> {
   const today = todayInTimezone(params.timezone, now);
   const [courses, activityDates, activityRowsResult] = await Promise.all([
     loadDueCourses(params.userId, admin),
     loadActivityDates(params.userId, admin),
-    admin
-      .from("lesson_activity")
-      .select("course_id, activity_date")
-      .eq("user_id", params.userId)
-      .eq("activity_date", today),
+    sample
+      ? Promise.resolve({ data: [] as { course_id: string }[] })
+      : admin
+          .from("lesson_activity")
+          .select("course_id, activity_date")
+          .eq("user_id", params.userId)
+          .eq("activity_date", today),
   ]);
 
   const todayCourseIds = new Set(
@@ -194,11 +198,26 @@ export async function buildDailyLessonEmailPayload(
     todayCourseIds,
   );
 
-  if (feed.due.length === 0) {
+  const dueCoursesSource =
+    feed.due.length > 0
+      ? feed.due
+      : sample
+        ? courses
+            .filter((c) => c.progress < c.total)
+            .map((c) => ({
+              id: c.id,
+              topic: c.topic,
+              progress: c.progress,
+              totalLessons: c.total,
+              depth: c.depth,
+            }))
+        : [];
+
+  if (dueCoursesSource.length === 0) {
     return null;
   }
 
-  const dueIds = feed.due.map((d) => d.id);
+  const dueIds = dueCoursesSource.map((d) => d.id);
   const dueCourses = courses.filter((c) => dueIds.includes(c.id));
   const featuredCourse = dueCourses[0];
   const featuredLesson = await loadLessonRow(

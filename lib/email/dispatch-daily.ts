@@ -43,6 +43,8 @@ export type DailyEmailDispatchDeps = {
   force?: boolean;
   /** Manual test: send only to this address (case-insensitive). */
   onlyEmail?: string;
+  /** QA sample: build payload even when all paths are done for today. */
+  sample?: boolean;
 };
 
 export async function dispatchDailyLessonEmails(
@@ -149,6 +151,7 @@ export async function dispatchDailyLessonEmails(
         },
         admin,
         now,
+        deps?.sample === true,
       );
 
       if (!payload) {
