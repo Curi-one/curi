@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   topicArt,
+  topicPatternStyle,
   topicSwatch,
   type TopicPattern,
 } from "@/lib/ui/topic-swatch";
@@ -16,14 +17,16 @@ const WARM_FIELDS = new Set([
   "#22201C",
 ]);
 
-const PATTERNS: TopicPattern[] = [
+/** Primary cover patterns from the geometric library (halftone demoted). */
+const PRIMARY_PATTERNS: TopicPattern[] = [
+  "ledger",
+  "columns",
   "hatch",
-  "grid",
-  "halftone",
-  "rules",
-  "grain",
+  "cross",
+  "blueprint",
   "band",
   "corners",
+  "vitrine",
 ];
 
 describe("topicArt", () => {
@@ -100,10 +103,19 @@ describe("topicArt", () => {
     }
   });
 
-  it("picks a deterministic pattern and alignment from the approved sets", () => {
+  it("picks a deterministic pattern from the brand library set (no halftone)", () => {
     const art = topicArt("Quantum Mechanics");
-    expect(PATTERNS).toContain(art.pattern);
+    expect(PRIMARY_PATTERNS).toContain(art.pattern);
+    expect(art.pattern).not.toBe("halftone");
     expect(["br", "bl", "center", "tr", "tl"]).toContain(art.align);
+  });
+
+  it("never selects halftone as a primary cover pattern", () => {
+    const topics = Array.from({ length: 80 }, (_, i) => `Cover topic ${i}`);
+    for (const topic of topics) {
+      expect(topicArt(topic).pattern).not.toBe("halftone");
+      expect(PRIMARY_PATTERNS).toContain(topicArt(topic).pattern);
+    }
   });
 
   it("may include an optional two-stop dark gradient field", () => {
@@ -118,6 +130,34 @@ describe("topicArt", () => {
       expect(WARM_FIELDS.has(art.fieldStops![0]!.toUpperCase())).toBe(true);
       expect(WARM_FIELDS.has(art.fieldStops![1]!.toUpperCase())).toBe(true);
     }
+  });
+});
+
+describe("topicPatternStyle", () => {
+  it("uses 115deg hatch matching the geometric library", () => {
+    const style = topicPatternStyle("hatch");
+    expect(style.backgroundImage).toContain("115deg");
+    expect(style.backgroundImage).toContain("repeating-linear-gradient");
+  });
+
+  it("renders ledger as horizontal rules", () => {
+    const style = topicPatternStyle("ledger");
+    expect(style.backgroundImage).toContain("to bottom");
+  });
+
+  it("renders cross as dual diagonal overlays", () => {
+    const style = topicPatternStyle("cross");
+    expect(style.backgroundImage).toContain("45deg");
+    expect(style.backgroundImage).toContain("-45deg");
+  });
+
+  it("keeps aliases mapped to library styles", () => {
+    expect(topicPatternStyle("rules").backgroundImage).toBe(
+      topicPatternStyle("ledger").backgroundImage,
+    );
+    expect(topicPatternStyle("grid").backgroundImage).toBe(
+      topicPatternStyle("columns").backgroundImage,
+    );
   });
 });
 
