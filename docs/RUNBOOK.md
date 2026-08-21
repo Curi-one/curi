@@ -62,9 +62,11 @@ Requires [PR #20](https://github.com/Curi-one/curi/pull/20) merged and Vercel en
 
 - `RESEND_API_KEY` — Resend API key (server only)
 - `EMAIL_FROM` — `Curi <lessons@curi.one>` (domain verified in Resend)
-- `CRON_SECRET` — already used for seed; same secret authorizes the cron route
+- `CRON_SECRET` — authorizes cron route; also set as GitHub Actions secret for hourly dispatch
 
-Vercel runs `/api/cron/daily-email` hourly (`vercel.json`). Manual test:
+**Scheduling:** Vercel Hobby allows at most one cron per day in `vercel.json`, so hourly sends use GitHub Actions (`.github/workflows/daily-email-cron.yml`) calling the API route. Upgrade to Vercel Pro to use native hourly crons instead.
+
+Manual test:
 
 ```bash
 curl -s "https://stage.curi.one/api/cron/daily-email?force=1&email=you@example.com" \

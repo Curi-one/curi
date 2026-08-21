@@ -1,0 +1,23 @@
+# Hourly daily-lesson email dispatch (Vercel Hobby cannot run sub-daily crons in vercel.json).
+name: Daily lesson email
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger staging cron
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          STAGING_URL: https://stage.curi.one
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "CRON_SECRET not set — skipping"
+            exit 0
+          fi
+          curl -fsS "$STAGING_URL/api/cron/daily-email" \
+            -H "Authorization: Bearer $CRON_SECRET"
