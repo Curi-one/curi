@@ -59,4 +59,29 @@ describe("Button", () => {
     expect(btn).toHaveClass("btn-primary");
     expect(btn).toBeDisabled();
   });
+
+  it("applies size classes with default size", () => {
+    const { rerender } = render(<Button>Go</Button>);
+    expect(screen.getByRole("button")).toHaveClass("btn-size-default");
+
+    rerender(<Button size="large">Go</Button>);
+    expect(screen.getByRole("button")).toHaveClass("btn-size-large");
+
+    rerender(<Button size="small">Go</Button>);
+    expect(screen.getByRole("button")).toHaveClass("btn-size-small");
+
+    rerender(<Button size="compact">Go</Button>);
+    expect(screen.getByRole("button")).toHaveClass("btn-size-compact");
+  });
+
+  it("keeps size class on icon-only buttons", () => {
+    render(
+      <Button size="small" iconOnly icon={<span>★</span>}>
+        Search
+      </Button>,
+    );
+    const btn = screen.getByRole("button", { name: "Search" });
+    expect(btn).toHaveClass("btn-icon");
+    expect(btn).toHaveClass("btn-size-small");
+  });
 });

@@ -13,7 +13,7 @@ export function topicSwatch(topic: string): [field: string, glyph: string] {
   const tones = [5, 8, 11, 14, 17, 9, 13, 16];
   const i =
     topic.split("").reduce((s, c) => s + c.charCodeAt(0), 0) % tones.length;
-  return [`hsl(0 0% ${tones[i]!}%)`, "#FFFFFF"];
+  return [`hsl(0 0% ${tones[i]!}%)`, "#FAF9F5"];
 }
 
 /** Progress % with a slight endowment so early progress feels visible. */

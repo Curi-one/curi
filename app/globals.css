@@ -10,23 +10,23 @@
 
 :root {
   /* ── Colour · §8.1 ───────────────────────────────────────────────────────
-     Strictly neutral greyscale — equal R/G/B in every tone. No warm, cream,
-     or cool cast (§16.1). Ink is #0d0d0d, never pure black. */
+     Warm greyscale is intentional — every tone carries a slight warm cast.
+     Never pure black or pure white. Vermilion is the only chromatic colour. */
 
-  /* Greyscale — eight tones (§4.2) */
-  --color-ink: #0d0d0d;
-  --color-ink-2: #1f1f1f;
-  --color-ink-3: #2a2a2a;
-  --color-mid: #666666;
-  --color-silver: #a3a3a3;
-  --color-light: #e2e2e2;
-  --color-paper-tone: #fafafa;
-  --color-white-tone: #ffffff;
+  /* Greyscale — eight warm tones (§4.2) */
+  --color-ink: #0a0908;
+  --color-ink-2: #1c1a18;
+  --color-ink-3: #2e2c28;
+  --color-mid: #6b6760;
+  --color-silver: #9e9b94;
+  --color-light: #d4d0c8;
+  --color-paper-tone: #f4f1e8; /* paper — secondary surfaces */
+  --color-white-tone: #faf9f5; /* white — primary page bg */
 
   /* Background */
   --color-bg-primary: var(--color-white-tone);
   --color-bg-secondary: var(--color-paper-tone);
-  --color-bg-tertiary: #f2f2f2;
+  --color-bg-tertiary: #ede9e0; /* warm pale between paper and light */
   --color-bg-inverse: var(--color-ink);
   --color-bg-inverse-2: var(--color-ink-2);
   --color-bg-inverse-3: var(--color-ink-3);
@@ -307,8 +307,8 @@ body {
   }
 
   /* ── Buttons · §9.1 ──────────────────────────────────────────────────────
-     All variants share the same type recipe (UI sans, 12px, uppercase).
-     Never switch font by variant or state. */
+     All variants share the same type recipe (UI sans, uppercase, medium,
+     tracking). Size controls padding / font-size / min-height only. */
 
   .btn-primary,
   .btn-secondary,
@@ -319,7 +319,6 @@ body {
     justify-content: center;
     gap: var(--space-2);
     font-family: var(--font-ui-stack);
-    font-size: var(--text-ui-2xs);
     font-weight: var(--weight-medium);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
@@ -333,13 +332,6 @@ body {
       opacity var(--duration-small) var(--ease-out);
   }
 
-  .btn-primary,
-  .btn-secondary,
-  .btn-danger {
-    min-height: 52px;
-    padding: var(--space-3) var(--space-6);
-  }
-
   .btn-primary svg,
   .btn-secondary svg,
   .btn-ghost svg,
@@ -347,6 +339,31 @@ body {
     width: 1rem;
     height: 1rem;
     flex-shrink: 0;
+  }
+
+  /* Size variants — padding + type size + touch target */
+  .btn-size-large {
+    padding: 14px 28px;
+    font-size: 13px;
+    min-height: 56px;
+  }
+
+  .btn-size-default {
+    padding: 12px 24px;
+    font-size: 12px;
+    min-height: 52px;
+  }
+
+  .btn-size-small {
+    padding: 8px 16px;
+    font-size: 11px;
+    min-height: 44px;
+  }
+
+  .btn-size-compact {
+    padding: 5px 12px;
+    font-size: 10px;
+    min-height: 32px;
   }
 
   /* Primary CTA. One per screen. Carries the Vermilion underline. */
@@ -395,8 +412,6 @@ body {
 
   /* Tertiary / inline action — same type as primary */
   .btn-ghost {
-    min-height: 44px;
-    padding: 0 var(--space-3);
     color: var(--color-text-secondary);
     background: transparent;
     border: none;
@@ -430,18 +445,33 @@ body {
     cursor: not-allowed;
   }
 
-  /* Icon-only square — same type stack (sr-only label), shared size */
+  /* Icon-only square — scales with size variant */
   .btn-icon {
-    width: 52px;
-    min-width: 52px;
-    min-height: 52px;
     padding: 0;
   }
 
-  .btn-icon.btn-ghost {
+  .btn-icon.btn-size-large {
+    width: 56px;
+    min-width: 56px;
+    min-height: 56px;
+  }
+
+  .btn-icon.btn-size-default {
+    width: 52px;
+    min-width: 52px;
+    min-height: 52px;
+  }
+
+  .btn-icon.btn-size-small {
     width: 44px;
     min-width: 44px;
     min-height: 44px;
+  }
+
+  .btn-icon.btn-size-compact {
+    width: 32px;
+    min-width: 32px;
+    min-height: 32px;
   }
 
   /* ── Form inputs · §9.2 ────────────────────────────────────────────────── */
@@ -729,7 +759,8 @@ body {
     z-index: 1;
   }
 
-  /* Colourful intensity — ink → vermilion ramp (only brand chromatic). */
+  /* Colourful intensity on warm paper — tertiary → accent mixes → full accent.
+     Mixes use warm greys / ink only (never cool grey). */
   .heatmap-cell-0 {
     background: var(--color-bg-tertiary);
   }
@@ -739,11 +770,11 @@ body {
   }
 
   .heatmap-cell-2 {
-    background: color-mix(in srgb, var(--color-accent) 52%, var(--color-light));
+    background: color-mix(in srgb, var(--color-accent) 48%, var(--color-light));
   }
 
   .heatmap-cell-3 {
-    background: color-mix(in srgb, var(--color-accent) 78%, var(--color-ink));
+    background: color-mix(in srgb, var(--color-accent) 72%, var(--color-ink-3));
   }
 
   .heatmap-cell-4 {

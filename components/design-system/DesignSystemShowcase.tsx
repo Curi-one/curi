@@ -156,9 +156,9 @@ export function DesignSystemShowcase() {
             Curi
           </p>
           <p className="mt-4 max-w-md font-sans text-ui-md leading-relaxed text-ink-muted">
-            Design system — tokens, type rules, and live components. Under{" "}
-            <span className="font-meta text-mono-md text-accent">20px</span> we use sans or mono
-            only.
+            Design system — warm greyscale tokens, type rules, and live components. Under{" "}
+            <span className="font-meta text-mono-md text-accent">18px</span> we use sans or mono
+            only. Vermilion once per screen.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button href="/today" icon={<BookOpen aria-hidden />}>
@@ -191,17 +191,18 @@ export function DesignSystemShowcase() {
       </header>
 
       {/* Colour — muted */}
-      <Panel tone="muted" eyebrow="01 · Colour" title="Palette with room to breathe">
+      <Panel tone="muted" eyebrow="01 · Colour" title="Warm greyscale + Vermilion">
         <div className="flex flex-wrap gap-4">
           <Swatch name="Ink" token="--color-ink" />
           <Swatch name="Paper" token="--color-paper-tone" />
+          <Swatch name="White" token="--color-white-tone" />
           <Swatch name="Light" token="--color-light" />
-          <Swatch name="Vermilion" token="--color-accent" />
           <Swatch name="Mid" token="--color-mid" />
+          <Swatch name="Vermilion" token="--color-accent" />
         </div>
         <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
-          Accent is for emphasis — primary CTA underline, peak heatmap days, active filters, and a
-          few clear signals. Hover the swatches.
+          Warm greyscale surfaces (Paper #F4F1E8, White #FAF9F5). Vermilion is the only chromatic
+          colour — one beat per screen. Hover the swatches.
         </p>
         <div className="flex flex-wrap gap-2">
           <span className="badge-accent transition-transform duration-small hover:-translate-y-px">
@@ -219,7 +220,7 @@ export function DesignSystemShowcase() {
       {/* Type — dark */}
       <Panel tone="dark" eyebrow="02 · Typography" title="Three fonts, one rule">
         <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
-          Fraunces for display (≥20px). Plus Jakarta Sans and JetBrains Mono for everything smaller
+          Fraunces for display (≥18px). Plus Jakarta Sans and JetBrains Mono for everything smaller
           — links, buttons, badges, tabs, chips.
         </p>
         <div>
@@ -227,7 +228,7 @@ export function DesignSystemShowcase() {
             label="Display · Fraunces"
             sample="Today’s lesson"
             className="font-display text-[28px] font-semibold tracking-tight"
-            note="≥20px"
+            note="≥18px"
           />
           <TypeRow
             label="UI · Plus Jakarta Sans"
@@ -242,7 +243,7 @@ export function DesignSystemShowcase() {
             note="Labels"
           />
           <TypeRow
-            label="Link · sans under 20px"
+            label="Link · sans under 18px"
             sample="Read the full path outline →"
             className="font-sans text-ui-sm text-accent underline-offset-4 transition-[text-decoration] duration-small hover:underline"
             note="14px"
@@ -251,11 +252,20 @@ export function DesignSystemShowcase() {
       </Panel>
 
       {/* Buttons — light */}
-      <Panel tone="light" eyebrow="03 · Buttons" title="Same type recipe, every variant">
+      <Panel tone="light" eyebrow="03 · Buttons" title="Same type recipe, every size">
         <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
-          All buttons share UI sans, 12px, uppercase, medium weight — primary, secondary, ghost,
-          danger, icon-only. Icons don’t change the type.
+          All buttons share UI sans, uppercase, medium weight, and tracking — primary carries the
+          Vermilion bottom border. Size changes padding and type size only.
         </p>
+
+        <InteractiveDemo label="Sizes">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button size="large">Large</Button>
+            <Button size="default">Default</Button>
+            <Button size="small">Small</Button>
+            <Button size="compact">Compact</Button>
+          </div>
+        </InteractiveDemo>
 
         <InteractiveDemo label="Variants">
           <div className="flex flex-wrap items-center gap-3">
@@ -287,16 +297,16 @@ export function DesignSystemShowcase() {
 
         <InteractiveDemo label="Icon only">
           <div className="flex flex-wrap items-center gap-3">
-            <Button variant="primary" iconOnly icon={<Plus aria-hidden />}>
+            <Button variant="primary" size="large" iconOnly icon={<Plus aria-hidden />}>
               Add
             </Button>
             <Button variant="secondary" iconOnly icon={<Search aria-hidden />}>
               Search
             </Button>
-            <Button variant="ghost" iconOnly icon={<Settings aria-hidden />}>
+            <Button variant="ghost" size="small" iconOnly icon={<Settings aria-hidden />}>
               Settings
             </Button>
-            <Button variant="danger" iconOnly icon={<Heart aria-hidden />}>
+            <Button variant="danger" size="compact" iconOnly icon={<Heart aria-hidden />}>
               Remove
             </Button>
           </div>
@@ -373,8 +383,8 @@ export function DesignSystemShowcase() {
       {/* Heatmap — muted */}
       <Panel tone="muted" eyebrow="05 · Heatmap" title="Colourful activity">
         <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
-          Intensity from neighbour density. The ramp moves ink → vermilion. Hover a cell for the
-          date label.
+          Intensity from neighbour density. The ramp moves warm tertiary → accent mixes → full
+          Vermilion. Hover a cell for the date label.
         </p>
         <div className="border border-border bg-paper p-5 transition-colors duration-medium hover:border-accent/35">
           <Heatmap dates={heatDates} streak={12} />

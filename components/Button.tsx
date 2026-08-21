@@ -2,9 +2,11 @@ import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+export type ButtonSize = "large" | "default" | "small" | "compact";
 
 type Shared = {
   variant?: ButtonVariant;
+  size?: ButtonSize;
   /** Leading icon (ignored when iconOnly). */
   icon?: ReactNode;
   /** Trailing icon (ignored when iconOnly). */
@@ -36,8 +38,16 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
   danger: "btn-danger",
 };
 
+const SIZE_CLASS: Record<ButtonSize, string> = {
+  large: "btn-size-large",
+  default: "btn-size-default",
+  small: "btn-size-small",
+  compact: "btn-size-compact",
+};
+
 const SHARED_KEYS = new Set([
   "variant",
+  "size",
   "icon",
   "iconRight",
   "iconOnly",
@@ -54,6 +64,7 @@ const SHARED_KEYS = new Set([
 export function Button(props: ButtonProps) {
   const {
     variant = "primary",
+    size = "default",
     icon,
     iconRight,
     iconOnly = false,
@@ -64,6 +75,7 @@ export function Button(props: ButtonProps) {
 
   const classes = [
     VARIANT_CLASS[variant],
+    SIZE_CLASS[size],
     iconOnly ? "btn-icon" : "",
     "focus-ring",
     className,

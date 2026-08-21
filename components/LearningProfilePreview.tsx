@@ -39,7 +39,7 @@ export function LearningProfilePreview({ profile }: LearningProfilePreviewProps)
     <div className="lg:sticky lg:top-7">
       <div className="mb-4 flex items-center gap-2.5 font-meta text-[11px] uppercase tracking-wider text-ink-muted">
         <span>Curi</span>
-        <span className="font-display italic text-accent">×</span>
+        <span className="font-display italic text-ink">×</span>
         <span>You</span>
       </div>
 
@@ -53,7 +53,7 @@ export function LearningProfilePreview({ profile }: LearningProfilePreviewProps)
             onClick={() => selectTopic(key)}
             className={`min-h-9 border px-3 py-2 font-meta text-[10.5px] uppercase tracking-wider transition-colors ${
               topicKey === key
-                ? "border-accent bg-accent text-paper"
+                ? "border-transparent bg-accent text-paper"
                 : "border-border-strong text-ink-muted hover:border-ink hover:text-ink"
             }`}
           >

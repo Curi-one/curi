@@ -22,7 +22,8 @@ const files = ["app", "components", "lib"].flatMap((dir) =>
 
 /**
  * Files permitted to hold raw hex, because they *are* the palette.
- * Everything in them still has to be neutral — the tint rule applies globally.
+ * Hexes there must still be allowlisted warm tones (or accents) — never
+ * pure black / white.
  */
 const PALETTE_FILES = new Set([
   join("app", "globals.css"), // the token definitions themselves (§8)
@@ -30,8 +31,23 @@ const PALETTE_FILES = new Set([
   join("lib", "ui", "topic-swatch.ts"), // cover art fields (§6.2)
 ]);
 
-/** Vermilion is the only chromatic value in the system (§4.2). */
-const ACCENT_HEX = new Set(["c1121f", "a30f1b"]);
+/** Warm greyscale + tertiary + Vermilion (§4.2). Case-insensitive. */
+const ALLOWED_HEX = new Set([
+  "0a0908", // ink
+  "1c1a18", // ink-2
+  "2e2c28", // ink-3
+  "6b6760", // mid
+  "9e9b94", // silver
+  "d4d0c8", // light
+  "f4f1e8", // paper
+  "faf9f5", // white
+  "ede9e0", // tertiary
+  "c1121f", // accent
+  "a30f1b", // accent-dark
+]);
+
+/** Pure black / white are never brand colours — banned even in palette files. */
+const BANNED_HEX = new Set(["000", "000000", "fff", "ffffff"]);
 
 /** Radius is permitted only as none/sm/md, or full on a true circle (§8.4). */
 const BAD_RADIUS =
@@ -43,9 +59,9 @@ const HEX = /#[0-9a-fA-F]{3,8}\b/g;
 /** Correct is Ink, errors are Silver. Never green, never red (§9.6, §16.1). */
 const FOREIGN_COLOR =
   /\b(?:bg|text|border|ring|from|to|via|decoration)-(?:green|emerald|lime|teal|red|rose|orange|amber|yellow|blue|indigo|violet|purple|pink|sky|cyan)-\d{2,3}\b/g;
-/** Fraunces is never used below 20px (product rule: sans/mono under 20px). */
+/** Fraunces is never used below 18px (product rule: sans/mono under 18px). */
 const SMALL_DISPLAY =
-  /font-display[^"`]*?\b(?:text-(?:xs|sm|base)|text-\[1[0-9]px\])\b/g;
+  /font-display[^"`]*?\b(?:text-(?:xs|sm|base)|text-\[(?:1[0-7]|[0-9])px\])\b/g;
 /**
  * Product surface may only name the brand trio (§5.1). System role fallbacks
  * (Georgia, system-ui, Courier New) are allowed beside them.
@@ -56,33 +72,56 @@ const FOREIGN_FONT =
 const RULES = [
   ["§8.4 · rounded container (use rounded-none)", BAD_RADIUS, "tsx"],
   ["§8.5 · box shadow (depth comes from surface + rule)", SHADOW, "tsx"],
-  ["§17.04 · hardcoded hex (use a token)", HEX, "palette"],
+  ["§17.04 · hardcoded hex (use a token or allowlisted warm tone)", HEX, "palette"],
   [
     "§9.6 · non-brand colour (correct = Ink, error = Silver)",
     FOREIGN_COLOR,
     "all",
   ],
-  ["§5.2 · Fraunces below 20px", SMALL_DISPLAY, "tsx"],
+  ["§5.2 · Fraunces below 18px", SMALL_DISPLAY, "tsx"],
   ["§5.1 · non-brand typeface (use Fraunces / Plus Jakarta / JetBrains)", FOREIGN_FONT, "all"],
 ];
 
+function expandHex(hex) {
+  const h = hex.toLowerCase();
+  if (h.length === 3 || h.length === 4) {
+    return h
+      .slice(0, 3)
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  if (h.length === 8) return h.slice(0, 6);
+  return h;
+}
+
+function isBanned(hex) {
+  const lower = hex.toLowerCase();
+  return BANNED_HEX.has(lower) || BANNED_HEX.has(expandHex(lower));
+}
+
+function isAllowed(hex) {
+  return ALLOWED_HEX.has(expandHex(hex));
+}
+
 /**
- * Every greyscale value must have equal R, G, and B channels (§4.2, §16.1).
- * Catches cream, sepia, and any warm or cool cast — including in the palette
- * files, which is exactly where a tint would otherwise hide.
+ * Warm tinted greys are required. Fail on pure black/white everywhere, and on
+ * any hex outside the allowlist (palette files may only use allowlisted tones).
  */
-function tintedGreys(line) {
-  const out = [];
-  for (const m of line.matchAll(/#([0-9a-fA-F]{6})\b/g)) {
-    const hex = m[1].toLowerCase();
-    if (ACCENT_HEX.has(hex)) continue;
-    const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
-    if (Math.max(r, g, b) - Math.min(r, g, b) > 2) out.push(`#${hex}`);
+function hexViolations(line) {
+  const banned = [];
+  const other = [];
+  for (const m of line.matchAll(/#([0-9a-fA-F]{3,8})\b/g)) {
+    const hex = m[1];
+    if (isBanned(hex)) {
+      banned.push(`#${hex}`);
+      continue;
+    }
+    if (!isAllowed(hex)) {
+      other.push(`#${hex}`);
+    }
   }
-  for (const m of line.matchAll(/hsl\(\s*[\d.]+\s+([\d.]+)%/g)) {
-    if (parseFloat(m[1]) > 0) out.push(m[0]);
-  }
-  return out;
+  return { banned, other };
 }
 
 let failures = 0;
@@ -101,12 +140,26 @@ for (const file of files) {
       if (scope === "tsx" && !isTsx) continue;
       if (scope === "palette" && isPalette) continue;
       re.lastIndex = 0;
-      const hits = line.match(re);
+      let hits = line.match(re);
+      // §17.04 — allowlisted warm / accent hexes are permitted; banned reported separately
+      if (hits && re === HEX) {
+        hits = hits.filter((h) => {
+          const hex = h.slice(1);
+          if (isBanned(hex)) return false;
+          return !isAllowed(hex);
+        });
+        if (!hits.length) continue;
+      }
       if (hits) report(file, i, label, hits);
     }
-    const tints = tintedGreys(line);
-    if (tints.length) {
-      report(file, i, "§4.2 · tinted grey (greyscale must be neutral)", tints);
+
+    const { banned, other } = hexViolations(line);
+    if (banned.length) {
+      report(file, i, "§4.2 · pure black/white banned (use warm ink / white-tone)", banned);
+    }
+    // Palette files: non-allowlisted hexes fail (warm greys must be the defined set)
+    if (isPalette && other.length) {
+      report(file, i, "§4.2 · hex outside warm palette allowlist", other);
     }
   });
 }
