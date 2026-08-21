@@ -54,10 +54,18 @@
 
   /* ── Typography · §8.2 ───────────────────────────────────────────────────
      Exactly three families (BRAND.md §5). Fallbacks are system stand-ins for
-     the same roles — never a fourth product typeface. */
-  --font-display-stack: var(--font-display), Georgia, "Times New Roman", serif;
-  --font-ui-stack: var(--font-ui), system-ui, sans-serif;
-  --font-mono-stack: var(--font-mono), "Courier New", monospace;
+     the same roles — never a fourth product typeface.
+
+     next/font sets --font-display|ui|mono on <html> (see app/layout.tsx).
+     Stacks MUST resolve on the same element as those vars — if they only
+     referenced undefined vars here, the stacks become guaranteed-invalid and
+     the whole UI renders in Times New Roman / system UI.
+     var(--token, "Literal") keeps a named face even if a var is missing. */
+  --font-display-stack: var(--font-display, "Fraunces"), Georgia,
+    "Times New Roman", serif;
+  --font-ui-stack: var(--font-ui, "Plus Jakarta Sans"), system-ui, sans-serif;
+  --font-mono-stack: var(--font-mono, "JetBrains Mono"), "Courier New",
+    monospace;
 
   --text-display-2xl: 192px;
   --text-display-xl: 88px;

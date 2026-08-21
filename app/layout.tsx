@@ -38,11 +38,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // next/font CSS variables MUST live on <html> (:root). Stacks in globals.css
+  // reference var(--font-display|ui|mono); if those are only on <body>, the
+  // stacks invalidate on :root and every face falls back to Times/system.
+  const fontVars = `${fraunces.variable} ${plusJakarta.variable} ${jetbrains.variable}`;
+
   return (
-    <html lang="en">
-      <body
-        className={`${fraunces.variable} ${plusJakarta.variable} ${jetbrains.variable} min-h-screen font-ui antialiased`}
-      >
+    <html lang="en" className={fontVars}>
+      <body className="min-h-screen font-ui antialiased">
         <DevPersonaToggle />
         {children}
       </body>
