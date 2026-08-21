@@ -28,6 +28,12 @@ import {
 import { stripMarkdownFences } from "@/lib/clarify/generate";
 import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
 import { isLessonReadable } from "@/lib/courses/path-map";
+import {
+  DEFAULT_LEARNING_PROFILE,
+  learningProfilePromptLines,
+  type LearningProfile,
+} from "@/lib/profile/learning-profile";
+import { loadUserPreferencesForUserId } from "@/lib/profile/db-preferences";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAuthenticatedUserId } from "@/lib/auth/user-id";
 import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
@@ -128,6 +134,9 @@ export type GetLessonBodyDeps = {
     priorLessonIndex: number;
     userId: string;
   }) => Promise<LessonFeel | null>;
+  loadLearningProfile?: (params: {
+    userId: string;
+  }) => Promise<LearningProfile>;
   upsertLessonContent?: (params: {
     courseId: string;
     lessonIndex: number;
@@ -461,7 +470,14 @@ function buildMessages(input: {
   lessonIndex: number;
   lessonTitle: string;
   modifier: DifficultyModifier;
+  learningProfile: LearningProfile;
 }): PerplexityMessage[] {
+  const lengthHint = {
+    short: "Target ~2 minute read (one opening + one core paragraph in body).",
+    medium: "Target ~5 minute read (opening + two substantive paragraphs in body).",
+    long: "Target ~10 minute read (opening + three paragraphs with deeper follow-through in body).",
+  }[input.learningProfile.length];
+
   const lines = [
     `Path topic (broader context): ${input.topic}`,
     `Depth band: ${input.depth}`,
@@ -469,7 +485,9 @@ function buildMessages(input: {
     `Lesson title: ${input.lessonTitle}`,
     `Difficulty modifier: ${input.modifier}`,
     `Modifier instruction: ${MODIFIER_HINTS[input.modifier]}`,
-    "Write a 3–5 minute micro-lesson body as markdown paragraphs separated by blank lines.",
+    lengthHint,
+    ...learningProfilePromptLines(input.learningProfile),
+    "Write the lesson body as markdown paragraphs separated by blank lines.",
     "Also return exactly 3 takeaways and 1 shareableFact tied to this lesson and the broader path topic.",
     "Add visuals (0–3) only when a figure, diagram caption, or equation materially helps understanding.",
     "Return ONLY valid JSON matching the schema in the system message.",
@@ -554,6 +572,9 @@ export async function getLessonBody(
     deps?.loadCourse ?? ((p) => defaultLoadCourse(p, resolveAdmin()));
   const loadPriorFeel =
     deps?.loadPriorFeel ?? ((p) => defaultLoadPriorFeel(p, resolveAdmin()));
+  const loadLearningProfile =
+    deps?.loadLearningProfile ??
+    ((p) => loadUserPreferencesForUserId(p.userId, resolveAdmin()));
   const lookup = deps?.lookup ?? lookupLessonBody;
   const store = deps?.store ?? storeLessonBody;
   const complete = deps?.complete ?? chatCompletion;
@@ -607,6 +628,11 @@ export async function getLessonBody(
     }
   }
 
+  let learningProfile: LearningProfile = { ...DEFAULT_LEARNING_PROFILE };
+  if (course.kind === "member" && course.userId) {
+    learningProfile = await loadLearningProfile({ userId: course.userId });
+  }
+
   const topicNormalized = normalizeTopic(course.topic);
   const cacheKey = buildFingerprint({
     topicNormalized,
@@ -615,6 +641,16 @@ export async function getLessonBody(
     cacheType: "lesson_body",
     lessonIndex: params.lessonIndex,
     difficultyModifier: modifier,
+    learningProfile:
+      course.kind === "member"
+        ? {
+            seq: learningProfile.seq,
+            anchor: learningProfile.anchor,
+            length: learningProfile.length,
+            rigor: learningProfile.rigor,
+            jargon: learningProfile.jargon,
+          }
+        : undefined,
   });
 
   const hit = await lookup(cacheKey);
@@ -651,6 +687,7 @@ export async function getLessonBody(
       lessonIndex: params.lessonIndex,
       lessonTitle: lesson.title,
       modifier,
+      learningProfile,
     }),
     temperature: 0.3,
     max_tokens: 3200,

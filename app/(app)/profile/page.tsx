@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, Minus } from "lucide-react";
+import { LearningProfilePreview } from "@/components/LearningProfilePreview";
 import { PageShell } from "@/components/PageShell";
 import { LoadingState } from "@/components/LoadingState";
 import { SettingChips } from "@/components/SettingChips";
@@ -11,19 +12,27 @@ import { SettingToggle } from "@/components/SettingToggle";
 import {
   getLibrary,
   getMe,
+  getPreferences,
   getProgress,
   patchMe,
+  patchPreferences,
   postBillingPortal,
   postSignOut,
   type ProgressResponse,
   type UserSession,
 } from "@/lib/api/client";
 import {
+  DEFAULT_LEARNING_PROFILE,
   DEFAULT_PREFERENCES,
-  loadPreferences,
-  savePreferences,
   type ProfilePreferences,
 } from "@/lib/profile/preferences";
+import {
+  ANCHOR_OPTIONS,
+  JARGON_OPTIONS,
+  LENGTH_OPTIONS,
+  RIGOR_OPTIONS,
+  SEQ_OPTIONS,
+} from "@/lib/profile/preview-samples";
 
 type Theme = "system" | "light" | "dark";
 type ProfileTab = "account" | "learning" | "email" | "plan";
@@ -38,30 +47,6 @@ function applyTheme(theme: Theme) {
   localStorage.setItem("curi-theme", theme);
 }
 
-function prefsUserKey(session: UserSession): string {
-  return session.email?.trim() || "member";
-}
-
-const CURIOSITY_OPTIONS = [
-  "Pure curiosity",
-  "For work or a project",
-  "Building something",
-  "Studying formally",
-  "To teach someone else",
-] as const;
-
-const DEPTH_OPTIONS = [
-  { value: "Short", label: "Short · ~2 min" },
-  { value: "Medium", label: "Medium · ~5 min" },
-  { value: "Long", label: "Long · ~10 min" },
-] as const;
-
-const STYLE_OPTIONS = [
-  "Through stories",
-  "With real examples",
-  "Build the model first",
-  "Show what breaks",
-] as const;
 
 const EMAIL_TIME_OPTIONS = [
   { value: "early-morning", label: "Early morning · 6 AM" },
@@ -95,8 +80,7 @@ const PLAN_ACADEMY_ROWS = [
 
 /**
  * Profile — mirrors prototypes/web Profile (Account / Learning / Email / Plan).
- * Learning + email preferences are collected and persisted locally;
- * daily email delivery remains deferred (DECISIONS).
+ * Learning profile + email schedule persist via /api/me/preferences.
  */
 export default function ProfilePage() {
   const router = useRouter();
@@ -126,11 +110,16 @@ export default function ProfilePage() {
 
   useEffect(() => {
     Promise.all([getMe(), getProgress(), getLibrary()])
-      .then(([m, p, lib]) => {
+      .then(async ([m, p, lib]) => {
         setSession(m.session);
         if (m.session.name) setName(m.session.name);
         if (m.session.kind === "member") {
-          setPrefs(loadPreferences(prefsUserKey(m.session)));
+          try {
+            const prefRes = await getPreferences();
+            setPrefs(prefRes.preferences);
+          } catch {
+            setPrefs(DEFAULT_PREFERENCES);
+          }
         }
         setProgress(p);
         setActivePaths(lib.exploring.length);
@@ -151,11 +140,27 @@ export default function ProfilePage() {
     setPrefs(next);
     if (prefsSaveTimer.current) clearTimeout(prefsSaveTimer.current);
     prefsSaveTimer.current = setTimeout(() => {
-      savePreferences(prefsUserKey(session), next);
-      setPrefsSaved(true);
-      if (prefsFeedbackTimer.current) clearTimeout(prefsFeedbackTimer.current);
-      prefsFeedbackTimer.current = setTimeout(() => setPrefsSaved(false), 1500);
+      void patchPreferences(next)
+        .then((res) => {
+          setPrefs(res.preferences);
+          setPrefsSaved(true);
+          if (prefsFeedbackTimer.current) clearTimeout(prefsFeedbackTimer.current);
+          prefsFeedbackTimer.current = setTimeout(
+            () => setPrefsSaved(false),
+            1500,
+          );
+        })
+        .catch(() => {
+          // Keep optimistic UI; user can refresh to reconcile.
+        });
     }, 200);
+  }
+
+  function resetLearningDefaults() {
+    persistPrefs({
+      ...prefs,
+      ...DEFAULT_LEARNING_PROFILE,
+    });
   }
 
   function patchPrefs<K extends keyof ProfilePreferences>(
@@ -358,72 +363,108 @@ export default function ProfilePage() {
       )}
 
       {tab === "learning" && (
-        <section className="surface-card mt-5 p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="text-base font-medium text-ink">
-                How you explore
-              </h2>
-              <p className="mt-1 text-sm text-ink-muted">
-                Tell Curi how you think and it shapes every lesson around you.
-              </p>
-            </div>
-            {prefsSaved && (
-              <p className="shrink-0 text-xs text-ink-muted" aria-live="polite">
-                Saved
-              </p>
-            )}
-          </div>
-
-          <label className="mt-6 block space-y-2">
-            <span className="text-sm font-medium leading-none text-ink">
-              What are you working toward right now?
+        <div className="mt-5">
+          <p className="mb-8 flex gap-2 text-sm text-ink-muted">
+            <span className="font-display italic text-accent">×</span>
+            <span>
+              This applies to every course you&apos;re taking. What you&apos;re
+              working toward, and where you&apos;re starting, is asked separately
+              each time you add a course.
             </span>
-            <p className="text-xs leading-relaxed text-ink-muted">
-              Your current raise, role, or learning goal. Curi uses this to
-              surface what matters most to you.
-            </p>
-            <textarea
-              value={prefs.goal}
-              onChange={(e) => patchPrefs("goal", e.target.value)}
-              rows={3}
-              className="input-field min-h-[6rem] resize-y text-sm leading-relaxed"
-              placeholder="e.g. Preparing for my first seed round, or understanding liquidation preferences before I sign"
-            />
-          </label>
+          </p>
 
-          <div className="my-5 h-px bg-border" aria-hidden />
+          <div className="grid gap-10 lg:grid-cols-2 lg:gap-14 lg:items-start">
+            <section className="surface-card p-4 sm:p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="font-display text-xl font-medium tracking-tight text-ink">
+                    How you like things explained
+                  </h2>
+                  <p className="mt-2 text-sm text-ink-muted">
+                    Not what you&apos;re learning — how Curi should teach it. Set
+                    it once; the preview shows it on three unrelated subjects.
+                  </p>
+                </div>
+                {prefsSaved && (
+                  <p
+                    className="shrink-0 text-xs text-ink-muted"
+                    aria-live="polite"
+                  >
+                    Saved
+                  </p>
+                )}
+              </div>
 
-          <SettingChips
-            label="How do you come to this?"
-            hint="Shapes which examples and framings Curi reaches for."
-            value={prefs.curiosityContext}
-            onChange={(v) => patchPrefs("curiosityContext", v)}
-            options={[...CURIOSITY_OPTIONS]}
-          />
+              <div className="mt-8 space-y-8">
+                <SettingChips
+                  label="How should a new idea open?"
+                  hint="The first move Curi makes on any topic."
+                  value={prefs.seq}
+                  onChange={(v) =>
+                    patchPrefs("seq", v as ProfilePreferences["seq"])
+                  }
+                  options={[...SEQ_OPTIONS]}
+                />
 
-          <div className="my-5 h-px bg-border" aria-hidden />
+                <SettingChips
+                  label="What should Curi reach for to explain things?"
+                  hint="The kind of illustration your lessons lean on."
+                  value={prefs.anchor}
+                  onChange={(v) =>
+                    patchPrefs("anchor", v as ProfilePreferences["anchor"])
+                  }
+                  options={[...ANCHOR_OPTIONS]}
+                />
 
-          <SettingChips
-            label="How long should each lesson run?"
-            hint="Sets how much ground each daily lesson covers. Medium is the default."
-            value={prefs.lessonDepth}
-            onChange={(v) =>
-              patchPrefs("lessonDepth", v as ProfilePreferences["lessonDepth"])
-            }
-            options={[...DEPTH_OPTIONS]}
-          />
+                <SettingChips
+                  label="How long should each lesson run?"
+                  hint="Sets how much ground a single day covers. Medium is the default."
+                  value={prefs.length}
+                  onChange={(v) =>
+                    patchPrefs("length", v as ProfilePreferences["length"])
+                  }
+                  options={[...LENGTH_OPTIONS]}
+                />
 
-          <div className="my-5 h-px bg-border" aria-hidden />
+                <SettingChips
+                  label="How much should Curi challenge you?"
+                  hint="Whether lessons stay tidy or push on the messy parts."
+                  value={prefs.rigor}
+                  onChange={(v) =>
+                    patchPrefs("rigor", v as ProfilePreferences["rigor"])
+                  }
+                  options={[...RIGOR_OPTIONS]}
+                />
 
-          <SettingChips
-            label="How do ideas click for you?"
-            hint="How Curi sequences and introduces new concepts."
-            value={prefs.learningStyle}
-            onChange={(v) => patchPrefs("learningStyle", v)}
-            options={[...STYLE_OPTIONS]}
-          />
-        </section>
+                <SettingChips
+                  label="How should new terms be handled?"
+                  hint="What happens when a lesson needs a word you might not know."
+                  value={prefs.jargon}
+                  onChange={(v) =>
+                    patchPrefs("jargon", v as ProfilePreferences["jargon"])
+                  }
+                  options={[...JARGON_OPTIONS]}
+                />
+              </div>
+
+              <div className="mt-8 flex flex-wrap items-baseline justify-between gap-4 border-t border-border pt-5">
+                <p className="max-w-sm text-sm text-ink-muted">
+                  Applies the moment you save it, to every course, current and
+                  future.
+                </p>
+                <button
+                  type="button"
+                  onClick={resetLearningDefaults}
+                  className="border-b border-border-strong pb-0.5 font-meta text-[11px] uppercase tracking-wider text-ink hover:border-ink"
+                >
+                  Reset to defaults
+                </button>
+              </div>
+            </section>
+
+            <LearningProfilePreview profile={prefs} />
+          </div>
+        </div>
       )}
 
       {tab === "email" && (

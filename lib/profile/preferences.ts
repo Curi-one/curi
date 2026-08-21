@@ -1,34 +1,34 @@
-export type LessonLength = "Short" | "Medium" | "Long";
+import {
+  DEFAULT_USER_PREFERENCES,
+  type UserPreferences,
+} from "@/lib/profile/db-preferences";
+import { normalizeLearningProfile } from "@/lib/profile/learning-profile";
 
-export type LearningPreferences = {
-  goal: string;
-  curiosityContext: string;
-  lessonDepth: LessonLength;
-  learningStyle: string;
-};
+export type {
+  AnchorStyle,
+  JargonHandling,
+  LearningProfile,
+  LessonLength,
+  Rigor,
+  SeqOpen,
+} from "@/lib/profile/learning-profile";
+export {
+  DEFAULT_LEARNING_PROFILE,
+  learningProfilePromptLines,
+  learningProfileStance,
+  normalizeLearningProfile,
+} from "@/lib/profile/learning-profile";
 
-export type EmailPreferences = {
-  emailEnabled: boolean;
-  emailTime: string;
-  emailFormat: string;
-  emailWeekends: boolean;
-  emailWeeklyDigest: boolean;
-};
+export type {
+  EmailPreferences,
+  UserPreferences,
+} from "@/lib/profile/db-preferences";
+export { DEFAULT_EMAIL_PREFERENCES } from "@/lib/profile/db-preferences";
 
-export type ProfilePreferences = LearningPreferences & EmailPreferences;
+/** Profile preferences = learning profile + email schedule. */
+export type ProfilePreferences = UserPreferences;
 
-/** Opt-in email defaults; learning chips match prototype sensible starters. */
-export const DEFAULT_PREFERENCES: ProfilePreferences = {
-  goal: "",
-  curiosityContext: "For work or a project",
-  lessonDepth: "Medium",
-  learningStyle: "With real examples",
-  emailEnabled: false,
-  emailTime: "morning",
-  emailFormat: "Full",
-  emailWeekends: false,
-  emailWeeklyDigest: false,
-};
+export const DEFAULT_PREFERENCES: ProfilePreferences = DEFAULT_USER_PREFERENCES;
 
 function storageKey(userKey: string): string {
   return `curi-prefs:${userKey}`;
@@ -38,80 +38,52 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-const LESSON_LENGTH_VALUES: LessonLength[] = ["Short", "Medium", "Long"];
+function mergeWithDefaults(raw: unknown): UserPreferences {
+  if (!isPlainObject(raw)) return { ...DEFAULT_USER_PREFERENCES };
 
-/** Legacy Quick/Standard/Deep labels migrate to Short/Medium/Long. */
-const LEGACY_LESSON_DEPTH_MIGRATIONS: Record<string, LessonLength> = {
-  Quick: "Short",
-  Standard: "Medium",
-  Deep: "Long",
-};
-
-function normalizeLessonDepth(value: unknown): LessonLength {
-  if (typeof value !== "string") {
-    return DEFAULT_PREFERENCES.lessonDepth;
-  }
-  const migrated = LEGACY_LESSON_DEPTH_MIGRATIONS[value];
-  if (migrated) return migrated;
-  if (LESSON_LENGTH_VALUES.includes(value as LessonLength)) {
-    return value as LessonLength;
-  }
-  return DEFAULT_PREFERENCES.lessonDepth;
-}
-
-function mergeWithDefaults(raw: unknown): ProfilePreferences {
-  if (!isPlainObject(raw)) return { ...DEFAULT_PREFERENCES };
-
+  const learning = normalizeLearningProfile(raw);
   return {
-    goal: typeof raw.goal === "string" ? raw.goal : DEFAULT_PREFERENCES.goal,
-    curiosityContext:
-      typeof raw.curiosityContext === "string"
-        ? raw.curiosityContext
-        : DEFAULT_PREFERENCES.curiosityContext,
-    lessonDepth: normalizeLessonDepth(raw.lessonDepth),
-    learningStyle:
-      typeof raw.learningStyle === "string"
-        ? raw.learningStyle
-        : DEFAULT_PREFERENCES.learningStyle,
+    ...learning,
     emailEnabled:
       typeof raw.emailEnabled === "boolean"
         ? raw.emailEnabled
-        : DEFAULT_PREFERENCES.emailEnabled,
+        : DEFAULT_USER_PREFERENCES.emailEnabled,
     emailTime:
       typeof raw.emailTime === "string"
         ? raw.emailTime
-        : DEFAULT_PREFERENCES.emailTime,
+        : DEFAULT_USER_PREFERENCES.emailTime,
     emailFormat:
       typeof raw.emailFormat === "string"
         ? raw.emailFormat
-        : DEFAULT_PREFERENCES.emailFormat,
+        : DEFAULT_USER_PREFERENCES.emailFormat,
     emailWeekends:
       typeof raw.emailWeekends === "boolean"
         ? raw.emailWeekends
-        : DEFAULT_PREFERENCES.emailWeekends,
+        : DEFAULT_USER_PREFERENCES.emailWeekends,
     emailWeeklyDigest:
       typeof raw.emailWeeklyDigest === "boolean"
         ? raw.emailWeeklyDigest
-        : DEFAULT_PREFERENCES.emailWeeklyDigest,
+        : DEFAULT_USER_PREFERENCES.emailWeeklyDigest,
   };
 }
 
-export function loadPreferences(userKey: string): ProfilePreferences {
+/** Local fallback — prefer GET/PATCH /api/me/preferences for members. */
+export function loadPreferences(userKey: string): UserPreferences {
   if (typeof localStorage === "undefined") {
-    return { ...DEFAULT_PREFERENCES };
+    return { ...DEFAULT_USER_PREFERENCES };
   }
   try {
     const raw = localStorage.getItem(storageKey(userKey));
-    if (!raw) return { ...DEFAULT_PREFERENCES };
+    if (!raw) return { ...DEFAULT_USER_PREFERENCES };
     return mergeWithDefaults(JSON.parse(raw) as unknown);
   } catch {
-    return { ...DEFAULT_PREFERENCES };
+    return { ...DEFAULT_USER_PREFERENCES };
   }
 }
 
 export function savePreferences(
   userKey: string,
-  prefs: ProfilePreferences,
+  prefs: UserPreferences,
 ): void {
   if (typeof localStorage === "undefined") return;
   localStorage.setItem(storageKey(userKey), JSON.stringify(prefs));

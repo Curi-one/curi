@@ -6,6 +6,7 @@ import {
   modifierFromFeel,
   type GetLessonBodyDeps,
 } from "@/lib/lessons/body";
+import { DEFAULT_LEARNING_PROFILE } from "@/lib/profile/learning-profile";
 
 vi.mock("@/lib/ai/perplexity", () => ({
   lessonBodyModel: () => "sonar-pro",
@@ -25,6 +26,13 @@ const LESSONS = [
 function fingerprintFor(
   lessonIndex: number,
   difficultyModifier: string,
+  learningProfile?: {
+    seq: string;
+    anchor: string;
+    length: string;
+    rigor: string;
+    jargon: string;
+  },
 ): string {
   return buildFingerprint({
     topicNormalized: normalizeTopic(TOPIC),
@@ -33,6 +41,7 @@ function fingerprintFor(
     cacheType: "lesson_body",
     lessonIndex,
     difficultyModifier,
+    learningProfile,
   });
 }
 
@@ -48,6 +57,7 @@ describe("too_hard on L1 → L2 uses easier fingerprint", () => {
   const store = vi.fn();
   const loadCourse = vi.fn();
   const loadPriorFeel = vi.fn();
+  const loadLearningProfile = vi.fn();
   const upsertLessonContent = vi.fn();
 
   const baseDeps: GetLessonBodyDeps = {
@@ -55,6 +65,7 @@ describe("too_hard on L1 → L2 uses easier fingerprint", () => {
     store,
     loadCourse,
     loadPriorFeel,
+    loadLearningProfile,
     upsertLessonContent,
     complete: chatCompletion,
   };
@@ -65,6 +76,7 @@ describe("too_hard on L1 → L2 uses easier fingerprint", () => {
     store.mockReset().mockResolvedValue(undefined);
     loadCourse.mockReset();
     loadPriorFeel.mockReset().mockResolvedValue(null);
+    loadLearningProfile.mockReset().mockResolvedValue(DEFAULT_LEARNING_PROFILE);
     upsertLessonContent.mockReset().mockResolvedValue(undefined);
   });
 
@@ -88,7 +100,15 @@ describe("too_hard on L1 → L2 uses easier fingerprint", () => {
       baseDeps,
     );
 
-    expect(lookup).toHaveBeenCalledWith(fingerprintFor(1, "easier"));
+    expect(lookup).toHaveBeenCalledWith(
+      fingerprintFor(1, "easier", {
+        seq: DEFAULT_LEARNING_PROFILE.seq,
+        anchor: DEFAULT_LEARNING_PROFILE.anchor,
+        length: DEFAULT_LEARNING_PROFILE.length,
+        rigor: DEFAULT_LEARNING_PROFILE.rigor,
+        jargon: DEFAULT_LEARNING_PROFILE.jargon,
+      }),
+    );
   });
 
   it("guest: lesson_feels too_hard on L1 → L2 lookup uses easier", async () => {
