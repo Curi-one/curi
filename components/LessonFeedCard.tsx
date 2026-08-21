@@ -50,9 +50,10 @@ export function LessonFeedCard({
           <TopicThumbnail topic={item.topic} />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-ui-sm font-semibold leading-snug tracking-tight text-ink/50 sm:text-ui-md">
+          <h3 className="font-display text-ui-xl font-light leading-tight tracking-tight text-ink/50 sm:text-display-2xs">
             {item.title}
           </h3>
+          <p className="mt-1 font-meta text-ink-muted/60">{item.topic}</p>
           <p className="mt-1.5 line-clamp-2 text-ui-2xs leading-relaxed text-ink-muted/70 sm:text-ui-xs">
             {blurb}
           </p>

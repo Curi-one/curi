@@ -46,10 +46,14 @@ describe("LessonFeedCard", () => {
     expect(screen.getByText(/missed yesterday/i)).toBeInTheDocument();
   });
 
-  it("renders a locked lesson with a lock icon and no link", () => {
+  it("renders a locked lesson with display title type matching other days", () => {
     render(<LessonFeedCard item={item({ status: "locked" })} />);
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
     expect(screen.getByText("Unlocks tomorrow")).toBeInTheDocument();
+    const title = screen.getByText("The dichotomy of control");
+    expect(title.tagName).toBe("H3");
+    expect(title.className).toContain("font-display");
+    expect(title.className).not.toContain("font-semibold");
   });
 
   it("uses custom locked copy when provided", () => {
