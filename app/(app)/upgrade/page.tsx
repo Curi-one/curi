@@ -26,6 +26,9 @@ const FEATURES = [
   },
 ] as const;
 
+const NOT_CONFIGURED =
+  "Billing is not configured on this environment yet.";
+
 export default function UpgradePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -33,12 +36,20 @@ export default function UpgradePage() {
 
   async function checkout() {
     setLoading(true);
+    setMessage(null);
     try {
       const res = await postCheckout();
-      setMessage(res.message ?? null);
-      if (res.url) router.push(res.url);
+      if (res.url) {
+        router.push(res.url);
+        return;
+      }
+      if (res.code === "not_configured") {
+        setMessage(NOT_CONFIGURED);
+      } else {
+        setMessage(res.message ?? "Checkout could not be started.");
+      }
     } catch {
-      setMessage("Checkout unavailable until Stripe is wired.");
+      setMessage(NOT_CONFIGURED);
     } finally {
       setLoading(false);
     }

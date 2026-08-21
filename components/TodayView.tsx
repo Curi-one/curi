@@ -6,6 +6,8 @@ import { LessonFeedCard } from "@/components/LessonFeedCard";
 type Props = FeedResponse & {
   streak?: number;
   streakAtRisk?: boolean;
+  /** Shown after Stripe Checkout success (`/today?upgraded=1`). */
+  upgradeConfirmed?: boolean;
 };
 
 export function TodayView({
@@ -14,6 +16,7 @@ export function TodayView({
   groups = [],
   streak = 0,
   streakAtRisk,
+  upgradeConfirmed = false,
 }: Props) {
   const total = due.length + done.length;
   const empty = total === 0;
@@ -26,9 +29,19 @@ export function TodayView({
       .map((i) => i.courseId),
   );
 
+  const upgradeBanner = upgradeConfirmed ? (
+    <p
+      className="mb-6 border-b border-border pb-4 text-sm leading-relaxed text-ink-muted"
+      role="status"
+    >
+      Academy is active — unlimited paths are unlocked.
+    </p>
+  ) : null;
+
   if (empty) {
     return (
       <div className="mx-auto w-full max-w-[580px] pb-4 pt-2">
+        {upgradeBanner}
         <div className="mb-10 border-b border-border pb-10">
           <h1 className="type-display-xl text-ink">
             Your daily founder fluency
@@ -92,6 +105,7 @@ export function TodayView({
 
   return (
     <div className="pb-4">
+      {upgradeBanner}
       <header className="mb-10">
         <div className="flex items-start justify-between gap-3">
           <div>

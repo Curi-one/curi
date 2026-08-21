@@ -217,4 +217,20 @@ describe("TodayView", () => {
     ).toHaveAttribute("href", "/new");
     expect(screen.queryByText("Nothing due today")).not.toBeInTheDocument();
   });
+
+  it("shows Academy upgrade confirmation when upgradeConfirmed", () => {
+    render(
+      <TodayView
+        due={due}
+        done={[]}
+        groups={[]}
+        streak={1}
+        streakAtRisk={false}
+        upgradeConfirmed
+      />,
+    );
+
+    expect(screen.getByText(/Academy is active/i)).toBeInTheDocument();
+    expect(screen.getByText(/unlimited paths/i)).toBeInTheDocument();
+  });
 });

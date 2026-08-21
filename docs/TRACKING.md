@@ -19,7 +19,7 @@ Delivery tracking lives in Linear — not in ad-hoc GitHub issues.
 | Slice 3 — Quiz, feel, auth | Slice 3 | Done (API); UI polish backlog |
 | Slice 4 — Today, library, explore | Slice 4 | Backlog |
 | Slice 5 — Progress & profile | Slice 5 | Backlog |
-| Slice 6 — Stripe | Slice 6 | Backlog |
+| Slice 6 — Stripe | Slice 6 | In progress — code done (checkout/portal/webhooks/UI); ops/env (Dashboard + Vercel keys) remaining — [`docs/STRIPE.md`](./STRIPE.md) |
 | Slice 7 — Ops & launch | Slice 7 | Backlog |
 
 ## API vs UI issues

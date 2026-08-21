@@ -1,19 +1,33 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { LoadingState } from "@/components/LoadingState";
 import { TodayView } from "@/components/TodayView";
-import { getFeed, getMe, getProgress } from "@/lib/api/client";
+import {
+  getFeed,
+  getMe,
+  getProgress,
+  invalidateClientCache,
+} from "@/lib/api/client";
 import { memberSignInPath } from "@/lib/auth/member-gate";
 import type { FeedResponse } from "@/lib/api/schemas";
 
 export default function TodayPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [feed, setFeed] = useState<FeedResponse | null>(null);
   const [streak, setStreak] = useState(0);
   const [ready, setReady] = useState(false);
+  const [upgradeConfirmed, setUpgradeConfirmed] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("upgraded") !== "1") return;
+    setUpgradeConfirmed(true);
+    invalidateClientCache(["/api/me"]);
+    router.replace("/today", { scroll: false });
+  }, [searchParams, router]);
 
   useEffect(() => {
     let cancelled = false;
@@ -59,6 +73,7 @@ export default function TodayPage() {
           {...feed}
           streak={streak}
           streakAtRisk={streak > 0 && feed.due.length > 0}
+          upgradeConfirmed={upgradeConfirmed}
         />
       )}
     </PageShell>

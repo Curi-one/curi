@@ -17,7 +17,7 @@ Three environments with **identical architecture** and **isolated data and secre
 | **Vercel project** | — | `curi-one/curi` (Preview / branch alias) | same project (Production target) |
 | **Database** | Supabase local or shared dev project | Dedicated Supabase (TBD) | Dedicated Supabase (TBD) |
 | **API mode** | `USE_MOCK_API=true` until Slice 2+ | Mock until backends land | Real |
-| **Stripe** | — | Test mode | Live mode |
+| **Stripe** | Test keys in `.env.local` (optional) | **Test mode** on Preview; `USE_MOCK_API=false` for real Checkout | **Live mode** |
 | **Perplexity** | `.env.local`; `sonar` only | Preview env; `sonar` only (no `sonar-pro`) | Production env at launch; lesson body `sonar-pro` |
 | **Auth email** | Console / Inbucket | Real delivery; **staging OTP `118833`** when mail is rate-limited; configure custom SMTP for heavy testing | Real users |
 | **Data** | Disposable | Seeded, resettable | Protected |
@@ -75,8 +75,9 @@ No production hot-fix without the same change on staging first.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client | All (when wired) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only | All (when wired) |
 | `PERPLEXITY_API_KEY` | Server only | Local + Preview (set); Production at launch |
-| `STRIPE_SECRET_KEY` | Server only | Staging (test), Prod (live) |
-| `STRIPE_WEBHOOK_SECRET` | Server only | Staging, Prod |
+| `STRIPE_SECRET_KEY` | Server only | Staging **test** keys; Prod **live** keys — see [`docs/STRIPE.md`](./STRIPE.md) |
+| `STRIPE_WEBHOOK_SECRET` | Server only | Staging, Prod (per webhook endpoint) |
+| `STRIPE_PRICE_ID` | Server only | Academy $10/mo Price id (test vs live) |
 | `SENTRY_DSN` | Server | Staging, Prod |
 | `CRON_SECRET` | Server | Staging, Prod (when cron ships) |
 

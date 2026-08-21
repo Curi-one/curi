@@ -163,9 +163,9 @@ Path map nodes: **read** · **today** (current) · **locked**.
 
 Triggered by 3rd active path (free) or Profile → Plan.
 
-Academy · $10/month → Stripe Checkout when billing ships → Today.
+Academy · $10/month → Stripe Checkout → success lands on **Today** (`/today?upgraded=1`) with a calm confirmation that Academy is active (unlimited paths). Webhooks set `users.plan = academy`. Profile Billing opens Customer Portal; cancel / unpaid → webhook sets `free` again.
 
-Until Stripe: enforce limit in API; plan toggle via seed/admin on staging only.
+Ops: [`docs/STRIPE.md`](./STRIPE.md) (staging test mode + production live mode).
 
 ---
 
