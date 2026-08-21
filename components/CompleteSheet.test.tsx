@@ -1,7 +1,6 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { CompleteSheet } from "@/components/CompleteSheet";
-import { linkedinShareUrl } from "@/lib/share/lesson-share";
 
 describe("CompleteSheet", () => {
   it("shows path mastered CTAs when pathMastered", () => {
@@ -15,6 +14,24 @@ describe("CompleteSheet", () => {
     expect(
       screen.getByRole("link", { name: "Back to Today" }),
     ).toBeInTheDocument();
+  });
+
+  it("does not show next-lesson preview when path is mastered", () => {
+    render(
+      <CompleteSheet
+        open
+        allPathsDoneToday
+        pathMastered
+        onClose={vi.fn()}
+        nextLessonTitle="Should not appear"
+        courseTopic="Fundraising"
+        lessonNumber={10}
+        totalLessons={10}
+      />,
+    );
+    expect(screen.queryByText(/Up next/)).not.toBeInTheDocument();
+    expect(screen.queryByText("Should not appear")).not.toBeInTheDocument();
+    expect(screen.queryByText(/unlocks tomorrow/)).not.toBeInTheDocument();
   });
 
   it("shows back to Today when more paths remain", () => {
@@ -34,7 +51,7 @@ describe("CompleteSheet", () => {
     );
   });
 
-  it("renders lesson meta, streak, and tomorrow teaser when provided", () => {
+  it("renders lesson meta, streak, and next-lesson preview as primary content", () => {
     render(
       <CompleteSheet
         open
@@ -52,8 +69,43 @@ describe("CompleteSheet", () => {
     expect(screen.getByText(/Lesson 2 of 10/)).toBeInTheDocument();
     expect(screen.getByText("What is a valuation?")).toBeInTheDocument();
     expect(screen.getByText("4-day streak")).toBeInTheDocument();
-    expect(screen.getByText("Dilution basics")).toBeInTheDocument();
     expect(screen.getByText(/Up next · Tomorrow/)).toBeInTheDocument();
+    expect(screen.getByText("Dilution basics")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Lesson 3 of 10 · unlocks tomorrow/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Today's insight")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Share on X" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Share on LinkedIn" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Copy text")).not.toBeInTheDocument();
+  });
+
+  it("shows topic cover art in the next-lesson preview when courseTopic is set", () => {
+    const { container } = render(
+      <CompleteSheet
+        open
+        allPathsDoneToday={false}
+        onClose={vi.fn()}
+        courseTopic="Fundraising"
+        lessonNumber={1}
+        totalLessons={8}
+        nextLessonTitle="Cap tables"
+      />,
+    );
+    expect(screen.getByText("Cap tables")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Lesson 2 of 8 · unlocks tomorrow/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/A short look ahead so you know what tomorrow holds/),
+    ).toBeInTheDocument();
+    // TopicThumbnail is aria-hidden; assert the cover field is present via glyph art container
+    const thumb = container.querySelector('[aria-hidden="true"]');
+    expect(thumb).toBeTruthy();
   });
 
   it("uses lesson-number title framing when provided and paths remain", () => {
@@ -68,76 +120,42 @@ describe("CompleteSheet", () => {
     expect(screen.getByText("Lesson 1 complete.")).toBeInTheDocument();
   });
 
-  it("hides the insight section entirely when no shareable fact is provided", () => {
+  it("shows next-lesson preview as hero when all caught up with a next title", () => {
+    render(
+      <CompleteSheet
+        open
+        allPathsDoneToday
+        onClose={vi.fn()}
+        lessonNumber={3}
+        totalLessons={12}
+        nextLessonTitle="Term sheets"
+        courseTopic="Fundraising"
+      />,
+    );
+    expect(screen.getByText("All caught up")).toBeInTheDocument();
+    expect(screen.getByText(/Up next · Tomorrow/)).toBeInTheDocument();
+    expect(screen.getByText("Term sheets")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Lesson 4 of 12 · unlocks tomorrow/),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a calm placeholder preview when there is no nextLessonTitle", () => {
     render(
       <CompleteSheet
         open
         allPathsDoneToday={false}
         onClose={vi.fn()}
-        courseTopic="Venture Capital"
+        lessonNumber={2}
+        totalLessons={10}
       />,
     );
+    expect(screen.getByText(/Up next · Tomorrow/)).toBeInTheDocument();
+    expect(screen.getByText(/Your next lesson/)).toBeInTheDocument();
+    expect(screen.getByText(/unlocks tomorrow/)).toBeInTheDocument();
     expect(screen.queryByText("Today's insight")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Share on X" }),
     ).not.toBeInTheDocument();
-  });
-
-  it("shows the insight section only when the lesson API shareable fact is provided", () => {
-    render(
-      <CompleteSheet
-        open
-        allPathsDoneToday={false}
-        onClose={vi.fn()}
-        courseTopic="Venture Capital"
-        shareableFact={{
-          fact: "Generated fact from this lesson",
-          reflection: "Generated reflection",
-        }}
-      />,
-    );
-    expect(screen.getByText("Today's insight")).toBeInTheDocument();
-    expect(
-      screen.getByText(/Generated fact from this lesson/),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Generated reflection")).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: "Share on X" }),
-    ).toBeInTheDocument();
-  });
-
-  describe("Share on LinkedIn", () => {
-    afterEach(() => {
-      vi.restoreAllMocks();
-    });
-
-    it("copies the share text and opens LinkedIn", async () => {
-      const writeText = vi.fn().mockResolvedValue(undefined);
-      Object.assign(navigator, { clipboard: { writeText } });
-      const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
-
-      render(
-        <CompleteSheet
-          open
-          allPathsDoneToday={false}
-          onClose={vi.fn()}
-          courseTopic="Venture Capital"
-          shareableFact={{
-            fact: "Generated fact from this lesson",
-            reflection: "Generated reflection",
-          }}
-        />,
-      );
-      fireEvent.click(screen.getByRole("link", { name: /share on linkedin/i }));
-
-      expect(writeText).toHaveBeenCalled();
-      await waitFor(() =>
-        expect(openSpy).toHaveBeenCalledWith(
-          linkedinShareUrl(),
-          "_blank",
-          "noopener,noreferrer",
-        ),
-      );
-    });
   });
 });
