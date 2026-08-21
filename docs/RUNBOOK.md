@@ -33,7 +33,9 @@ git push origin staging
 | `STRIPE_PRICE_ID` | Vercel | Academy $10/mo price |
 | `SENTRY_DSN` | Vercel | Optional until Slice 7 exit |
 | `NEXT_PUBLIC_POSTHOG_KEY` | Vercel | Optional until Slice 7 exit |
-| `CRON_SECRET` | Vercel | Required for `/api/dev/seed` outside local |
+| `CRON_SECRET` | Vercel | Required for `/api/dev/seed` and `/api/cron/daily-email` |
+| `RESEND_API_KEY` | Vercel Preview + Prod | Resend dashboard → API Keys |
+| `EMAIL_FROM` | Vercel Preview + Prod | e.g. `Curi <lessons@curi.one>` — domain must be verified in Resend |
 
 After rotating: Redeploy the affected environment.
 
@@ -53,6 +55,25 @@ curl -X POST https://stage.curi.one/api/dev/seed \
 ```
 
 Demo user: `demo@curi.one` (staging OTP bypass `118833` when `APP_ENV=staging`).
+
+## Daily lesson email (staging)
+
+Requires [PR #20](https://github.com/Curi-one/curi/pull/20) merged and Vercel env:
+
+- `RESEND_API_KEY` — Resend API key (server only)
+- `EMAIL_FROM` — `Curi <lessons@curi.one>` (domain verified in Resend)
+- `CRON_SECRET` — already used for seed; same secret authorizes the cron route
+
+Vercel runs `/api/cron/daily-email` hourly (`vercel.json`). Manual test:
+
+```bash
+curl -s https://stage.curi.one/api/cron/daily-email \
+  -H "Authorization: Bearer $CRON_SECRET"
+```
+
+User must have **Email → Send daily email** on, a due lesson today, and the current hour must match their delivery time (user timezone).
+
+Preview (no send): Profile → Email → **Preview today's email**, or `GET /api/me/email-preview` when signed in.
 
 ## Production checklist (launch)
 
