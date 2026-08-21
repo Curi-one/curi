@@ -82,6 +82,7 @@ export function AppSidebar() {
   const [streak, setStreak] = useState(0);
   const [dueCount, setDueCount] = useState(0);
 
+  // Load once — api client caches GETs; refetching on every nav was the main lag.
   useEffect(() => {
     Promise.all([getMe(), getProgress(), getFeed()])
       .then(([me, progress, feed]) => {
@@ -92,7 +93,7 @@ export function AppSidebar() {
       .catch(() => {
         setSession(null);
       });
-  }, [pathname]);
+  }, []);
 
   const streakAtRisk = streak > 0 && dueCount > 0;
   const isAcademy = session?.plan === "academy";
