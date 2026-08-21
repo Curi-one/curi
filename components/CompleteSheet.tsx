@@ -1,15 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Flame, Lock } from "lucide-react";
-import type { ShareableFactPayload } from "@/lib/api/schemas";
 import { Button } from "@/components/Button";
-import {
-  buildShareText,
-  copyAndOpenLinkedIn,
-  linkedinShareUrl,
-  twitterIntentUrl,
-} from "@/lib/share/lesson-share";
+import { TopicThumbnail } from "@/components/TopicThumbnail";
 
 export type CompleteSheetProps = {
   open: boolean;
@@ -22,8 +15,6 @@ export type CompleteSheetProps = {
   lessonNumber?: number;
   totalLessons?: number;
   nextLessonTitle?: string;
-  /** Prefer lesson API / Perplexity shareable fact when present. */
-  shareableFact?: ShareableFactPayload;
 };
 
 export function CompleteSheet({
@@ -37,11 +28,7 @@ export function CompleteSheet({
   lessonNumber,
   totalLessons,
   nextLessonTitle,
-  shareableFact,
 }: CompleteSheetProps) {
-  const [copied, setCopied] = useState(false);
-  const insight = shareableFact ?? null;
-
   if (!open) return null;
 
   const title = pathMastered
@@ -53,33 +40,17 @@ export function CompleteSheet({
         : "Lesson complete.";
 
   const body = pathMastered
-    ? "This path is complete. It lives in Library → Mastered. No certificate — just the work done."
+    ? "This path is complete. It lives in Library → Mastered. No certificate, just the work done."
     : allPathsDoneToday
       ? "Next lessons unlock tomorrow."
       : "You still have paths to read today.";
 
-  const shareText = insight
-    ? buildShareText({ fact: insight.fact, topic: courseTopic ?? "founder" })
-    : null;
-  const tweetUrl = shareText ? twitterIntentUrl(shareText) : null;
-  const liUrl = linkedinShareUrl();
+  const showNextPreview = !pathMastered;
 
-  const showTomorrow =
-    Boolean(nextLessonTitle) || (allPathsDoneToday && !pathMastered);
-
-  function copyText() {
-    if (!shareText) return;
-    void navigator.clipboard?.writeText(shareText);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
-  }
-
-  function shareToLinkedIn() {
-    if (!shareText) return;
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
-    void copyAndOpenLinkedIn(shareText);
-  }
+  const nextMeta =
+    lessonNumber != null && totalLessons != null
+      ? `Lesson ${lessonNumber + 1} of ${totalLessons} · unlocks tomorrow`
+      : "Unlocks tomorrow";
 
   return (
     <div
@@ -140,74 +111,29 @@ export function CompleteSheet({
         <div className="mx-7 h-px shrink-0 bg-border" />
 
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {insight && (
+          {showNextPreview && (
             <div className="px-7 py-5">
               <div className="mb-4 font-meta text-ink-muted">
-                Today&apos;s insight
+                Up next · Tomorrow
               </div>
-              <blockquote className="font-display text-xl font-light leading-snug tracking-tight text-ink">
-                &ldquo;{insight.fact}&rdquo;
-              </blockquote>
-              <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-                {insight.reflection}
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                <a
-                  href={tweetUrl ?? undefined}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-11 items-center rounded-none border border-border bg-ink px-4 py-2.5 text-xs font-medium text-paper transition hover:opacity-90"
-                >
-                  Share on X
-                </a>
-                <a
-                  href={liUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-11 items-center rounded-none border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    shareToLinkedIn();
-                  }}
-                >
-                  Share on LinkedIn
-                </a>
-                <button
-                  type="button"
-                  onClick={copyText}
-                  className="inline-flex min-h-11 items-center rounded-none border border-border px-4 py-2.5 text-xs font-medium text-ink-muted transition hover:border-ink/30 hover:text-ink"
-                >
-                  {copied ? "Copied" : "Copy text"}
-                </button>
+              <div className="flex items-start gap-4">
+                {courseTopic ? (
+                  <TopicThumbnail topic={courseTopic} size={72} />
+                ) : null}
+                <div className="min-w-0 flex-1">
+                  <div className="font-display text-xl font-light leading-snug tracking-tight text-ink">
+                    {nextLessonTitle ?? "Your next lesson"}
+                  </div>
+                  <p className="mt-2 text-ui-3xs text-ink-muted">
+                    {nextMeta}
+                  </p>
+                </div>
+                <Lock
+                  className="mt-1 h-3.5 w-3.5 shrink-0 text-ink-muted/40"
+                  aria-hidden
+                />
               </div>
             </div>
-          )}
-
-          {showTomorrow && (
-            <>
-              <div className="mx-7 h-px bg-border" />
-              <div className="px-7 py-5">
-                <div className="mb-3 font-meta text-ink-muted">
-                  Up next · Tomorrow
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="flex-1">
-                    <div className="font-ui text-base font-light leading-snug text-ink-faint">
-                      {nextLessonTitle ?? "Your next lesson"}
-                    </div>
-                    <p className="mt-1.5 text-ui-3xs text-ink-muted/70">
-                      {lessonNumber != null && totalLessons != null
-                        ? `Lesson ${lessonNumber + 1} of ${totalLessons} · ~5 min · unlocks tomorrow`
-                        : "~5 min · unlocks tomorrow"}
-                    </p>
-                  </div>
-                  <Lock
-                    className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-muted/40"
-                    aria-hidden
-                  />
-                </div>
-              </div>
-            </>
           )}
         </div>
 

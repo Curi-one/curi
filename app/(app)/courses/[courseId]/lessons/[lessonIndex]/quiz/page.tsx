@@ -17,10 +17,7 @@ import {
   getQuiz,
   postQuiz,
 } from "@/lib/api/client";
-import type {
-  LessonFeel as LessonFeelType,
-  ShareableFactPayload,
-} from "@/lib/api/schemas";
+import type { LessonFeel as LessonFeelType } from "@/lib/api/schemas";
 
 type Phase = "quiz" | "feel" | "done";
 
@@ -34,7 +31,6 @@ type SheetState = {
   lessonNumber?: number;
   totalLessons?: number;
   nextLessonTitle?: string;
-  shareableFact?: ShareableFactPayload;
 };
 
 export default function QuizPage() {
@@ -59,7 +55,6 @@ export default function QuizPage() {
     lessonTitle?: string;
     totalLessons?: number;
     nextLessonTitle?: string;
-    shareableFact?: ShareableFactPayload;
   }>({});
   const [toastStreak, setToastStreak] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -84,7 +79,6 @@ export default function QuizPage() {
           lessonTitle: node?.title ?? lesson?.title,
           totalLessons: map.nodes.length,
           nextLessonTitle: next?.title,
-          shareableFact: lesson?.shareableFact,
         });
       })
       .catch(() => {
@@ -133,7 +127,6 @@ export default function QuizPage() {
         totalLessons: courseMeta.totalLessons,
         nextLessonTitle:
           result.pathMastered === true ? undefined : courseMeta.nextLessonTitle,
-        shareableFact: courseMeta.shareableFact,
       });
       setPhase("done");
     } catch {
@@ -217,7 +210,6 @@ export default function QuizPage() {
         lessonNumber={sheet.lessonNumber}
         totalLessons={sheet.totalLessons}
         nextLessonTitle={sheet.nextLessonTitle}
-        shareableFact={sheet.shareableFact}
         onClose={() =>
           setSheet({ open: false, allDone: false, pathMastered: false })
         }
