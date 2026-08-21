@@ -14,13 +14,18 @@ describe("LessonImage", () => {
     expect(screen.getByText("API visual caption")).toBeInTheDocument();
   });
 
-  it("renders decorative geometry chrome when the API visual has no imageUrl", () => {
+  it("renders greyscale topic art fallback when the API visual has no imageUrl", () => {
     const { container } = render(
       <LessonImage
-        visual={{ title: "API visual title", caption: "API visual caption" }}
+        visual={{ title: "Constitutional Law", caption: "API visual caption" }}
       />,
     );
     expect(container.querySelector("img")).not.toBeInTheDocument();
+    const fallback = screen.getByTestId("lesson-image-fallback");
+    expect(fallback).toBeInTheDocument();
+    // No vermilion radial fills in geometric imagery (BRAND §6.3)
+    expect(fallback.innerHTML).not.toMatch(/193,\s*18,\s*31|#C1121F/i);
+    expect(fallback.textContent).toContain("§");
   });
 
   it("renders the real image when the API visual provides an imageUrl", () => {
