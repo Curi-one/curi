@@ -8,9 +8,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@/components/design-system/DesignSystemShowcase", () => ({
-  DesignSystemShowcase: ({ env }: { env: string }) => (
-    <div>Design system · {env}</div>
-  ),
+  DesignSystemShowcase: () => <div>Design system · staging</div>,
 }));
 
 vi.mock("@/lib/env", () => ({
