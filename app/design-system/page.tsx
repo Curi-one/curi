@@ -8,5 +8,5 @@ export default function DesignSystemPage() {
     notFound();
   }
 
-  return <DesignSystemShowcase env={getEnv().APP_ENV} />;
+  return <DesignSystemShowcase />;
 }

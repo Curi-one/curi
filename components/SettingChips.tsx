@@ -42,10 +42,10 @@ export function SettingChips({
               type="button"
               onClick={() => onChange(v)}
               aria-pressed={selected}
-              className={`inline-flex min-h-11 items-center rounded-none border px-3.5 py-2.5 text-xs font-medium leading-none transition-colors focus-ring ${
+              className={`inline-flex min-h-11 items-center rounded-none border px-3.5 py-2.5 font-meta text-[10px] leading-none transition-all duration-200 focus-ring ${
                 selected
                   ? "border-ink bg-ink text-paper"
-                  : "interactive-chip border-border bg-paper text-ink-muted hover:border-ink/40"
+                  : "interactive-chip border-border bg-paper text-ink-muted hover:border-ink/40 hover:text-ink"
               }`}
             >
               {l}

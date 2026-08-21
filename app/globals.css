@@ -306,27 +306,55 @@ body {
     background: var(--color-border-strong);
   }
 
-  /* ── Buttons · §9.1 ────────────────────────────────────────────────────── */
+  /* ── Buttons · §9.1 ──────────────────────────────────────────────────────
+     All variants share the same type recipe (UI sans, 12px, uppercase).
+     Never switch font by variant or state. */
 
-  /* Primary CTA. One per screen. Carries the Vermilion underline. */
-  .btn-primary {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 52px;
-    padding: var(--space-3) var(--space-6);
+    gap: var(--space-2);
     font-family: var(--font-ui-stack);
     font-size: var(--text-ui-2xs);
     font-weight: var(--weight-medium);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     text-align: center;
+    border-radius: var(--radius-none);
+    transition:
+      background-color var(--duration-small) var(--ease-out),
+      border-color var(--duration-small) var(--ease-out),
+      color var(--duration-small) var(--ease-out),
+      transform var(--duration-micro) var(--ease-out),
+      opacity var(--duration-small) var(--ease-out);
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger {
+    min-height: 52px;
+    padding: var(--space-3) var(--space-6);
+  }
+
+  .btn-primary svg,
+  .btn-secondary svg,
+  .btn-ghost svg,
+  .btn-danger svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  /* Primary CTA. One per screen. Carries the Vermilion underline. */
+  .btn-primary {
     color: var(--color-text-inverse);
     background: var(--color-bg-inverse);
     border: none;
     border-bottom: var(--border-accent);
-    border-radius: var(--radius-none);
-    transition: background-color var(--duration-small) var(--ease-out);
   }
 
   .btn-primary:hover:not(:disabled) {
@@ -343,26 +371,11 @@ body {
     cursor: not-allowed;
   }
 
-  /* Secondary (ghost). Never carries the Vermilion underline. */
+  /* Secondary (ghost outline). Never carries the Vermilion underline. */
   .btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 52px;
-    padding: var(--space-3) var(--space-6);
-    font-family: var(--font-ui-stack);
-    font-size: var(--text-ui-2xs);
-    font-weight: var(--weight-regular);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
-    text-align: center;
     color: var(--color-text-primary);
     background: transparent;
     border: var(--border-subtle);
-    border-radius: var(--radius-none);
-    transition:
-      background-color var(--duration-small) var(--ease-out),
-      border-color var(--duration-small) var(--ease-out);
   }
 
   .btn-secondary:hover:not(:disabled) {
@@ -380,36 +393,55 @@ body {
     cursor: not-allowed;
   }
 
-  /* Tertiary / inline action */
+  /* Tertiary / inline action — same type as primary */
   .btn-ghost {
-    display: inline-flex;
-    align-items: center;
     min-height: 44px;
     padding: 0 var(--space-3);
-    font-family: var(--font-ui-stack);
-    font-size: var(--text-ui-xs);
     color: var(--color-text-secondary);
     background: transparent;
     border: none;
-    border-radius: var(--radius-none);
-    transition: color var(--duration-small) var(--ease-out);
   }
 
-  .btn-ghost:hover {
+  .btn-ghost:hover:not(:disabled) {
     color: var(--color-text-primary);
+  }
+
+  .btn-ghost:disabled {
+    color: var(--color-text-disabled);
+    cursor: not-allowed;
   }
 
   /* Destructive — resolved through copy, never colour (§9.1) */
   .btn-danger {
-    @apply btn-secondary;
     color: var(--color-text-secondary);
-    border-color: var(--color-border-subtle);
+    background: transparent;
+    border: var(--border-subtle);
   }
 
   .btn-danger:hover:not(:disabled) {
     color: var(--color-text-primary);
     border-color: var(--color-border-strong);
     background: transparent;
+  }
+
+  .btn-danger:disabled {
+    color: var(--color-text-disabled);
+    border-color: var(--color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* Icon-only square — same type stack (sr-only label), shared size */
+  .btn-icon {
+    width: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    padding: 0;
+  }
+
+  .btn-icon.btn-ghost {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   /* ── Form inputs · §9.2 ────────────────────────────────────────────────── */
@@ -503,9 +535,10 @@ body {
 
   /* ── Chips · derived from Badge §9.4 ───────────────────────────────────── */
 
+  /* Chips / pills / tabs — mono under 20px (same family as badges). */
   .interactive-chip {
-    font-family: var(--font-ui-stack);
-    font-size: var(--text-ui-3xs);
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-sm);
     font-weight: var(--weight-medium);
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
@@ -513,7 +546,12 @@ body {
     transition:
       background-color var(--duration-micro) var(--ease-out),
       color var(--duration-micro) var(--ease-out),
-      border-color var(--duration-micro) var(--ease-out);
+      border-color var(--duration-micro) var(--ease-out),
+      transform var(--duration-micro) var(--ease-out);
+  }
+
+  .interactive-chip:active:not(:disabled) {
+    transform: translateY(1px);
   }
 
   .interactive-chip:hover {
@@ -608,9 +646,14 @@ body {
     background: var(--color-bg-secondary);
     border: var(--border-subtle);
     border-radius: var(--radius-none);
+    transition:
+      border-color var(--duration-small) var(--ease-out),
+      color var(--duration-small) var(--ease-out),
+      background-color var(--duration-small) var(--ease-out);
   }
 
   .badge-mono {
+    display: inline-block;
     font-family: var(--font-mono-stack);
     font-size: var(--text-mono-xs);
     font-weight: var(--weight-regular);
@@ -620,6 +663,111 @@ body {
     background: none;
     border: none;
     padding: 0;
+  }
+
+  /* Accent badge — use sparingly (one accent beat per panel) */
+  .badge-accent {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-xs);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--color-accent);
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-none);
+  }
+
+  /* Design-system panel surfaces */
+  .ds-panel {
+    border: var(--border-subtle);
+    border-radius: var(--radius-none);
+    padding: var(--space-6);
+    transition:
+      background-color var(--duration-medium) var(--ease-out),
+      border-color var(--duration-medium) var(--ease-out),
+      color var(--duration-medium) var(--ease-out);
+  }
+
+  .ds-panel-light {
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+  }
+
+  .ds-panel-muted {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+  }
+
+  .ds-panel-dark {
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
+    border-color: transparent;
+  }
+
+  .ds-panel-dark .font-meta,
+  .ds-panel-dark .type-kicker,
+  .ds-panel-dark .type-label {
+    color: var(--color-silver);
+  }
+
+  /* Heatmap intensity cells */
+  .heatmap-cell {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: var(--radius-none);
+    transition:
+      transform var(--duration-micro) var(--ease-out),
+      background-color var(--duration-small) var(--ease-out),
+      box-shadow var(--duration-small) var(--ease-out);
+  }
+
+  .heatmap-cell:hover {
+    transform: scale(1.35);
+    z-index: 1;
+  }
+
+  /* Colourful intensity — ink → vermilion ramp (only brand chromatic). */
+  .heatmap-cell-0 {
+    background: var(--color-bg-tertiary);
+  }
+
+  .heatmap-cell-1 {
+    background: color-mix(in srgb, var(--color-accent) 28%, var(--color-bg-tertiary));
+  }
+
+  .heatmap-cell-2 {
+    background: color-mix(in srgb, var(--color-accent) 52%, var(--color-light));
+  }
+
+  .heatmap-cell-3 {
+    background: color-mix(in srgb, var(--color-accent) 78%, var(--color-ink));
+  }
+
+  .heatmap-cell-4 {
+    background: var(--color-accent);
+  }
+
+  .ds-panel-dark .heatmap-cell-0 {
+    background: var(--color-ink-3);
+  }
+
+  .ds-panel-dark .heatmap-cell-1 {
+    background: color-mix(in srgb, var(--color-accent) 35%, var(--color-ink-3));
+  }
+
+  .ds-panel-dark .heatmap-cell-2 {
+    background: color-mix(in srgb, var(--color-accent) 55%, var(--color-ink-2));
+  }
+
+  .ds-panel-dark .heatmap-cell-3 {
+    background: color-mix(in srgb, var(--color-accent) 80%, var(--color-ink));
+  }
+
+  .ds-panel-dark .heatmap-cell-4 {
+    background: var(--color-accent);
   }
 
   /* ── Lesson reader · §11.1 ─────────────────────────────────────────────── */

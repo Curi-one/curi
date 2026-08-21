@@ -43,9 +43,9 @@ const HEX = /#[0-9a-fA-F]{3,8}\b/g;
 /** Correct is Ink, errors are Silver. Never green, never red (§9.6, §16.1). */
 const FOREIGN_COLOR =
   /\b(?:bg|text|border|ring|from|to|via|decoration)-(?:green|emerald|lime|teal|red|rose|orange|amber|yellow|blue|indigo|violet|purple|pink|sky|cyan)-\d{2,3}\b/g;
-/** Fraunces is never used below 18px (§5.2, §16.2). */
+/** Fraunces is never used below 20px (product rule: sans/mono under 20px). */
 const SMALL_DISPLAY =
-  /font-display[^"`]*?\b(?:text-(?:xs|sm|base)|text-\[1[0-7]px\])\b/g;
+  /font-display[^"`]*?\b(?:text-(?:xs|sm|base)|text-\[1[0-9]px\])\b/g;
 /**
  * Product surface may only name the brand trio (§5.1). System role fallbacks
  * (Georgia, system-ui, Courier New) are allowed beside them.
@@ -62,7 +62,7 @@ const RULES = [
     FOREIGN_COLOR,
     "all",
   ],
-  ["§5.2 · Fraunces below 18px", SMALL_DISPLAY, "tsx"],
+  ["§5.2 · Fraunces below 20px", SMALL_DISPLAY, "tsx"],
   ["§5.1 · non-brand typeface (use Fraunces / Plus Jakarta / JetBrains)", FOREIGN_FONT, "all"],
 ];
 
@@ -118,6 +118,8 @@ for (const file of files) {
  */
 for (const file of files) {
   if (!file.endsWith(".tsx")) continue;
+  // Living catalog — multiple accent demos are intentional.
+  if (file.includes("design-system")) continue;
   const src = readFileSync(join(process.cwd(), file), "utf8");
   const uses = (
     src.match(/\b(?:bg|text|border|border-b|ring|decoration)-accent\b/g) ?? []
