@@ -500,4 +500,60 @@ describe("getLessonBody", () => {
       message: "Lesson not found",
     });
   });
+
+  it("includes additional learner context in the prompt when present", async () => {
+    const clarifications = [
+      ...CLARIFICATIONS,
+      {
+        questionId: "learner_details",
+        answer: "I need phrases for ordering food.",
+      },
+    ];
+    loadCourse.mockResolvedValueOnce({
+      kind: "pending",
+      topic: TOPIC,
+      depth: DEPTH,
+      clarifications,
+      lessons: LESSONS,
+    });
+    lookup.mockResolvedValueOnce(null);
+    vi.mocked(chatCompletion).mockResolvedValueOnce(
+      completion(sampleLessonJson()),
+    );
+
+    await getLessonBody(
+      { courseId: "c1", lessonIndex: 0, sessionId: "anon-1" },
+      baseDeps,
+    );
+
+    const messages = vi.mocked(chatCompletion).mock.calls[0]?.[0]?.messages;
+    const user = messages?.find((m) => m.role === "user")?.content ?? "";
+    expect(user).toContain(
+      "Additional learner context: I need phrases for ordering food.",
+    );
+    expect(user).not.toContain("- learner_details:");
+  });
+
+  it("changes lesson_body fingerprint when learner_details change", () => {
+    const base = {
+      topicNormalized: normalizeTopic(TOPIC),
+      depth: DEPTH,
+      cacheType: "lesson_body" as const,
+      lessonIndex: 0,
+      difficultyModifier: "baseline",
+    };
+    const without = buildFingerprint({
+      ...base,
+      clarifications: clarificationsToMap(CLARIFICATIONS),
+    });
+    const withDetails = buildFingerprint({
+      ...base,
+      clarifications: clarificationsToMap(
+        CLARIFICATIONS,
+        "I need phrases for ordering food.",
+      ),
+    });
+    expect(withDetails).not.toBe(without);
+  });
+
 });

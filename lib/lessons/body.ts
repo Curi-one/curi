@@ -25,6 +25,10 @@ import {
   type LessonBodyPayload,
   type StoreLessonBodyInput,
 } from "@/lib/cache/content-cache";
+import {
+  LEARNER_DETAILS_KEY,
+  resolveLearnerDetails,
+} from "@/lib/clarify/details";
 import { stripMarkdownFences } from "@/lib/clarify/generate";
 import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
 import { isLessonReadable } from "@/lib/courses/path-map";
@@ -493,11 +497,19 @@ function buildMessages(input: {
     "Return ONLY valid JSON matching the schema in the system message.",
   ];
 
-  if (input.clarifications.length > 0) {
+  const topicClarifications = input.clarifications.filter(
+    (item) => item.questionId !== LEARNER_DETAILS_KEY,
+  );
+  if (topicClarifications.length > 0) {
     lines.push("Learner clarifications:");
-    for (const item of input.clarifications) {
+    for (const item of topicClarifications) {
       lines.push(`- ${item.questionId}: ${item.answer}`);
     }
+  }
+
+  const learnerDetails = resolveLearnerDetails(input.clarifications);
+  if (learnerDetails) {
+    lines.push(`Additional learner context: ${learnerDetails}`);
   }
 
   return [

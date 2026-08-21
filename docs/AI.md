@@ -43,13 +43,19 @@ Lazy: generate lesson body + quiz on first access, not at path creation.
 
 Input: `{ topic, catalogue_slug? }`
 
-Output: 1–3 questions `{ id, text, options[] }`. Depth screen is app UI, not LLM.
+Output JSON:
+- `questions`: 1–3 `{ id, prompt, options[] }`
+- `depthOptions` (optional but preferred): exactly three `{ slug, label, subcopy }` with fixed slugs `essentials` | `fluent` | `thorough`. Labels/subcopy are topic-appropriate; never promise unrealistic mastery (e.g. short language paths must not be labelled “Fluent speaker”). On parse failure or omit, app uses heuristic fallback.
+
+Depth **screen** is still app UI (bands fixed); only labels/subcopy come from the model.
 
 ---
 
 ## Path outline
 
-Input: `{ topic, depth, clarifications[] }`
+Input: `{ topic, depth, clarifications[], details? }`
+
+Optional `details` (≤500 chars) is merged into the fingerprint clarifications map as `learner_details` and included in the user prompt as `Additional learner context: …` when present.
 
 Output: `{ total, lessons: [{ index, title }] }` within depth band (essentials 5–9, fluent 10–18, thorough 19–35).
 

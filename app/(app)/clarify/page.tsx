@@ -7,8 +7,9 @@ import { DepthPicker } from "@/components/DepthPicker";
 import { LoadingState } from "@/components/LoadingState";
 import { PageShell } from "@/components/PageShell";
 import { Wordmark } from "@/components/Wordmark";
-import type { DepthSlug } from "@/lib/api/schemas";
+import type { DepthOption, DepthSlug } from "@/lib/api/schemas";
 import { postClarify } from "@/lib/api/client";
+import { DETAILS_MAX_CHARS } from "@/lib/clarify/details";
 import {
   loadClarifySession,
   saveClarifySession,
@@ -27,6 +28,8 @@ function ClarifyContent() {
   const [answers, setAnswers] = useState<ClarifyAnswer[]>([]);
   const [stepIndex, setStepIndex] = useState(0);
   const [depth, setDepth] = useState<DepthSlug | undefined>();
+  const [details, setDetails] = useState("");
+  const [depthOptions, setDepthOptions] = useState<DepthOption[] | undefined>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,7 +43,13 @@ function ClarifyContent() {
     try {
       const res = await postClarify({ topic });
       setQuestions(res.questions);
-      saveClarifySession({ topic, questions: res.questions, answers: [] });
+      setDepthOptions(res.depthOptions);
+      saveClarifySession({
+        topic,
+        questions: res.questions,
+        answers: [],
+        depthOptions: res.depthOptions,
+      });
     } catch {
       setError("Could not load questions. Try again.");
     } finally {
@@ -54,6 +63,8 @@ function ClarifyContent() {
       setQuestions(existing.questions);
       setAnswers(existing.answers);
       setDepth(existing.depth);
+      setDetails(existing.details ?? "");
+      setDepthOptions(existing.depthOptions);
       setLoading(false);
       return;
     }
@@ -65,13 +76,21 @@ function ClarifyContent() {
     void loadQuestions(topicParam);
   }, [topicParam, router, loadQuestions]);
 
-  function persist(nextAnswers: ClarifyAnswer[], nextDepth?: DepthSlug) {
+  function persist(patch: {
+    nextAnswers?: ClarifyAnswer[];
+    nextDepth?: DepthSlug;
+    nextDetails?: string;
+    nextDepthOptions?: DepthOption[];
+  }) {
     const session = loadClarifySession();
     if (!session) return;
     saveClarifySession({
       ...session,
-      answers: nextAnswers,
-      depth: nextDepth ?? session.depth,
+      answers: patch.nextAnswers ?? session.answers,
+      depth: patch.nextDepth ?? session.depth,
+      details:
+        patch.nextDetails !== undefined ? patch.nextDetails : session.details,
+      depthOptions: patch.nextDepthOptions ?? session.depthOptions,
     });
   }
 
@@ -82,7 +101,7 @@ function ClarifyContent() {
       { questionId: q.id, answer },
     ];
     setAnswers(next);
-    persist(next);
+    persist({ nextAnswers: next });
     if (stepIndex + 1 < questions.length) {
       setStepIndex((i) => i + 1);
     } else {
@@ -92,8 +111,14 @@ function ClarifyContent() {
 
   function selectDepth(d: DepthSlug) {
     setDepth(d);
-    persist(answers, d);
+    persist({ nextAnswers: answers, nextDepth: d, nextDetails: details });
     router.push("/generating");
+  }
+
+  function handleDetailsChange(value: string) {
+    const next = value.slice(0, DETAILS_MAX_CHARS);
+    setDetails(next);
+    persist({ nextDetails: next });
   }
 
   function goBack() {
@@ -127,6 +152,10 @@ function ClarifyContent() {
         step={currentStep}
         totalSteps={totalSteps}
         onBack={goBack}
+        options={depthOptions}
+        details={details}
+        onDetailsChange={handleDetailsChange}
+        detailsMax={DETAILS_MAX_CHARS}
       />
     );
   }

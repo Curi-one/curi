@@ -26,6 +26,8 @@ import {
   feelToDifficultyModifier,
   type DifficultyModifier,
 } from "@/lib/lessons/body";
+import { mergeLearnerDetails } from "@/lib/clarify/details";
+import { fallbackDepthOptions } from "@/lib/clarify/depth-options";
 import { FREE_ACTIVE_PATH_LIMIT } from "@/lib/plans";
 import { computeStreak } from "@/lib/streak";
 import {
@@ -208,6 +210,7 @@ class MockStore {
   clarify(request: ClarifyRequest): ClarifyResponse {
     return {
       questions: clarifyQuestionsForTopic(request.topic),
+      depthOptions: fallbackDepthOptions(request.topic),
     };
   }
 
@@ -222,7 +225,10 @@ class MockStore {
       id: nextCourseId(request.topic),
       topic: request.topic,
       depth: request.depth,
-      clarifications: request.clarifications,
+      clarifications: mergeLearnerDetails(
+        request.clarifications,
+        request.details,
+      ),
       lessonTitles: titles,
       progress: 0,
       status: "active",

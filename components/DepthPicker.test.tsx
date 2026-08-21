@@ -23,4 +23,60 @@ describe("DepthPicker", () => {
     );
     expect(onSelect).toHaveBeenCalledWith("fluent");
   });
+
+  it("renders custom depth option labels when provided", () => {
+    render(
+      <DepthPicker
+        step={3}
+        totalSteps={3}
+        onSelect={vi.fn()}
+        options={[
+          {
+            slug: "essentials",
+            label: "Survival phrases",
+            subcopy: "Core phrases · about a week",
+          },
+          {
+            slug: "fluent",
+            label: "Conversational basics",
+            subcopy: "Everyday exchanges · about two weeks",
+          },
+          {
+            slug: "thorough",
+            label: "Structured foundation",
+            subcopy: "Grammar + patterns · about a month",
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Survival phrases")).toBeInTheDocument();
+    expect(screen.getByText("Conversational basics")).toBeInTheDocument();
+    expect(screen.getByText("Structured foundation")).toBeInTheDocument();
+    expect(screen.queryByText("Fluent")).not.toBeInTheDocument();
+  });
+
+  it("shows optional details textarea with character counter", () => {
+    const onDetailsChange = vi.fn();
+    render(
+      <DepthPicker
+        step={3}
+        totalSteps={3}
+        onSelect={vi.fn()}
+        details="Prior Spanish helps."
+        onDetailsChange={onDetailsChange}
+        detailsMax={500}
+      />,
+    );
+
+    expect(
+      screen.getByLabelText(/Anything else we should know/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText("20 / 500")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "New note" },
+    });
+    expect(onDetailsChange).toHaveBeenCalledWith("New note");
+  });
 });

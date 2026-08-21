@@ -5,6 +5,7 @@ import type {
   Plan,
 } from "@/lib/api/schemas";
 import { buildFingerprint } from "@/lib/cache/fingerprint";
+import { mergeLearnerDetails } from "@/lib/clarify/details";
 import {
   clarificationsToMap,
   generatePathOutline,
@@ -126,10 +127,17 @@ export async function createCourse(
   const outlinePayload = await generateOutline(params.request);
   const outline = outlinePayload.lessons;
   const topicNormalized = normalizeTopic(params.request.topic);
+  const clarifications = mergeLearnerDetails(
+    params.request.clarifications,
+    params.request.details,
+  );
   const fingerprint = buildFingerprint({
     topicNormalized,
     depth: params.request.depth,
-    clarifications: clarificationsToMap(params.request.clarifications),
+    clarifications: clarificationsToMap(
+      params.request.clarifications,
+      params.request.details,
+    ),
     cacheType: "path_outline",
   });
 
@@ -141,7 +149,7 @@ export async function createCourse(
         anonymous_id: params.sessionId,
         topic: params.request.topic,
         depth: params.request.depth,
-        clarifications: params.request.clarifications,
+        clarifications,
         outline,
         expires_at: expiresAt,
       })
@@ -169,7 +177,7 @@ export async function createCourse(
       user_id: user.id,
       topic: params.request.topic,
       depth: params.request.depth,
-      clarifications: params.request.clarifications,
+      clarifications,
       clarifications_fingerprint: fingerprint,
       status: "active",
       progress: 0,

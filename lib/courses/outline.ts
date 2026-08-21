@@ -13,6 +13,10 @@ import {
   type PathOutlinePayload,
   type StorePathOutlineInput,
 } from "@/lib/cache/content-cache";
+import {
+  LEARNER_DETAILS_KEY,
+  resolveLearnerDetails,
+} from "@/lib/clarify/details";
 import { stripMarkdownFences } from "@/lib/clarify/generate";
 
 export const DEPTH_LESSON_BANDS: Record<
@@ -95,10 +99,15 @@ export function isTotalInDepthBand(total: number, depth: DepthSlug): boolean {
 /** Build clarifications map keyed by questionId (v1 fingerprint). */
 export function clarificationsToMap(
   clarifications: CourseCreateRequest["clarifications"],
+  details?: string,
 ): Record<string, string> {
   const map: Record<string, string> = {};
   for (const item of clarifications) {
     map[item.questionId] = item.answer;
+  }
+  const learnerDetails = resolveLearnerDetails(clarifications, details);
+  if (learnerDetails) {
+    map[LEARNER_DETAILS_KEY] = learnerDetails;
   }
   return map;
 }
@@ -129,6 +138,7 @@ function buildMessages(input: {
   topic: string;
   depth: DepthSlug;
   clarifications: CourseCreateRequest["clarifications"];
+  details?: string;
 }): PerplexityMessage[] {
   const band = DEPTH_LESSON_BANDS[input.depth];
   const lines = [
@@ -137,11 +147,22 @@ function buildMessages(input: {
     "Generate a path outline as JSON.",
   ];
 
-  if (input.clarifications.length > 0) {
+  const topicClarifications = input.clarifications.filter(
+    (item) => item.questionId !== LEARNER_DETAILS_KEY,
+  );
+  if (topicClarifications.length > 0) {
     lines.push("Learner clarifications:");
-    for (const item of input.clarifications) {
+    for (const item of topicClarifications) {
       lines.push(`- ${item.questionId}: ${item.answer}`);
     }
+  }
+
+  const learnerDetails = resolveLearnerDetails(
+    input.clarifications,
+    input.details,
+  );
+  if (learnerDetails) {
+    lines.push(`Additional learner context: ${learnerDetails}`);
   }
 
   return [
@@ -183,7 +204,10 @@ export async function generatePathOutline(
   deps?: GeneratePathOutlineDeps,
 ): Promise<PathOutlinePayload> {
   const topicNormalized = normalizeTopic(input.topic);
-  const clarifications = clarificationsToMap(input.clarifications);
+  const clarifications = clarificationsToMap(
+    input.clarifications,
+    input.details,
+  );
   const cacheKey = buildFingerprint({
     topicNormalized,
     depth: input.depth,

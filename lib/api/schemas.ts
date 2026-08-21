@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DETAILS_MAX_CHARS } from "@/lib/clarify/details";
 
 export const DepthSlugSchema = z.enum(["essentials", "fluent", "thorough"]);
 export type DepthSlug = z.infer<typeof DepthSlugSchema>;
@@ -21,6 +22,13 @@ export const ClarifyQuestionSchema = z.object({
 });
 export type ClarifyQuestion = z.infer<typeof ClarifyQuestionSchema>;
 
+export const DepthOptionSchema = z.object({
+  slug: DepthSlugSchema,
+  label: z.string().min(1),
+  subcopy: z.string().min(1),
+});
+export type DepthOption = z.infer<typeof DepthOptionSchema>;
+
 export const ClarifyRequestSchema = z.object({
   topic: z.string().min(1),
   previousAnswers: z
@@ -34,9 +42,26 @@ export const ClarifyRequestSchema = z.object({
 });
 export type ClarifyRequest = z.infer<typeof ClarifyRequestSchema>;
 
-export const ClarifyResponseSchema = z.object({
-  questions: z.array(ClarifyQuestionSchema).min(1).max(3),
-});
+const DEPTH_SLUGS = ["essentials", "fluent", "thorough"] as const;
+
+export const ClarifyResponseSchema = z
+  .object({
+    questions: z.array(ClarifyQuestionSchema).min(1).max(3),
+    depthOptions: z.array(DepthOptionSchema).length(3).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.depthOptions) return;
+    const slugs = data.depthOptions.map((o) => o.slug).sort();
+    const expected = [...DEPTH_SLUGS].sort();
+    if (slugs.join(",") !== expected.join(",")) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "depthOptions must include exactly essentials, fluent, and thorough",
+        path: ["depthOptions"],
+      });
+    }
+  });
 export type ClarifyResponse = z.infer<typeof ClarifyResponseSchema>;
 
 export const CourseCreateRequestSchema = z.object({
@@ -48,6 +73,7 @@ export const CourseCreateRequestSchema = z.object({
       answer: z.string(),
     }),
   ),
+  details: z.string().max(DETAILS_MAX_CHARS).optional(),
 });
 export type CourseCreateRequest = z.infer<typeof CourseCreateRequestSchema>;
 

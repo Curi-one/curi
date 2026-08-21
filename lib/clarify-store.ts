@@ -1,4 +1,4 @@
-import type { ClarifyQuestion, DepthSlug } from "@/lib/api/schemas";
+import type { ClarifyQuestion, DepthOption, DepthSlug } from "@/lib/api/schemas";
 
 const KEY = "curi_clarify";
 
@@ -9,6 +9,10 @@ export type ClarifySession = {
   questions: ClarifyQuestion[];
   answers: ClarifyAnswer[];
   depth?: DepthSlug;
+  /** Optional free-text learner context (≤500 chars). */
+  details?: string;
+  /** Topic-dynamic depth labels; slugs/bands remain fixed. */
+  depthOptions?: DepthOption[];
   courseId?: string;
 };
 

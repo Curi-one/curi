@@ -118,6 +118,7 @@ export default function GeneratingPage() {
       topic: session.topic,
       depth: session.depth,
       clarifications: session.answers,
+      ...(session.details ? { details: session.details } : {}),
     })
       .then((res) => {
         setCourseId(res.courseId);

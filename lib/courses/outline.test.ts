@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChatCompletionResult } from "@/lib/ai/perplexity";
 import type { PathOutlinePayload } from "@/lib/cache/content-cache";
+import { buildFingerprint } from "@/lib/cache/fingerprint";
 import {
+  clarificationsToMap,
   DEPTH_LESSON_BANDS,
   generatePathOutline,
   isTotalInDepthBand,
@@ -168,5 +170,55 @@ describe("generatePathOutline", () => {
 
     expect(chatCompletion).toHaveBeenCalledTimes(2);
     expect(store).not.toHaveBeenCalled();
+  });
+
+  it("includes additional learner context in the user prompt when details set", async () => {
+    lookup.mockResolvedValueOnce(null);
+    vi.mocked(chatCompletion).mockResolvedValueOnce(
+      completion(JSON.stringify(ESSENTIALS_PAYLOAD)),
+    );
+
+    await generatePathOutline(
+      {
+        topic: "Mandarin",
+        depth: "essentials",
+        clarifications: [{ questionId: "focus", answer: "Travel" }],
+        details: "I need phrases for ordering food.",
+      },
+      { lookup, store },
+    );
+
+    const messages = vi.mocked(chatCompletion).mock.calls[0]?.[0]?.messages;
+    const user = messages?.find((m) => m.role === "user")?.content ?? "";
+    expect(user).toContain(
+      "Additional learner context: I need phrases for ordering food.",
+    );
+  });
+
+  it("changes path_outline fingerprint when details change", async () => {
+    const base = {
+      topicNormalized: "mandarin",
+      depth: "essentials" as const,
+      cacheType: "path_outline" as const,
+    };
+    const clarifications = [{ questionId: "focus", answer: "Travel" }];
+    const without = buildFingerprint({
+      ...base,
+      clarifications: clarificationsToMap(clarifications),
+    });
+    const withDetails = buildFingerprint({
+      ...base,
+      clarifications: clarificationsToMap(
+        clarifications,
+        "I need phrases for ordering food.",
+      ),
+    });
+    expect(withDetails).not.toBe(without);
+    expect(clarificationsToMap(clarifications, "I need phrases")).toMatchObject(
+      {
+        focus: "Travel",
+        learner_details: "I need phrases",
+      },
+    );
   });
 });
