@@ -6,29 +6,16 @@ import {
   type LearningProfile,
   normalizeLearningProfile,
 } from "@/lib/profile/learning-profile";
+import {
+  DEFAULT_USER_PREFERENCES,
+  type UserPreferences,
+} from "@/lib/profile/user-preferences";
 
-export type EmailPreferences = {
-  emailEnabled: boolean;
-  emailTime: string;
-  emailFormat: string;
-  emailWeekends: boolean;
-  emailWeeklyDigest: boolean;
-};
-
-export type UserPreferences = LearningProfile & EmailPreferences;
-
-export const DEFAULT_EMAIL_PREFERENCES: EmailPreferences = {
-  emailEnabled: false,
-  emailTime: "morning",
-  emailFormat: "Full",
-  emailWeekends: false,
-  emailWeeklyDigest: false,
-};
-
-export const DEFAULT_USER_PREFERENCES: UserPreferences = {
-  ...DEFAULT_LEARNING_PROFILE,
-  ...DEFAULT_EMAIL_PREFERENCES,
-};
+export type { EmailPreferences, UserPreferences } from "@/lib/profile/user-preferences";
+export {
+  DEFAULT_EMAIL_PREFERENCES,
+  DEFAULT_USER_PREFERENCES,
+} from "@/lib/profile/user-preferences";
 
 type PreferencesRow = {
   seq_open: string;

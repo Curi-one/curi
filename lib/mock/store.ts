@@ -44,7 +44,7 @@ import {
 import {
   DEFAULT_USER_PREFERENCES,
   type UserPreferences,
-} from "@/lib/profile/db-preferences";
+} from "@/lib/profile/user-preferences";
 import { normalizeLearningProfile } from "@/lib/profile/learning-profile";
 import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
 

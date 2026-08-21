@@ -1,8 +1,8 @@
+import { normalizeLearningProfile } from "@/lib/profile/learning-profile";
 import {
   DEFAULT_USER_PREFERENCES,
   type UserPreferences,
-} from "@/lib/profile/db-preferences";
-import { normalizeLearningProfile } from "@/lib/profile/learning-profile";
+} from "@/lib/profile/user-preferences";
 
 export type {
   AnchorStyle,
@@ -21,14 +21,14 @@ export {
 
 export type {
   EmailPreferences,
+  ProfilePreferences,
   UserPreferences,
-} from "@/lib/profile/db-preferences";
-export { DEFAULT_EMAIL_PREFERENCES } from "@/lib/profile/db-preferences";
-
-/** Profile preferences = learning profile + email schedule. */
-export type ProfilePreferences = UserPreferences;
-
-export const DEFAULT_PREFERENCES: ProfilePreferences = DEFAULT_USER_PREFERENCES;
+} from "@/lib/profile/user-preferences";
+export {
+  DEFAULT_EMAIL_PREFERENCES,
+  DEFAULT_PREFERENCES,
+  DEFAULT_USER_PREFERENCES,
+} from "@/lib/profile/user-preferences";
 
 function storageKey(userKey: string): string {
   return `curi-prefs:${userKey}`;

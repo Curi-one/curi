@@ -173,7 +173,7 @@ export function patchMe(body: { name?: string }) {
 }
 
 export type UserPreferencesResponse = {
-  preferences: import("@/lib/profile/db-preferences").UserPreferences;
+  preferences: import("@/lib/profile/user-preferences").UserPreferences;
 };
 
 export function getPreferences() {
