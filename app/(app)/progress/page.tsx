@@ -44,6 +44,7 @@ export default function ProgressPage() {
       back={{ href: "/today", label: "Today" }}
       title="Progress"
       kicker={streak > 0 ? `${streak}-day streak` : "Build your streak"}
+      content="full"
       withTabPad={false}
       className="pt-4"
     >

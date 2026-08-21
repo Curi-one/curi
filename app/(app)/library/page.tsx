@@ -125,7 +125,12 @@ function LibraryContent() {
 
 export default function LibraryPage() {
   return (
-    <PageShell title="Library" withTabPad={false} className="pt-4">
+    <PageShell
+      title="Library"
+      content="full"
+      withTabPad={false}
+      className="pt-4"
+    >
       <Suspense
         fallback={
           <LoadingState label="Loading library…" minHeight="min-h-[24vh]" />

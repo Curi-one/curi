@@ -127,6 +127,14 @@ const config: Config = {
         20: "var(--space-20)",
         24: "var(--space-24)",
         32: "var(--space-32)",
+        // Negative-space scale (globals.css). Sizes the void between things,
+        // not the things themselves — fluid, so silence grows with the canvas.
+        cluster: "var(--flow-cluster)",
+        block: "var(--flow-block)",
+        section: "var(--flow-section)",
+        chapter: "var(--flow-chapter)",
+        gutter: "var(--grid-gutter)",
+        margin: "var(--grid-margin)",
       },
       maxWidth: {
         grid: "var(--grid-max-width)",

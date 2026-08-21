@@ -52,7 +52,7 @@ export default function TodayPage() {
   }, [router]);
 
   return (
-    <PageShell withTabPad={false} className="pt-4">
+    <PageShell content="full" withTabPad={false} className="pt-4">
       {!ready && <LoadingState label="Loading your feed…" />}
       {feed && ready && (
         <TodayView
