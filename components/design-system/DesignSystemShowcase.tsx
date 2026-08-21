@@ -557,9 +557,9 @@ export function DesignSystemShowcase() {
         </InteractiveDemo>
         <InteractiveDemo label="Skeleton · opacity pulse (never shimmer)">
           <div className="flex flex-col gap-2.5">
-            <div className="skeleton-pulse h-3 w-4/5" />
-            <div className="skeleton-pulse h-3 w-3/5" />
-            <div className="skeleton-pulse h-3 w-2/5" />
+            <div className="skeleton-pulse h-3 w-[80%]" />
+            <div className="skeleton-pulse h-3 w-[60%]" />
+            <div className="skeleton-pulse h-3 w-[40%]" />
           </div>
         </InteractiveDemo>
         <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">

@@ -109,10 +109,8 @@ export function LessonFeedCard({
             {positionLabel(item)}
           </span>
           <span
-            className={`text-ui-4xs font-semibold uppercase tracking-wider transition-colors ${
-              dimmed
-                ? "text-ink-muted/45 group-hover:text-ink-muted/70"
-                : "text-ink group-hover:text-ink"
+            className={`text-ui-4xs font-semibold uppercase tracking-wider ${
+              dimmed ? "text-ink-muted/45" : "text-ink"
             }`}
           >
             {actionLabel(item.status)}
