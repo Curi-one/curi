@@ -18,7 +18,7 @@ Eight warm greyscale tones plus one accent. Never pure black (`#000000`) or pure
 | `color.mid` | `#6B6760` | 107, 103, 96 | Secondary text, supporting copy |
 | `color.silver` | `#9E9B94` | 158, 155, 148 | Labels, captions, metadata, disabled |
 | `color.light` | `#D4D0C8` | 212, 208, 200 | Borders, rules, subtle backgrounds |
-| `color.paper` | `#F4F1E8` | 244, 241, 232 | Secondary background, cards |
+| `color.paper` | `#F5F4F0` | 245, 244, 240 | Secondary background, cards |
 | `color.white` | `#FAF9F5` | 250, 249, 245 | Primary background |
 | `color.accent` (Vermilion) | `#C1121F` | 193, 18, 31 | Single accent — once per screen |
 

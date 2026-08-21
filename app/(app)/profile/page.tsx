@@ -373,7 +373,7 @@ export default function ProfilePage() {
             <section className="surface-card p-4 sm:p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-display text-xl font-medium tracking-tight text-ink">
+                  <h2 className="font-display text-xl  tracking-tight text-ink">
                     How you like things explained
                   </h2>
                   <p className="mt-2 text-sm text-ink-muted">

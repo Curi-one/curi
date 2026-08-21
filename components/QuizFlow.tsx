@@ -60,10 +60,7 @@ export function QuizFlow({ questions, onComplete }: Props) {
         totalSteps={questions.length}
         label="Quiz"
       />
-      <h1
-        className="mt-2 font-display text-display-xs font-light leading-snug text-ink"
-        style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
-      >
+      <h1 className="mt-2 font-display text-display-xs font-light leading-snug text-ink">
         {q.prompt}
       </h1>
       <ul className="mt-8 space-y-3">

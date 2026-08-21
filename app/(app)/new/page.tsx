@@ -66,10 +66,7 @@ export default function NewPathPage() {
     >
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center py-6">
         <p className="type-kicker">New path</p>
-        <h1
-          className="mt-2 font-display text-display-xs font-light leading-tight tracking-tight text-ink sm:text-display-sm"
-          style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
-        >
+        <h1 className="mt-2 font-display display-section text-display-xs leading-tight tracking-tight text-ink sm:text-display-sm">
           What do you want to learn?
         </h1>
         <p className="mt-3 text-ui-md font-light leading-relaxed text-ink-muted">

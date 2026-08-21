@@ -34,13 +34,11 @@ export function LessonImage({ visual }: Props) {
           )}
         </div>
         <figcaption className="flex flex-col justify-end border-l-0 pl-0 pt-4 lg:border-l lg:border-border lg:pl-6 lg:pt-0">
-          <div className="text-xs uppercase tracking-widest text-ink-muted">
-            Visual note
-          </div>
-          <div className="mt-3 font-display text-2xl font-light leading-tight text-ink sm:text-3xl">
+          <div className="wall-label">Visual note</div>
+          <div className="mt-3 font-display text-display-2xs leading-tight text-ink sm:text-display-xs">
             {title}
           </div>
-          <p className="mt-4 text-base leading-7 text-ink-muted">{caption}</p>
+          <p className="caption mt-4">{caption}</p>
         </figcaption>
       </div>
     </figure>

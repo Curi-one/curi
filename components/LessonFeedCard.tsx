@@ -90,7 +90,6 @@ export function LessonFeedCard({
               ? "text-ink/55 group-hover:text-ink/70"
               : "text-ink group-hover:text-ink"
           }`}
-          style={{ fontVariationSettings: "'SOFT' 55, 'WONK' 1" }}
         >
           {item.title}
         </h3>

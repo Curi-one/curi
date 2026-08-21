@@ -37,10 +37,9 @@ export function LandingHeadline() {
 
   return (
     <h1
-      className="font-display text-display-xs font-normal tracking-tight break-words text-ink sm:text-display-md"
+      className="font-display display-hero text-display-xs tracking-tight break-words text-ink sm:text-display-md"
       style={{
         lineHeight: 1.1,
-        fontVariationSettings: "'SOFT' 70, 'WONK' 1",
       }}
     >
       Explore

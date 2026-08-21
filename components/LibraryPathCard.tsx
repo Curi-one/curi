@@ -23,7 +23,7 @@ export function LibraryPathCard({ path, tab }: Props) {
           className="pointer-events-none absolute inset-0 flex select-none items-end justify-end overflow-hidden p-2 opacity-[0.12]"
           aria-hidden
         >
-          <span className="font-display text-display-xl leading-none tracking-tighter">
+          <span className="font-display display-hero text-display-xl leading-none tracking-tighter">
             {path.topic.slice(0, 1).toUpperCase()}
           </span>
         </div>

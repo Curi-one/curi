@@ -95,10 +95,7 @@ export default function LibraryCoursePage() {
       <div className="mt-4 flex items-start gap-5">
         <div className="min-w-0 flex-1">
           <p className="font-meta">{eyebrow}</p>
-          <h1
-            className="mt-1 font-display text-display-xs font-light leading-tight text-ink sm:text-4xl"
-            style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
-          >
+          <h1 className="mt-1 font-display text-display-xs font-light leading-tight text-ink sm:text-4xl">
             {course.topic}
           </h1>
           <p className="mt-1.5 font-meta">{depthLabel(course.depth)}</p>

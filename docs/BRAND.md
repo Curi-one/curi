@@ -23,7 +23,7 @@
 **Part II — Design System**
 
 8. [Design Tokens](#8-design-tokens)
-9. [Core Components](#9-core-components)
+9. [Core Components](#9-core-components) · [Museum Devices](#99-museum-devices--editorial-modernism)
 10. [Layout & Navigation Patterns](#10-layout--navigation-patterns)
 11. [Product UI — Applied Brand](#11-product-ui--applied-brand)
 12. [Email Component System](#12-email-component-system)
@@ -200,10 +200,14 @@ Most products compete on colour. Curi competes on contrast.
 | `color.mid` | Mid | `#6B6760` | 107, 103, 96 | Secondary text, supporting copy |
 | `color.silver` | Silver | `#9E9B94` | 158, 155, 148 | Labels, captions, metadata |
 | `color.light` | Light | `#D4D0C8` | 212, 208, 200 | Borders, rules, subtle backgrounds |
-| `color.paper` | Paper | `#F4F1E8` | 244, 241, 232 | Secondary background, cards |
+| `color.paper` | Paper | `#F5F4F0` | 245, 244, 240 | Secondary background, cards |
 | `color.white` | White | `#FAF9F5` | 250, 249, 245 | Primary background |
 
 Never use pure black (`#000000`) or pure white (`#FFFFFF`) — the warmth is intentional. Vermilion is the only chromatic value in the entire palette.
+
+The warmth is a whisper, not a cream. Every light tone carries the same slight cast: White, Paper, and Pale all sit five points of red above blue. If a surface reads as beige or yellow, its value is wrong.
+
+**Paper is a secondary surface, used sparingly.** White is the page. Paper distinguishes a card, an input, or an inset panel from the page behind it — and because every card also carries a 1px Light rule (§8.6), the fill is a supporting signal, not the thing doing the work. A screen where most of the area is Paper has lost the distinction Paper exists to make.
 
 #### The Accent
 
@@ -265,19 +269,23 @@ Fraunces (by Undercase Type) is a variable "wonky" serif — an optical typeface
 **Why Fraunces for Curi:** it sits at the exact intersection of scholarly and contemporary — a typeface that would be at home in a serious art book or a well-designed product. It does not look like any other learning app.
 
 **Axes (variable font):**
-- `wght`: 100–900 — use 300 (Light) for display headlines, 400 for card titles
-- `SOFT`: 0–100 — set to 50–100 for headlines; lower values are sharper
-- `WONK`: 0–1 — set to 1 to enable optical quirks; 0 for more conventional forms
+- `wght`: **always 300 (Light)**. Display type is never set heavier. Weight is not how Curi makes something important — size and space are.
+- `SOFT`: 0–100 — **kept high, 90–100.** SOFT rounds the terminals and is what makes the face read as bookish rather than technical.
+- `WONK`: **always 1.** This is the axis that lets the genuinely odd forms through. Turning it off removes the reason to use Fraunces at all.
+
+The eccentricity is the point. A Fraunces set Light with both axes up is doing something no other learning product does; a Fraunces set semibold with the axes down is an ordinary serif, and the brand disappears with it.
 
 **Recommended settings by context:**
 
 | Context | Weight | SOFT | WONK | Size |
 |---|---|---|---|---|
-| Hero headline | 300 | 80 | 1 | 72–192px |
-| Section headline | 300 | 60 | 1 | 48–72px |
-| Lesson title | 400 | 50 | 1 | 32–52px |
-| Card title | 400 | 40 | 0 | 20–28px |
-| Pull quote display | 300 italic | 80 | 1 | 28–36px |
+| Hero headline | 300 | 100 | 1 | 72–192px |
+| Section headline | 300 | 96 | 1 | 38–72px |
+| Lesson title | 300 | 96 | 1 | 38–52px |
+| Card title | 300 | 90 | 1 | 22–28px |
+| Pull quote display | 300 italic | 100 | 1 | 28–36px |
+
+**These are set once, in `.font-display`, and nowhere else.** The weight and both axes come from CSS custom properties (`--display-soft`, `--display-wonk`); shift the optical setting with `.display-section` or `.display-hero`. A component that hand-sets `font-variation-settings` has left the system (§17.04). `.display-plain` turns WONK off and exists only for the rare case where the quirks fight a very tight measure.
 
 **Letter-spacing:**
 - 80px+: `-0.04em`
@@ -536,8 +544,8 @@ Design tokens are the single source of truth for all visual values. They must be
 ```css
 /* ── Background ── */
 --color-bg-primary:     #FAF9F5;   /* White — page background */
---color-bg-secondary:   #F4F1E8;   /* Paper — cards, secondary */
---color-bg-tertiary:    #EDE9E0;   /* Pale — hover states, subtle (between paper and light) */
+--color-bg-secondary:   #F5F4F0;   /* Paper — cards, secondary */
+--color-bg-tertiary:    #EEEDE9;   /* Pale — hover states, subtle (between paper and light) */
 --color-bg-inverse:     #0A0908;   /* Ink — dark panels, footer */
 --color-bg-inverse-2:   #1C1A18;   /* Ink 2 — hover on dark */
 
@@ -1220,6 +1228,40 @@ Animation:
 
 ---
 
+## 9.9 Museum Devices — Editorial Modernism
+
+Curi's components take their register from the gallery and the art book, not the dashboard: hairline rules doing structural work, real air around objects, and metadata set like a wall label. Four devices carry it. Each **encodes something true** about the content — what the thing is, that it is on display, where it sits in a sequence, and what the curator has to say about it. None of them is texture.
+
+**Using more than one device on a surface makes them compete.** Pick the one the content actually needs.
+
+### The Wall Label — `.wall-label`
+
+A 20px hairline, then the accession metadata: mono, 9px, `0.3em` tracking, uppercase, Silver. Use for the small factual line that sits above a title — source, day count, duration, provenance (§11.1).
+
+```
+──── LESSON 07 · STOICISM · 3 MIN
+```
+
+### The Vitrine — `.vitrine`
+
+A hairline frame with genuine air inside it. Padding is `--space-10`/`--space-8`, rising to `--space-12`/`--space-10` above 768px.
+
+**The generous inset is the entire device.** An object is never crowded to the walls of its case. Tightening the padding to fit more in turns a vitrine back into a card.
+
+### The Exhibit Number — `.exhibit-number`
+
+An oversized Fraunces numeral in the corner, set almost to the ground: display-xl, Light, SOFT 100, WONK 1, 5% opacity, bleeding past the bottom edge.
+
+**Only where the content is genuinely a sequence** — lesson 7 of 14, path III. A topic initial is identity, not sequence; a decorative numeral on unordered content is the exact ornament this system rejects (§17.01). On Ink surfaces the numeral inverts to White at 8%.
+
+### The Caption — `.caption`
+
+One quiet italic line under the thing it describes: UI sans, 14px, Light, italic, Silver.
+
+A caption **never carries an action** and never doubles as a label. If it needs a button, it is not a caption.
+
+---
+
 ## 10. Layout & Navigation Patterns
 
 ### 10.1 The Grid System
@@ -1667,7 +1709,7 @@ Metadata line:
 
 7. TOMORROW TEASER
    padding:       20px 36px 28px
-   background:    #F4F1E8
+   background:    #F5F4F0
 
    Label:         Mono 9px, Silver, uppercase — "Tomorrow"
    Title:         Fraunces 18px, italic, Ink

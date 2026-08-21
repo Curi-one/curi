@@ -20,13 +20,13 @@
   --color-mid: #6b6760;
   --color-silver: #9e9b94;
   --color-light: #d4d0c8;
-  --color-paper-tone: #f4f1e8; /* paper — secondary surfaces */
+  --color-paper-tone: #f5f4f0; /* paper — secondary surfaces, barely warm */
   --color-white-tone: #faf9f5; /* white — primary page bg */
 
   /* Background */
   --color-bg-primary: var(--color-white-tone);
   --color-bg-secondary: var(--color-paper-tone);
-  --color-bg-tertiary: #ede9e0; /* warm pale between paper and light */
+  --color-bg-tertiary: #eeede9; /* pale — between paper and light */
   --color-bg-inverse: var(--color-ink);
   --color-bg-inverse-2: var(--color-ink-2);
   --color-bg-inverse-3: var(--color-ink-3);
@@ -61,11 +61,11 @@
      referenced undefined vars here, the stacks become guaranteed-invalid and
      the whole UI renders in Times New Roman / system UI.
      var(--token, "Literal") keeps a named face even if a var is missing. */
-  --font-display-stack: var(--font-display, "Fraunces"), Georgia,
-    "Times New Roman", serif;
+  --font-display-stack:
+    var(--font-display, "Fraunces"), Georgia, "Times New Roman", serif;
   --font-ui-stack: var(--font-ui, "Plus Jakarta Sans"), system-ui, sans-serif;
-  --font-mono-stack: var(--font-mono, "JetBrains Mono"), "Courier New",
-    monospace;
+  --font-mono-stack:
+    var(--font-mono, "JetBrains Mono"), "Courier New", monospace;
 
   --text-display-2xl: 192px;
   --text-display-xl: 88px;
@@ -162,6 +162,16 @@
   --content-max-width: 680px;
   --narrow-max-width: 480px;
 
+  /* ── Fraunces variable axes · §5.2 ──────────────────────────────────────
+     Display type is always Light (300) with the optical axes turned up: the
+     eccentricity is the point. SOFT rounds the terminals, WONK enables the
+     genuinely odd forms. Larger type carries more of both — the quirks need
+     room to read as intentional rather than as noise. */
+  --display-soft: 90; /* default — titles, card headings */
+  --display-soft-section: 96; /* section leads */
+  --display-soft-hero: 100; /* hero, ghost numerals */
+  --display-wonk: 1; /* on, everywhere */
+
   /* ── Motion · §7.2–7.3 ─────────────────────────────────────────────────── */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
@@ -227,11 +237,32 @@ body {
 @layer components {
   /* ── Type · §5 ─────────────────────────────────────────────────────────── */
 
+  /**
+   * Fraunces, always Light with the axes up (§5.2). The weight and the axes
+   * are set here and nowhere else — a component that hand-sets
+   * `font-variation-settings` has left the system (§17.04). To shift the
+   * optical setting, add `.display-section` / `.display-hero`.
+   */
   .font-display {
     font-family: var(--font-display-stack);
+    font-weight: var(--weight-light);
     font-variation-settings:
-      "SOFT" 50,
-      "WONK" 1;
+      "SOFT" var(--display-soft),
+      "WONK" var(--display-wonk);
+  }
+
+  /* Optical steps — larger type, more softness and wonk */
+  .display-section {
+    --display-soft: var(--display-soft-section);
+  }
+
+  .display-hero {
+    --display-soft: var(--display-soft-hero);
+  }
+
+  /* Escape hatch: straightens the wonk where it fights a tight measure. */
+  .display-plain {
+    --display-wonk: 0;
   }
 
   .font-ui {
@@ -266,17 +297,13 @@ body {
 
   /* Editorial display — Fraunces Light, tight tracking (§5.2) */
   .type-display {
-    font-family: var(--font-display-stack);
-    font-weight: var(--weight-light);
+    @apply font-display display-section;
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-tighter);
-    font-variation-settings:
-      "SOFT" 60,
-      "WONK" 1;
   }
 
   .type-display-xl {
-    @apply type-display text-[2.75rem] sm:text-[3.25rem];
+    @apply type-display display-hero text-display-sm sm:text-display-md;
   }
 
   .type-lede {
@@ -571,6 +598,100 @@ body {
     background: var(--color-bg-inverse-2);
   }
 
+  /* ── Museum devices · §6, §9.3, §10.7, §11.1 ─────────────────────────────
+     Four devices carry the editorial-modernist register. Each encodes
+     something true about the content rather than decorating it: what the
+     thing is, that it is on display, where it sits in a sequence, and what
+     the curator has to say about it. Used together on one surface they
+     compete — pick the one the content actually needs. */
+
+  /**
+   * Wall label. A hairline, then the accession metadata (§11.1 provenance
+   * line). Use for the small uppercase facts that sit above a title: source,
+   * day count, duration.
+   */
+  .wall-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-xs);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-ultra);
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .wall-label::before {
+    content: "";
+    width: var(--space-5);
+    height: 1px;
+    flex-shrink: 0;
+    background: var(--color-border-subtle);
+  }
+
+  /**
+   * Vitrine. A hairline frame with real air inside it — an object is never
+   * crowded to the walls of its case. The generous inset is the whole point;
+   * do not tighten it to fit more in.
+   */
+  .vitrine {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-bg-primary);
+    border: var(--border-subtle);
+    padding: var(--space-10) var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .vitrine {
+      padding: var(--space-12) var(--space-10);
+    }
+  }
+
+  /**
+   * Exhibit number. An oversized Fraunces numeral set almost to the ground
+   * (§9.3 ghost numeral). Only where the content is genuinely a sequence —
+   * lesson 7 of 14, path III. Never as texture.
+   */
+  .exhibit-number {
+    position: absolute;
+    right: var(--space-4);
+    bottom: calc(var(--space-6) * -1);
+    font-family: var(--font-display-stack);
+    font-weight: var(--weight-light);
+    font-variation-settings:
+      "SOFT" var(--display-soft-hero),
+      "WONK" var(--display-wonk);
+    font-size: var(--text-display-xl);
+    line-height: var(--leading-none);
+    letter-spacing: var(--tracking-tighter);
+    color: var(--color-text-primary);
+    opacity: 0.05;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /** Exhibit number on an Ink surface. */
+  .surface-card-dark .exhibit-number,
+  .exhibit-number-inverse {
+    color: var(--color-text-inverse);
+    opacity: 0.08;
+  }
+
+  /**
+   * Caption. What the curator says about the object: one quiet italic line
+   * under the thing it describes. Never carries an action.
+   */
+  .caption {
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-sm);
+    font-weight: var(--weight-light);
+    font-style: italic;
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-tertiary);
+  }
+
   /* ── Chips · derived from Badge §9.4 ───────────────────────────────────── */
 
   /* Chips / pills / tabs — mono under 20px (same family as badges). */
@@ -774,7 +895,11 @@ body {
   }
 
   .heatmap-cell-1 {
-    background: color-mix(in srgb, var(--color-accent) 28%, var(--color-bg-tertiary));
+    background: color-mix(
+      in srgb,
+      var(--color-accent) 28%,
+      var(--color-bg-tertiary)
+    );
   }
 
   .heatmap-cell-2 {

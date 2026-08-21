@@ -53,11 +53,11 @@ export default function EmailPreviewPage() {
           <h1 className="mt-1 text-lg font-medium text-ink">{subject}</h1>
         </div>
       </div>
-      <div className="overflow-hidden border border-border bg-[#EDE9E0]">
+      <div className="overflow-hidden border border-border bg-paper-tertiary">
         <iframe
           title="Daily lesson email preview"
           srcDoc={html}
-          className="min-h-[720px] w-full border-0 bg-[#EDE9E0]"
+          className="min-h-[720px] w-full border-0 bg-paper-tertiary"
         />
       </div>
     </PageShell>

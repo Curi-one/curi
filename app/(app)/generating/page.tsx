@@ -204,10 +204,7 @@ export default function GeneratingPage() {
                   <p className="font-meta text-ink-muted">
                     {totalLessons}-lesson founder path
                   </p>
-                  <h1
-                    className="mt-2 font-display text-3xl font-light tracking-tight text-ink sm:text-4xl"
-                    style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
-                  >
+                  <h1 className="mt-2 font-display text-3xl font-light tracking-tight text-ink sm:text-4xl">
                     {topic}
                   </h1>
                 </div>

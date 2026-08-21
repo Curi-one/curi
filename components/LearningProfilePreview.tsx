@@ -78,7 +78,7 @@ export function LearningProfilePreview({
           <p className="mb-2 font-meta text-ui-3xs uppercase tracking-widest text-ink-faint">
             {lesson.tag}
           </p>
-          <h3 className="mb-4 font-display text-xl font-medium leading-tight tracking-tight text-ink">
+          <h3 className="mb-4 font-display text-xl  leading-tight tracking-tight text-ink">
             {lesson.title}
           </h3>
 

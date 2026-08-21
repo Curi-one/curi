@@ -35,10 +35,7 @@ export function DepthPicker({
         )}
       </div>
       <StepProgress step={step} totalSteps={totalSteps} label="Depth" />
-      <h1
-        className="font-display text-display-xs font-light leading-snug tracking-tight text-ink"
-        style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
-      >
+      <h1 className="font-display text-display-xs font-light leading-snug tracking-tight text-ink">
         How far should this path go?
       </h1>
       <p className="mt-2 text-ui-md font-light text-ink-muted">

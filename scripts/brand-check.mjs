@@ -39,9 +39,9 @@ const ALLOWED_HEX = new Set([
   "6b6760", // mid
   "9e9b94", // silver
   "d4d0c8", // light
-  "f4f1e8", // paper
+  "f5f4f0", // paper
   "faf9f5", // white
-  "ede9e0", // tertiary
+  "eeede9", // tertiary
   "c1121f", // accent
   "a30f1b", // accent-dark
 ]);
@@ -80,6 +80,15 @@ const RAW_BUTTON =
  * An arbitrary value here is a token that does not exist.
  */
 const OFF_SCALE_TYPE = /\b(?:text|tracking|leading)-\[[^\]]+\]/g;
+/**
+ * Fraunces weight and axes are set once in `.font-display` (§5.2). A component
+ * that hand-sets them has left the system, and almost always turns SOFT/WONK
+ * down in the process.
+ */
+const INLINE_AXES = /fontVariationSettings|font-variation-settings/g;
+/** Display type is always Light (300) — never bolded to signal importance. */
+const HEAVY_DISPLAY =
+  /(?:font-display|type-display)[^"`]*?\bfont-(?:medium|semibold|bold|extrabold|black)\b/g;
 
 const RULES = [
   ["§8.4 · rounded container (use rounded-none)", BAD_RADIUS, "tsx"],
@@ -102,6 +111,12 @@ const RULES = [
   ],
   ["§9.1 · hand-rolled button (use <Button>)", RAW_BUTTON, "button"],
   ["§5.5 · off-scale type value (use a token)", OFF_SCALE_TYPE, "type"],
+  [
+    "§5.2 · inline Fraunces axes (set in .font-display only)",
+    INLINE_AXES,
+    "axes",
+  ],
+  ["§5.2 · display type heavier than Light 300", HEAVY_DISPLAY, "tsx"],
 ];
 
 /**
@@ -175,6 +190,7 @@ for (const file of files) {
       if (scope === "palette" && isPalette) continue;
       if (scope === "button" && (!isTsx || isButtonSource)) continue;
       if (scope === "type" && (!isTsx || TYPE_EXEMPT.has(file))) continue;
+      if (scope === "axes" && file === join("app", "globals.css")) continue;
       re.lastIndex = 0;
       let hits = line.match(re);
       // §17.04 — allowlisted warm / accent hexes are permitted; banned reported separately

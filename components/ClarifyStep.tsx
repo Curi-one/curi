@@ -43,10 +43,7 @@ export function ClarifyStep({
           {topic}
         </p>
       )}
-      <h1
-        className="font-display text-display-xs font-light leading-snug tracking-tight text-ink"
-        style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
-      >
+      <h1 className="font-display text-display-xs font-light leading-snug tracking-tight text-ink">
         {question.prompt}
       </h1>
       <ul className="mt-8 space-y-3">

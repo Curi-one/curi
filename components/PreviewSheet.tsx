@@ -129,7 +129,7 @@ export function PreviewSheet({
           )}
         </div>
 
-        <div className="shrink-0 border-t border-border bg-paper-secondary/40 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-5 sm:pb-5">
+        <div className="shrink-0 border-t border-border bg-paper-secondary px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-5 sm:pb-5">
           {atLimit ? (
             <>
               <div className="flex w-full items-center justify-center gap-2 rounded-none border border-border bg-paper-secondary py-3 text-sm font-medium text-ink-muted">

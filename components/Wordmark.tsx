@@ -20,10 +20,7 @@ export function Wordmark({ href = "/", size = "sm", underline = true }: Props) {
 
   const mark = (
     <span className="relative inline-block px-0.5 py-0.5 leading-none">
-      <span
-        className={`font-display font-light leading-none text-ink ${type}`}
-        style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
-      >
+      <span className={`font-display font-light leading-none text-ink ${type}`}>
         Cu<em className="italic">ri</em>
       </span>
       {underline && (

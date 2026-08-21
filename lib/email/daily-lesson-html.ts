@@ -123,7 +123,7 @@ export function renderDailyLessonEmail(payload: DailyLessonEmailPayload): string
       : "";
 
   const alsoDueHtml = hasMultiple
-    ? `<div style="border-top:1px solid #D4D0C8;background:#EDE9E0;"><div style="padding:20px 36px 8px;font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#9E9B94;">Also due today</div>${alsoDue
+    ? `<div style="border-top:1px solid #D4D0C8;background:#EEEDE9;"><div style="padding:20px 36px 8px;font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#9E9B94;">Also due today</div>${alsoDue
           .map(
             (course, i) =>
               `<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 36px;border-bottom:${i === alsoDue.length - 1 ? "none" : "1px solid #D4D0C8"};"><div style="flex:1;min-width:0;"><div style="font-family:'JetBrains Mono','Courier New',monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:#9E9B94;margin-bottom:4px;">${escapeHtml(course.topic)}</div><div style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:14px;line-height:1.4;color:#0A0908;">${escapeHtml(course.lessonTitle)}</div></div><a href="${escapeHtml(course.lessonUrl)}" style="flex-shrink:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:11px;font-weight:600;color:#0A0908;text-decoration:none;border:1px solid #D4D0C8;padding:7px 14px;">Read →</a></div>`,
@@ -132,14 +132,14 @@ export function renderDailyLessonEmail(payload: DailyLessonEmailPayload): string
     : "";
 
   const tomorrow = featured.tomorrowTitle
-    ? `<div style="padding:20px 36px 28px;background:#EDE9E0;border-top:1px solid #D4D0C8;"><div style="font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#9E9B94;margin-bottom:8px;">Tomorrow · ${escapeHtml(featured.topic)}</div><div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:17px;color:#0A0908;line-height:1.3;">${escapeHtml(featured.tomorrowTitle)}</div></div>`
+    ? `<div style="padding:20px 36px 28px;background:#EEEDE9;border-top:1px solid #D4D0C8;"><div style="font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#9E9B94;margin-bottom:8px;">Tomorrow · ${escapeHtml(featured.topic)}</div><div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:17px;color:#0A0908;line-height:1.3;">${escapeHtml(featured.tomorrowTitle)}</div></div>`
     : "";
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#EDE9E0;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#EDE9E0;padding:32px 16px;">
+<body style="margin:0;padding:0;background:#EEEDE9;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#EEEDE9;padding:32px 16px;">
     <tr><td align="center">
       <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="background:#FAF9F5;border:1px solid #D4D0C8;">
         <tr><td style="padding:28px 36px 0;border-bottom:1px solid #D4D0C8;">
@@ -162,7 +162,7 @@ export function renderDailyLessonEmail(payload: DailyLessonEmailPayload): string
           <p style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:11px;color:#9E9B94;text-align:center;margin:12px 0 0;">${dayNum} day streak — keep it alive</p>
         </td></tr>
         ${tomorrow ? `<tr><td>${tomorrow}</td></tr>` : ""}
-        <tr><td style="padding:20px 36px;border-top:1px solid #D4D0C8;background:#F4F1E8;">
+        <tr><td style="padding:20px 36px;border-top:1px solid #D4D0C8;background:#F5F4F0;">
           <table role="presentation" width="100%"><tr>
             <td style="font-family:'Fraunces',Georgia,serif;font-size:18px;color:#0A0908;">Cu<em style="font-style:italic;">ri</em></td>
             <td align="right" style="font-family:'JetBrains Mono','Courier New',monospace;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:#9E9B94;"><a href="${escapeHtml(preferencesUrl)}" style="color:#9E9B94;text-decoration:none;">Manage preferences</a> · <a href="${escapeHtml(unsubscribeUrl)}" style="color:#9E9B94;text-decoration:none;">Unsubscribe</a></td>

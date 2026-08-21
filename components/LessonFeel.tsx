@@ -13,10 +13,7 @@ export function LessonFeel({ onSelect, selected }: Props) {
   return (
     <div className="flex min-h-[70vh] flex-col pb-28 animate-fade-in">
       <p className="type-kicker">Required</p>
-      <h1
-        className="mt-2 font-display text-display-xs font-light leading-snug text-ink"
-        style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
-      >
+      <h1 className="mt-2 font-display text-display-xs font-light leading-snug text-ink">
         How did that land?
       </h1>
       <p className="mt-2 text-ui-md font-light text-ink-muted">

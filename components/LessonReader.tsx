@@ -300,7 +300,6 @@ export function LessonReader({
             <>
               <span
                 className="float-left mr-3 mt-1 font-display text-5xl font-light leading-[0.78] text-ink sm:text-7xl"
-                style={{ fontVariationSettings: "'SOFT' 55, 'WONK' 1" }}
                 aria-hidden
               >
                 {firstLetter}
@@ -618,7 +617,7 @@ export function LessonReader({
         </div>
 
         {isGuest && (
-          <div className="mb-8 overflow-hidden rounded-none border border-border bg-paper-secondary/60">
+          <div className="mb-8 overflow-hidden rounded-none border border-border bg-paper-secondary">
             <div className="flex items-center gap-0 divide-x divide-border">
               {[
                 {
@@ -669,7 +668,7 @@ export function LessonReader({
           ref={articleRef}
           className="pb-[calc(8rem+env(safe-area-inset-bottom))]"
         >
-          <div className="mb-6 flex flex-wrap items-center gap-2.5 text-xs uppercase tracking-ultra text-ink-muted">
+          <div className="wall-label mb-6 flex-wrap">
             <span>
               Lesson {lessonIndex + 1}
               {topicLabel ? ` · ${topicLabel}` : ""}
@@ -679,10 +678,7 @@ export function LessonReader({
             </span>
           </div>
 
-          <h1
-            className="font-display text-4xl font-light leading-[0.97] tracking-tighter text-ink sm:text-5xl sm:text-display-md"
-            style={{ fontVariationSettings: "'SOFT' 55, 'WONK' 1" }}
-          >
+          <h1 className="font-display display-section text-display-sm leading-tight tracking-tighter text-ink sm:text-display-md">
             {lesson.title}
           </h1>
 
@@ -787,7 +783,7 @@ export function LessonReader({
               </button>
             </div>
 
-            <div className="shrink-0 border-b border-border bg-paper-secondary/60 px-6 py-3">
+            <div className="shrink-0 border-b border-border bg-paper-secondary px-6 py-3">
               <p className="text-ui-3xs leading-relaxed text-ink-muted">
                 These references informed the lesson content. Curi synthesises
                 ideas across sources — always read the originals for full
@@ -822,7 +818,7 @@ export function LessonReader({
                         className={`group flex items-start gap-3.5 rounded-none border p-4 transition-all ${
                           isActive
                             ? "border-ink bg-paper-tertiary"
-                            : "border-border bg-paper-secondary/40 hover:border-ink/20 hover:bg-paper"
+                            : "border-border bg-paper-secondary hover:border-ink/20 hover:bg-paper"
                         }`}
                       >
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-paper-tertiary text-ui-4xs font-semibold text-ink-muted">

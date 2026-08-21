@@ -41,7 +41,6 @@ export function PageShell({
           className={`font-display text-display-xs font-light leading-tight tracking-tight text-ink ${
             kicker ? "mt-2" : back ? "mt-4" : ""
           }`}
-          style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
         >
           {title}
         </h1>

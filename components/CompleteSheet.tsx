@@ -112,15 +112,11 @@ export function CompleteSheet({
           <h2
             id="complete-sheet-title"
             className="font-display text-display-xs font-light leading-tight text-ink"
-            style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
           >
             {title}
           </h2>
           {lessonTitle ? (
-            <p
-              className="mt-2 font-display text-lg italic leading-snug text-ink/55"
-              style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 1" }}
-            >
+            <p className="mt-2 font-display text-lg italic leading-snug text-ink/55">
               {lessonTitle}
             </p>
           ) : (
@@ -149,10 +145,7 @@ export function CompleteSheet({
               <div className="mb-4 font-meta text-ink-muted">
                 Today&apos;s insight
               </div>
-              <blockquote
-                className="font-display text-xl font-light leading-snug tracking-tight text-ink"
-                style={{ fontVariationSettings: "'SOFT' 40, 'WONK' 1" }}
-              >
+              <blockquote className="font-display text-xl font-light leading-snug tracking-tight text-ink">
                 &ldquo;{insight.fact}&rdquo;
               </blockquote>
               <p className="mt-3 text-sm leading-relaxed text-ink-muted">
