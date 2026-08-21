@@ -3,6 +3,7 @@ import { AuthRequestSchema } from "@/lib/api/schemas";
 import {
   invalidBodyResponse,
   jsonWithSession,
+  newSessionId,
   resolveSession,
 } from "@/lib/api/handler-utils";
 import {
@@ -22,6 +23,30 @@ import {
   createClientForResponse,
   requestFromIncoming,
 } from "@/lib/supabase/server";
+import { clientIp, rateLimit, tooManyRequests } from "@/lib/api/rate-limit";
+
+const HOUR_MS = 60 * 60 * 1000;
+/** Sign-in emails are free to request and land in someone else's inbox. */
+const SEND_PER_EMAIL = 5;
+/** A 6-digit OTP is only strong if guesses are bounded. */
+const VERIFY_PER_EMAIL = 10;
+const VERIFY_WINDOW_MS = 15 * 60 * 1000;
+const PER_IP = 30;
+
+/**
+ * Carry Supabase's auth cookies onto the outgoing response **with their
+ * options**. Copying only name/value drops maxAge, path, sameSite, secure and
+ * httpOnly, which downgrades the session cookie to a non-Secure, browser-
+ * session-lifetime cookie.
+ */
+function copySessionCookies(
+  carrier: NextResponse,
+  response: NextResponse,
+): void {
+  for (const cookie of carrier.cookies.getAll()) {
+    response.cookies.set(cookie);
+  }
+}
 
 export async function POST(request: Request) {
   const { sessionId } = resolveSession(request);
@@ -60,6 +85,23 @@ export async function POST(request: Request) {
     return jsonWithSession(result.data, sessionId);
   }
 
+  // Mock mode is local-only and has no real mailbox or OTP to protect.
+  const normalizedEmail = email.trim().toLowerCase();
+  const ipLimit = rateLimit(`auth:ip:${clientIp(request)}`, PER_IP, HOUR_MS);
+  if (!ipLimit.ok) {
+    return tooManyRequests(ipLimit.retryAfterSeconds);
+  }
+  const perEmail = code
+    ? rateLimit(
+        `auth:verify:${normalizedEmail}`,
+        VERIFY_PER_EMAIL,
+        VERIFY_WINDOW_MS,
+      )
+    : rateLimit(`auth:send:${normalizedEmail}`, SEND_PER_EMAIL, HOUR_MS);
+  if (!perEmail.ok) {
+    return tooManyRequests(perEmail.retryAfterSeconds);
+  }
+
   try {
     // Email only → send OTP
     if (!code && !name) {
@@ -80,9 +122,7 @@ export async function POST(request: Request) {
         },
         sessionId,
       );
-      for (const cookie of cookieCarrier.cookies.getAll()) {
-        response.cookies.set(cookie.name, cookie.value);
-      }
+      copySessionCookies(cookieCarrier, response);
       return response;
     }
 
@@ -127,24 +167,35 @@ export async function POST(request: Request) {
     }
 
     const session = await loadMemberSession(userId, userEmail);
+    // Pending paths have been claimed above; retire the guest id so it cannot
+    // be replayed or inherited.
     const response = jsonWithSession(
       {
         session,
         ...(migratedPathId ? { migratedPathId } : {}),
+        ...(migrated.shelvedPathIds.length > 0
+          ? { shelvedPathIds: migrated.shelvedPathIds }
+          : {}),
       },
-      sessionId,
+      newSessionId(),
     );
-    for (const cookie of cookieCarrier.cookies.getAll()) {
-      response.cookies.set(cookie.name, cookie.value);
-    }
+    copySessionCookies(cookieCarrier, response);
     return response;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Auth failed";
     const classified = classifyAuthError(message);
-    const clientMessage =
-      classified.code === "rate_limited"
-        ? "Too many sign-in emails. Wait a few minutes, or open the link we already sent."
-        : message;
+    // Only the two user-actionable classes get a specific message. Anything
+    // else is an internal fault — do not echo the raw error to the client.
+    let clientMessage: string;
+    if (classified.code === "rate_limited") {
+      clientMessage =
+        "Too many sign-in emails. Wait a few minutes, or open the link we already sent.";
+    } else if (classified.code === "invalid_code") {
+      clientMessage = "That code is invalid or expired. Request a new one.";
+    } else {
+      console.error("auth route failed", err);
+      clientMessage = "Something went wrong signing you in. Try again.";
+    }
     return jsonWithSession(
       {
         error: clientMessage,

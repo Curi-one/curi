@@ -12,6 +12,7 @@ import {
   normalizeTopic,
   type GeneratePathOutlineDeps,
 } from "@/lib/courses/outline";
+import { activePathSlotsRemaining } from "@/lib/courses/active-limit";
 import { FREE_ACTIVE_PATH_LIMIT, isFreePlan, normalizePlan } from "@/lib/plans";
 import {
   DEFAULT_LEARNING_PROFILE,
@@ -37,7 +38,29 @@ export type CreateCoursePlanLimit = {
   message: string;
 };
 
-export type CreateCourseResult = CreateCourseSuccess | CreateCoursePlanLimit;
+/**
+ * The Supabase session could not be resolved. Never silently downgrade to the
+ * guest branch here — guests are uncapped, so a transient auth failure would
+ * hand a capped member an unlimited-path bypass.
+ */
+export type CreateCourseAuthUnavailable = {
+  ok: false;
+  code: "auth_unavailable";
+  message: string;
+};
+
+export type CreateCourseResult =
+  | CreateCourseSuccess
+  | CreateCoursePlanLimit
+  | CreateCourseAuthUnavailable;
+
+/** Thrown by the auth lookup when we cannot tell member from guest. */
+export class AuthUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AuthUnavailableError";
+  }
+}
 
 export type AuthUser = {
   id: string;
@@ -54,49 +77,62 @@ export type CreateCourseDeps = {
   ) => ReturnType<typeof generatePathOutline>;
 };
 
-async function defaultGetUser(): Promise<AuthUser | null> {
-  try {
-    const supabase = await createServerClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      return null;
-    }
-
-    const admin = createAdminClient();
-    const { data: profile } = await admin
-      .from("users")
-      .select("plan")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    return {
-      id: user.id,
-      plan: normalizePlan(
-        typeof profile?.plan === "string" ? profile.plan : null,
-      ),
-    };
-  } catch {
-    // No Supabase auth session yet (staging until auth ships).
-    return null;
+/**
+ * "No session" and "could not check the session" are different answers.
+ * Only the first one means guest; the second throws so the caller can 503.
+ */
+function isMissingSessionError(error: unknown): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
   }
+  const name = (error as { name?: string }).name ?? "";
+  const status = (error as { status?: number }).status;
+  return (
+    name === "AuthSessionMissingError" ||
+    name === "AuthInvalidTokenResponseError" ||
+    status === 401 ||
+    status === 403
+  );
 }
 
-async function defaultCountActiveCourses(
-  admin: SupabaseClient,
-  userId: string,
-): Promise<number> {
-  const { count, error } = await admin
-    .from("courses")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .eq("status", "active");
-
-  if (error) {
-    throw new Error(`Failed to count active courses: ${error.message}`);
+async function defaultGetUser(): Promise<AuthUser | null> {
+  let supabase;
+  try {
+    supabase = await createServerClient();
+  } catch (err) {
+    throw new AuthUnavailableError(
+      err instanceof Error ? err.message : "Supabase client unavailable",
+    );
   }
-  return count ?? 0;
+
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error && !isMissingSessionError(error)) {
+    throw new AuthUnavailableError(error.message);
+  }
+  if (!data.user) {
+    return null;
+  }
+
+  const admin = createAdminClient();
+  const { data: profile, error: profileError } = await admin
+    .from("users")
+    .select("plan")
+    .eq("id", data.user.id)
+    .maybeSingle();
+
+  // Defaulting to "free" on a read failure would cap a paying member; treating
+  // it as a member-with-unknown-plan would uncap a free one. Refuse instead.
+  if (profileError) {
+    throw new AuthUnavailableError(
+      `plan lookup failed: ${profileError.message}`,
+    );
+  }
+
+  return {
+    id: data.user.id,
+    plan: normalizePlan(typeof profile?.plan === "string" ? profile.plan : null),
+  };
 }
 
 /**
@@ -114,14 +150,29 @@ export async function createCourse(
   const getUser = deps?.getUser ?? defaultGetUser;
   const generateOutline = deps?.generateOutline ?? generatePathOutline;
 
-  const user = await getUser();
+  let user: AuthUser | null;
+  try {
+    user = await getUser();
+  } catch (err) {
+    if (err instanceof AuthUnavailableError) {
+      return {
+        ok: false,
+        code: "auth_unavailable",
+        message: "Could not verify your session. Try again in a moment.",
+      };
+    }
+    throw err;
+  }
 
   if (user) {
-    const countActive =
-      deps?.countActiveCourses ??
-      ((userId: string) => defaultCountActiveCourses(admin, userId));
-    const activeCount = await countActive(user.id);
-    if (isFreePlan(user.plan) && activeCount >= FREE_ACTIVE_PATH_LIMIT) {
+    const injectedCount = deps?.countActiveCourses;
+    const remaining = injectedCount
+      ? isFreePlan(user.plan)
+        ? Math.max(0, FREE_ACTIVE_PATH_LIMIT - (await injectedCount(user.id)))
+        : Number.POSITIVE_INFINITY
+      : await activePathSlotsRemaining(admin, user.id, user.plan);
+
+    if (remaining <= 0) {
       return {
         ok: false,
         code: "plan_limit",

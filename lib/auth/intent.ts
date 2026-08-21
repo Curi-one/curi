@@ -77,9 +77,23 @@ export function authEmailSubcopy(
   }
 }
 
+/**
+ * Same-origin in-app path only. Rejects protocol-relative (`//host`),
+ * backslash variants (`/\host` — normalized to `//host` by some browsers),
+ * and control characters that can smuggle a newline into a Location header.
+ */
 export function sanitizeReturnTo(raw: string | null | undefined): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) {
+  if (!raw) {
     return "/today";
   }
-  return raw;
+  const value = raw.trim();
+  if (
+    !value.startsWith("/") ||
+    value.startsWith("//") ||
+    value.startsWith("/\\") ||
+    /[\u0000-\u001f\u007f]/.test(value)
+  ) {
+    return "/today";
+  }
+  return value;
 }

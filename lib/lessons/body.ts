@@ -102,7 +102,29 @@ export type CourseContext = {
   /** Member courses only — used for the unlock-tomorrow read gate below. */
   progress?: number;
   hasActivityToday?: boolean;
+  /** Member courses only. Shelved paths are view-only (FLOWS F4). */
+  status?: "active" | "completed" | "shelved";
 };
+
+/**
+ * Shelving frees an active-path slot, so an ungated shelved path would be an
+ * unlimited-paths loophole: shelve → start another → shelve → repeat, while
+ * every shelved path still serves (and bills for) new AI lessons. Already-read
+ * lessons stay readable; anything past `progress` does not.
+ */
+export function isShelvedLessonBlocked(
+  course: CourseContext,
+  lessonIndex: number,
+): boolean {
+  return (
+    course.kind === "member" &&
+    course.status === "shelved" &&
+    lessonIndex >= (course.progress ?? 0)
+  );
+}
+
+export const SHELVED_LOCK_MESSAGE =
+  "This path is shelved. Restore it to continue.";
 
 export type GetLessonBodySuccess = {
   ok: true;
@@ -329,7 +351,7 @@ export async function defaultLoadCourse(
 
   const { data: course, error: courseError } = await admin
     .from("courses")
-    .select("id, user_id, topic, depth, clarifications, progress")
+    .select("id, user_id, topic, depth, clarifications, progress, status")
     .eq("id", params.courseId)
     .eq("user_id", userId)
     .maybeSingle();
@@ -362,6 +384,10 @@ export async function defaultLoadCourse(
     admin,
   );
 
+  const statusRaw = String(course.status);
+  const status =
+    statusRaw === "shelved" || statusRaw === "completed" ? statusRaw : "active";
+
   return {
     kind: "member",
     topic: String(course.topic),
@@ -371,6 +397,7 @@ export async function defaultLoadCourse(
     userId: memberUserId,
     progress: typeof course.progress === "number" ? course.progress : 0,
     hasActivityToday,
+    status,
   };
 }
 
@@ -605,6 +632,10 @@ export async function getLessonBody(
   const lesson = course.lessons.find((l) => l.index === params.lessonIndex);
   if (!lesson) {
     return { ok: false, code: "not_found", message: "Lesson not found" };
+  }
+
+  if (isShelvedLessonBlocked(course, params.lessonIndex)) {
+    return { ok: false, code: "locked", message: SHELVED_LOCK_MESSAGE };
   }
 
   if (

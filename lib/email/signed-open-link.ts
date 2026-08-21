@@ -8,12 +8,22 @@ export type EmailOpenPayload = {
   exp: number;
 };
 
-const DEFAULT_TTL_SECONDS = 72 * 60 * 60;
+/**
+ * A valid link mints a full session for the payload's email, so treat it as a
+ * bearer credential: short-lived, and scoped to the day's email. 24h matches
+ * the daily send cadence — a link is superseded before it expires.
+ */
+const DEFAULT_TTL_SECONDS = 24 * 60 * 60;
 
+/**
+ * Dedicated key, falling back to CRON_SECRET. Never the service-role key:
+ * that is the highest-privilege secret in the system and must not double as
+ * an HMAC key handed out (in signature form) to every email recipient.
+ */
 function linkSigningSecret(): string {
-  const cron = getEnv().CRON_SECRET.trim();
-  if (cron) return cron;
-  return getEnv().SUPABASE_SERVICE_ROLE_KEY.trim();
+  const dedicated = getEnv().EMAIL_LINK_SECRET.trim();
+  if (dedicated) return dedicated;
+  return getEnv().CRON_SECRET.trim();
 }
 
 function base64UrlEncode(value: string): string {

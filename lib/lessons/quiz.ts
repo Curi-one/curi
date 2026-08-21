@@ -25,6 +25,8 @@ import {
 import { stripMarkdownFences } from "@/lib/clarify/generate";
 import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
 import {
+  isShelvedLessonBlocked,
+  SHELVED_LOCK_MESSAGE,
   defaultLoadCourse,
   normalizeSources,
   type CourseContext,
@@ -57,12 +59,17 @@ export type GetQuizNotFound = {
   code: "not_found";
   message: string;
 };
-export type GetQuizResult = GetQuizSuccess | GetQuizNotFound;
+export type GetQuizLocked = {
+  ok: false;
+  code: "locked";
+  message: string;
+};
+export type GetQuizResult = GetQuizSuccess | GetQuizNotFound | GetQuizLocked;
 
 export type SubmitQuizSuccess = { ok: true; data: QuizSubmitResponse };
 export type SubmitQuizError = {
   ok: false;
-  code: "not_found" | "already_done_today";
+  code: "not_found" | "already_done_today" | "locked";
   message: string;
 };
 export type SubmitQuizResult = SubmitQuizSuccess | SubmitQuizError;
@@ -553,6 +560,10 @@ export async function getQuiz(
     return { ok: false, code: "not_found", message: "Lesson not found" };
   }
 
+  if (isShelvedLessonBlocked(course, params.lessonIndex)) {
+    return { ok: false, code: "locked", message: SHELVED_LOCK_MESSAGE };
+  }
+
   const cacheKey = quizCacheKey(course, params.lessonIndex);
   const hit = await lookup(cacheKey);
   if (hit?.payload?.questions?.length) {
@@ -655,6 +666,10 @@ export async function submitQuiz(
   );
   if (!lesson) {
     return { ok: false, code: "not_found", message: "Lesson not found" };
+  }
+
+  if (isShelvedLessonBlocked(course, params.lessonIndex)) {
+    return { ok: false, code: "locked", message: SHELVED_LOCK_MESSAGE };
   }
 
   const cacheKey = quizCacheKey(course, params.lessonIndex);

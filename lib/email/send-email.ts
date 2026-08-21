@@ -5,6 +5,8 @@ export type SendEmailInput = {
   to: string;
   subject: string;
   html: string;
+  /** Extra SMTP headers (e.g. RFC 8058 List-Unsubscribe). */
+  headers?: Record<string, string>;
 };
 
 export type SendEmailResult =
@@ -30,6 +32,7 @@ export async function sendEmail(
       to: [input.to],
       subject: input.subject,
       html: input.html,
+      ...(input.headers ? { headers: input.headers } : {}),
     }),
   });
 

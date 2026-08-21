@@ -556,4 +556,84 @@ describe("getLessonBody", () => {
     expect(withDetails).not.toBe(without);
   });
 
+  describe("shelved paths are view-only", () => {
+    function shelvedCourse(progress: number) {
+      return {
+        kind: "member" as const,
+        topic: TOPIC,
+        depth: DEPTH,
+        clarifications: [],
+        lessons: [
+          { index: 0, title: "L0" },
+          { index: 1, title: "L1" },
+          { index: 2, title: "L2" },
+        ],
+        userId: "user-1",
+        progress,
+        hasActivityToday: false,
+        status: "shelved" as const,
+      };
+    }
+
+    it("blocks the next unread lesson on a shelved path", async () => {
+      // Shelving frees an active-path slot, so serving new lessons here is an
+      // unlimited-paths bypass: shelve, start another, repeat.
+      loadCourse.mockResolvedValueOnce(shelvedCourse(1));
+
+      const result = await getLessonBody(
+        { courseId: "course-1", lessonIndex: 1, sessionId: "s" },
+        baseDeps,
+      );
+
+      expect(result).toEqual({
+        ok: false,
+        code: "locked",
+        message: "This path is shelved. Restore it to continue.",
+      });
+      expect(vi.mocked(chatCompletion)).not.toHaveBeenCalled();
+    });
+
+    it("still allows re-reading lessons finished before shelving", async () => {
+      loadCourse.mockResolvedValueOnce(shelvedCourse(2));
+      lookup.mockResolvedValueOnce({
+        payload: {
+          body: ["Cached paragraph."],
+          takeaways: ["A", "B", "C"],
+          shareableFact: { fact: "Cached fact", reflection: "Cached note" },
+          visuals: [],
+        },
+        sources: [],
+      });
+
+      const result = await getLessonBody(
+        { courseId: "course-1", lessonIndex: 0, sessionId: "s" },
+        baseDeps,
+      );
+
+      expect(result.ok).toBe(true);
+    });
+
+    it("does not gate active paths", async () => {
+      loadCourse.mockResolvedValueOnce({
+        ...shelvedCourse(0),
+        status: "active" as const,
+      });
+      lookup.mockResolvedValueOnce({
+        payload: {
+          body: ["Cached paragraph."],
+          takeaways: ["A", "B", "C"],
+          shareableFact: { fact: "Cached fact", reflection: "Cached note" },
+          visuals: [],
+        },
+        sources: [],
+      });
+
+      const result = await getLessonBody(
+        { courseId: "course-1", lessonIndex: 0, sessionId: "s" },
+        baseDeps,
+      );
+
+      expect(result.ok).toBe(true);
+    });
+  });
 });

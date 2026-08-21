@@ -163,6 +163,12 @@ export async function dispatchDailyLessonEmails(
         to: payload.to,
         subject: dailyLessonSubject(payload),
         html: renderDailyLessonEmail(payload),
+        headers: {
+          // RFC 8058: mail clients POST here, so the opt-out never depends on
+          // a state-changing GET.
+          "List-Unsubscribe": `<${payload.unsubscribeUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
       });
 
       if (!sendResult.ok) {

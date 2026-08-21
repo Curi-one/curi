@@ -144,6 +144,8 @@ export type AuthLinkStepResponse = {
 export type AuthSessionResponse = {
   session: UserSession;
   migratedPathId?: string;
+  /** Guest paths imported as shelved because the free active cap was full. */
+  shelvedPathIds?: string[];
 };
 
 export type AuthResponse = AuthLinkStepResponse | AuthSessionResponse;

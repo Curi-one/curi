@@ -3,8 +3,9 @@ import { dispatchDailyLessonEmails } from "@/lib/email/dispatch-daily";
 import { getEnv } from "@/lib/env";
 
 /**
- * POST /api/dev/send-daily-email — staging QA send (no CRON_SECRET required).
- * Only sends to opted-in users; use ?force=1 to bypass delivery-hour gates.
+ * POST /api/dev/send-daily-email — staging QA send.
+ * Requires `Authorization: Bearer $CRON_SECRET`; staging only.
+ * Only sends to opted-in users; use ?force=0 to respect delivery-hour gates.
  */
 export async function POST(request: Request) {
   const env = getEnv();
@@ -17,6 +18,19 @@ export async function POST(request: Request) {
       { status: 403 },
     );
   }
+  // Sends real mail to real opted-in users — must not be callable by anyone
+  // who knows the URL, and must not fire from a link prefetch.
+  const cronSecret = env.CRON_SECRET.trim();
+  if (!cronSecret) {
+    return NextResponse.json(
+      { error: "CRON_SECRET not configured" },
+      { status: 503 },
+    );
+  }
+  if (request.headers.get("authorization") !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   if (!env.RESEND_API_KEY.trim()) {
     return NextResponse.json(
       { error: "RESEND_API_KEY not configured" },
@@ -54,8 +68,4 @@ export async function POST(request: Request) {
     const message = err instanceof Error ? err.message : "send_failed";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
-}
-
-export async function GET(request: Request) {
-  return POST(request);
 }

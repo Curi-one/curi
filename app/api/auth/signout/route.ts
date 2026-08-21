@@ -1,4 +1,8 @@
-import { jsonWithSession, resolveSession } from "@/lib/api/handler-utils";
+import {
+  jsonWithSession,
+  newSessionId,
+  resolveSession,
+} from "@/lib/api/handler-utils";
 import { getEnv } from "@/lib/env";
 import { getMockStore } from "@/lib/mock/store";
 import { createClient } from "@/lib/supabase/server";
@@ -19,8 +23,10 @@ export async function POST(request: Request) {
     // Cookie/session may already be cleared; still return guest.
   }
 
+  // New anonymous id on the way out — the signed-out browser must not keep an
+  // id that is still associated with the account's guest history.
   return jsonWithSession(
     { session: { kind: "guest" as const, plan: "free" as const } },
-    sessionId,
+    newSessionId(),
   );
 }
