@@ -74,6 +74,16 @@ export const CourseCreateRequestSchema = z.object({
     }),
   ),
   details: z.string().max(DETAILS_MAX_CHARS).optional(),
+  /** Guest client may send prefs from localStorage; members use server DB. */
+  learningProfile: z
+    .object({
+      seq: z.enum(["broad", "definition", "straight"]),
+      anchor: z.enum(["example", "data", "story", "analogy"]),
+      length: z.enum(["short", "medium", "long"]),
+      rigor: z.enum(["clean", "edges", "harder"]),
+      jargon: z.enum(["always", "unusual", "skip"]),
+    })
+    .optional(),
 });
 export type CourseCreateRequest = z.infer<typeof CourseCreateRequestSchema>;
 

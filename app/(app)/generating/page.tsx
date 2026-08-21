@@ -7,6 +7,7 @@ import { PageShell } from "@/components/PageShell";
 import { Wordmark } from "@/components/Wordmark";
 import { getMe, postCourse } from "@/lib/api/client";
 import { loadClarifySession, saveClarifySession } from "@/lib/clarify-store";
+import { loadPreferences } from "@/lib/profile/preferences";
 import { Button } from "@/components/Button";
 
 const WARMUP_MSGS = [
@@ -114,11 +115,19 @@ export default function GeneratingPage() {
     }
     setTopic(session.topic);
 
+    const localPrefs = loadPreferences("guest");
     postCourse({
       topic: session.topic,
       depth: session.depth,
       clarifications: session.answers,
       ...(session.details ? { details: session.details } : {}),
+      learningProfile: {
+        seq: localPrefs.seq,
+        anchor: localPrefs.anchor,
+        length: localPrefs.length,
+        rigor: localPrefs.rigor,
+        jargon: localPrefs.jargon,
+      },
     })
       .then((res) => {
         setCourseId(res.courseId);

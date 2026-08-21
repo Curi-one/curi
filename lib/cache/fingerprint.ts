@@ -7,7 +7,7 @@ export type FingerprintInput = {
   cacheType: "path_outline" | "lesson_body" | "quiz";
   lessonIndex?: number;
   difficultyModifier?: string;
-  /** Per-user teaching preferences — lesson_body only. */
+  /** Per-user teaching preferences — lesson_body and path_outline. */
   learningProfile?: {
     seq: string;
     anchor: string;

@@ -221,4 +221,32 @@ describe("generatePathOutline", () => {
       },
     );
   });
+
+  it("includes learning profile teaching preferences in the outline prompt", async () => {
+    lookup.mockResolvedValueOnce(null);
+    vi.mocked(chatCompletion).mockResolvedValueOnce(
+      completion(JSON.stringify(ESSENTIALS_PAYLOAD)),
+    );
+
+    await generatePathOutline(
+      {
+        topic: "Mandarin",
+        depth: "essentials",
+        clarifications: [],
+        learningProfile: {
+          seq: "definition",
+          anchor: "analogy",
+          length: "short",
+          rigor: "clean",
+          jargon: "always",
+        },
+      },
+      { lookup, store },
+    );
+
+    const messages = vi.mocked(chatCompletion).mock.calls[0]?.[0]?.messages;
+    const user = messages?.find((m) => m.role === "user")?.content ?? "";
+    expect(user).toMatch(/Learner teaching preferences/i);
+    expect(user).toMatch(/definition/i);
+  });
 });

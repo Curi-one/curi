@@ -18,6 +18,12 @@ import {
   resolveLearnerDetails,
 } from "@/lib/clarify/details";
 import { stripMarkdownFences } from "@/lib/clarify/generate";
+import {
+  DEFAULT_LEARNING_PROFILE,
+  learningProfilePromptLines,
+  normalizeLearningProfile,
+  type LearningProfile,
+} from "@/lib/profile/learning-profile";
 
 export const DEPTH_LESSON_BANDS: Record<
   DepthSlug,
@@ -139,12 +145,15 @@ function buildMessages(input: {
   depth: DepthSlug;
   clarifications: CourseCreateRequest["clarifications"];
   details?: string;
+  learningProfile?: LearningProfile;
 }): PerplexityMessage[] {
   const band = DEPTH_LESSON_BANDS[input.depth];
+  const profile = input.learningProfile ?? DEFAULT_LEARNING_PROFILE;
   const lines = [
     `Topic: ${input.topic}`,
     `Depth: ${input.depth} (total lessons must be between ${band.min} and ${band.max} inclusive)`,
-    "Generate a path outline as JSON.",
+    ...learningProfilePromptLines(profile),
+    "Generate a path outline as JSON. Order and title lessons to match the learner teaching preferences above.",
   ];
 
   const topicClarifications = input.clarifications.filter(
@@ -172,13 +181,19 @@ function buildMessages(input: {
 }
 
 async function attemptGenerate(
-  input: CourseCreateRequest,
+  input: CourseCreateRequest & { learningProfile?: LearningProfile },
   complete: typeof chatCompletion,
 ): Promise<AttemptResult> {
   try {
     const result = await complete({
       model: outlineModel(),
-      messages: buildMessages(input),
+      messages: buildMessages({
+        topic: input.topic,
+        depth: input.depth,
+        clarifications: input.clarifications,
+        details: input.details,
+        learningProfile: input.learningProfile,
+      }),
       temperature: 0.2,
       max_tokens: 1200,
     });
@@ -208,11 +223,23 @@ export async function generatePathOutline(
     input.clarifications,
     input.details,
   );
+  const learningProfile = input.learningProfile
+    ? normalizeLearningProfile(input.learningProfile)
+    : undefined;
   const cacheKey = buildFingerprint({
     topicNormalized,
     depth: input.depth,
     clarifications,
     cacheType: "path_outline",
+    learningProfile: learningProfile
+      ? {
+          seq: learningProfile.seq,
+          anchor: learningProfile.anchor,
+          length: learningProfile.length,
+          rigor: learningProfile.rigor,
+          jargon: learningProfile.jargon,
+        }
+      : undefined,
   });
 
   const lookup = deps?.lookup ?? lookupPathOutline;
@@ -224,7 +251,8 @@ export async function generatePathOutline(
     return hit.payload;
   }
 
-  const first = await attemptGenerate(input, complete);
+  const enriched = { ...input, learningProfile };
+  const first = await attemptGenerate(enriched, complete);
   if (first.ok) {
     await store({
       cacheKey,
@@ -236,7 +264,7 @@ export async function generatePathOutline(
     return first.payload;
   }
 
-  const second = await attemptGenerate(input, complete);
+  const second = await attemptGenerate(enriched, complete);
   if (second.ok) {
     await store({
       cacheKey,

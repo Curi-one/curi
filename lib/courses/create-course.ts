@@ -13,6 +13,12 @@ import {
   type GeneratePathOutlineDeps,
 } from "@/lib/courses/outline";
 import { FREE_ACTIVE_PATH_LIMIT, isFreePlan, normalizePlan } from "@/lib/plans";
+import {
+  DEFAULT_LEARNING_PROFILE,
+  normalizeLearningProfile,
+  type LearningProfile,
+} from "@/lib/profile/learning-profile";
+import { loadUserPreferencesForUserId } from "@/lib/profile/db-preferences";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 
@@ -124,7 +130,29 @@ export async function createCourse(
     }
   }
 
-  const outlinePayload = await generateOutline(params.request);
+  let learningProfile: LearningProfile | undefined =
+    params.request.learningProfile
+      ? normalizeLearningProfile(params.request.learningProfile)
+      : undefined;
+  if (user) {
+    try {
+      const prefs = await loadUserPreferencesForUserId(user.id);
+      learningProfile = {
+        seq: prefs.seq,
+        anchor: prefs.anchor,
+        length: prefs.length,
+        rigor: prefs.rigor,
+        jargon: prefs.jargon,
+      };
+    } catch {
+      learningProfile = learningProfile ?? { ...DEFAULT_LEARNING_PROFILE };
+    }
+  }
+
+  const outlinePayload = await generateOutline({
+    ...params.request,
+    learningProfile,
+  });
   const outline = outlinePayload.lessons;
   const topicNormalized = normalizeTopic(params.request.topic);
   const clarifications = mergeLearnerDetails(
