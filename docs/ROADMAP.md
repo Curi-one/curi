@@ -37,20 +37,19 @@ PRD, flows, decisions, architecture, data, AI, environments locked.
 
 ---
 
-## Slice 2 — Clarify, path, guest loop
+## Slice 2 — Clarify, path, guest loop (in progress on staging)
 
-**Deliver**
+**Done on staging (`USE_MOCK_API=false` Preview):**
 
-- `POST /api/clarify` — 1–3 topic questions  
-- Depth screen (Essentials / Fluent / Thorough)  
-- `POST /api/courses` — **cache-first** outline; Perplexity on miss  
-- `content_cache` table + fingerprint helper  
-- Lesson 1 read — cache-first (baseline modifier)  
-- `pending_courses` + guest cookie  
+- CUR-6 Supabase schema + RLS  
+- CUR-7 Perplexity client  
+- CUR-8 Real `POST /api/clarify`  
+- CUR-9 Cache-first `POST /api/courses` + `pending_courses`  
+- CUR-10 Cache-first lesson body `GET .../lessons/:index`  
 
-**Exit**
+**Remaining for Slice 2 exit:** smoke F1 through lesson 1 on stage.curi.one (quiz/auth still mock until Slice 3).
 
-- F1 through lesson 1 on staging without account.
+**Exit (roadmap):** F1 through lesson 1 on staging without account.
 
 ---
 

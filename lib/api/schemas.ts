@@ -95,6 +95,10 @@ export const QuizQuestionSchema = z.object({
   prompt: z.string(),
   options: z.array(z.string()).min(2),
   correctIndex: z.number().int().nonnegative(),
+  /** Optional per-answer why copy for QuizFlow (also returned on submit feedback). */
+  explanation: z.string().optional(),
+  /** Optional citation shown after why text (FLOWS: right/wrong + why + source). */
+  source: SourceSchema.optional(),
 });
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
 
@@ -127,6 +131,7 @@ export const QuizSubmitResponseSchema = z.object({
   complete: z.boolean(),
   streak: z.number().int().nonnegative().optional(),
   pathsStillDue: z.number().int().nonnegative().optional(),
+  pathMastered: z.boolean().optional(),
 });
 export type QuizSubmitResponse = z.infer<typeof QuizSubmitResponseSchema>;
 
@@ -153,12 +158,20 @@ export const UserSessionSchema = z.object({
 export type UserSession = z.infer<typeof UserSessionSchema>;
 
 export const BillingCheckoutResponseSchema = z.object({
-  url: z.null(),
-  message: z.string(),
+  url: z.string().nullable(),
+  message: z.string().optional(),
+  code: z.string().optional(),
 });
 export type BillingCheckoutResponse = z.infer<
   typeof BillingCheckoutResponseSchema
 >;
+
+export const BillingPortalResponseSchema = z.object({
+  url: z.string().nullable(),
+  message: z.string().optional(),
+  code: z.string().optional(),
+});
+export type BillingPortalResponse = z.infer<typeof BillingPortalResponseSchema>;
 
 export const ApiErrorSchema = z.object({
   error: z.string(),

@@ -17,6 +17,11 @@ const config: Config = {
         accent: "var(--color-accent)",
         streak: "var(--color-streak)",
       },
+      fontFamily: {
+        display: "var(--font-display), Georgia, serif",
+        ui: "var(--font-ui), system-ui, sans-serif",
+        meta: "var(--font-mono), ui-monospace, monospace",
+      },
     },
   },
   plugins: [],

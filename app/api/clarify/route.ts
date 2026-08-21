@@ -4,6 +4,8 @@ import {
   jsonWithSession,
   resolveSession,
 } from "@/lib/api/handler-utils";
+import { generateClarifyQuestions } from "@/lib/clarify/generate";
+import { getEnv } from "@/lib/env";
 import { getMockStore } from "@/lib/mock/store";
 
 export async function POST(request: Request) {
@@ -14,7 +16,12 @@ export async function POST(request: Request) {
     return invalidBodyResponse();
   }
 
-  const store = getMockStore();
-  const data = store.clarify(parsed.data);
+  // Preview USE_MOCK_API=false is flipped by ops/manager, not this route.
+  if (getEnv().USE_MOCK_API) {
+    const store = getMockStore();
+    return jsonWithSession(store.clarify(parsed.data), sessionId);
+  }
+
+  const data = await generateClarifyQuestions(parsed.data);
   return jsonWithSession(data, sessionId);
 }

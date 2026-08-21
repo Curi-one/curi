@@ -146,7 +146,7 @@ Path map nodes: **read** · **today** (current) · **locked**.
 ## F5 — Auth (other entry)
 
 - Profile → Sign out → Landing (guest).  
-- Sign in without pending path → Today (empty or existing paths).
+- Sign in without pending path → Today (empty or existing paths). Landing **Sign in** / **Sign up** (header) is this entry — guest Start stays the primary CTA.
 
 ---
 
@@ -164,7 +164,7 @@ Until Stripe: enforce limit in API; plan toggle via seed/admin on staging only.
 
 **Progress:** streak count, 26-week heatmap, active and mastered paths.
 
-**Profile:** name, email, theme (system), plan, sign out. Daily email row shown as coming later.
+**Profile:** name, email, theme (system), plan, sign out. Learning and email-schedule preferences are collected in Profile (local persistence); daily email delivery itself remains deferred.
 
 ---
 

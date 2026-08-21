@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { EmptyState } from "@/components/EmptyState";
+import { LibraryPathCard } from "@/components/LibraryPathCard";
+import { PageShell } from "@/components/PageShell";
+import { TabPills } from "@/components/TabPills";
 import type { LibraryResponse } from "@/lib/api/schemas";
 import { getLibrary } from "@/lib/api/client";
-import { depthLabel } from "@/lib/ui/constants";
 
 type Tab = keyof LibraryResponse;
 
@@ -14,9 +17,17 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "shelved", label: "Shelved" },
 ];
 
-export default function LibraryPage() {
+function LibraryContent() {
   const [tab, setTab] = useState<Tab>("exploring");
   const [lib, setLib] = useState<LibraryResponse | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("tab");
+    if (q === "mastered" || q === "shelved" || q === "exploring") {
+      setTab(q);
+    }
+  }, []);
 
   useEffect(() => {
     getLibrary().then(setLib).catch(() =>
@@ -25,54 +36,96 @@ export default function LibraryPage() {
   }, []);
 
   const paths = lib?.[tab] ?? [];
+  const masteredCount = lib?.mastered.length ?? 0;
+  const exploringCount = lib?.exploring.length ?? 0;
+  const totalPaths =
+    (lib?.exploring.length ?? 0) +
+    (lib?.mastered.length ?? 0) +
+    (lib?.shelved.length ?? 0);
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-10 pb-24">
-      <h1 className="font-display text-3xl text-ink">Library</h1>
-      <div className="mt-6 flex gap-2">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setTab(t.id)}
-            className={`rounded-full px-4 py-2 text-sm ${
-              tab === t.id ? "bg-ink text-paper" : "border border-border"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+    <>
+      <div className="mt-2 flex items-center justify-between gap-3">
+        <p className="text-sm text-ink-muted">Your paths</p>
+        <Link href="/new" className="btn-secondary h-9 px-3 text-sm">
+          New path
+        </Link>
+      </div>
+
+      {lib && totalPaths > 0 && (
+        <div className="mt-7 grid grid-cols-2 divide-x divide-border border-y border-border py-5">
+          <div className="px-4 sm:px-6">
+            <p className="font-display text-4xl leading-none tracking-[-0.04em] text-ink">
+              {masteredCount}
+            </p>
+            <p className="mt-2 font-meta">mastered</p>
+          </div>
+          <div className="px-4 sm:px-6">
+            <p className="font-display text-4xl leading-none tracking-[-0.04em] text-ink">
+              {exploringCount}
+            </p>
+            <p className="mt-2 font-meta">exploring</p>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-6">
+        <TabPills
+          tabs={TABS.map((t) => ({
+            id: t.id,
+            label: t.label,
+            count: lib?.[t.id].length,
+          }))}
+          active={tab}
+          onChange={(id) => setTab(id as Tab)}
+        />
       </div>
       <div className="mt-6">
         {!lib && <p className="text-ink-muted">Loading…</p>}
         {lib && paths.length === 0 && (
-          <p className="text-ink-muted">
-            {tab === "exploring"
-              ? "No active paths. Start one from Explore."
-              : tab === "mastered"
-                ? "Nothing mastered yet."
-                : "No shelved paths."}
-          </p>
+          <EmptyState
+            message={
+              tab === "exploring"
+                ? "No active paths yet. Start a curated founder path, or create a custom one."
+                : tab === "mastered"
+                  ? "Nothing mastered yet. Finish a path to see it here."
+                  : "No shelved paths."
+            }
+            actionHref={tab === "exploring" ? "/explore" : undefined}
+            actionLabel={tab === "exploring" ? "Browse Explore" : undefined}
+            secondaryHref={tab === "exploring" ? "/new" : undefined}
+            secondaryLabel={tab === "exploring" ? "New path" : undefined}
+          />
         )}
-        {paths.length > 0 && (
+        {paths.length > 0 && tab === "mastered" && (
+          <ul className="grid grid-cols-2 gap-3 sm:gap-4">
+            {paths.map((p) => (
+              <li key={p.id}>
+                <LibraryPathCard path={p} tab={tab} />
+              </li>
+            ))}
+          </ul>
+        )}
+        {paths.length > 0 && tab !== "mastered" && (
           <ul className="space-y-3">
             {paths.map((p) => (
               <li key={p.id}>
-                <Link
-                  href={`/library/${p.id}`}
-                  className="block rounded-xl border border-border bg-paper-secondary px-4 py-4 hover:border-ink/20"
-                >
-                  <p className="font-display text-lg text-ink">{p.topic}</p>
-                  <p className="mt-1 text-sm text-ink-muted">
-                    {depthLabel(p.depth)} · {p.progress} of {p.totalLessons}{" "}
-                    lessons
-                  </p>
-                </Link>
+                <LibraryPathCard path={p} tab={tab} />
               </li>
             ))}
           </ul>
         )}
       </div>
-    </main>
+    </>
+  );
+}
+
+export default function LibraryPage() {
+  return (
+    <PageShell title="Library" withTabPad={false} className="pt-4">
+      <Suspense fallback={<p className="mt-6 text-ink-muted">Loading…</p>}>
+        <LibraryContent />
+      </Suspense>
+    </PageShell>
   );
 }

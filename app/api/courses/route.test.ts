@@ -1,11 +1,22 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST } from "@/app/api/courses/route";
 import { DEFAULT_MEMBER } from "@/lib/mock/fixtures";
 import { resetMockStore, SESSION_COOKIE } from "@/lib/mock/store";
 
 describe("POST /api/courses", () => {
+  const previousUseMockApi = process.env.USE_MOCK_API;
+
   beforeEach(() => {
+    process.env.USE_MOCK_API = "true";
     resetMockStore();
+  });
+
+  afterEach(() => {
+    if (previousUseMockApi === undefined) {
+      delete process.env.USE_MOCK_API;
+    } else {
+      process.env.USE_MOCK_API = previousUseMockApi;
+    }
   });
 
   function courseRequest(

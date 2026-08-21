@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { QuizQuestion } from "@/lib/api/schemas";
+import { StepProgress } from "@/components/StepProgress";
 
 type Props = {
   questions: QuizQuestion[];
@@ -44,21 +45,33 @@ export function QuizFlow({ questions, onComplete }: Props) {
   }
 
   const correct = selectedIndex === q.correctIndex;
+  const why =
+    q.explanation && q.explanation.trim().length > 0
+      ? q.explanation
+      : "Check the lesson sources for more detail.";
 
   return (
-    <div className="flex min-h-[70vh] flex-col pb-28">
-      <p className="text-sm text-ink-muted">
-        Question {index + 1} of {questions.length}
-      </p>
-      <h1 className="mt-4 font-display text-2xl text-ink">{q.prompt}</h1>
+    <div className="flex min-h-[70vh] flex-col pb-28 animate-fade-in">
+      <StepProgress
+        step={index + 1}
+        totalSteps={questions.length}
+        label="Quiz"
+      />
+      <h1
+        className="mt-2 font-display text-[1.65rem] font-light leading-snug text-ink"
+        style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
+      >
+        {q.prompt}
+      </h1>
       <ul className="mt-8 space-y-3">
         {q.options.map((opt, optIndex) => {
-          let style = "border-border bg-paper-secondary hover:border-ink/30";
+          let style = "border-border bg-paper-secondary hover:border-accent/30";
           if (revealed && optIndex === q.correctIndex) {
-            style = "border-ink bg-ink text-paper";
+            style =
+              "border-ink bg-ink text-paper shadow-[inset_0_-2px_0_var(--color-accent)]";
           } else if (revealed && optIndex === selectedIndex && !correct) {
-            style = "border-border bg-paper-tertiary text-ink-muted";
-          } else if (selectedIndex === optIndex) {
+            style = "border-border bg-paper-tertiary text-ink-muted line-through";
+          } else if (!revealed && selectedIndex === optIndex) {
             style = "border-ink bg-ink text-paper";
           }
           return (
@@ -67,7 +80,7 @@ export function QuizFlow({ questions, onComplete }: Props) {
                 type="button"
                 disabled={revealed}
                 onClick={() => choose(optIndex)}
-                className={`w-full rounded-xl border px-4 py-4 text-left min-h-[52px] ${style}`}
+                className={`w-full rounded-xl border px-4 py-4 text-left text-[15px] min-h-[52px] transition-colors ${style}`}
               >
                 {opt}
               </button>
@@ -76,16 +89,36 @@ export function QuizFlow({ questions, onComplete }: Props) {
         })}
       </ul>
       {revealed && (
-        <div className="mt-8 rounded-xl border border-border bg-paper-secondary p-4">
-          <p className="font-medium text-ink">{correct ? "Right" : "Not quite"}</p>
-          <p className="mt-2 text-sm text-ink-muted">
-            Check the lesson sources for more detail.
+        <div
+          className={`mt-8 rounded-xl border p-4 ${
+            correct
+              ? "border-ink/20 bg-paper-secondary"
+              : "border-border bg-paper-secondary"
+          }`}
+        >
+          <p className="font-medium text-ink">
+            {correct ? "Right" : "Not quite"}
           </p>
+          <p className="mt-2 text-sm leading-relaxed text-ink-muted">{why}</p>
+          {q.source && (
+            <p className="mt-3 text-sm text-ink-muted">
+              <span className="font-meta text-ink-muted">Sources</span>
+              {" · "}
+              <a
+                href={q.source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-ink underline decoration-border underline-offset-4 hover:decoration-accent"
+              >
+                {q.source.title}
+              </a>
+            </p>
+          )}
         </div>
       )}
       {revealed && (
-        <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-paper/95 p-4 backdrop-blur">
-          <div className="mx-auto max-w-lg">
+        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md md:left-[84px]">
+          <div className="mx-auto max-w-lg md:max-w-xl lg:max-w-2xl">
             <button type="button" onClick={next} className="btn-primary w-full">
               {isLast ? "How did that land?" : "Next question"}
             </button>

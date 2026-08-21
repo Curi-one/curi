@@ -9,6 +9,7 @@ export function Heatmap({ dates, streak, atRisk }: Props) {
   const weeks = 26;
   const days = 7;
   const active = new Set(dates);
+  const activeDays = dates.length;
   const grid: boolean[][] = Array.from({ length: weeks }, () =>
     Array.from({ length: days }, () => false),
   );
@@ -34,6 +35,12 @@ export function Heatmap({ dates, streak, atRisk }: Props) {
           <span className="ml-auto text-xs font-medium text-streak">At risk</span>
         )}
       </div>
+      <p className="mt-1 text-sm text-ink-muted">
+        <span className="font-display text-lg tabular-nums text-ink">
+          {activeDays}
+        </span>
+        <span className="ml-1.5">active days</span>
+      </p>
       <div className="mt-4 overflow-x-auto">
         <div className="inline-flex gap-1">
           {grid.map((week, wi) => (
