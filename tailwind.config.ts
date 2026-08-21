@@ -55,9 +55,14 @@ const config: Config = {
         streak: "var(--color-streak)",
       },
       fontFamily: {
-        display: "var(--font-display-stack)",
-        ui: "var(--font-ui-stack)",
-        meta: "var(--font-mono-stack)",
+        // Brand trio only (§5) — override Tailwind defaults so `font-sans` /
+        // `font-serif` / `font-mono` never pull Inter / ui-sans / system stacks.
+        sans: ["var(--font-ui-stack)"],
+        serif: ["var(--font-display-stack)"],
+        mono: ["var(--font-mono-stack)"],
+        display: ["var(--font-display-stack)"],
+        ui: ["var(--font-ui-stack)"],
+        meta: ["var(--font-mono-stack)"],
       },
       fontSize: {
         // Display — Fraunces (§5.5). Never below 18px.

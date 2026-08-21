@@ -41,7 +41,6 @@ describe("TodayPage auth gate", () => {
       session: {
         kind: "member",
         plan: "free",
-        userId: "u1",
         email: "a@b.com",
         name: "A",
       },

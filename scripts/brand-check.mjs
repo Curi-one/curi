@@ -46,6 +46,12 @@ const FOREIGN_COLOR =
 /** Fraunces is never used below 18px (§5.2, §16.2). */
 const SMALL_DISPLAY =
   /font-display[^"`]*?\b(?:text-(?:xs|sm|base)|text-\[1[0-7]px\])\b/g;
+/**
+ * Product surface may only name the brand trio (§5.1). System role fallbacks
+ * (Georgia, system-ui, Courier New) are allowed beside them.
+ */
+const FOREIGN_FONT =
+  /(?:font-family\s*:\s*|fontFamily\s*:\s*['"`]|family\s*:\s*['"`])[^;}"'`]*\b(?:Inter|Roboto|Arial|Helvetica|Cormorant|Instrument|Geist|ui-sans-serif|ui-serif|ui-monospace|SFMono-Regular|Menlo|Monaco|Consolas)\b/gi;
 
 const RULES = [
   ["§8.4 · rounded container (use rounded-none)", BAD_RADIUS, "tsx"],
@@ -57,6 +63,7 @@ const RULES = [
     "all",
   ],
   ["§5.2 · Fraunces below 18px", SMALL_DISPLAY, "tsx"],
+  ["§5.1 · non-brand typeface (use Fraunces / Plus Jakarta / JetBrains)", FOREIGN_FONT, "all"],
 ];
 
 /**

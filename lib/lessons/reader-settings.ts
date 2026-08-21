@@ -27,17 +27,17 @@ export const READER_FONTS: { id: ReaderFont; label: string; family: string }[] =
     {
       id: "sans",
       label: "Sans",
-      family: "var(--font-ui), system-ui, sans-serif",
+      family: "var(--font-ui-stack)",
     },
     {
       id: "serif",
       label: "Serif",
-      family: "var(--font-display), Georgia, serif",
+      family: "var(--font-display-stack)",
     },
     {
       id: "mono",
       label: "Mono",
-      family: "var(--font-mono), ui-monospace, monospace",
+      family: "var(--font-mono-stack)",
     },
   ];
 

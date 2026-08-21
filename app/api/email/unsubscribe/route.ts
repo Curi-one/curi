@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
-  const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:40px;max-width:480px;margin:auto;"><h1 style="font-weight:500;">Unsubscribed</h1><p>Daily lesson emails are turned off. You can re-enable them anytime in Profile → Email.</p></body></html>`;
+  const html = `<!DOCTYPE html><html><body style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;padding:40px;max-width:480px;margin:auto;"><h1 style="font-family:'Fraunces',Georgia,serif;font-weight:300;">Unsubscribed</h1><p>Daily lesson emails are turned off. You can re-enable them anytime in Profile → Email.</p></body></html>`;
   return new NextResponse(html, {
     status: 200,
     headers: { "Content-Type": "text/html; charset=utf-8" },
