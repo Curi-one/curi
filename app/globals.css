@@ -151,39 +151,7 @@
   --z-toast: 50;
   --z-cursor: 99;
 
-  /* ── Negative space · §8.3, §17 ────────────────────────────────────────
-     "Empty space is the default. Fill it only when the content has enough
-     weight to deserve it."
-
-     The base-4 scale above sizes *objects*. This scale sizes the VOID between
-     them, and it is deliberately non-linear: Swiss composition reads through
-     the CONTRAST between a tight cluster and a large silence, not through
-     even padding everywhere. Four steps only, so the rhythm stays legible.
-
-       cluster  — inside a group: rows of a list, label above its value
-       block    — between related blocks inside one section
-       section  — between distinct sections (§8.3: 64–96px)
-       chapter  — page-level silence: masthead to body, hero breathing
-
-     Fluid so the void grows with the canvas — a 1440px desktop earns more
-     silence than a 390px phone, which is exactly where Swiss layout wins. */
-  --flow-cluster: clamp(0.75rem, 0.5rem + 0.6vw, 1rem); /*  12 → 16 */
-  --flow-block: clamp(1.5rem, 1rem + 1.6vw, 2.5rem); /*  24 → 40 */
-  --flow-section: clamp(3rem, 2rem + 4vw, 6rem); /*  48 → 96 */
-  --flow-chapter: clamp(4rem, 2.5rem + 7vw, 10rem); /*  64 → 160 */
-
-  /* ── Grid · §8.9 ───────────────────────────────────────────────────────
-     A real modular grid: 4 columns mobile, 6 tablet, 12 desktop. Mobile is 4
-     rather than 1 so that half- and quarter-width elements still land on the
-     same vertical lines as their desktop counterparts.
-
-     `--grid-columns`, `--grid-gutter` and `--grid-margin` are the live values;
-     the breakpoint blocks below reassign them. Components read the live token
-     and never the per-breakpoint one. */
-  --grid-columns: 4;
-  --grid-gutter: 16px;
-  --grid-margin: 20px;
-
+  /* ── Grid · §8.9 ───────────────────────────────────────────────────────── */
   --grid-gutter-mobile: 16px;
   --grid-gutter-tablet: 24px;
   --grid-gutter-desktop: 24px;
@@ -228,24 +196,6 @@
   --color-streak: var(
     --color-text-primary
   ); /* streak is never Vermilion (§11.3) */
-}
-
-/* Live grid tokens per breakpoint. Declared once here so every grid consumer
-   changes together — a component must never restate a breakpoint itself. */
-@media (min-width: 768px) {
-  :root {
-    --grid-columns: 6;
-    --grid-gutter: var(--grid-gutter-tablet);
-    --grid-margin: var(--grid-margin-tablet);
-  }
-}
-
-@media (min-width: 1024px) {
-  :root {
-    --grid-columns: 12;
-    --grid-gutter: var(--grid-gutter-desktop);
-    --grid-margin: var(--grid-margin-desktop);
-  }
 }
 
 /* Dark chrome — remapped onto the brand Ink tones, not cool grey.
@@ -1031,106 +981,26 @@ body {
   /* ── Layout · §8.9, §10.1 ──────────────────────────────────────────────── */
 
   .app-shell {
-    @apply min-h-screen w-full min-w-0 overflow-x-hidden;
-    max-width: var(--grid-max-width);
-    margin-inline: auto;
-    padding-left: var(--grid-margin);
-    padding-right: var(--grid-margin);
+    @apply mx-auto min-h-screen w-full min-w-0 max-w-lg overflow-x-hidden;
+    padding-left: var(--grid-margin-mobile);
+    padding-right: var(--grid-margin-mobile);
     background: var(--color-bg-primary);
   }
 
   @media (min-width: 768px) {
     .app-shell {
-      @apply py-6;
-    }
-  }
-
-  /* ── The modular grid · §8.9 ────────────────────────────────────────────
-     `.grid-canvas` is the only place columns are declared. Children take a
-     SEMANTIC placement class (`.col-measure`, `.col-main`…) rather than a
-     numeric span, so the composition survives a change to the column count
-     and stays readable as intent: "this is the reading measure", not
-     "this is 7 columns".
-
-     Column arithmetic is identical on every breakpoint because the classes
-     resolve against `--grid-columns`, which the media queries above reset. */
-  .grid-canvas {
-    display: grid;
-    grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
-    column-gap: var(--grid-gutter);
-    align-content: start;
-  }
-
-  /* Full bleed across the canvas. */
-  .col-full {
-    grid-column: 1 / -1;
-  }
-
-  /* Reading measure — the long-form column. Caps at --content-max-width so
-     line length stays optically correct (§8.3: 680px) even on a wide canvas;
-     the leftover columns become the silence on the right. */
-  .col-measure {
-    grid-column: 1 / -1;
-    max-width: var(--content-max-width);
-  }
-
-  /* Primary content block: two thirds of the canvas, flush left.
-     Asymmetry is the point — the void sits to one side, never split evenly
-     around a centred box (§16: no centre-aligned standard layouts). */
-  .col-main {
-    grid-column: 1 / -1;
-  }
-
-  /* Metadata / secondary rail, hung on the right-hand columns. */
-  .col-aside {
-    grid-column: 1 / -1;
-  }
-
-  /* Wide but not full — cards, grids of items. */
-  .col-wide {
-    grid-column: 1 / -1;
-  }
-
-  @media (min-width: 768px) {
-    .col-main {
-      grid-column: 1 / span 4;
-    }
-    .col-aside {
-      grid-column: 5 / span 2;
-    }
-    .col-wide {
-      grid-column: 1 / span 5;
+      @apply max-w-3xl py-6;
+      padding-left: var(--grid-margin-tablet);
+      padding-right: var(--grid-margin-tablet);
     }
   }
 
   @media (min-width: 1024px) {
-    .col-main {
-      grid-column: 1 / span 7;
+    .app-shell {
+      @apply max-w-4xl;
+      padding-left: var(--grid-margin-desktop);
+      padding-right: var(--grid-margin-desktop);
     }
-    .col-aside {
-      grid-column: 9 / span 4;
-    }
-    .col-wide {
-      grid-column: 1 / span 10;
-    }
-  }
-
-  /* ── Vertical rhythm ────────────────────────────────────────────────────
-     Stacks own the space BETWEEN their children, so no child carries a
-     stray margin and the rhythm cannot drift as blocks are reordered.
-     Owl selector: space is only ever inserted between siblings, never
-     before the first or after the last. */
-  .flow-cluster > * + * {
-    margin-top: var(--flow-cluster);
-  }
-  .flow-block > * + * {
-    margin-top: var(--flow-block);
-  }
-  .flow-section > * + * {
-    margin-top: var(--flow-section);
-  }
-  .flow-chapter > * + * {
-    margin-top: var(--flow-chapter);
   }
 
   /* Lesson reading column (§11.1) */
@@ -1143,38 +1013,6 @@ body {
   .narrow-column {
     max-width: var(--narrow-max-width);
     margin: 0 auto;
-  }
-
-  /* ── Grid overlay · development aid ─────────────────────────────────────
-     Renders the live column structure over the page so alignment can be
-     checked by eye. Opt-in per element; used by the design-system showcase.
-     Vermilion here is a tool, not a composition — the overlay never ships
-     inside a product screen, so it does not spend the accent budget. */
-  .grid-guides {
-    position: relative;
-  }
-
-  .grid-guides::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: var(--z-raised);
-    background-image: repeating-linear-gradient(
-      to right,
-      color-mix(in srgb, var(--color-accent) 12%, transparent) 0,
-      color-mix(in srgb, var(--color-accent) 12%, transparent)
-        calc((100% - (var(--grid-columns) - 1) * var(--grid-gutter)) /
-        var(--grid-columns)),
-      transparent
-        calc((100% - (var(--grid-columns) - 1) * var(--grid-gutter)) /
-        var(--grid-columns)),
-      transparent
-        calc(
-          (100% - (var(--grid-columns) - 1) * var(--grid-gutter)) /
-          var(--grid-columns) + var(--grid-gutter)
-        )
-    );
   }
 }
 

@@ -141,113 +141,6 @@ function demoDates(): string[] {
   return out;
 }
 
-/**
- * Full-bleed panel. The standard `Panel` caps at 480px, which cannot show a
- * 12-column grid — this one runs to the grid max-width instead.
- */
-function WidePanel({
-  eyebrow,
-  title,
-  children,
-}: {
-  eyebrow: string;
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="ds-panel-light border-b border-border px-5 py-10 sm:px-8 sm:py-14">
-      <div className="mx-auto max-w-grid">
-        <p className="font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
-          {eyebrow}
-        </p>
-        <h2 className="mt-2 font-display text-display-2xs tracking-tight">
-          {title}
-        </h2>
-        <div className="mt-8 space-y-8">{children}</div>
-      </div>
-    </section>
-  );
-}
-
-const FLOW_STEPS = [
-  { token: "--flow-cluster", name: "cluster", use: "Rows of a list" },
-  { token: "--flow-block", name: "block", use: "Related blocks" },
-  { token: "--flow-section", name: "section", use: "Distinct sections" },
-  { token: "--flow-chapter", name: "chapter", use: "Masthead to body" },
-] as const;
-
-function GridPanel({ guides }: { guides: boolean }) {
-  return (
-    <>
-      <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
-        Four columns on mobile, six on tablet, twelve on desktop. Placement is
-        semantic — <code className="font-meta text-mono-md">.col-measure</code>{" "}
-        is the reading column, <code className="font-meta text-mono-md">
-          .col-main
-        </code>{" "}
-        the primary block, <code className="font-meta text-mono-md">
-          .col-aside
-        </code>{" "}
-        the right rail. Resize the window: the spans re-resolve against{" "}
-        <code className="font-meta text-mono-md">--grid-columns</code> without a
-        component knowing the breakpoint.
-      </p>
-
-      <div className={`grid-canvas ${guides ? "grid-guides" : ""}`}>
-        <div className="col-measure border border-border bg-paper-secondary px-4 py-3">
-          <span className="font-meta text-mono-xs uppercase tracking-wider text-ink-muted">
-            col-measure
-          </span>
-        </div>
-        <div className="col-main mt-cluster border border-border bg-paper-secondary px-4 py-3">
-          <span className="font-meta text-mono-xs uppercase tracking-wider text-ink-muted">
-            col-main
-          </span>
-        </div>
-        <div className="col-aside mt-cluster border border-border bg-paper-tertiary px-4 py-3">
-          <span className="font-meta text-mono-xs uppercase tracking-wider text-ink-muted">
-            col-aside
-          </span>
-        </div>
-        <div className="col-full mt-cluster border border-border bg-paper-secondary px-4 py-3">
-          <span className="font-meta text-mono-xs uppercase tracking-wider text-ink-muted">
-            col-full
-          </span>
-        </div>
-      </div>
-
-      <div>
-        <p className="font-meta text-mono-xs uppercase tracking-wider text-ink-faint">
-          Negative space — sizes the void, not the object
-        </p>
-        <ul className="mt-4 space-y-3">
-          {FLOW_STEPS.map((step) => (
-            <li key={step.name} className="flex items-center gap-4">
-              <span
-                aria-hidden
-                className="block shrink-0 bg-ink"
-                style={{ height: "2px", width: `var(${step.token})` }}
-              />
-              <span className="font-meta text-mono-md text-ink">
-                {step.name}
-              </span>
-              <span className="font-sans text-ui-xs text-ink-muted">
-                {step.use}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-4 max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
-          Each step is fluid — the bars above grow as the window widens, so a
-          desktop layout earns more silence than a phone. The scale is
-          deliberately non-linear: composition reads through the contrast
-          between a tight cluster and a large void, never through even padding.
-        </p>
-      </div>
-    </>
-  );
-}
-
 export function DesignSystemShowcase() {
   const heatDates = useMemo(() => demoDates(), []);
   const [pace, setPace] = useState("Balanced");
@@ -257,7 +150,6 @@ export function DesignSystemShowcase() {
   const [filter, setFilter] = useState<string | null>(null);
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(0);
-  const [guides, setGuides] = useState(false);
 
   return (
     <div className="min-h-dvh bg-paper text-ink">
@@ -309,19 +201,6 @@ export function DesignSystemShowcase() {
           </div>
         </div>
       </header>
-
-      {/* Grid — the structural layer, before colour or type */}
-      <WidePanel eyebrow="00 · Grid" title="The modular grid">
-        <button
-          type="button"
-          onClick={() => setGuides((v) => !v)}
-          className="btn-secondary btn-size-small focus-ring"
-          aria-pressed={guides}
-        >
-          {guides ? "Hide" : "Show"} column guides
-        </button>
-        <GridPanel guides={guides} />
-      </WidePanel>
 
       {/* Colour — muted */}
       <Panel

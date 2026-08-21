@@ -138,7 +138,6 @@ export default function ExplorePage() {
     <PageShell
       title="Explore"
       kicker="Founder catalogue"
-      content="full"
       withTabPad={false}
       className="pt-4"
     >
