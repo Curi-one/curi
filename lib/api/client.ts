@@ -17,8 +17,19 @@ import type {
   UserSession,
 } from "@/lib/api/schemas";
 import type { CatalogueBook, CataloguePath } from "@/lib/mock/fixtures";
+import {
+  cacheKey,
+  invalidateClientCache,
+  readThroughCache,
+  ttlForPath,
+} from "@/lib/api/client-cache";
 
-async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+export type ApiFetchOptions = RequestInit & {
+  /** Bypass GET cache and refresh the entry. */
+  skipCache?: boolean;
+};
+
+async function rawFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
     ...init,
     credentials: "same-origin",
@@ -47,6 +58,31 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   }
   return res.json() as Promise<T>;
 }
+
+/**
+ * Client API helper. GETs are cached (memory + sessionStorage) with short TTL
+ * and in-flight dedupe. Non-GET clears the cache so Today/library stay fresh.
+ */
+async function apiFetch<T>(path: string, init?: ApiFetchOptions): Promise<T> {
+  const method = (init?.method ?? "GET").toUpperCase();
+  const { skipCache, ...fetchInit } = init ?? {};
+
+  if (method === "GET") {
+    return readThroughCache(
+      cacheKey("GET", path),
+      () => rawFetch<T>(path, fetchInit),
+      { skipCache, ttlMs: ttlForPath(path) },
+    );
+  }
+
+  const data = await rawFetch<T>(path, { ...fetchInit, method });
+  // Auth and writes change session / feed / library — drop stale GETs.
+  invalidateClientCache();
+  return data;
+}
+
+/** Drop cached GETs (e.g. after local auth state changes outside apiFetch). */
+export { invalidateClientCache };
 
 export function postClarify(body: ClarifyRequest) {
   return apiFetch<ClarifyResponse>("/api/clarify", {
