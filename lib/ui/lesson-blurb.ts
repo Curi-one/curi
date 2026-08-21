@@ -1,15 +1,16 @@
 /**
  * Deterministic lesson teaser from title keywords + position in path.
  * Ported from prototypes/web/src/lib/feed-utils.js `lessonBlurb`.
- * Topic is accepted for call-site parity; wording is topic-agnostic.
  */
 
 export function lessonBlurb(
   title: string,
   index: number,
   total: number,
-  _topic?: string,
+  /** Accepted for call-site parity with the prototype; wording is topic-agnostic. */
+  topic?: string,
 ): string {
+  void topic;
   const t = title.toLowerCase();
   const pos = index / Math.max(total - 1, 1);
 
