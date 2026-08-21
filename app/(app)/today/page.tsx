@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { LoadingState } from "@/components/LoadingState";
 import { TodayView } from "@/components/TodayView";
@@ -14,7 +14,7 @@ import {
 import { memberSignInPath } from "@/lib/auth/member-gate";
 import type { FeedResponse } from "@/lib/api/schemas";
 
-export default function TodayPage() {
+function TodayContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [feed, setFeed] = useState<FeedResponse | null>(null);
@@ -66,7 +66,7 @@ export default function TodayPage() {
   }, [router]);
 
   return (
-    <PageShell withTabPad={false} className="pt-4">
+    <>
       {!ready && <LoadingState label="Loading your feed…" />}
       {feed && ready && (
         <TodayView
@@ -76,6 +76,16 @@ export default function TodayPage() {
           upgradeConfirmed={upgradeConfirmed}
         />
       )}
+    </>
+  );
+}
+
+export default function TodayPage() {
+  return (
+    <PageShell withTabPad={false} className="pt-4">
+      <Suspense fallback={<LoadingState label="Loading your feed…" />}>
+        <TodayContent />
+      </Suspense>
     </PageShell>
   );
 }
