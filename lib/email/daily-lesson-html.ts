@@ -162,7 +162,7 @@ export function renderDailyLessonEmail(payload: DailyLessonEmailPayload): string
           <p style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:11px;color:#9E9B94;text-align:center;margin:12px 0 0;">${dayNum} day streak — keep it alive</p>
         </td></tr>
         ${tomorrow ? `<tr><td>${tomorrow}</td></tr>` : ""}
-        <tr><td style="padding:20px 36px;border-top:1px solid #D4D0C8;background:#F5F4F0;">
+        <tr><td style="padding:20px 36px;border-top:1px solid #D4D0C8;background:#F4F1E8;">
           <table role="presentation" width="100%"><tr>
             <td style="font-family:'Fraunces',Georgia,serif;font-size:18px;color:#0A0908;">Cu<em style="font-style:italic;">ri</em></td>
             <td align="right" style="font-family:'JetBrains Mono','Courier New',monospace;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:#9E9B94;"><a href="${escapeHtml(preferencesUrl)}" style="color:#9E9B94;text-decoration:none;">Manage preferences</a> · <a href="${escapeHtml(unsubscribeUrl)}" style="color:#9E9B94;text-decoration:none;">Unsubscribe</a></td>

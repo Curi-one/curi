@@ -2,19 +2,38 @@
  * Deterministic cover art for catalogue / library topic imagery.
  *
  * Greyscale only: imagery is never rendered in colour (BRAND.md §6.3).
+ * Patterns follow docs/references/geometric-patterns.html — ruled lines,
+ * grids, hatching, blueprint. Never dotted grids as primary backgrounds.
  * Fields use warm ink tones from the brand palette — never cold
  * `hsl(0 0% n%)` or pure `#000` / `#FFF` (WEBSITE-DESIGN-RULES §1.1).
  * Glyphs prefer BRAND §6.2 symbols when topic keywords match.
  */
 
+/** Brand library pattern names (primary cover set). */
 export type TopicPattern =
+  | "ledger"
+  | "columns"
   | "hatch"
-  | "grid"
-  | "halftone"
-  | "rules"
-  | "grain"
+  | "cross"
+  | "blueprint"
   | "band"
-  | "corners";
+  | "corners"
+  | "vitrine"
+  /** @deprecated Prefer `ledger` — kept for style switch aliases. */
+  | "rules"
+  /** @deprecated Prefer `columns`. */
+  | "grid"
+  /** @deprecated Prefer `band` / component reveal line. */
+  | "reveal"
+  /** @deprecated Prefer `corners`. */
+  | "crop"
+  /**
+   * Optional subtle layer on dark glyph cards only — never a primary cover
+   * pattern (library: no dotted grids as backgrounds).
+   */
+  | "halftone"
+  /** @deprecated Mapped to hatch. */
+  | "grain";
 
 export type TopicAlign = "br" | "bl" | "center" | "tr" | "tl";
 
@@ -41,14 +60,16 @@ const FIELDS = [
   "#22201C",
 ] as const;
 
+/** Primary cover patterns from the geometric library (no halftone). */
 const PATTERNS: TopicPattern[] = [
+  "ledger",
+  "columns",
   "hatch",
-  "grid",
-  "halftone",
-  "rules",
-  "grain",
+  "cross",
+  "blueprint",
   "band",
   "corners",
+  "vitrine",
 ];
 
 const ALIGNS: TopicAlign[] = ["br", "bl", "center", "tr", "tl"];
@@ -148,58 +169,90 @@ export function topicSwatch(topic: string): [field: string, glyphColor: string] 
   return [art.field, art.glyphColor];
 }
 
-/** CSS overlay styles for a topic pattern (warm paper ink at low opacity). */
+/**
+ * CSS overlay styles for a topic pattern on dark cover fields.
+ * Uses warm white-tone ink at low opacity (library greyscale rule).
+ */
 export function topicPatternStyle(
   pattern: TopicPattern,
 ): Record<string, string> {
-  const ink = "250,249,245";
+  const ink = "250,249,245"; // --color-white-tone on dark fields
+  const mid = "107,103,96"; // --color-mid for subtle hatch on dark
   switch (pattern) {
     case "hatch":
+    case "grain":
+      // Library: 115deg fine diagonal hatch at low opacity
       return {
-        backgroundImage: `repeating-linear-gradient(138deg, transparent, transparent 5px, rgba(${ink},0.045) 5px, rgba(${ink},0.045) 6px)`,
+        backgroundImage: `repeating-linear-gradient(115deg, rgba(${ink},0.14) 0 1px, transparent 1px 9px)`,
+        opacity: "0.85",
       };
+    case "columns":
     case "grid":
       return {
-        backgroundImage: `linear-gradient(rgba(${ink},0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(${ink},0.06) 1px, transparent 1px)`,
-        backgroundSize: "14px 14px",
+        backgroundImage: `repeating-linear-gradient(to right, rgba(${ink},0.08) 0 1px, transparent 1px 12px)`,
       };
-    case "halftone":
-      return {
-        backgroundImage: `radial-gradient(circle, rgba(${ink},0.09) 1px, transparent 1.2px)`,
-        backgroundSize: "7px 7px",
-      };
+    case "ledger":
     case "rules":
       return {
-        backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 11px, rgba(${ink},0.05) 11px, rgba(${ink},0.05) 12px)`,
+        backgroundImage: `repeating-linear-gradient(to bottom, rgba(${ink},0.08) 0 1px, transparent 1px 14px)`,
       };
-    case "grain":
+    case "cross":
       return {
         backgroundImage: [
-          `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(${ink},0.03) 2px, rgba(${ink},0.03) 3px)`,
-          `repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(${ink},0.025) 3px, rgba(${ink},0.025) 4px)`,
+          `repeating-linear-gradient(45deg, rgba(${ink},0.12) 0 1px, transparent 1px 12px)`,
+          `repeating-linear-gradient(-45deg, rgba(${ink},0.12) 0 1px, transparent 1px 12px)`,
+        ].join(", "),
+      };
+    case "blueprint":
+      return {
+        backgroundImage: [
+          `repeating-linear-gradient(to bottom, rgba(${ink},0.07) 0 1px, transparent 1px 16px)`,
+          `repeating-linear-gradient(to right, rgba(${ink},0.07) 0 1px, transparent 1px 16px)`,
+          `linear-gradient(45deg, transparent 49.5%, rgba(${ink},0.18) 49.5%, rgba(${ink},0.18) 50.5%, transparent 50.5%)`,
+          `linear-gradient(-45deg, transparent 49.5%, rgba(${ink},0.18) 49.5%, rgba(${ink},0.18) 50.5%, transparent 50.5%)`,
         ].join(", "),
       };
     case "band":
+    case "reveal":
       return {
-        backgroundImage: `linear-gradient(125deg, transparent 38%, rgba(${ink},0.035) 44%, rgba(${ink},0.035) 56%, transparent 62%)`,
+        backgroundImage: `linear-gradient(125deg, transparent 38%, rgba(${ink},0.06) 44%, rgba(${ink},0.06) 56%, transparent 62%)`,
       };
     case "corners":
+    case "crop":
       return {
         backgroundImage: [
-          `linear-gradient(rgba(${ink},0.14), rgba(${ink},0.14))`,
-          `linear-gradient(rgba(${ink},0.14), rgba(${ink},0.14))`,
-          `linear-gradient(rgba(${ink},0.14), rgba(${ink},0.14))`,
-          `linear-gradient(rgba(${ink},0.14), rgba(${ink},0.14))`,
-          `linear-gradient(rgba(${ink},0.14), rgba(${ink},0.14))`,
-          `linear-gradient(rgba(${ink},0.14), rgba(${ink},0.14))`,
-          `linear-gradient(rgba(${ink},0.14), rgba(${ink},0.14))`,
-          `linear-gradient(rgba(${ink},0.14), rgba(${ink},0.14))`,
+          `linear-gradient(rgba(${ink},0.18), rgba(${ink},0.18))`,
+          `linear-gradient(rgba(${ink},0.18), rgba(${ink},0.18))`,
+          `linear-gradient(rgba(${ink},0.18), rgba(${ink},0.18))`,
+          `linear-gradient(rgba(${ink},0.18), rgba(${ink},0.18))`,
+          `linear-gradient(rgba(${ink},0.18), rgba(${ink},0.18))`,
+          `linear-gradient(rgba(${ink},0.18), rgba(${ink},0.18))`,
+          `linear-gradient(rgba(${ink},0.18), rgba(${ink},0.18))`,
+          `linear-gradient(rgba(${ink},0.18), rgba(${ink},0.18))`,
         ].join(", "),
         backgroundSize:
-          "22px 1px, 1px 22px, 22px 1px, 1px 22px, 22px 1px, 1px 22px, 22px 1px, 1px 22px",
+          "18px 1px, 1px 18px, 18px 1px, 1px 18px, 18px 1px, 1px 18px, 18px 1px, 1px 18px",
         backgroundPosition:
-          "12px 12px, 12px 12px, calc(100% - 12px) 12px, calc(100% - 12px) 12px, 12px calc(100% - 12px), 12px calc(100% - 12px), calc(100% - 12px) calc(100% - 12px), calc(100% - 12px) calc(100% - 12px)",
+          "10px 10px, 10px 10px, calc(100% - 10px) 10px, calc(100% - 10px) 10px, 10px calc(100% - 10px), 10px calc(100% - 10px), calc(100% - 10px) calc(100% - 10px), calc(100% - 10px) calc(100% - 10px)",
         backgroundRepeat: "no-repeat",
+      };
+    case "vitrine":
+      return {
+        backgroundImage: [
+          `linear-gradient(rgba(${ink},0.12), rgba(${ink},0.12))`,
+          `linear-gradient(rgba(${ink},0.12), rgba(${ink},0.12))`,
+          `linear-gradient(rgba(${ink},0.12), rgba(${ink},0.12))`,
+          `linear-gradient(rgba(${ink},0.12), rgba(${ink},0.12))`,
+        ].join(", "),
+        backgroundSize: "100% 1px, 100% 1px, 1px 100%, 1px 100%",
+        backgroundPosition: "0 18%, 0 82%, 18% 0, 82% 0",
+        backgroundRepeat: "no-repeat",
+      };
+    case "halftone":
+      // Demoted: optional subtle layer only — not selected for new covers
+      return {
+        backgroundImage: `radial-gradient(circle, rgba(${mid},0.07) 0.8px, transparent 1px)`,
+        backgroundSize: "8px 8px",
       };
   }
 }

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curi · Geometric Pattern Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white:#FAF9F5; --paper:#F4F1E8; --pale:#E8E5DC; --light:#D4D0C8;
+  --silver:#9E9B94; --mid:#6B6760; --ink3:#2E2C28; --ink2:#1C1A18; --ink:#0A0908;
+  --vermilion:#C1121F;
+  --display:'Fraunces',Georgia,serif;
+  --ui:'Plus Jakarta Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Courier New',monospace;
+  --margin:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{ background:var(--white); color:var(--ink); font-family:var(--ui); font-weight:300; -webkit-font-smoothing:antialiased; }
+
+.masthead{
+  display:flex; align-items:center; justify-content:space-between;
+  height:52px; padding:0 var(--margin); border-bottom:2px solid var(--ink);
+  position:sticky; top:0; background:var(--white); z-index:30;
+}
+.wordmark{ font-family:var(--display); font-size:22px; letter-spacing:-.02em; }
+.wordmark i{ font-style:italic; }
+.masthead .meta{ font-family:var(--mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--silver); }
+
+.intro{ padding:64px var(--margin) 48px; max-width:760px; border-bottom:1px solid var(--light); }
+.intro h1{ font-family:var(--display); font-weight:300; font-size:46px; line-height:1.1; letter-spacing:-.02em; margin-bottom:18px; }
+.intro p{ font-size:15px; line-height:1.65; color:var(--mid); max-width:58ch; }
+.intro p + p{ margin-top:12px; }
+
+.rulebar{ display:flex; flex-wrap:wrap; gap:0; border-bottom:1px solid var(--light); }
+.rulebar div{ flex:1 1 160px; padding:20px var(--margin); border-right:1px solid var(--light); }
+.rulebar div:last-child{ border-right:none; }
+.rulebar .k{ font-family:var(--mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--vermilion); display:block; margin-bottom:6px; }
+.rulebar .v{ font-size:12.5px; line-height:1.5; color:var(--mid); }
+
+.section-head{
+  display:flex; align-items:baseline; justify-content:space-between; gap:24px;
+  padding:56px var(--margin) 22px; border-bottom:1px solid var(--light);
+}
+.section-head .label{ font-family:var(--ui); font-size:10px; font-weight:500; letter-spacing:.3em; text-transform:uppercase; color:var(--silver); }
+.section-head .num{ font-family:var(--mono); font-size:9px; color:var(--white); background:var(--ink); padding:3px 8px; letter-spacing:.12em; }
+
+.grid{ display:grid; gap:1px; background:var(--light); padding:1px var(--margin) 64px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); border-bottom:0; margin-left:calc(var(--margin) * -1); margin-right:calc(var(--margin) * -1); padding-left:var(--margin); padding-right:var(--margin); }
+
+.tile{ background:var(--white); display:flex; flex-direction:column; }
+.swatch{ position:relative; aspect-ratio:1/1; overflow:hidden; background:var(--white); }
+.swatch.on-ink{ background:var(--ink); }
+.tile-meta{ padding:18px 20px 22px; border-top:1px solid var(--light); }
+.tile-name{ font-family:var(--display); font-size:19px; letter-spacing:-.01em; margin-bottom:4px; }
+.tile-name i{ font-style:italic; }
+.tile-use{ font-size:12.5px; line-height:1.55; color:var(--mid); margin-bottom:12px; }
+.tile-code{
+  font-family:var(--mono); font-size:10.5px; line-height:1.6; color:var(--ink);
+  background:var(--paper); border:1px solid var(--light); padding:12px 14px;
+  white-space:pre-wrap; word-break:break-word;
+}
+.tile-code .c{ color:var(--silver); }
+
+/* ── PATTERN 1 — ledger rules ── */
+.p-ledger{
+  background-image:repeating-linear-gradient(to bottom, var(--light) 0 1px, transparent 1px 34px);
+}
+.p-ledger::after{ content:'§'; position:absolute; right:16px; bottom:8px; font-family:var(--display); font-style:italic; font-size:64px; color:var(--light); opacity:.5; }
+
+/* ── PATTERN 2 — column rules ── */
+.p-columns{
+  background-image:repeating-linear-gradient(to right, var(--light) 0 1px, transparent 1px calc(100%/12));
+}
+
+/* ── PATTERN 3 — ghost 12-col + dominant panel outline ── */
+.p-exhibition{ background:var(--white); }
+.p-exhibition .cols{ position:absolute; inset:0; background-image:repeating-linear-gradient(to right, var(--light) 0 1px, transparent 1px calc(100%/12)); opacity:.7; }
+.p-exhibition .panel{ position:absolute; left:0; top:0; width:calc(100%/12*5); height:100%; border-right:2px solid var(--ink); background:var(--ink); opacity:.06; }
+
+/* ── PATTERN 4 — fine diagonal hatch ── */
+.p-hatch{
+  background-image:repeating-linear-gradient(115deg, var(--mid) 0 1px, transparent 1px 9px);
+  opacity:1;
+}
+.p-hatch-inner{ position:absolute; inset:0; opacity:.16; background-image:repeating-linear-gradient(115deg, var(--ink) 0 1px, transparent 1px 9px); }
+
+/* ── PATTERN 5 — cross hatch on ink ── */
+.p-cross{ }
+.p-cross .a{ position:absolute; inset:0; opacity:.12; background-image:repeating-linear-gradient(45deg, var(--white) 0 1px, transparent 1px 12px); }
+.p-cross .b{ position:absolute; inset:0; opacity:.12; background-image:repeating-linear-gradient(-45deg, var(--white) 0 1px, transparent 1px 12px); }
+
+/* ── PATTERN 6 — concentric vitrine frame ── */
+.p-vitrine{ display:flex; align-items:center; justify-content:center; }
+.p-vitrine .r{ position:absolute; border:1px solid var(--light); }
+.p-vitrine .r1{ inset:12%; }
+.p-vitrine .r2{ inset:24%; }
+.p-vitrine .r3{ inset:36%; border-color:var(--ink); }
+
+/* ── PATTERN 7 — registration / crop marks ── */
+.p-crop{ }
+.p-crop .mark{ position:absolute; width:18px; height:18px; }
+.p-crop .mark::before,.p-crop .mark::after{ content:''; position:absolute; background:var(--ink); }
+.p-crop .mark::before{ width:100%; height:1px; top:50%; }
+.p-crop .mark::after{ width:1px; height:100%; left:50%; }
+.p-crop .tl{ top:14px; left:14px; } .p-crop .tr{ top:14px; right:14px; }
+.p-crop .bl{ bottom:14px; left:14px; } .p-crop .br{ bottom:14px; right:14px; }
+.p-crop .cx{ position:absolute; inset:14px; border:1px solid var(--light); }
+
+/* ── PATTERN 8 — radiating construction lines ── */
+.p-radiate{ }
+.p-radiate .ray{ position:absolute; left:50%; top:50%; width:1px; height:60%; background:var(--light); transform-origin:top center; }
+
+/* ── PATTERN 9 — blueprint baseline + diagonals ── */
+.p-blueprint{
+  background-image:
+    repeating-linear-gradient(to bottom, var(--light) 0 1px, transparent 1px 16px),
+    repeating-linear-gradient(to right, var(--light) 0 1px, transparent 1px 16px);
+}
+.p-blueprint .diag{ position:absolute; inset:0; }
+.p-blueprint .diag::before,.p-blueprint .diag::after{ content:''; position:absolute; background:var(--ink); opacity:.3; height:1px; width:141.4%; top:50%; left:50%; }
+.p-blueprint .diag::before{ transform:translate(-50%,-50%) rotate(45deg); }
+.p-blueprint .diag::after{ transform:translate(-50%,-50%) rotate(-45deg); }
+
+/* ── PATTERN 10 — stepped rule (spec elevation) ── */
+.p-steps{ display:flex; align-items:flex-end; gap:0; padding:0; }
+.p-steps .bar{ flex:1; background:var(--paper); border-top:1px solid var(--ink); border-left:1px solid var(--light); border-right:1px solid var(--light); }
+.p-steps .bar:nth-child(1){ height:20%; } .p-steps .bar:nth-child(2){ height:38%; }
+.p-steps .bar:nth-child(3){ height:52%; } .p-steps .bar:nth-child(4){ height:71%; }
+.p-steps .bar:nth-child(5){ height:100%; background:var(--ink); border-top-color:var(--ink); }
+
+/* ── PATTERN 11 — hairline compass / index ticks ── */
+.p-ticks{ }
+.p-ticks .tick{ position:absolute; left:50%; top:50%; width:1px; height:8px; background:var(--mid); transform-origin:center 46%; }
+.p-ticks .ring{ position:absolute; inset:20%; border:1px solid var(--light); border-radius:0; }
+
+/* ── PATTERN 12 — vermilion reveal line demo ── */
+.p-reveal{ display:flex; align-items:flex-end; justify-content:flex-start; }
+.p-reveal .rule{ position:absolute; left:0; bottom:0; height:3px; width:100%; background:var(--vermilion); transform:scaleX(.42); transform-origin:left; }
+.p-reveal .label{ position:relative; z-index:2; padding:18px; font-family:var(--mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--silver); }
+
+.rules{ background:var(--ink); color:var(--white); padding:56px var(--margin) 64px; margin-top:8px; }
+.rules h2{ font-family:var(--display); font-weight:300; font-size:32px; letter-spacing:-.02em; margin-bottom:28px; }
+.rules ul{ display:grid; gap:0; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+.rules li{ list-style:none; padding:18px 32px 18px 0; border-top:1px solid var(--ink3); }
+.rules .k{ font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--vermilion); display:block; margin-bottom:6px; }
+.rules .v{ font-size:13.5px; line-height:1.6; color:var(--silver); }
+
+.colophon{ padding:28px var(--margin) 56px; font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--silver); }
+@media (max-width:720px){ :root{ --margin:20px; } .intro h1{ font-size:34px; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wordmark">Cu<i>ri</i></div>
+  <div class="meta">Geometric pattern library · v1</div>
+</header>
+
+<section class="intro">
+  <h1>Twelve reference patterns.</h1>
+  <p>Secondary imagery, built from ruled lines, grid structures, hatching and precise geometry, the architectural vocabulary of a museum or library floor plan. Always greyscale. Colour is never in the pattern itself, only ever the reveal line at the edge.</p>
+  <p>Use this page as a swatch book: check a design against the tile, copy the CSS underneath it, and adjust only the spacing values, never the logic.</p>
+</section>
+
+<div class="rulebar">
+  <div><span class="k">Colour</span><span class="v">Ink, Mid, Silver, Light, Paper only. Vermilion appears only as the reveal line, never woven into a pattern.</span></div>
+  <div><span class="k">Weight</span><span class="v">Hairlines are 1px. Emphasis lines are 2px Ink. Never a third weight in one composition.</span></div>
+  <div><span class="k">Corners</span><span class="v">Square, always. A pattern with a radius on it is not a Curi pattern.</span></div>
+  <div><span class="k">Role</span><span class="v">Geometry is texture, not subject. If it competes with the type on the same panel, reduce its opacity.</span></div>
+</div>
+
+<div class="section-head"><span class="label">Ruled &amp; gridded</span><span class="num">01</span></div>
+
+<div class="grid">
+
+  <div class="tile">
+    <div class="swatch p-ledger"></div>
+    <div class="tile-meta">
+      <div class="tile-name">Ledger rules</div>
+      <div class="tile-use">Background texture for long text panels: the reader, changelog, ledger-style stat blocks. Keep opacity low behind body copy.</div>
+      <div class="tile-code">background-image: repeating-linear-gradient(
+  to bottom, var(--light) 0 1px,
+  transparent 1px 34px
+);<span class="c">/* row height = one line of body copy */</span></div>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="swatch p-columns"></div>
+    <div class="tile-meta">
+      <div class="tile-name">Column rules</div>
+      <div class="tile-use">Ghost 12-column grid as a standalone texture. Use to check alignment during layout, or as a faint watermark behind a hero.</div>
+      <div class="tile-code">background-image: repeating-linear-gradient(
+  to right, var(--light) 0 1px,
+  transparent 1px calc(100%/12)
+);</div>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="swatch p-exhibition">
+      <div class="cols"></div>
+      <div class="panel"></div>
+    </div>
+    <div class="tile-meta">
+      <div class="tile-name">Exhibition skeleton</div>
+      <div class="tile-use">Wireframe for the 12-col exhibition grid, dominant panel at 5 columns. Reference this before placing any card grid, never eyeball the span.</div>
+      <div class="tile-code">.panel { width: calc(100%/12*5); }
+<span class="c">/* one dominant panel, dark, per grid */</span></div>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="swatch p-blueprint">
+      <div class="diag"></div>
+    </div>
+    <div class="tile-meta">
+      <div class="tile-name">Blueprint grid</div>
+      <div class="tile-use">Dense construction grid with corner diagonals. For technical or methodology sections, how the curriculum engine works, the spaced-repetition diagram.</div>
+      <div class="tile-code">background-image:
+  repeating-linear-gradient(to bottom, var(--light) 0 1px, transparent 1px 16px),
+  repeating-linear-gradient(to right, var(--light) 0 1px, transparent 1px 16px);</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section-head"><span class="label">Hatching</span><span class="num">02</span></div>
+
+<div class="grid">
+
+  <div class="tile">
+    <div class="swatch p-hatch"><div class="p-hatch-inner"></div></div>
+    <div class="tile-meta">
+      <div class="tile-name">Fine diagonal hatch</div>
+      <div class="tile-use">Single-direction hatch at low opacity. Sits behind stat panels or as a subtle fill inside a badge, never behind body text.</div>
+      <div class="tile-code">background-image: repeating-linear-gradient(
+  115deg, var(--ink) 0 1px,
+  transparent 1px 9px
+);
+opacity: .16;</div>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="swatch on-ink p-cross"><div class="a"></div><div class="b"></div></div>
+    <div class="tile-meta">
+      <div class="tile-name">Cross hatch, on ink</div>
+      <div class="tile-use">Two opposed diagonals at 12% white opacity. Reserved for dark feature panels needing texture without a glyph, e.g. a quote panel.</div>
+      <div class="tile-code">background-image: repeating-linear-gradient(
+  45deg, var(--white) 0 1px, transparent 1px 12px
+);
+<span class="c">/* layer a second at -45deg, same opacity */</span></div>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="swatch p-steps">
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    </div>
+    <div class="tile-meta">
+      <div class="tile-name">Stepped elevation</div>
+      <div class="tile-use">A row of ascending bars, ruled not filled. Progress and streak visuals, curriculum-depth indicators. Final bar solid Ink marks "today."</div>
+      <div class="tile-code">.bar { border-top: 1px solid var(--ink);
+  border-left/right: 1px solid var(--light); }
+.bar:last-child { background: var(--ink); }</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section-head"><span class="label">Precise geometry</span><span class="num">03</span></div>
+
+<div class="grid">
+
+  <div class="tile">
+    <div class="swatch p-vitrine">
+      <div class="r r1"></div><div class="r r2"></div><div class="r r3"></div>
+    </div>
+    <div class="tile-meta">
+      <div class="tile-name">Vitrine frame</div>
+      <div class="tile-use">Nested rectangles, museum-case logic. Frame a single stat or a pull quote to give it ceremony without adding colour.</div>
+      <div class="tile-code">.r1{inset:12%} .r2{inset:24%}
+.r3{inset:36%; border-color:var(--ink)}
+<span class="c">/* innermost ring only in full Ink */</span></div>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="swatch p-crop">
+      <div class="cx"></div>
+      <div class="mark tl"></div><div class="mark tr"></div>
+      <div class="mark bl"></div><div class="mark br"></div>
+    </div>
+    <div class="tile-meta">
+      <div class="tile-name">Registration marks</div>
+      <div class="tile-use">Print-shop crop marks at the four corners. Certificate borders, print exports, anything meant to feel issued rather than posted.</div>
+      <div class="tile-code">.mark::before{ width:100%; height:1px }
+.mark::after { width:1px; height:100% }
+<span class="c">/* 18px marks, 14px inset from edge */</span></div>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="swatch p-radiate">
+      <div class="ray" style="transform:rotate(0deg)"></div>
+      <div class="ray" style="transform:rotate(30deg)"></div>
+      <div class="ray" style="transform:rotate(60deg)"></div>
+      <div class="ray" style="transform:rotate(90deg)"></div>
+      <div class="ray" style="transform:rotate(120deg)"></div>
+      <div class="ray" style="transform:rotate(150deg)"></div>
+      <div class="ray" style="transform:rotate(180deg)"></div>
+      <div class="ray" style="transform:rotate(210deg)"></div>
+      <div class="ray" style="transform:rotate(240deg)"></div>
+      <div class="ray" style="transform:rotate(270deg)"></div>
+      <div class="ray" style="transform:rotate(300deg)"></div>
+      <div class="ray" style="transform:rotate(330deg)"></div>
+    </div>
+    <div class="tile-meta">
+      <div class="tile-name">Radiating lines</div>
+      <div class="tile-use">Twelve lines from a centre point, sundial logic. Behind a single large stat number (streak count, day count) to give it a quiet halo.</div>
+      <div class="tile-code">.ray{ transform-origin: top center;
+  transform: rotate(Ndeg); }
+<span class="c">/* repeat at 30deg steps, 1px, var(--light) */</span></div>
+    </div>
+  </div>
+
+  <div class="tile">
+    <div class="swatch p-ticks">
+      <div class="ring"></div>
+    </div>
+    <div class="tile-meta">
+      <div class="tile-name">Index ticks</div>
+      <div class="tile-use">Clock-face ticks inside a ruled ring, twelve positions matching the radiating pattern's angles. For loading states or a lesson-count dial.</div>
+      <div class="tile-code">.ring{ inset:20%; border:1px solid var(--light) }
+.tick{ transform-origin:center 46%;
+  transform: rotate(Ndeg) }</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section-head"><span class="label">Where colour is allowed</span><span class="num">04</span></div>
+
+<div class="grid">
+  <div class="tile">
+    <div class="swatch p-reveal">
+      <div class="rule"></div>
+      <div class="label">Hover / static reveal</div>
+    </div>
+    <div class="tile-meta">
+      <div class="tile-name">The reveal line</div>
+      <div class="tile-use">The only place Vermilion may enter a geometric composition. 2 to 4px, bottom or edge, on hover or as a static print element. A thread, not a flag.</div>
+      <div class="tile-code">height: 3px; background: var(--vermilion);
+transform: scaleX(0) → scaleX(1);
+transform-origin: left; duration: 350ms;</div>
+    </div>
+  </div>
+</div>
+
+<section class="rules">
+  <h2>Checklist before shipping any pattern</h2>
+  <ul>
+    <li><span class="k">Colour check</span><span class="v">Open the file and search for any hex outside the greyscale set. If Vermilion appears anywhere but a reveal line, stop.</span></li>
+    <li><span class="k">Opacity check</span><span class="v">Pattern sitting behind text should read as texture, not shape. If you can trace individual lines from three feet away, lower it.</span></li>
+    <li><span class="k">Radius check</span><span class="v">Zero everywhere. A rounded corner on a hatch tile or a vitrine frame is the fastest way to look off-brand.</span></li>
+    <li><span class="k">Purpose check</span><span class="v">Every pattern here maps to a real idea, a ledger, a blueprint, a vitrine, a dial. Don't reach for one that doesn't fit the content's own logic.</span></li>
+    <li><span class="k">Density check</span><span class="v">One pattern per panel. Do not stack hatch over grid over rules; pick the single form that says the most.</span></li>
+    <li><span class="k">Dotted fill</span><span class="v">Never use a dot grid as a background pattern. Halftone dots exist only as a texture layer on the dark glyph cards, nowhere else.</span></li>
+  </ul>
+</section>
+
+<p class="colophon">Curi · Brand system v2.0 · Geometric pattern reference</p>
+
+</body>
+</html>

@@ -12,6 +12,8 @@ type Props = {
   ) => void;
 };
 
+const LETTERS = ["A", "B", "C", "D", "E", "F"] as const;
+
 export function QuizFlow({ questions, onComplete }: Props) {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<
@@ -65,24 +67,25 @@ export function QuizFlow({ questions, onComplete }: Props) {
       </h1>
       <ul className="mt-8 space-y-3">
         {q.options.map((opt, optIndex) => {
-          let style = "border-border bg-paper-secondary hover:border-ink";
+          let stateClass = "";
           if (revealed && optIndex === q.correctIndex) {
-            style = "border-ink bg-ink text-paper";
+            stateClass = "correct";
           } else if (revealed && optIndex === selectedIndex && !correct) {
-            style =
-              "border-border bg-paper-tertiary text-ink-muted line-through";
+            stateClass = "incorrect";
           } else if (!revealed && selectedIndex === optIndex) {
-            style = "border-ink bg-ink text-paper";
+            stateClass = "correct";
           }
+          const letter = LETTERS[optIndex] ?? String(optIndex + 1);
           return (
             <li key={opt}>
               <button
                 type="button"
                 disabled={revealed}
                 onClick={() => choose(optIndex)}
-                className={`w-full rounded-none border px-4 py-4 text-left text-ui-md min-h-[52px] transition-colors ${style}`}
+                className={`quiz-opt focus-ring min-h-[52px] ${stateClass}`}
               >
-                {opt}
+                <span className="letter">{letter}</span>
+                <span className="text">{opt}</span>
               </button>
             </li>
           );
