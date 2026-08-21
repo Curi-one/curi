@@ -48,6 +48,7 @@ describe("POST /api/dev/send-daily-email", () => {
     expect(res.status).toBe(200);
     expect(dispatchDailyLessonEmails).toHaveBeenCalledWith({
       force: true,
+      sample: false,
       onlyEmail: "you@example.com",
     });
   });
