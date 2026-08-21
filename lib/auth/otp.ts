@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { LessonFeel, Plan, UserSession } from "@/lib/api/schemas";
 import { LessonFeelSchema } from "@/lib/api/schemas";
+import { authEmailRedirectTo } from "@/lib/auth/email-redirect";
 import { buildFingerprint } from "@/lib/cache/fingerprint";
 import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
 import { getEnv } from "@/lib/env";
@@ -122,30 +123,6 @@ function progressFromFeels(feels: Record<number, LessonFeel>): number {
     return 0;
   }
   return Math.max(...indices) + 1;
-}
-
-function authEmailRedirectTo(returnTo?: string): string {
-  const appEnv = process.env.APP_ENV;
-  let base: string;
-  if (appEnv === "production") {
-    base = "https://www.curi.one/auth/callback";
-  } else if (appEnv === "staging") {
-    base = "https://stage.curi.one/auth/callback";
-  } else {
-    base = "http://localhost:3000/auth/callback";
-  }
-  const safe = returnTo?.trim();
-  if (
-    safe &&
-    safe.startsWith("/") &&
-    !safe.startsWith("//") &&
-    safe !== "/today"
-  ) {
-    const url = new URL(base);
-    url.searchParams.set("next", safe);
-    return url.toString();
-  }
-  return base;
 }
 
 export type RequestOtpResult = {

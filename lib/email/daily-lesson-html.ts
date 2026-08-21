@@ -92,7 +92,7 @@ export function renderDailyLessonEmail(payload: DailyLessonEmailPayload): string
   } = payload;
   const totalDue = 1 + alsoDue.length;
   const hasMultiple = alsoDue.length > 0;
-  const ctaLabel = hasMultiple ? "Open today's lessons" : "Continue today's lesson";
+  const ctaLabel = hasMultiple ? "Open today's lessons" : "Open today's lesson";
   const metaLine = hasMultiple
     ? `${totalDue} active paths`
     : `${featured.topic} · ${featured.depthLabel}`;

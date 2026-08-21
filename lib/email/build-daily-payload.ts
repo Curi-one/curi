@@ -5,6 +5,10 @@ import { buildFeed } from "@/lib/feed/build-feed";
 import { markdownToParagraphs } from "@/lib/lessons/body";
 import { computeStreak } from "@/lib/streak";
 import { appBaseUrl } from "@/lib/email/urls";
+import {
+  buildSignedEmailOpenUrl,
+  lessonPagePath,
+} from "@/lib/email/signed-open-link";
 import type { DailyLessonEmailPayload } from "@/lib/email/daily-lesson-html";
 import { todayInTimezone } from "@/lib/timezone";
 
@@ -242,13 +246,21 @@ export async function buildDailyLessonEmailPayload(
       : undefined;
 
   const base = appBaseUrl();
+  const featuredLessonPath = lessonPagePath(
+    featuredCourse.id,
+    featuredCourse.progress,
+  );
+  const ctaReturnTo =
+    dueCourses.length > 1 ? "/today" : featuredLessonPath;
+
   const alsoDue = await Promise.all(
     dueCourses.slice(1).map(async (course) => {
       const lesson = await loadLessonRow(course.id, course.progress, admin);
+      const path = lessonPagePath(course.id, course.progress);
       return {
         topic: course.topic,
         lessonTitle: lesson?.title ?? "Today's lesson",
-        lessonUrl: `${base}/courses/${course.id}/lessons/${course.progress}`,
+        lessonUrl: buildSignedEmailOpenUrl(params.email, path, now),
       };
     }),
   );
@@ -279,7 +291,7 @@ export async function buildDailyLessonEmailPayload(
       tomorrowTitle,
     },
     alsoDue,
-    ctaUrl: `${base}/today`,
+    ctaUrl: buildSignedEmailOpenUrl(params.email, ctaReturnTo, now),
     preferencesUrl: `${base}/profile?tab=email`,
     unsubscribeUrl: `${base}/api/email/unsubscribe?token=${encodeURIComponent(params.unsubscribeToken)}`,
     isAcademy: params.plan === "academy",
