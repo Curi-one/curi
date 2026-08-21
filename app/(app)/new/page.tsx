@@ -66,13 +66,10 @@ export default function NewPathPage() {
     >
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center py-6">
         <p className="type-kicker">New path</p>
-        <h1
-          className="mt-2 font-display text-[2rem] font-light leading-tight tracking-tight text-ink sm:text-[2.35rem]"
-          style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
-        >
+        <h1 className="mt-2 font-display display-section text-display-xs leading-tight tracking-tight text-ink sm:text-display-sm">
           What do you want to learn?
         </h1>
-        <p className="mt-3 text-[15px] font-light leading-relaxed text-ink-muted">
+        <p className="mt-3 text-ui-md font-light leading-relaxed text-ink-muted">
           Type any topic. Curi builds a daily lesson path around it — you pick
           the depth next.
         </p>
@@ -110,7 +107,7 @@ export default function NewPathPage() {
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               placeholder="e.g. liquidation preferences, burn rate…"
-              className="min-w-0 flex-1 border-0 bg-transparent text-[17px] leading-snug text-ink outline-none placeholder:text-ink-muted/40"
+              className="min-w-0 flex-1 border-0 bg-transparent text-ui-xl leading-snug text-ink outline-none placeholder:text-ink-muted/40"
               autoComplete="off"
               aria-label="Topic for your new learning path"
             />
@@ -129,7 +126,7 @@ export default function NewPathPage() {
           {DEPTH_TEASERS.map(({ label, icon: Icon }) => (
             <span
               key={label}
-              className="flex items-center gap-1.5 text-[12px] text-ink-muted/80"
+              className="flex items-center gap-1.5 text-ui-2xs text-ink-muted/80"
             >
               <Icon className="h-3 w-3 shrink-0 opacity-50" aria-hidden />
               {label}

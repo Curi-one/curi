@@ -16,6 +16,15 @@ export function resolveSession(request: Request): {
   return { sessionId, isNew: true };
 }
 
+/**
+ * Fresh anonymous id. Issue one on every auth-state change (sign-in,
+ * sign-out): the cookie survives both otherwise, so on a shared device the
+ * next person inherits the previous visitor's pending paths.
+ */
+export function newSessionId(): string {
+  return crypto.randomUUID();
+}
+
 export function withSessionCookie(
   response: NextResponse,
   sessionId: string,

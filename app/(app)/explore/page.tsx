@@ -15,6 +15,7 @@ import { PreviewSheet } from "@/components/PreviewSheet";
 import { TabPills } from "@/components/TabPills";
 import { depthLabel } from "@/lib/ui/constants";
 import { getExplore, getLibrary, getMe } from "@/lib/api/client";
+import { Button } from "@/components/Button";
 
 function groupByFirstLetter<T>(
   items: T[],
@@ -164,13 +165,14 @@ export default function ExplorePage() {
       </div>
 
       <div className="mt-4">
-        <Link
+        <Button
           href="/new"
-          className="btn-secondary flex min-h-11 w-full items-center justify-center gap-2"
+          variant="secondary"
+          icon={<Sparkles aria-hidden />}
+          className="w-full"
         >
-          <Sparkles className="h-4 w-4" aria-hidden />
           Start a custom path
-        </Link>
+        </Button>
       </div>
 
       {atLimit && (
@@ -220,18 +222,17 @@ export default function ExplorePage() {
         )}
         {listEmpty && q && (
           <div className="surface-card p-8 text-center">
-            <p className="text-[15px] font-light leading-relaxed text-ink-muted">
+            <p className="text-ui-md font-light leading-relaxed text-ink-muted">
               No catalogue match for “{query.trim()}”. Start a custom path on
               that topic.
             </p>
-            <button
-              type="button"
+            <Button
               onClick={() => startCustomFromQuery()}
-              className="btn-primary mt-6 inline-flex items-center gap-2"
+              icon={<Sparkles aria-hidden />}
+              className="mt-6"
             >
-              <Sparkles className="h-4 w-4" aria-hidden />
               Start a path on “{query.trim()}”
-            </button>
+            </Button>
           </div>
         )}
 
@@ -264,7 +265,7 @@ export default function ExplorePage() {
               <section aria-labelledby="explore-start-here">
                 <h2
                   id="explore-start-here"
-                  className="text-[15px] font-semibold tracking-tight text-ink"
+                  className="text-ui-md font-semibold tracking-tight text-ink"
                 >
                   Start here
                 </h2>
@@ -281,7 +282,7 @@ export default function ExplorePage() {
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
                         <p className="font-meta">Featured · Founder path</p>
-                        <h3 className="mt-1 font-display text-[22px] leading-snug text-ink sm:text-2xl">
+                        <h3 className="mt-1 font-display text-display-2xs leading-snug text-ink sm:text-2xl">
                           {featured.topic}
                         </h3>
                       </div>
@@ -314,7 +315,7 @@ export default function ExplorePage() {
                 <div className="mb-3 flex items-center gap-3">
                   <h2
                     id={`path-letter-${group.letter}`}
-                    className="text-[15px] font-semibold tracking-tight text-ink"
+                    className="text-ui-md font-semibold tracking-tight text-ink"
                   >
                     {group.letter}
                   </h2>
@@ -384,7 +385,7 @@ function PathMarketCard({
       <CourseCover topic={item.topic} height={100} />
       <div className="flex flex-1 flex-col gap-1 p-3.5">
         <p className="font-meta">Founder path</p>
-        <p className="font-display text-[20px] leading-snug text-ink">
+        <p className="font-display text-display-2xs leading-snug text-ink">
           {item.topic}
         </p>
         <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-ink-muted">

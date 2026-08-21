@@ -21,7 +21,7 @@ Full roster: `docs/AGENT-ROSTER.md`.
 | 2 | `docs/FLOWS.md` |
 | 3 | `docs/PRD.md` |
 | 4 | `docs/ARCHITECTURE.md` · `DATA.md` · `AI.md` · `CONTENT-CACHE.md` |
-| 5 | `docs/BRAND.md` — visual system, binding on all UI |
+| 5 | `docs/BRAND.md` — visual system, binding on all UI · quick ref: `docs/WEBSITE-DESIGN-RULES.md` |
 | 6 | `docs/ROADMAP.md` |
 
 Prototypes are visual reference in `prototypes/` — not imported by the app.
@@ -30,7 +30,7 @@ Prototypes are visual reference in `prototypes/` — not imported by the app.
 
 **TDD:** `docs/TDD.md` — red → green → refactor.  
 **UX:** `docs/UX-PRINCIPLES.md` on every screen change.  
-**Brand:** `docs/BRAND.md` — tokens before components, components before layouts. A hardcoded hex in a component is a bug.
+**Brand:** `docs/BRAND.md` — tokens before components, components before layouts. A hardcoded hex in a component is a bug. Quick reference: `docs/WEBSITE-DESIGN-RULES.md`.
 
 ## Specialist routing
 

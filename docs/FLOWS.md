@@ -28,16 +28,20 @@ Topic
 
 User picks how far the path goes. Perplexity later chooses exact lesson count **within the band**.
 
-| Slug | Label | Subcopy | Lessons |
+Depth **slugs and lesson bands are fixed**. Labels and subcopy are **topic-dynamic** (from clarify `depthOptions`, with heuristic fallback for languages/skills).
+
+| Slug | Default label | Default subcopy | Lessons |
 |---|---|---|---|
 | `essentials` | Essentials | Core ideas · about a week | 5–9 |
 | `fluent` | Fluent | Enough for real decisions · about two weeks | 10–18 |
 | `thorough` | Thorough | Full picture · about a month | 19–35 |
 
+Optional free-text field on the depth screen: “Anything else we should know?” (max 500 chars). Passed to path outline and lesson generation as additional learner context; included in the content-cache fingerprint as `learner_details`.
+
 ### Generating
 
 ```
-POST /api/courses (topic + depth + clarifications)
+POST /api/courses (topic + depth + clarifications + optional details)
   → cache lookup (path_outline fingerprint)
   → HIT: copy outline from content_cache
   → MISS: Perplexity → store cache → outline
@@ -159,9 +163,9 @@ Path map nodes: **read** · **today** (current) · **locked**.
 
 Triggered by 3rd active path (free) or Profile → Plan.
 
-Academy · $10/month → Stripe Checkout when billing ships → Today.
+Academy · $10/month → Stripe Checkout → success lands on **Today** (`/today?upgraded=1`) with a calm confirmation that Academy is active (unlimited paths). Webhooks set `users.plan = academy`. Profile Billing opens Customer Portal; cancel / unpaid → webhook sets `free` again.
 
-Until Stripe: enforce limit in API; plan toggle via seed/admin on staging only.
+Ops: [`docs/STRIPE.md`](./STRIPE.md) (staging test mode + production live mode).
 
 ---
 
@@ -169,7 +173,7 @@ Until Stripe: enforce limit in API; plan toggle via seed/admin on staging only.
 
 **Progress:** streak count, 26-week heatmap, active and mastered paths.
 
-**Profile:** name, email, theme (system), plan, sign out. Learning and email-schedule preferences are collected in Profile (local persistence); daily email delivery itself remains deferred.
+**Profile:** name, email, theme (system), plan, sign out. Learning and email preferences persist in `user_preferences`. Daily lesson email sends via hourly cron when `email_enabled`, respecting delivery time, weekends, and format.
 
 ---
 

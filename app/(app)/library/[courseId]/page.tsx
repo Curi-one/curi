@@ -15,6 +15,7 @@ import {
 } from "@/lib/api/client";
 import { depthLabel } from "@/lib/ui/constants";
 import { endowedPct } from "@/lib/ui/topic-swatch";
+import { Button } from "@/components/Button";
 
 function pathEyebrow(nodes: CourseMapResponse["nodes"]): string {
   if (nodes.length === 0) return "Exploring";
@@ -58,9 +59,9 @@ export default function LibraryCoursePage() {
         withTabPad={false}
       >
         <p className="mt-6 text-ink-muted">Could not load this path.</p>
-        <Link href="/library" className="btn-secondary mt-6 inline-block">
+        <Button href="/library" variant="secondary" className="mt-6">
           Back to Library
-        </Link>
+        </Button>
       </PageShell>
     );
   }
@@ -94,10 +95,7 @@ export default function LibraryCoursePage() {
       <div className="mt-4 flex items-start gap-5">
         <div className="min-w-0 flex-1">
           <p className="font-meta">{eyebrow}</p>
-          <h1
-            className="mt-1 font-display text-[1.75rem] font-light leading-tight text-ink sm:text-4xl"
-            style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
-          >
+          <h1 className="mt-1 font-display text-display-xs font-light leading-tight text-ink sm:text-4xl">
             {course.topic}
           </h1>
           <p className="mt-1.5 font-meta">{depthLabel(course.depth)}</p>
@@ -127,21 +125,21 @@ export default function LibraryCoursePage() {
       </div>
       {todayNode ? (
         <div className="mt-8 space-y-3">
-          <Link
+          <Button
             href={`/courses/${course.id}/lessons/${todayNode.index}?from=library`}
-            className="btn-primary block w-full text-center"
+            className="w-full"
           >
             Continue today&apos;s lesson
-          </Link>
+          </Button>
           {canShelve && (
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={() => void handleShelve()}
-              disabled={shelving}
-              className="btn-secondary block w-full text-center"
+              loading={shelving}
+              className="w-full"
             >
-              {shelving ? "Shelving…" : "Shelve path"}
-            </button>
+              Shelve path
+            </Button>
           )}
         </div>
       ) : (

@@ -25,6 +25,10 @@ import {
   type LessonBodyPayload,
   type StoreLessonBodyInput,
 } from "@/lib/cache/content-cache";
+import {
+  LEARNER_DETAILS_KEY,
+  resolveLearnerDetails,
+} from "@/lib/clarify/details";
 import { stripMarkdownFences } from "@/lib/clarify/generate";
 import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
 import { isLessonReadable } from "@/lib/courses/path-map";
@@ -98,7 +102,29 @@ export type CourseContext = {
   /** Member courses only — used for the unlock-tomorrow read gate below. */
   progress?: number;
   hasActivityToday?: boolean;
+  /** Member courses only. Shelved paths are view-only (FLOWS F4). */
+  status?: "active" | "completed" | "shelved";
 };
+
+/**
+ * Shelving frees an active-path slot, so an ungated shelved path would be an
+ * unlimited-paths loophole: shelve → start another → shelve → repeat, while
+ * every shelved path still serves (and bills for) new AI lessons. Already-read
+ * lessons stay readable; anything past `progress` does not.
+ */
+export function isShelvedLessonBlocked(
+  course: CourseContext,
+  lessonIndex: number,
+): boolean {
+  return (
+    course.kind === "member" &&
+    course.status === "shelved" &&
+    lessonIndex >= (course.progress ?? 0)
+  );
+}
+
+export const SHELVED_LOCK_MESSAGE =
+  "This path is shelved. Restore it to continue.";
 
 export type GetLessonBodySuccess = {
   ok: true;
@@ -325,7 +351,7 @@ export async function defaultLoadCourse(
 
   const { data: course, error: courseError } = await admin
     .from("courses")
-    .select("id, user_id, topic, depth, clarifications, progress")
+    .select("id, user_id, topic, depth, clarifications, progress, status")
     .eq("id", params.courseId)
     .eq("user_id", userId)
     .maybeSingle();
@@ -358,6 +384,10 @@ export async function defaultLoadCourse(
     admin,
   );
 
+  const statusRaw = String(course.status);
+  const status =
+    statusRaw === "shelved" || statusRaw === "completed" ? statusRaw : "active";
+
   return {
     kind: "member",
     topic: String(course.topic),
@@ -367,6 +397,7 @@ export async function defaultLoadCourse(
     userId: memberUserId,
     progress: typeof course.progress === "number" ? course.progress : 0,
     hasActivityToday,
+    status,
   };
 }
 
@@ -487,17 +518,25 @@ function buildMessages(input: {
     `Modifier instruction: ${MODIFIER_HINTS[input.modifier]}`,
     lengthHint,
     ...learningProfilePromptLines(input.learningProfile),
-    "Write the lesson body as markdown paragraphs separated by blank lines.",
+    "Write the lesson body as proper markdown (paragraphs separated by blank lines; short ##/### headings sparingly; lists when useful; inline $...$ and block $$...$$ for equations when helpful).",
     "Also return exactly 3 takeaways and 1 shareableFact tied to this lesson and the broader path topic.",
-    "Add visuals (0–3) only when a figure, diagram caption, or equation materially helps understanding.",
+    "Add visuals (0–3) only when a figure, diagram caption, or equation materially helps understanding (visuals[].equation can accompany in-body math).",
     "Return ONLY valid JSON matching the schema in the system message.",
   ];
 
-  if (input.clarifications.length > 0) {
+  const topicClarifications = input.clarifications.filter(
+    (item) => item.questionId !== LEARNER_DETAILS_KEY,
+  );
+  if (topicClarifications.length > 0) {
     lines.push("Learner clarifications:");
-    for (const item of input.clarifications) {
+    for (const item of topicClarifications) {
       lines.push(`- ${item.questionId}: ${item.answer}`);
     }
+  }
+
+  const learnerDetails = resolveLearnerDetails(input.clarifications);
+  if (learnerDetails) {
+    lines.push(`Additional learner context: ${learnerDetails}`);
   }
 
   return [
@@ -514,11 +553,11 @@ Return ONLY valid JSON (no markdown fences, no commentary) matching:
 }
 
 Rules:
-- body is the teaching content: markdown with short paragraphs separated by blank lines. The app displays body as you write it (only blank-line splitting). Do not put takeaways inside body.
+- body is the teaching content: proper markdown. Use short ## / ### headings sparingly, lists when useful, and inline $...$ / block $$...$$ for equations when helpful (in addition to visuals[].equation). Separate short paragraphs with blank lines. The app renders markdown (GFM + math). Do not put takeaways inside body.
 - Stay on the lesson title; use the path topic for broader context only.
 - takeaways: exactly 3 memorable, concrete insights from THIS lesson (not generic advice).
 - shareableFact: one punchy fact + short reflection clearly related to the lesson and/or broader path topic — suitable to share on social.
-- visuals: omit or [] when text alone is enough. When helpful, include title+caption; add equation/formulaNote for formulas; imageUrl only if a real public https image URL would help (never invent broken URLs).
+- visuals: omit or [] when text alone is enough. When helpful, include title+caption; add equation/formulaNote for formulas. For visuals[].equation use bare TeX only (e.g. \\frac{a}{b} or E=mc^2) — do NOT wrap in \\[ \\], \\( \\), or $ delimiters. imageUrl only if a real public https image URL would help (never invent broken URLs).
 - Prefer accurate, source-backed claims.`,
     },
     { role: "user", content: lines.join("\n") },
@@ -593,6 +632,10 @@ export async function getLessonBody(
   const lesson = course.lessons.find((l) => l.index === params.lessonIndex);
   if (!lesson) {
     return { ok: false, code: "not_found", message: "Lesson not found" };
+  }
+
+  if (isShelvedLessonBlocked(course, params.lessonIndex)) {
+    return { ok: false, code: "locked", message: SHELVED_LOCK_MESSAGE };
   }
 
   if (

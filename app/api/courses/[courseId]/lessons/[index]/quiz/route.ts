@@ -41,7 +41,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     return jsonWithSession(
       { error: result.message, code: result.code },
       sessionId,
-      { status: 404 },
+      { status: result.code === "locked" ? 403 : 404 },
     );
   }
   return jsonWithSession(result.data, sessionId);
@@ -105,7 +105,14 @@ export async function POST(request: Request, { params }: RouteParams) {
     return jsonWithSession(
       { error: result.message, code: result.code },
       sessionId,
-      { status: result.code === "already_done_today" ? 409 : 404 },
+      {
+        status:
+          result.code === "already_done_today"
+            ? 409
+            : result.code === "locked"
+              ? 403
+              : 404,
+      },
     );
   }
   return jsonWithSession(result.data, sessionId);

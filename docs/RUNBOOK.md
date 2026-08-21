@@ -2,9 +2,13 @@
 
 Deploy, rollback, rotate secrets, and launch checklist for [stage.curi.one](https://stage.curi.one) / production.
 
-## Deploy
+## Design system showcase
 
-### Staging (`staging` branch → stage.curi.one)
+Staging / local only: [https://stage.curi.one/design-system](https://stage.curi.one/design-system)
+
+Gated by `APP_ENV` (`local` \| `staging`). Production returns 404.
+
+
 
 ```bash
 git push origin staging
@@ -33,16 +37,20 @@ git push origin staging
 | `STRIPE_PRICE_ID` | Vercel | Academy $10/mo price |
 | `SENTRY_DSN` | Vercel | Optional until Slice 7 exit |
 | `NEXT_PUBLIC_POSTHOG_KEY` | Vercel | Optional until Slice 7 exit |
-| `CRON_SECRET` | Vercel | Required for `/api/dev/seed` outside local |
+| `CRON_SECRET` | Vercel | Required for `/api/dev/seed` and `/api/cron/daily-email` |
+| `RESEND_API_KEY` | Vercel Preview + Prod | Resend dashboard → API Keys |
+| `EMAIL_FROM` | Vercel Preview + Prod | e.g. `Curi <lessons@curi.one>` — domain must be verified in Resend |
 
 After rotating: Redeploy the affected environment.
 
 ## Stripe webhook
 
+Full ops guide (Dashboard setup, Vercel env, QA, CLI, launch checklist): **[`docs/STRIPE.md`](./STRIPE.md)**.
+
 Endpoint: `POST /api/billing/webhook`
 
-- Staging: Stripe test mode webhook → `https://stage.curi.one/api/billing/webhook`
-- Production: live mode webhook → `https://www.curi.one/api/billing/webhook`
+- Staging (test mode): `https://stage.curi.one/api/billing/webhook`
+- Production (live mode): `https://www.curi.one/api/billing/webhook` (or Production URL from Vercel until custom domain is attached)
 - Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
 
 ## Staging seed
@@ -53,6 +61,29 @@ curl -X POST https://stage.curi.one/api/dev/seed \
 ```
 
 Demo user: `demo@curi.one` (staging OTP bypass `118833` when `APP_ENV=staging`).
+
+## Daily lesson email (staging)
+
+Requires [PR #20](https://github.com/Curi-one/curi/pull/20) merged and Vercel env:
+
+- `RESEND_API_KEY` — Resend API key (server only)
+- `EMAIL_FROM` — `Curi <lessons@curi.one>` (domain verified in Resend)
+- `CRON_SECRET` — authorizes cron route; also set as GitHub Actions secret for hourly dispatch; **signs daily-email lesson deep links** (`/api/email/open`)
+
+**Scheduling:** Vercel Hobby allows at most one cron per day in `vercel.json`, so hourly sends use GitHub Actions (`.github/workflows/daily-email-cron.yml`) calling the API route. Upgrade to Vercel Pro to use native hourly crons instead.
+
+Manual test:
+
+```bash
+curl -s "https://stage.curi.one/api/cron/daily-email?force=1&email=you@example.com" \
+  -H "Authorization: Bearer $CRON_SECRET"
+```
+
+`force=1` skips delivery hour, weekend, and already-sent-today checks (for manual QA). Optional `email=` limits to one inbox.
+
+User must have **Email → Send daily email** on, a due lesson today, and the current hour must match their delivery time (user timezone).
+
+Preview (no send): Profile → Email → **Preview today's email**, or `GET /api/me/email-preview` when signed in.
 
 ## Production checklist (launch)
 

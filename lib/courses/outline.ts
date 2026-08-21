@@ -13,7 +13,17 @@ import {
   type PathOutlinePayload,
   type StorePathOutlineInput,
 } from "@/lib/cache/content-cache";
+import {
+  LEARNER_DETAILS_KEY,
+  resolveLearnerDetails,
+} from "@/lib/clarify/details";
 import { stripMarkdownFences } from "@/lib/clarify/generate";
+import {
+  DEFAULT_LEARNING_PROFILE,
+  learningProfilePromptLines,
+  normalizeLearningProfile,
+  type LearningProfile,
+} from "@/lib/profile/learning-profile";
 
 export const DEPTH_LESSON_BANDS: Record<
   DepthSlug,
@@ -95,10 +105,15 @@ export function isTotalInDepthBand(total: number, depth: DepthSlug): boolean {
 /** Build clarifications map keyed by questionId (v1 fingerprint). */
 export function clarificationsToMap(
   clarifications: CourseCreateRequest["clarifications"],
+  details?: string,
 ): Record<string, string> {
   const map: Record<string, string> = {};
   for (const item of clarifications) {
     map[item.questionId] = item.answer;
+  }
+  const learnerDetails = resolveLearnerDetails(clarifications, details);
+  if (learnerDetails) {
+    map[LEARNER_DETAILS_KEY] = learnerDetails;
   }
   return map;
 }
@@ -129,19 +144,34 @@ function buildMessages(input: {
   topic: string;
   depth: DepthSlug;
   clarifications: CourseCreateRequest["clarifications"];
+  details?: string;
+  learningProfile?: LearningProfile;
 }): PerplexityMessage[] {
   const band = DEPTH_LESSON_BANDS[input.depth];
+  const profile = input.learningProfile ?? DEFAULT_LEARNING_PROFILE;
   const lines = [
     `Topic: ${input.topic}`,
     `Depth: ${input.depth} (total lessons must be between ${band.min} and ${band.max} inclusive)`,
-    "Generate a path outline as JSON.",
+    ...learningProfilePromptLines(profile),
+    "Generate a path outline as JSON. Order and title lessons to match the learner teaching preferences above.",
   ];
 
-  if (input.clarifications.length > 0) {
+  const topicClarifications = input.clarifications.filter(
+    (item) => item.questionId !== LEARNER_DETAILS_KEY,
+  );
+  if (topicClarifications.length > 0) {
     lines.push("Learner clarifications:");
-    for (const item of input.clarifications) {
+    for (const item of topicClarifications) {
       lines.push(`- ${item.questionId}: ${item.answer}`);
     }
+  }
+
+  const learnerDetails = resolveLearnerDetails(
+    input.clarifications,
+    input.details,
+  );
+  if (learnerDetails) {
+    lines.push(`Additional learner context: ${learnerDetails}`);
   }
 
   return [
@@ -151,13 +181,19 @@ function buildMessages(input: {
 }
 
 async function attemptGenerate(
-  input: CourseCreateRequest,
+  input: CourseCreateRequest & { learningProfile?: LearningProfile },
   complete: typeof chatCompletion,
 ): Promise<AttemptResult> {
   try {
     const result = await complete({
       model: outlineModel(),
-      messages: buildMessages(input),
+      messages: buildMessages({
+        topic: input.topic,
+        depth: input.depth,
+        clarifications: input.clarifications,
+        details: input.details,
+        learningProfile: input.learningProfile,
+      }),
       temperature: 0.2,
       max_tokens: 1200,
     });
@@ -183,12 +219,27 @@ export async function generatePathOutline(
   deps?: GeneratePathOutlineDeps,
 ): Promise<PathOutlinePayload> {
   const topicNormalized = normalizeTopic(input.topic);
-  const clarifications = clarificationsToMap(input.clarifications);
+  const clarifications = clarificationsToMap(
+    input.clarifications,
+    input.details,
+  );
+  const learningProfile = input.learningProfile
+    ? normalizeLearningProfile(input.learningProfile)
+    : undefined;
   const cacheKey = buildFingerprint({
     topicNormalized,
     depth: input.depth,
     clarifications,
     cacheType: "path_outline",
+    learningProfile: learningProfile
+      ? {
+          seq: learningProfile.seq,
+          anchor: learningProfile.anchor,
+          length: learningProfile.length,
+          rigor: learningProfile.rigor,
+          jargon: learningProfile.jargon,
+        }
+      : undefined,
   });
 
   const lookup = deps?.lookup ?? lookupPathOutline;
@@ -200,7 +251,8 @@ export async function generatePathOutline(
     return hit.payload;
   }
 
-  const first = await attemptGenerate(input, complete);
+  const enriched = { ...input, learningProfile };
+  const first = await attemptGenerate(enriched, complete);
   if (first.ok) {
     await store({
       cacheKey,
@@ -212,7 +264,7 @@ export async function generatePathOutline(
     return first.payload;
   }
 
-  const second = await attemptGenerate(input, complete);
+  const second = await attemptGenerate(enriched, complete);
   if (second.ok) {
     await store({
       cacheKey,

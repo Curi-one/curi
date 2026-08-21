@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PathOutlinePayload } from "@/lib/cache/content-cache";
-import { createCourse } from "@/lib/courses/create-course";
+import { AuthUnavailableError, createCourse } from "@/lib/courses/create-course";
 
 const OUTLINE: PathOutlinePayload = {
   total: 6,
@@ -165,5 +165,61 @@ describe("createCourse", () => {
       ]),
     );
     expect(lessonsInsert.mock.calls[0]![0]).toHaveLength(6);
+  });
+
+  it("refuses rather than falling back to the uncapped guest path when auth is unavailable", async () => {
+    // A member whose session lookup fails must not be treated as a guest:
+    // guests have no active-path cap, so that would be a free bypass.
+    const result = await createCourse(
+      {
+        sessionId: "member-session",
+        request: { topic: "Bypass", depth: "essentials", clarifications: [] },
+      },
+      {
+        admin: { from: vi.fn() } as never,
+        getUser: async () => {
+          throw new AuthUnavailableError("supabase unreachable");
+        },
+        generateOutline,
+      },
+    );
+
+    expect(result).toEqual({
+      ok: false,
+      code: "auth_unavailable",
+      message: "Could not verify your session. Try again in a moment.",
+    });
+    expect(generateOutline).not.toHaveBeenCalled();
+  });
+
+  it("does not cap Academy members", async () => {
+    const lessonsInsert = vi.fn().mockResolvedValue({ error: null });
+    const courseInsert = vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        single: vi
+          .fn()
+          .mockResolvedValue({ data: { id: "course-9" }, error: null }),
+      }),
+    });
+    const from = vi.fn((table: string) => {
+      if (table === "courses") return { insert: courseInsert };
+      if (table === "course_lessons") return { insert: lessonsInsert };
+      throw new Error(`unexpected table ${table}`);
+    });
+
+    const result = await createCourse(
+      {
+        sessionId: "member-session",
+        request: { topic: "Tenth", depth: "essentials", clarifications: [] },
+      },
+      {
+        admin: { from } as never,
+        getUser: async () => ({ id: "user-1", plan: "academy" as const }),
+        countActiveCourses: async () => 9,
+        generateOutline,
+      },
+    );
+
+    expect(result.ok).toBe(true);
   });
 });

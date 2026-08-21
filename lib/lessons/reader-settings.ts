@@ -27,17 +27,17 @@ export const READER_FONTS: { id: ReaderFont; label: string; family: string }[] =
     {
       id: "sans",
       label: "Sans",
-      family: "var(--font-ui), system-ui, sans-serif",
+      family: "var(--font-ui-stack)",
     },
     {
       id: "serif",
       label: "Serif",
-      family: "var(--font-display), Georgia, serif",
+      family: "var(--font-display-stack)",
     },
     {
       id: "mono",
       label: "Mono",
-      family: "var(--font-mono), ui-monospace, monospace",
+      family: "var(--font-mono-stack)",
     },
   ];
 
@@ -52,54 +52,53 @@ export const READER_THEMES: {
   border: string;
   card: string;
 }[] = [
-  // Reader themes are a neutral tonal ladder: white, off-white, grey, ink.
-  // No warm, sepia, or tinted surfaces (BRAND.md §4.2, §16.1).
+  // Reader themes — warm tonal ladder matching globals.css tokens.
+  // Never pure black or white; Vermilion is not used in reader chrome.
   {
     id: "light",
     label: "Light",
-    swatch: "#FFFFFF",
-    swatchBorder: "#E2E2E2",
-    bg: "#FFFFFF",
-    fg: "#0D0D0D",
-    muted: "#666666",
-    border: "#E2E2E2",
-    card: "#FAFAFA",
+    swatch: "#FAF9F5",
+    swatchBorder: "#D4D0C8",
+    bg: "#FAF9F5",
+    fg: "#0A0908",
+    muted: "#6B6760",
+    border: "#D4D0C8",
+    card: "#F4F1E8",
   },
   {
     id: "paper",
     label: "Paper",
-    swatch: "#FAFAFA",
-    swatchBorder: "#DCDCDC",
-    bg: "#FAFAFA",
-    fg: "#0D0D0D",
-    muted: "#666666",
-    border: "#DCDCDC",
-    card: "#F2F2F2",
+    swatch: "#F4F1E8",
+    swatchBorder: "#D4D0C8",
+    bg: "#F4F1E8",
+    fg: "#0A0908",
+    muted: "#6B6760",
+    border: "#D4D0C8",
+    card: "#E8E5DC",
   },
   {
     id: "soft",
     label: "Soft",
-    swatch: "#F2F2F2",
-    swatchBorder: "#D0D0D0",
-    bg: "#F2F2F2",
-    fg: "#2A2A2A",
-    muted: "#5C5C5C",
-    border: "#D0D0D0",
-    card: "#EAEAEA",
+    swatch: "#E8E5DC",
+    swatchBorder: "#D4D0C8",
+    bg: "#E8E5DC",
+    fg: "#2E2C28",
+    muted: "#6B6760",
+    border: "#D4D0C8",
+    card: "#D4D0C8",
   },
   {
     id: "dark",
     label: "Dark",
-    swatch: "#0D0D0D",
-    swatchBorder: "#2A2A2A",
-    bg: "#0D0D0D",
-    fg: "#FAFAFA",
-    muted: "#A3A3A3",
-    border: "#2A2A2A",
-    card: "#1F1F1F",
+    swatch: "#0A0908",
+    swatchBorder: "#2E2C28",
+    bg: "#0A0908",
+    fg: "#FAF9F5",
+    muted: "#9E9B94",
+    border: "#2E2C28",
+    card: "#1C1A18",
   },
 ];
-
 export const DEFAULT_READER_SETTINGS: ReaderSettings = {
   size: "m",
   font: "sans",
@@ -137,4 +136,106 @@ export function saveReaderSettings(settings: ReaderSettings) {
   } catch {
     /* ignore quota */
   }
+}
+
+export type ReaderThemeTokens = (typeof READER_THEMES)[number];
+
+const THEME_CSS_VAR_KEYS = [
+  "--color-ink",
+  "--color-ink-muted",
+  "--color-border",
+  "--color-paper",
+  "--color-paper-secondary",
+  "--color-paper-tertiary",
+  "--color-bg-primary",
+  "--color-bg-secondary",
+  "--color-text-primary",
+  "--color-text-secondary",
+  "--color-border-subtle",
+] as const;
+
+type ThemeCssVarKey = (typeof THEME_CSS_VAR_KEYS)[number];
+
+export function resolveReaderTheme(
+  theme: ReaderTheme | ReaderThemeTokens,
+): ReaderThemeTokens {
+  if (typeof theme === "string") {
+    return READER_THEMES.find((t) => t.id === theme) ?? READER_THEMES[0];
+  }
+  return theme;
+}
+
+/** Map a reader theme to CSS custom properties for the document / reader chrome. */
+export function themeToCssVars(
+  theme: ReaderTheme | ReaderThemeTokens,
+): Record<ThemeCssVarKey, string> {
+  const t = resolveReaderTheme(theme);
+  return {
+    "--color-ink": t.fg,
+    "--color-ink-muted": t.muted,
+    "--color-border": t.border,
+    "--color-paper": t.bg,
+    "--color-paper-secondary": t.card,
+    "--color-paper-tertiary": t.border,
+    "--color-bg-primary": t.bg,
+    "--color-bg-secondary": t.card,
+    "--color-text-primary": t.fg,
+    "--color-text-secondary": t.muted,
+    "--color-border-subtle": t.border,
+  };
+}
+
+type SavedThemeStyles = {
+  vars: Partial<Record<ThemeCssVarKey, string>>;
+  rootBackground: string;
+  bodyBackground: string;
+};
+
+let savedThemeStyles: SavedThemeStyles | null = null;
+
+/** Apply reader theme tokens to `document.documentElement` (and body background). */
+export function applyReaderThemeToDocument(
+  theme: ReaderTheme | ReaderThemeTokens,
+): void {
+  if (typeof document === "undefined") return;
+  const t = resolveReaderTheme(theme);
+  const vars = themeToCssVars(t);
+  const root = document.documentElement;
+
+  if (!savedThemeStyles) {
+    const prevVars: Partial<Record<ThemeCssVarKey, string>> = {};
+    for (const key of THEME_CSS_VAR_KEYS) {
+      prevVars[key] = root.style.getPropertyValue(key);
+    }
+    savedThemeStyles = {
+      vars: prevVars,
+      rootBackground: root.style.backgroundColor,
+      bodyBackground: document.body.style.backgroundColor,
+    };
+  }
+
+  for (const key of THEME_CSS_VAR_KEYS) {
+    root.style.setProperty(key, vars[key]);
+  }
+  root.style.backgroundColor = t.bg;
+  document.body.style.backgroundColor = t.bg;
+}
+
+/** Restore document styles saved before the first `applyReaderThemeToDocument`. */
+export function clearReaderThemeFromDocument(): void {
+  if (typeof document === "undefined") return;
+  if (!savedThemeStyles) return;
+
+  const root = document.documentElement;
+  for (const key of THEME_CSS_VAR_KEYS) {
+    const prev = savedThemeStyles.vars[key];
+    if (prev) {
+      root.style.setProperty(key, prev);
+    } else {
+      root.style.removeProperty(key);
+    }
+  }
+  root.style.backgroundColor = savedThemeStyles.rootBackground;
+  document.body.style.backgroundColor = savedThemeStyles.bodyBackground;
+  savedThemeStyles = null;
 }

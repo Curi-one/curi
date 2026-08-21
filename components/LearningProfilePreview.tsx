@@ -15,7 +15,9 @@ type LearningProfilePreviewProps = {
   profile: LearningProfile;
 };
 
-export function LearningProfilePreview({ profile }: LearningProfilePreviewProps) {
+export function LearningProfilePreview({
+  profile,
+}: LearningProfilePreviewProps) {
   const [topicKey, setTopicKey] = useState<PreviewTopicKey>("fundraising");
   const [swapping, setSwapping] = useState(false);
 
@@ -37,9 +39,9 @@ export function LearningProfilePreview({ profile }: LearningProfilePreviewProps)
 
   return (
     <div className="lg:sticky lg:top-7">
-      <div className="mb-4 flex items-center gap-2.5 font-meta text-[11px] uppercase tracking-wider text-ink-muted">
+      <div className="mb-4 flex items-center gap-2.5 font-meta text-ui-3xs uppercase tracking-wider text-ink-muted">
         <span>Curi</span>
-        <span className="font-display italic text-accent">×</span>
+        <span className="font-display italic text-ink">×</span>
         <span>You</span>
       </div>
 
@@ -51,9 +53,9 @@ export function LearningProfilePreview({ profile }: LearningProfilePreviewProps)
             key={key}
             type="button"
             onClick={() => selectTopic(key)}
-            className={`min-h-9 border px-3 py-2 font-meta text-[10.5px] uppercase tracking-wider transition-colors ${
+            className={`min-h-9 border px-3 py-2 font-meta text-ui-4xs uppercase tracking-wider transition-colors ${
               topicKey === key
-                ? "border-accent bg-accent text-paper"
+                ? "border-transparent bg-accent text-paper"
                 : "border-border-strong text-ink-muted hover:border-ink hover:text-ink"
             }`}
           >
@@ -66,17 +68,17 @@ export function LearningProfilePreview({ profile }: LearningProfilePreviewProps)
       </p>
 
       <article className="border border-ink bg-paper">
-        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5 font-meta text-[11px] uppercase tracking-wider text-ink-muted">
+        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5 font-meta text-ui-3xs uppercase tracking-wider text-ink-muted">
           <span>Sample lesson</span>
           <span>{LENGTH_CAPTION[profile.length]}</span>
         </div>
         <div
           className={`px-5 py-6 transition-opacity duration-150 ${swapping ? "opacity-0" : "opacity-100"}`}
         >
-          <p className="mb-2 font-meta text-[11px] uppercase tracking-widest text-ink-faint">
+          <p className="mb-2 font-meta text-ui-3xs uppercase tracking-widest text-ink-faint">
             {lesson.tag}
           </p>
-          <h3 className="mb-4 font-display text-xl font-medium leading-tight tracking-tight text-ink">
+          <h3 className="mb-4 font-display text-xl  leading-tight tracking-tight text-ink">
             {lesson.title}
           </h3>
 
@@ -102,10 +104,12 @@ export function LearningProfilePreview({ profile }: LearningProfilePreviewProps)
 
           {lesson.extraTag && lesson.extraText ? (
             <div className="mt-4 border-t border-border pt-3.5">
-              <p className="mb-1.5 font-meta text-[10px] uppercase tracking-widest text-ink-faint">
+              <p className="mb-1.5 font-meta text-ui-4xs uppercase tracking-widest text-ink-faint">
                 {lesson.extraTag}
               </p>
-              <p className="text-sm leading-relaxed text-ink">{lesson.extraText}</p>
+              <p className="text-sm leading-relaxed text-ink">
+                {lesson.extraText}
+              </p>
             </div>
           ) : null}
         </div>

@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Check, Minus } from "lucide-react";
+import { ArrowLeft, Check, LogOut, Minus } from "lucide-react";
 import { LearningProfilePreview } from "@/components/LearningProfilePreview";
 import { PageShell } from "@/components/PageShell";
 import { LoadingState } from "@/components/LoadingState";
 import { SettingChips } from "@/components/SettingChips";
 import { SettingToggle } from "@/components/SettingToggle";
+import { UserAvatar } from "@/components/UserAvatar";
+import { Button } from "@/components/Button";
 import {
   getLibrary,
   getMe,
@@ -46,7 +48,6 @@ function applyTheme(theme: Theme) {
   }
   localStorage.setItem("curi-theme", theme);
 }
-
 
 const EMAIL_TIME_OPTIONS = [
   { value: "early-morning", label: "Early morning · 6 AM" },
@@ -144,7 +145,8 @@ export default function ProfilePage() {
         .then((res) => {
           setPrefs(res.preferences);
           setPrefsSaved(true);
-          if (prefsFeedbackTimer.current) clearTimeout(prefsFeedbackTimer.current);
+          if (prefsFeedbackTimer.current)
+            clearTimeout(prefsFeedbackTimer.current);
           prefsFeedbackTimer.current = setTimeout(
             () => setPrefsSaved(false),
             1500,
@@ -228,19 +230,15 @@ export default function ProfilePage() {
         withTabPad={false}
       >
         <p className="mt-6 text-ink-muted">Sign in to manage your account.</p>
-        <Link
-          href="/auth?intent=signin&returnTo=%2Fprofile"
-          className="btn-primary mt-6 inline-block"
-        >
+        <Button href="/auth?intent=signin&returnTo=%2Fprofile" className="mt-6">
           Sign in
-        </Link>
+        </Button>
       </PageShell>
     );
   }
 
   const isAcademy = session.plan === "academy";
   const displayName = name.trim() || session.name || "Learner";
-  const initial = displayName.slice(0, 1).toUpperCase();
   const streak = progress?.streak ?? 0;
 
   return (
@@ -253,22 +251,18 @@ export default function ProfilePage() {
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Today
         </Link>
-        <button
-          type="button"
+        <Button
+          variant="danger"
+          size="small"
+          icon={<LogOut className="h-3.5 w-3.5" aria-hidden />}
           onClick={() => void signOut()}
-          className="btn-secondary h-9 px-3 text-sm"
         >
           Sign out
-        </button>
+        </Button>
       </div>
 
       <header className="mb-7 flex items-center gap-4">
-        <div
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-none border border-border bg-paper-secondary text-base font-medium text-ink"
-          aria-hidden
-        >
-          {initial}
-        </div>
+        <UserAvatar name={displayName} size={56} />
         <div className="min-w-0">
           <p className="truncate text-xl font-medium leading-none tracking-tight text-ink">
             {displayName}
@@ -317,14 +311,16 @@ export default function ProfilePage() {
                   className="input-field flex-1"
                   autoComplete="name"
                 />
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="small"
                   disabled={saving || !name.trim()}
+                  loading={saving}
                   onClick={() => void saveName()}
-                  className="btn-secondary shrink-0 px-4 disabled:opacity-40"
+                  className="shrink-0"
                 >
-                  {saving ? "…" : "Save"}
-                </button>
+                  Save
+                </Button>
               </div>
             </label>
             {saveMessage && (
@@ -368,8 +364,8 @@ export default function ProfilePage() {
             <span className="font-display italic text-accent">×</span>
             <span>
               This applies to every course you&apos;re taking. What you&apos;re
-              working toward, and where you&apos;re starting, is asked separately
-              each time you add a course.
+              working toward, and where you&apos;re starting, is asked
+              separately each time you add a course.
             </span>
           </p>
 
@@ -377,12 +373,13 @@ export default function ProfilePage() {
             <section className="surface-card p-4 sm:p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-display text-xl font-medium tracking-tight text-ink">
+                  <h2 className="font-display text-xl  tracking-tight text-ink">
                     How you like things explained
                   </h2>
                   <p className="mt-2 text-sm text-ink-muted">
-                    Not what you&apos;re learning — how Curi should teach it. Set
-                    it once; the preview shows it on three unrelated subjects.
+                    Not what you&apos;re learning — how Curi should teach it.
+                    Set it once; the preview shows it on three unrelated
+                    subjects.
                   </p>
                 </div>
                 {prefsSaved && (
@@ -455,7 +452,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={resetLearningDefaults}
-                  className="border-b border-border-strong pb-0.5 font-meta text-[11px] uppercase tracking-wider text-ink hover:border-ink"
+                  className="border-b border-border-strong pb-0.5 font-meta text-ui-3xs uppercase tracking-wider text-ink hover:border-ink"
                 >
                   Reset to defaults
                 </button>
@@ -526,8 +523,18 @@ export default function ProfilePage() {
               onChange={(v) => patchPrefs("emailWeeklyDigest", v)}
             />
 
+            <div className="h-px bg-border" aria-hidden />
+
+            <Link
+              href="/email-preview"
+              className="inline-flex min-h-11 items-center text-sm text-ink underline decoration-border-strong underline-offset-4 hover:decoration-ink"
+            >
+              Preview today&apos;s email
+            </Link>
+
             <p className="text-xs leading-relaxed text-ink-muted">
-              Delivery starts when digests ship — your choices are saved.
+              Daily emails send once per day at your chosen time when you have
+              lessons due. Weekly digest delivery is coming soon.
             </p>
           </div>
         </section>
@@ -593,7 +600,7 @@ export default function ProfilePage() {
                     {row.label}
                   </span>
                   {"note" in row && row.note && (
-                    <span className="ml-auto font-meta text-[10px] uppercase tracking-wider text-ink-muted/60">
+                    <span className="ml-auto font-meta text-ui-4xs uppercase tracking-wider text-ink-muted/60">
                       {row.note}
                     </span>
                   )}
@@ -604,21 +611,18 @@ export default function ProfilePage() {
 
           <div className="mt-6 border-t border-border pt-5">
             {!isAcademy ? (
-              <Link
-                href="/upgrade"
-                className="btn-primary inline-flex w-full justify-center sm:w-auto"
-              >
+              <Button href="/upgrade" className="w-full sm:w-auto">
                 Upgrade to Academy
-              </Link>
+              </Button>
             ) : (
-              <button
-                type="button"
-                disabled={portalLoading}
+              <Button
+                variant="secondary"
+                loading={portalLoading}
                 onClick={() => void openPortal()}
-                className="btn-secondary w-full disabled:opacity-40 sm:w-auto"
+                className="w-full sm:w-auto"
               >
-                {portalLoading ? "Opening…" : "Billing & invoices"}
-              </button>
+                Billing &amp; invoices
+              </Button>
             )}
             {portalMessage && (
               <p className="mt-2 text-sm text-ink-muted">{portalMessage}</p>

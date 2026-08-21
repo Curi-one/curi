@@ -43,10 +43,7 @@ export function ClarifyStep({
           {topic}
         </p>
       )}
-      <h1
-        className="font-display text-[1.75rem] font-light leading-snug tracking-tight text-ink"
-        style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
-      >
+      <h1 className="font-display text-display-xs font-light leading-snug tracking-tight text-ink">
         {question.prompt}
       </h1>
       <ul className="mt-8 space-y-3">
@@ -55,7 +52,7 @@ export function ClarifyStep({
             <button
               type="button"
               onClick={() => onSelect(opt)}
-              className={`option-card focus-ring text-[15px] leading-snug ${
+              className={`option-card focus-ring text-ui-md leading-snug ${
                 selectedAnswer === opt ? "option-card-selected" : ""
               }`}
             >

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curi · Component Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════ TOKENS ══════════════ */
+:root{
+  --white:#FAF9F5; --paper:#F4F1E8; --pale:#E8E5DC; --light:#D4D0C8;
+  --silver:#9E9B94; --mid:#6B6760; --ink3:#2E2C28; --ink2:#1C1A18; --ink:#0A0908;
+  --vermilion:#C1121F; --vermilion-dark:#A30F1B;
+
+  --display:'Fraunces',Georgia,serif;
+  --ui:'Plus Jakarta Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Courier New',monospace;
+
+  --border-subtle:1px solid #D4D0C8;
+  --border-default:1px solid #9E9B94;
+  --border-strong:1px solid #0A0908;
+  --border-bold:2px solid #0A0908;
+  --border-accent:2px solid #C1121F;
+
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --margin:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{ background:var(--white); color:var(--ink); font-family:var(--ui); font-weight:300; -webkit-font-smoothing:antialiased; }
+:focus-visible{ outline:2px solid var(--silver); outline-offset:2px; }
+
+/* ══════════════ PAGE CHROME ══════════════ */
+.masthead{ display:flex; align-items:center; justify-content:space-between; height:52px;
+  padding:0 var(--margin); border-bottom:var(--border-bold); position:sticky; top:0; background:var(--white); z-index:30; }
+.wordmark{ font-family:var(--display); font-size:22px; letter-spacing:-.02em }
+.wordmark i{ font-style:italic }
+.masthead .meta{ font-family:var(--mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--silver) }
+
+.intro{ padding:64px var(--margin) 44px; max-width:780px; border-bottom:var(--border-subtle) }
+.intro h1{ font-family:var(--display); font-weight:300; font-size:46px; line-height:1.1; letter-spacing:-.02em; margin-bottom:18px }
+.intro p{ font-size:15px; line-height:1.65; color:var(--mid); max-width:58ch }
+.intro p+p{ margin-top:12px }
+
+.section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:24px;
+  padding:56px var(--margin) 20px; border-bottom:var(--border-subtle) }
+.section-head .label{ font-size:10px; font-weight:500; letter-spacing:.3em; text-transform:uppercase; color:var(--silver) }
+.section-head .num{ font-family:var(--mono); font-size:9px; color:var(--white); background:var(--ink); padding:3px 8px; letter-spacing:.12em }
+
+.bay{ padding:36px var(--margin) 12px; display:grid; gap:36px;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); align-items:start }
+.bay.single{ grid-template-columns:1fr; max-width:900px }
+.spec{ display:flex; flex-direction:column; gap:14px }
+.spec-label{ font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--silver) }
+.spec-note{ font-size:13px; line-height:1.6; color:var(--mid); max-width:46ch }
+.stage{ border:var(--border-subtle); padding:28px; background:var(--white); display:flex; flex-wrap:wrap; gap:16px; align-items:center }
+.stage.col{ flex-direction:column; align-items:stretch; gap:12px }
+.stage.dark{ background:var(--ink); border-color:var(--ink) }
+.stage.plain{ border:none; padding:0; background:none }
+
+/* ══════════════ BUTTONS ══════════════ */
+.btn{ font-family:var(--ui); border-radius:0; text-transform:uppercase; letter-spacing:.06em;
+  cursor:pointer; transition:background 120ms ease, color 120ms ease, border-color 120ms ease; }
+.btn:active{ transform:translateY(1px) }
+
+.btn-primary{ font-size:12px; font-weight:500; color:var(--white); background:var(--ink);
+  padding:12px 24px; border:none; border-bottom:var(--border-accent) }
+.btn-primary:hover{ background:var(--ink2) }
+.btn-primary:disabled{ background:var(--light); color:var(--white); border-bottom:none; cursor:not-allowed; transform:none }
+
+.btn-ghost{ font-size:12px; font-weight:400; color:var(--ink); background:transparent;
+  padding:12px 24px; border:var(--border-subtle) }
+.btn-ghost:hover{ border-color:var(--ink); background:var(--pale) }
+.btn-ghost:disabled{ color:var(--light); border-color:var(--light); cursor:not-allowed; background:transparent }
+
+.btn-link{ font-size:13px; font-weight:400; color:var(--ink); background:none; border:none; padding:0;
+  text-decoration:underline; text-underline-offset:3px; text-transform:none; letter-spacing:0 }
+.btn-link:hover{ color:var(--mid) }
+
+.btn-danger{ font-size:12px; font-weight:400; color:var(--mid); background:transparent;
+  padding:12px 24px; border:var(--border-subtle) }
+.btn-danger:hover{ color:var(--ink); border-color:var(--ink) }
+
+.btn-lg{ padding:14px 28px; font-size:13px }
+.btn-sm{ padding:8px 16px; font-size:11px }
+.btn-xs{ padding:5px 12px; font-size:10px }
+
+/* ══════════════ FORMS ══════════════ */
+.field{ display:block; width:100% }
+.field-label{ font-family:var(--mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase;
+  color:var(--silver); margin-bottom:8px; display:block }
+.input{ font-family:var(--ui); font-size:14px; font-weight:400; color:var(--ink); background:transparent;
+  border:none; border-bottom:var(--border-subtle); padding:12px 0; border-radius:0; width:100% }
+.input::placeholder{ color:var(--silver); font-style:italic }
+.input:focus{ border-bottom:var(--border-strong); outline:none }
+.input:disabled{ color:var(--light); cursor:not-allowed }
+textarea.input{ min-height:96px; resize:vertical }
+select.input{ appearance:none; cursor:pointer }
+.select-wrap{ position:relative }
+.select-wrap::after{ content:'↓'; position:absolute; right:0; bottom:14px; font-size:10px; color:var(--silver); pointer-events:none }
+.field-error{ font-size:12px; color:var(--silver); margin-top:8px; display:block }
+
+.check{ display:flex; align-items:center; gap:12px; cursor:pointer; font-size:14px }
+.check input{ appearance:none; width:16px; height:16px; border:var(--border-subtle); border-radius:0;
+  background:transparent; margin:0; cursor:pointer; position:relative; flex-shrink:0 }
+.check input:checked{ background:var(--ink); border-color:var(--ink) }
+.check input:checked::after{ content:'✓'; position:absolute; inset:0; color:var(--white); font-size:11px;
+  display:flex; align-items:center; justify-content:center }
+
+/* ══════════════ CARDS ══════════════ */
+.card-lesson{ background:var(--paper); border:var(--border-subtle); padding:24px; cursor:pointer; transition:background 300ms ease }
+.card-lesson:hover{ background:var(--pale) }
+.card-meta{ font-family:var(--mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--silver); margin-bottom:12px }
+.card-title{ font-family:var(--display); font-size:28px; font-weight:400; line-height:1.1; letter-spacing:-.02em; margin-bottom:12px }
+.card-body{ font-size:14px; line-height:1.65; color:var(--mid) }
+.card-foot{ margin-top:20px; padding-top:16px; border-top:var(--border-subtle); display:flex; align-items:center; justify-content:space-between }
+
+.card-dark{ background:var(--ink); color:var(--white); padding:40px; position:relative; overflow:hidden; transition:background 300ms ease }
+.card-dark:hover{ background:var(--ink2) }
+.card-dark .card-meta{ color:var(--vermilion) }
+.card-dark .card-title{ font-size:38px; color:var(--white) }
+.card-dark .card-body{ color:var(--silver) }
+.ghost-num{ position:absolute; right:-8px; bottom:-46px; font-family:var(--display); font-size:140px;
+  font-weight:300; color:var(--white); opacity:.04; line-height:1; pointer-events:none }
+
+.card-stat{ background:var(--paper); border:var(--border-subtle); padding:40px }
+.stat-num{ font-family:var(--display); font-size:72px; font-weight:300; line-height:1; letter-spacing:-.04em }
+.stat-label{ font-family:var(--display); font-size:22px; font-weight:300; font-style:italic; color:var(--mid); margin-top:6px }
+.stat-support{ font-size:14px; color:var(--mid); margin-top:16px; line-height:1.6 }
+
+.card-accent{ background:var(--vermilion); color:var(--white); padding:40px; transition:background 300ms ease; cursor:pointer }
+.card-accent:hover{ background:var(--vermilion-dark) }
+.card-accent .card-meta{ color:rgba(255,255,255,.55) }
+.card-accent .card-title{ color:var(--white); font-size:28px }
+
+/* ══════════════ BADGES ══════════════ */
+.badge{ font-size:10px; font-weight:500; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--mid); background:var(--paper); padding:4px 12px; border-radius:0; display:inline-block }
+.badge.outlined{ border:var(--border-subtle) }
+.badge-mono{ font-family:var(--mono); font-size:9px; font-weight:400; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--silver); background:none; padding:0 }
+.badge-inverse{ background:var(--ink); color:var(--white) }
+
+/* ══════════════ PROGRESS ══════════════ */
+.progress-frac{ font-family:var(--mono); font-size:10px; letter-spacing:.12em; color:var(--silver); margin-bottom:8px; display:block }
+.progress{ height:2px; background:var(--light); width:100% }
+.progress .fill{ height:100%; background:var(--ink); transition:width 600ms var(--ease-out) }
+
+/* ══════════════ QUIZ ══════════════ */
+.quiz-q{ font-family:var(--display); font-size:28px; font-weight:400; line-height:1.15; letter-spacing:-.02em; margin-bottom:24px }
+.quiz-opt{ padding:16px 20px; border:var(--border-subtle); background:var(--white);
+  cursor:pointer; transition:all 200ms ease; display:flex; align-items:center; gap:16px; width:100%; text-align:left }
+.quiz-opt:hover{ background:var(--pale); border-color:var(--ink) }
+.quiz-opt .letter{ font-family:var(--mono); font-size:10px; color:var(--silver); flex-shrink:0 }
+.quiz-opt .text{ font-size:15px; font-weight:300; color:var(--ink) }
+.quiz-opt.correct{ background:var(--ink); border-color:var(--ink) }
+.quiz-opt.correct .letter{ color:var(--vermilion) }
+.quiz-opt.correct .text{ color:var(--white) }
+.quiz-opt.incorrect{ background:var(--paper); border-color:var(--light) }
+.quiz-opt.incorrect .text{ color:var(--silver) }
+.quiz-opt.correct:hover,.quiz-opt.incorrect:hover{ border-color:inherit }
+.quiz-reset{ margin-top:4px }
+
+/* ══════════════ STREAK ══════════════ */
+.streak{ display:flex; align-items:baseline; gap:16px }
+.streak .n{ font-family:var(--display); font-size:88px; font-weight:300; line-height:1; letter-spacing:-.04em }
+.streak .l{ font-size:14px; font-style:italic; font-weight:300; color:var(--silver) }
+
+/* ══════════════ TOAST ══════════════ */
+.toast{ background:var(--ink); color:var(--white); padding:16px 24px; max-width:320px; border-radius:0;
+  font-size:13px; line-height:1.5 }
+.toast.streak-toast{ display:flex; align-items:baseline; gap:14px }
+.toast.streak-toast .n{ font-family:var(--display); font-size:32px; font-weight:300; line-height:1 }
+.toast.error .msg{ color:var(--silver) }
+
+/* live toast */
+#liveToast{ position:fixed; right:24px; bottom:24px; z-index:50; opacity:0; transform:translateY(8px);
+  transition:opacity 300ms var(--ease-out), transform 300ms var(--ease-out); pointer-events:none }
+#liveToast.on{ opacity:1; transform:translateY(0) }
+
+/* ══════════════ MODAL ══════════════ */
+.modal-demo{ border:var(--border-subtle); border-top:var(--border-bold); background:var(--white); padding:40px; max-width:480px }
+.modal-title{ font-family:var(--display); font-size:28px; font-weight:400; letter-spacing:-.02em; margin-bottom:16px }
+.modal-body{ font-size:14px; font-weight:300; line-height:1.65; color:var(--mid); margin-bottom:32px }
+.modal-actions{ display:flex; gap:12px; justify-content:flex-end }
+
+#overlay{ position:fixed; inset:0; background:rgba(10,9,8,.72); backdrop-filter:blur(4px); z-index:40;
+  display:none; align-items:center; justify-content:center; padding:24px }
+#overlay.on{ display:flex }
+
+/* ══════════════ READER ══════════════ */
+.reader{ max-width:680px; padding:8px 0 }
+.provenance{ font-family:var(--mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase;
+  color:var(--silver); margin-bottom:40px; display:flex; align-items:center; gap:16px }
+.provenance::before{ content:''; width:20px; height:1px; background:var(--light) }
+.reader h2{ font-family:var(--display); font-size:52px; font-weight:400; line-height:1.1; letter-spacing:-.02em; margin-bottom:32px }
+.pullquote{ font-family:var(--display); font-size:22px; font-weight:300; font-style:italic; line-height:1.65;
+  padding-left:24px; border-left:var(--border-accent); margin-bottom:28px }
+.reader p{ font-size:16px; font-weight:300; line-height:1.75; margin-bottom:20px }
+.takeaways{ margin-top:40px; padding-top:32px; border-top:var(--border-subtle) }
+.takeaways .lbl{ font-family:var(--mono); font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--silver); margin-bottom:20px; display:block }
+.takeaways li{ list-style:none; display:flex; gap:16px; margin-bottom:16px }
+.takeaways .n{ font-family:var(--mono); font-size:9px; color:var(--vermilion); flex-shrink:0; padding-top:5px }
+.takeaways .t{ font-size:15px; font-weight:400; line-height:1.5 }
+
+/* ══════════════ NOTE PANEL ══════════════ */
+.rules{ background:var(--ink); color:var(--white); padding:56px var(--margin) 64px; margin-top:64px }
+.rules h2{ font-family:var(--display); font-weight:300; font-size:32px; letter-spacing:-.02em; margin-bottom:28px }
+.rules ul{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)) }
+.rules li{ list-style:none; padding:18px 32px 18px 0; border-top:1px solid var(--ink3) }
+.rules .k{ font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--vermilion); display:block; margin-bottom:6px }
+.rules .v{ font-size:13.5px; line-height:1.6; color:var(--silver) }
+
+.colophon{ padding:28px var(--margin) 56px; font-family:var(--mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--silver) }
+
+@media (max-width:720px){ :root{ --margin:20px } .intro h1{ font-size:34px } .reader h2{ font-size:34px } .streak .n{ font-size:64px } }
+@media (prefers-reduced-motion:reduce){ *{ animation-duration:.01ms!important; transition-duration:.01ms!important } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wordmark">Cu<i>ri</i></div>
+  <div class="meta">Component library · v1</div>
+</header>
+
+<section class="intro">
+  <h1>Every component, live.</h1>
+  <p>Built entirely from the tokens in section 8. Nothing here uses a value that is not defined there. Hover, click, focus and type in these, they are real elements rather than pictures of elements.</p>
+  <p>One deliberate exception to the rules: Vermilion appears many times on this page. A component library is a catalogue, not a screen. In production the limit is one use per screen, and the checklist at the bottom says where each use is permitted.</p>
+</section>
+
+<div class="section-head"><span class="label">Buttons</span><span class="num">01</span></div>
+<div class="bay">
+
+  <div class="spec">
+    <span class="spec-label">Primary · one per screen</span>
+    <div class="stage">
+      <button class="btn btn-primary btn-lg">Begin reading →</button>
+      <button class="btn btn-primary">Start a track</button>
+      <button class="btn btn-primary btn-sm">Continue</button>
+      <button class="btn btn-primary" disabled>Disabled</button>
+    </div>
+    <p class="spec-note">Ink fill, 2px Vermilion underline, uppercase 12px medium. The underline is the accent. If two primaries appear on one screen, one of them is a ghost button.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Ghost · secondary actions</span>
+    <div class="stage">
+      <button class="btn btn-ghost btn-lg">Browse catalogue</button>
+      <button class="btn btn-ghost">Skip for now</button>
+      <button class="btn btn-ghost btn-sm">Edit</button>
+      <button class="btn btn-ghost" disabled>Disabled</button>
+    </div>
+    <p class="spec-note">1px Light border, transparent fill. Border goes Ink and background goes Pale on hover. Never carries the underline.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Text link · tertiary</span>
+    <div class="stage">
+      <button class="btn btn-link">Change delivery time</button>
+      <button class="btn btn-link">See all 14 lessons</button>
+    </div>
+    <p class="spec-note">Sentence case, underlined at 3px offset. The only button type that is not uppercase, because it sits inside running copy.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Destructive</span>
+    <div class="stage">
+      <button class="btn btn-danger">Cancel subscription</button>
+      <button class="btn btn-danger btn-sm">Delete track</button>
+    </div>
+    <p class="spec-note">Identical to ghost, set in Mid. No red, no Vermilion. Destruction is signalled by the words, not the colour, which is what keeps the accent meaningful elsewhere.</p>
+  </div>
+
+</div>
+
+<div class="section-head"><span class="label">Form inputs</span><span class="num">02</span></div>
+<div class="bay">
+
+  <div class="spec">
+    <span class="spec-label">Text input · the homepage field</span>
+    <div class="stage col">
+      <label class="field">
+        <span class="field-label">Your subject</span>
+        <input class="input" type="text" placeholder="What do you want to understand?">
+      </label>
+      <label class="field">
+        <span class="field-label">Email</span>
+        <input class="input" type="email" value="you@example.com">
+        <span class="field-error">That address is already on a track. Sign in instead.</span>
+      </label>
+    </div>
+    <p class="spec-note">Underline only, no box. Border goes Light to Ink on focus. Errors sit below in Silver, never in Vermilion, so an error never outranks a CTA.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Select, textarea, checkbox</span>
+    <div class="stage col">
+      <label class="field select-wrap">
+        <span class="field-label">Delivery time</span>
+        <select class="input">
+          <option>06:30 · before the day starts</option>
+          <option>08:00 · with the commute</option>
+          <option>21:00 · last thing</option>
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">What do you already know?</span>
+        <textarea class="input" placeholder="Optional. A sentence is enough."></textarea>
+      </label>
+      <label class="check"><input type="checkbox" checked> Send me the next lesson each morning</label>
+      <label class="check"><input type="checkbox"> Include the weekly Rabbit Hole pick</label>
+    </div>
+    <p class="spec-note">Checkboxes are square with an Ink fill. Zero radius, as everywhere. The custom select arrow is a typed character in Silver rather than an icon.</p>
+  </div>
+
+</div>
+
+<div class="section-head"><span class="label">Cards</span><span class="num">03</span></div>
+<div class="bay">
+
+  <div class="spec">
+    <span class="spec-label">Lesson card · standard</span>
+    <div class="stage plain">
+      <div class="card-lesson">
+        <div class="card-meta">Lesson 04 · Monetary policy</div>
+        <div class="card-title">Why central banks fear being believed too late</div>
+        <p class="card-body">Expectations move prices before policy does. A rate rise that everyone saw coming has already done most of its work.</p>
+        <div class="card-foot">
+          <span class="badge-mono">4 / 12</span>
+          <span class="badge-mono">3 min</span>
+        </div>
+      </div>
+    </div>
+    <p class="spec-note">Paper fill, 1px border, no shadow. Hover shifts to Pale. Depth comes from background steps, not elevation.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Dark feature card · dominant panel</span>
+    <div class="stage plain">
+      <div class="card-dark">
+        <div class="card-meta">Featured track</div>
+        <div class="card-title">Game Theory</div>
+        <p class="card-body">Sixteen lessons on why rational people reach bad outcomes together.</p>
+        <span class="ghost-num">16</span>
+      </div>
+    </div>
+    <p class="spec-note">One per exhibition grid. Metadata takes the Vermilion here, which is this composition's single accent. The ghost numeral sits at 4% opacity.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Stat card</span>
+    <div class="stage plain">
+      <div class="card-stat">
+        <div class="stat-num">3</div>
+        <div class="stat-label">minutes a morning</div>
+        <p class="stat-support">Short enough to do before coffee lands. Long enough to hold one real idea.</p>
+      </div>
+    </div>
+    <p class="spec-note">Fraunces at 72px Light with tight tracking, italic label beneath. The number is a design element, not a data point.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Vermilion accent card · one per page</span>
+    <div class="stage plain">
+      <div class="card-accent">
+        <div class="card-meta">New this week</div>
+        <div class="card-title">The Norman Conquest, in eleven lessons</div>
+      </div>
+    </div>
+    <p class="spec-note">The only card that fills with the accent. Using it means no other Vermilion appears anywhere on that page, including the wordmark underline.</p>
+  </div>
+
+</div>
+
+<div class="section-head"><span class="label">Badges &amp; progress</span><span class="num">04</span></div>
+<div class="bay">
+
+  <div class="spec">
+    <span class="spec-label">Badges</span>
+    <div class="stage">
+      <span class="badge">Philosophy</span>
+      <span class="badge outlined">Beginner</span>
+      <span class="badge badge-inverse">Complete</span>
+      <span class="badge-mono">Day 7 of 14</span>
+      <span class="badge-mono">Streak 21</span>
+    </div>
+    <p class="spec-note">Sans badges carry topics and states. Mono badges carry numbers. Never mix the two roles, a count in the sans badge reads as a label.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Progress · fraction, never percent</span>
+    <div class="stage col">
+      <div>
+        <span class="progress-frac">7 / 14 lessons</span>
+        <div class="progress"><div class="fill" style="width:50%"></div></div>
+      </div>
+      <div>
+        <span class="progress-frac">1 / 30 lessons</span>
+        <div class="progress"><div class="fill" style="width:3%"></div></div>
+      </div>
+      <button class="btn btn-link" onclick="stepProgress()">Advance the top bar</button>
+    </div>
+    <p class="spec-note">2px rule, Ink fill, 600ms settle. Labelled as a fraction because "7 of 14" is a position in a story and "50%" is a statistic. The second bar shows the endowed-progress rule: a new track never starts at zero.</p>
+  </div>
+
+</div>
+
+<div class="section-head"><span class="label">Quiz</span><span class="num">05</span></div>
+<div class="bay single">
+  <div class="spec">
+    <span class="spec-label">Quiz option · click an answer</span>
+    <div class="stage col">
+      <p class="quiz-q">Two firms both cut prices, and both end up worse off. What is this?</p>
+      <button class="quiz-opt" data-correct="false" onclick="answer(this)"><span class="letter">A</span><span class="text">A monopoly forming</span></button>
+      <button class="quiz-opt" data-correct="true" onclick="answer(this)"><span class="letter">B</span><span class="text">A prisoner's dilemma</span></button>
+      <button class="quiz-opt" data-correct="false" onclick="answer(this)"><span class="letter">C</span><span class="text">A market clearing</span></button>
+      <button class="quiz-opt" data-correct="false" onclick="answer(this)"><span class="letter">D</span><span class="text">An externality</span></button>
+      <button class="btn btn-link quiz-reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <p class="spec-note">Correct is a solid Ink fill with the option letter in Vermilion, the single accent in this composition. Wrong answers dim to Silver on Paper rather than turning red. Nobody should feel caught out, so the incorrect state reads as quiet, not as an alarm.</p>
+  </div>
+</div>
+
+<div class="section-head"><span class="label">Streak, toasts, modal</span><span class="num">06</span></div>
+<div class="bay">
+
+  <div class="spec">
+    <span class="spec-label">Streak counter</span>
+    <div class="stage">
+      <div class="streak"><span class="n">21</span><span class="l">days in a row</span></div>
+    </div>
+    <p class="spec-note">Never in a badge, bubble or pill. Never in Vermilion. It is a display number set in Fraunces Light, and it is always the largest thing in its context.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Toasts · click to fire one</span>
+    <div class="stage col">
+      <div class="toast">Delivery time saved. Tomorrow's lesson arrives at 06:30.</div>
+      <div class="toast streak-toast"><span class="n">7</span><span>Seven mornings in a row.</span></div>
+      <div class="toast error"><span class="msg">That track could not be generated. Try a narrower subject.</span></div>
+      <button class="btn btn-ghost btn-sm" onclick="fireToast()">Fire a live toast</button>
+    </div>
+    <p class="spec-note">Always Ink background, bottom right, 320px maximum. Errors sit in Silver on the same Ink, never on a red field.</p>
+  </div>
+
+  <div class="spec">
+    <span class="spec-label">Modal</span>
+    <div class="stage plain">
+      <div class="modal-demo">
+        <div class="modal-title">Lesson 4 arrives tomorrow</div>
+        <p class="modal-body">You have read three lessons today, which is more than most people manage in a week. Paid readers move at their own pace.</p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost btn-sm">Not today</button>
+          <button class="btn btn-primary btn-sm">Read at my pace</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-sm" style="align-self:flex-start" onclick="openModal()">Open as overlay</button>
+    <p class="spec-note">2px Ink top border, no radius, no shadow. Backdrop is Ink at 72% with a 4px blur. The copy celebrates before it constrains.</p>
+  </div>
+
+</div>
+
+<div class="section-head"><span class="label">The reader</span><span class="num">07</span></div>
+<div class="bay single">
+  <div class="spec">
+    <span class="spec-label">Lesson reader · the surface that matters most</span>
+    <div class="stage">
+      <article class="reader">
+        <div class="provenance">Day 04 · Game theory · Beginner</div>
+        <h2>Why two rational people talk themselves into a bad room</h2>
+        <p class="pullquote">Everyone acting sensibly can still walk everyone into the wall. The trap is not stupidity, it is structure.</p>
+        <p>Two petrol stations sit opposite each other. Either can hold its price or cut it. If both hold, both do well. If both cut, both do badly. If one cuts alone, it takes the whole street.</p>
+        <p>Look at it from inside one station. Whatever the other does, cutting is the better move. So you cut. So do they. Both of you land in the outcome neither of you wanted, and neither of you made a mistake.</p>
+        <div class="takeaways">
+          <span class="lbl">Takeaways</span>
+          <ul>
+            <li><span class="n">01</span><span class="t">A dominant strategy is one that wins regardless of what the other side does.</span></li>
+            <li><span class="n">02</span><span class="t">Individually rational choices can produce a collectively worse result.</span></li>
+            <li><span class="n">03</span><span class="t">Repeating the game changes it. Reputation is what makes cooperation rational.</span></li>
+          </ul>
+        </div>
+      </article>
+    </div>
+    <p class="spec-note">680px column, 16px body at 1.75 line height. Two Vermilion elements appear here, the pull-quote rule and the takeaway numerals, which is one more than the rule allows. Pick one per lesson: use the numerals when there is no pull quote, and drop the numerals to Silver when there is.</p>
+  </div>
+</div>
+
+<section class="rules">
+  <h2>Using this library</h2>
+  <ul>
+    <li><span class="k">Accent budget</span><span class="v">Before shipping a screen, count the Vermilion. One. The wordmark underline, or a CTA underline, or a pull-quote rule, or an accent card. Not two of them.</span></li>
+    <li><span class="k">Never invent a variant</span><span class="v">Four button types, four card types. A need for a fifth is almost always a layout problem in disguise.</span></li>
+    <li><span class="k">No semantic colour</span><span class="v">Correct is Ink. Wrong is dimmed. Errors are Silver. Destructive is Mid. Green and red do not exist in this system.</span></li>
+    <li><span class="k">Numbers are typography</span><span class="v">Streaks, stats and progress counts are set in Fraunces at display scale and never boxed. Metadata numbers are Mono and small. Nothing sits in between.</span></li>
+    <li><span class="k">Fractions, not percentages</span><span class="v">"7 of 14 lessons" tells a reader where they are in a story. "50%" tells them a statistic about themselves.</span></li>
+    <li><span class="k">Zero radius, zero shadow</span><span class="v">If a component has either, it came from somewhere else. This is the fastest tell that a screen has drifted.</span></li>
+  </ul>
+</section>
+
+<p class="colophon">Curi · Brand system v2.0 · Component library</p>
+
+<div id="liveToast" class="toast">Saved. Your next lesson arrives at 06:30.</div>
+
+<div id="overlay" onclick="closeModal(event)">
+  <div class="modal-demo" onclick="event.stopPropagation()">
+    <div class="modal-title">Cancel your subscription</div>
+    <p class="modal-body">Access continues until 14 September. Your progress is saved for 90 days, and you are welcome back at any point.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Keep reading</button>
+      <button class="btn btn-danger btn-sm" onclick="closeModal()">Cancel subscription</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function answer(el){
+  var opts = el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(function(o){
+    o.classList.remove('correct','incorrect');
+    if(o.dataset.correct === 'true') o.classList.add('correct');
+    else o.classList.add('incorrect');
+  });
+}
+function resetQuiz(){
+  document.querySelectorAll('.quiz-opt').forEach(function(o){ o.classList.remove('correct','incorrect'); });
+}
+var step = 7;
+function stepProgress(){
+  step = step >= 14 ? 1 : step + 1;
+  var frac = document.querySelectorAll('.progress-frac')[0];
+  var fill = document.querySelectorAll('.progress .fill')[0];
+  frac.textContent = step + ' / 14 lessons';
+  fill.style.width = (step/14*100) + '%';
+}
+var toastTimer;
+function fireToast(){
+  var t = document.getElementById('liveToast');
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('on'); }, 3200);
+}
+function openModal(){ document.getElementById('overlay').classList.add('on'); }
+function closeModal(e){ document.getElementById('overlay').classList.remove('on'); }
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
+</script>
+
+</body>
+</html>

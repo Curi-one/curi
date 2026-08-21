@@ -44,7 +44,7 @@ export function ShareableFact({ topic, title, fact }: Props) {
     <aside className="my-12 border-y border-border py-7">
       <div className="grid gap-7 lg:grid-cols-[0.34fr_1fr] lg:items-start">
         <div>
-          <div className="text-xs uppercase tracking-[0.24em] text-ink-muted">
+          <div className="text-xs uppercase tracking-widest text-ink-muted">
             Shareable fact
           </div>
           <p className="mt-3 text-sm leading-6 text-ink-muted">
@@ -52,7 +52,7 @@ export function ShareableFact({ topic, title, fact }: Props) {
           </p>
         </div>
         <div>
-          <blockquote className="font-display text-2xl font-light leading-tight tracking-[-0.03em] text-ink sm:text-3xl">
+          <blockquote className="font-display text-2xl font-light leading-tight tracking-tight text-ink sm:text-3xl">
             &ldquo;{item.fact}&rdquo;
           </blockquote>
           <p className="mt-4 max-w-2xl text-base leading-7 text-ink-muted">

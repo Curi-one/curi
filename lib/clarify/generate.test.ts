@@ -7,6 +7,7 @@ vi.mock("@/lib/ai/perplexity", () => ({
 }));
 
 import { chatCompletion } from "@/lib/ai/perplexity";
+import { fallbackDepthOptions } from "@/lib/clarify/depth-options";
 import {
   fallbackClarifyQuestions,
   generateClarifyQuestions,
@@ -25,6 +26,27 @@ const VALID_PAYLOAD = {
         "Teaching others",
         "General curiosity",
       ],
+    },
+  ],
+};
+
+const VALID_WITH_DEPTH = {
+  ...VALID_PAYLOAD,
+  depthOptions: [
+    {
+      slug: "essentials" as const,
+      label: "Survival phrases",
+      subcopy: "Core phrases · about a week",
+    },
+    {
+      slug: "fluent" as const,
+      label: "Conversational basics",
+      subcopy: "Everyday exchanges · about two weeks",
+    },
+    {
+      slug: "thorough" as const,
+      label: "Structured foundation",
+      subcopy: "Grammar + patterns · about a month",
     },
   ],
 };
@@ -62,6 +84,39 @@ describe("parseClarifyJson", () => {
   it("returns null when schema validation fails", () => {
     expect(parseClarifyJson(JSON.stringify({ questions: [] }))).toBeNull();
   });
+
+  it("accepts depthOptions when present", () => {
+    expect(parseClarifyJson(JSON.stringify(VALID_WITH_DEPTH))).toEqual(
+      VALID_WITH_DEPTH,
+    );
+  });
+
+  it("returns null when depthOptions slugs are wrong", () => {
+    expect(
+      parseClarifyJson(
+        JSON.stringify({
+          ...VALID_PAYLOAD,
+          depthOptions: [
+            {
+              slug: "essentials",
+              label: "A",
+              subcopy: "a",
+            },
+            {
+              slug: "essentials",
+              label: "B",
+              subcopy: "b",
+            },
+            {
+              slug: "thorough",
+              label: "C",
+              subcopy: "c",
+            },
+          ],
+        }),
+      ),
+    ).toBeNull();
+  });
 });
 
 describe("fallbackClarifyQuestions", () => {
@@ -80,7 +135,16 @@ describe("fallbackClarifyQuestions", () => {
           ],
         },
       ],
+      depthOptions: fallbackDepthOptions("term sheets"),
     });
+  });
+
+  it("includes language-aware depthOptions for Mandarin", () => {
+    const result = fallbackClarifyQuestions("Mandarin");
+    expect(result.depthOptions).toEqual(fallbackDepthOptions("Mandarin"));
+    expect(result.depthOptions?.find((o) => o.slug === "fluent")?.label).toBe(
+      "Conversational basics",
+    );
   });
 });
 
@@ -96,7 +160,10 @@ describe("generateClarifyQuestions", () => {
 
     const result = await generateClarifyQuestions({ topic: "term sheets" });
 
-    expect(result).toEqual(VALID_PAYLOAD);
+    expect(result).toEqual({
+      ...VALID_PAYLOAD,
+      depthOptions: fallbackDepthOptions("term sheets"),
+    });
     expect(chatCompletion).toHaveBeenCalledTimes(1);
     expect(chatCompletion).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -113,7 +180,10 @@ describe("generateClarifyQuestions", () => {
 
     const result = await generateClarifyQuestions({ topic: "stoicism" });
 
-    expect(result).toEqual(VALID_PAYLOAD);
+    expect(result).toEqual({
+      ...VALID_PAYLOAD,
+      depthOptions: fallbackDepthOptions("stoicism"),
+    });
     expect(chatCompletion).toHaveBeenCalledTimes(2);
   });
 
@@ -150,5 +220,16 @@ describe("generateClarifyQuestions", () => {
     await generateClarifyQuestions({ topic: "test" });
 
     expect(vi.isMockFunction(chatCompletion)).toBe(true);
+  });
+
+  it("fills missing depthOptions from fallback on success", async () => {
+    vi.mocked(chatCompletion).mockResolvedValueOnce(
+      completion(JSON.stringify(VALID_PAYLOAD)),
+    );
+
+    const result = await generateClarifyQuestions({ topic: "Mandarin" });
+
+    expect(result.questions).toEqual(VALID_PAYLOAD.questions);
+    expect(result.depthOptions).toEqual(fallbackDepthOptions("Mandarin"));
   });
 });

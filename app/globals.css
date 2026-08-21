@@ -10,23 +10,24 @@
 
 :root {
   /* ── Colour · §8.1 ───────────────────────────────────────────────────────
-     Strictly neutral greyscale — equal R/G/B in every tone. No warm, cream,
-     or cool cast (§16.1). Ink is #0d0d0d, never pure black. */
+     Warm greyscale is intentional — every tone carries a slight warm cast.
+     Never pure black or pure white. Vermilion is the only chromatic colour. */
 
-  /* Greyscale — eight tones (§4.2) */
-  --color-ink: #0d0d0d;
-  --color-ink-2: #1f1f1f;
-  --color-ink-3: #2a2a2a;
-  --color-mid: #666666;
-  --color-silver: #a3a3a3;
-  --color-light: #e2e2e2;
-  --color-paper-tone: #fafafa;
-  --color-white-tone: #ffffff;
+  /* Greyscale — eight warm tones (§4.2) */
+  --color-ink: #0a0908;
+  --color-ink-2: #1c1a18;
+  --color-ink-3: #2e2c28;
+  --color-mid: #6b6760;
+  --color-silver: #9e9b94;
+  --color-light: #d4d0c8;
+  --color-paper-tone: #f4f1e8; /* paper — secondary surfaces (library --paper) */
+  --color-white-tone: #faf9f5; /* white — primary page bg */
+  --color-pale: #e8e5dc; /* pale — tertiary / hover (library --pale) */
 
   /* Background */
   --color-bg-primary: var(--color-white-tone);
   --color-bg-secondary: var(--color-paper-tone);
-  --color-bg-tertiary: #f2f2f2;
+  --color-bg-tertiary: var(--color-pale);
   --color-bg-inverse: var(--color-ink);
   --color-bg-inverse-2: var(--color-ink-2);
   --color-bg-inverse-3: var(--color-ink-3);
@@ -52,10 +53,20 @@
   --color-correct-text: var(--color-white-tone);
   --color-error-text: var(--color-silver);
 
-  /* ── Typography · §8.2 ─────────────────────────────────────────────────── */
-  --font-display-stack: var(--font-display), Georgia, serif;
-  --font-ui-stack: var(--font-ui), system-ui, sans-serif;
-  --font-mono-stack: var(--font-mono), ui-monospace, monospace;
+  /* ── Typography · §8.2 ───────────────────────────────────────────────────
+     Exactly three families (BRAND.md §5). Fallbacks are system stand-ins for
+     the same roles — never a fourth product typeface.
+
+     next/font sets --font-display|ui|mono on <html> (see app/layout.tsx).
+     Stacks MUST resolve on the same element as those vars — if they only
+     referenced undefined vars here, the stacks become guaranteed-invalid and
+     the whole UI renders in Times New Roman / system UI.
+     var(--token, "Literal") keeps a named face even if a var is missing. */
+  --font-display-stack:
+    var(--font-display, "Fraunces"), Georgia, "Times New Roman", serif;
+  --font-ui-stack: var(--font-ui, "Plus Jakarta Sans"), system-ui, sans-serif;
+  --font-mono-stack:
+    var(--font-mono, "JetBrains Mono"), "Courier New", monospace;
 
   --text-display-2xl: 192px;
   --text-display-xl: 88px;
@@ -152,15 +163,25 @@
   --content-max-width: 680px;
   --narrow-max-width: 480px;
 
+  /* ── Fraunces variable axes · §5.2 ──────────────────────────────────────
+     Display type is always Light (300) with the optical axes turned up: the
+     eccentricity is the point. SOFT rounds the terminals, WONK enables the
+     genuinely odd forms. Larger type carries more of both — the quirks need
+     room to read as intentional rather than as noise. */
+  --display-soft: 90; /* default — titles, card headings */
+  --display-soft-section: 96; /* section leads */
+  --display-soft-hero: 100; /* hero, ghost numerals */
+  --display-wonk: 1; /* on, everywhere */
+
   /* ── Motion · §7.2–7.3 ─────────────────────────────────────────────────── */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
-  --duration-micro: 120ms;
+  --duration-micro: 100ms;
   --duration-small: 200ms;
   --duration-medium: 350ms;
-  --duration-large: 900ms;
+  --duration-large: 750ms;
   --duration-xl: 1100ms;
 
   /* Legacy alias — `--ease-spring` is `--ease-out`. Prefer --ease-out. */
@@ -217,11 +238,32 @@ body {
 @layer components {
   /* ── Type · §5 ─────────────────────────────────────────────────────────── */
 
+  /**
+   * Fraunces, always Light with the axes up (§5.2). The weight and the axes
+   * are set here and nowhere else — a component that hand-sets
+   * `font-variation-settings` has left the system (§17.04). To shift the
+   * optical setting, add `.display-section` / `.display-hero`.
+   */
   .font-display {
     font-family: var(--font-display-stack);
+    font-weight: var(--weight-light);
     font-variation-settings:
-      "SOFT" 50,
-      "WONK" 1;
+      "SOFT" var(--display-soft),
+      "WONK" var(--display-wonk);
+  }
+
+  /* Optical steps — larger type, more softness and wonk */
+  .display-section {
+    --display-soft: var(--display-soft-section);
+  }
+
+  .display-hero {
+    --display-soft: var(--display-soft-hero);
+  }
+
+  /* Escape hatch: straightens the wonk where it fights a tight measure. */
+  .display-plain {
+    --display-wonk: 0;
   }
 
   .font-ui {
@@ -256,17 +298,13 @@ body {
 
   /* Editorial display — Fraunces Light, tight tracking (§5.2) */
   .type-display {
-    font-family: var(--font-display-stack);
-    font-weight: var(--weight-light);
+    @apply font-display display-section;
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-tighter);
-    font-variation-settings:
-      "SOFT" 60,
-      "WONK" 1;
   }
 
   .type-display-xl {
-    @apply type-display text-[2.75rem] sm:text-[3.25rem];
+    @apply type-display display-hero text-display-sm sm:text-display-md;
   }
 
   .type-lede {
@@ -304,27 +342,69 @@ body {
     background: var(--color-border-strong);
   }
 
-  /* ── Buttons · §9.1 ────────────────────────────────────────────────────── */
+  /* ── Buttons · §9.1 ──────────────────────────────────────────────────────
+     All variants share the same type recipe (UI sans, uppercase, medium,
+     tracking). Size controls padding / font-size / min-height only. */
 
-  /* Primary CTA. One per screen. Carries the Vermilion underline. */
-  .btn-primary {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 52px;
-    padding: var(--space-3) var(--space-6);
+    gap: var(--space-2);
     font-family: var(--font-ui-stack);
-    font-size: var(--text-ui-2xs);
     font-weight: var(--weight-medium);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     text-align: center;
+    border-radius: var(--radius-none);
+    transition:
+      background-color var(--duration-micro) var(--ease-out),
+      opacity var(--duration-small) var(--ease-out);
+  }
+
+  .btn-primary svg,
+  .btn-secondary svg,
+  .btn-ghost svg,
+  .btn-danger svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  /* Size variants — padding + type size + touch target */
+  .btn-size-large {
+    padding: 14px 28px;
+    font-size: 13px;
+    min-height: 56px;
+  }
+
+  .btn-size-default {
+    padding: 12px 24px;
+    font-size: 12px;
+    min-height: 52px;
+  }
+
+  .btn-size-small {
+    padding: 8px 16px;
+    font-size: 11px;
+    min-height: 44px;
+  }
+
+  .btn-size-compact {
+    padding: 5px 12px;
+    font-size: 10px;
+    min-height: 32px;
+  }
+
+  /* Primary CTA. One per screen. Carries the Vermilion underline. */
+  .btn-primary {
     color: var(--color-text-inverse);
     background: var(--color-bg-inverse);
     border: none;
     border-bottom: var(--border-accent);
-    border-radius: var(--radius-none);
-    transition: background-color var(--duration-small) var(--ease-out);
   }
 
   .btn-primary:hover:not(:disabled) {
@@ -333,6 +413,7 @@ body {
 
   .btn-primary:active:not(:disabled) {
     transform: translateY(1px);
+    transition: none;
   }
 
   .btn-primary:disabled {
@@ -341,35 +422,20 @@ body {
     cursor: not-allowed;
   }
 
-  /* Secondary (ghost). Never carries the Vermilion underline. */
+  /* Secondary (ghost outline). Never carries the Vermilion underline. */
   .btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 52px;
-    padding: var(--space-3) var(--space-6);
-    font-family: var(--font-ui-stack);
-    font-size: var(--text-ui-2xs);
-    font-weight: var(--weight-regular);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
-    text-align: center;
     color: var(--color-text-primary);
     background: transparent;
     border: var(--border-subtle);
-    border-radius: var(--radius-none);
-    transition:
-      background-color var(--duration-small) var(--ease-out),
-      border-color var(--duration-small) var(--ease-out);
   }
 
   .btn-secondary:hover:not(:disabled) {
     background: var(--color-bg-tertiary);
-    border-color: var(--color-border-strong);
   }
 
   .btn-secondary:active:not(:disabled) {
     transform: translateY(1px);
+    transition: none;
   }
 
   .btn-secondary:disabled {
@@ -378,36 +444,87 @@ body {
     cursor: not-allowed;
   }
 
-  /* Tertiary / inline action */
+  /* Ghost — Light border → Ink border + Pale fill (component library) */
   .btn-ghost {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    padding: 0 var(--space-3);
-    font-family: var(--font-ui-stack);
-    font-size: var(--text-ui-xs);
+    color: var(--color-text-primary);
+    background: transparent;
+    border: var(--border-subtle);
+    font-weight: var(--weight-regular);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    color: var(--color-text-primary);
+    border-color: var(--color-border-strong);
+    background: var(--color-bg-tertiary);
+  }
+
+  .btn-ghost:active:not(:disabled) {
+    transform: translateY(1px);
+    transition: none;
+  }
+
+  .btn-ghost:disabled {
+    color: var(--color-text-disabled);
+    border-color: var(--color-text-disabled);
+    background: transparent;
+    cursor: not-allowed;
+  }
+
+  /* Destructive — Mid text, ghost-like outline. No vermilion/red:
+     destruction is signalled by words, not colour (component library). */
+  .btn-danger {
     color: var(--color-text-secondary);
     background: transparent;
-    border: none;
-    border-radius: var(--radius-none);
-    transition: color var(--duration-small) var(--ease-out);
-  }
-
-  .btn-ghost:hover {
-    color: var(--color-text-primary);
-  }
-
-  /* Destructive — resolved through copy, never colour (§9.1) */
-  .btn-danger {
-    @apply btn-secondary;
-    color: var(--color-text-secondary);
-    border-color: var(--color-border-subtle);
+    border: var(--border-subtle);
+    font-weight: var(--weight-regular);
   }
 
   .btn-danger:hover:not(:disabled) {
-    color: var(--color-text-primary);
-    border-color: var(--color-border-strong);
-    background: transparent;
+    background: var(--color-bg-tertiary);
+  }
+
+  .btn-danger:active:not(:disabled) {
+    transform: translateY(1px);
+    transition: none;
+  }
+
+  .btn-danger:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  .btn-danger:disabled {
+    color: var(--color-text-disabled);
+    border-color: var(--color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* Icon-only square — scales with size variant */
+  .btn-icon {
+    padding: 0;
+  }
+
+  .btn-icon.btn-size-large {
+    width: 56px;
+    min-width: 56px;
+    min-height: 56px;
+  }
+
+  .btn-icon.btn-size-default {
+    width: 52px;
+    min-width: 52px;
+    min-height: 52px;
+  }
+
+  .btn-icon.btn-size-small {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .btn-icon.btn-size-compact {
+    width: 32px;
+    min-width: 32px;
+    min-height: 32px;
   }
 
   /* ── Form inputs · §9.2 ────────────────────────────────────────────────── */
@@ -459,31 +576,26 @@ body {
     background: var(--color-bg-secondary);
     border: var(--border-subtle);
     border-radius: var(--radius-none);
-    transition:
-      background-color var(--duration-medium) var(--ease-out),
-      border-color var(--duration-medium) var(--ease-out);
+    transition: background-color 300ms var(--ease-out);
   }
 
   .surface-card-interactive {
     cursor: pointer;
+    transition: background-color 300ms var(--ease-out);
   }
 
   .surface-card-interactive:hover {
     background: var(--color-bg-tertiary);
-    border-color: var(--color-border-strong);
   }
 
-  /* Clickable rows and cards — no shadow, no lift (§16.3) */
+  /* Clickable rows and cards — Paper→Pale bg only, no lift (§16.3 / INTERACTIONS) */
   .interactive-card {
     border-radius: var(--radius-none);
-    transition:
-      background-color var(--duration-medium) var(--ease-out),
-      border-color var(--duration-medium) var(--ease-out);
+    transition: background-color 300ms var(--ease-out);
   }
 
   .interactive-card:hover {
     background: var(--color-bg-tertiary);
-    border-color: var(--color-border-strong);
   }
 
   /* Dark feature card (§9.3) */
@@ -499,11 +611,106 @@ body {
     background: var(--color-bg-inverse-2);
   }
 
+  /* ── Museum devices · §6, §9.3, §10.7, §11.1 ─────────────────────────────
+     Four devices carry the editorial-modernist register. Each encodes
+     something true about the content rather than decorating it: what the
+     thing is, that it is on display, where it sits in a sequence, and what
+     the curator has to say about it. Used together on one surface they
+     compete — pick the one the content actually needs. */
+
+  /**
+   * Wall label. A hairline, then the accession metadata (§11.1 provenance
+   * line). Use for the small uppercase facts that sit above a title: source,
+   * day count, duration.
+   */
+  .wall-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-xs);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-ultra);
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .wall-label::before {
+    content: "";
+    width: var(--space-5);
+    height: 1px;
+    flex-shrink: 0;
+    background: var(--color-border-subtle);
+  }
+
+  /**
+   * Vitrine. A hairline frame with real air inside it — an object is never
+   * crowded to the walls of its case. The generous inset is the whole point;
+   * do not tighten it to fit more in.
+   */
+  .vitrine {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-bg-primary);
+    border: var(--border-subtle);
+    padding: var(--space-10) var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .vitrine {
+      padding: var(--space-12) var(--space-10);
+    }
+  }
+
+  /**
+   * Exhibit number. An oversized Fraunces numeral set almost to the ground
+   * (§9.3 ghost numeral). Only where the content is genuinely a sequence —
+   * lesson 7 of 14, path III. Never as texture.
+   */
+  .exhibit-number {
+    position: absolute;
+    right: var(--space-4);
+    bottom: calc(var(--space-6) * -1);
+    font-family: var(--font-display-stack);
+    font-weight: var(--weight-light);
+    font-variation-settings:
+      "SOFT" var(--display-soft-hero),
+      "WONK" var(--display-wonk);
+    font-size: var(--text-display-xl);
+    line-height: var(--leading-none);
+    letter-spacing: var(--tracking-tighter);
+    color: var(--color-text-primary);
+    opacity: 0.05;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /** Exhibit number on an Ink surface. */
+  .surface-card-dark .exhibit-number,
+  .exhibit-number-inverse {
+    color: var(--color-text-inverse);
+    opacity: 0.08;
+  }
+
+  /**
+   * Caption. What the curator says about the object: one quiet italic line
+   * under the thing it describes. Never carries an action.
+   */
+  .caption {
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-sm);
+    font-weight: var(--weight-light);
+    font-style: italic;
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-tertiary);
+  }
+
   /* ── Chips · derived from Badge §9.4 ───────────────────────────────────── */
 
+  /* Chips / pills / tabs — mono under 20px (same family as badges). */
   .interactive-chip {
-    font-family: var(--font-ui-stack);
-    font-size: var(--text-ui-3xs);
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-sm);
     font-weight: var(--weight-medium);
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
@@ -511,7 +718,12 @@ body {
     transition:
       background-color var(--duration-micro) var(--ease-out),
       color var(--duration-micro) var(--ease-out),
-      border-color var(--duration-micro) var(--ease-out);
+      border-color var(--duration-micro) var(--ease-out),
+      transform var(--duration-micro) var(--ease-out);
+  }
+
+  .interactive-chip:active:not(:disabled) {
+    transform: translateY(1px);
   }
 
   .interactive-chip:hover {
@@ -606,9 +818,14 @@ body {
     background: var(--color-bg-secondary);
     border: var(--border-subtle);
     border-radius: var(--radius-none);
+    transition:
+      border-color var(--duration-small) var(--ease-out),
+      color var(--duration-small) var(--ease-out),
+      background-color var(--duration-small) var(--ease-out);
   }
 
   .badge-mono {
+    display: inline-block;
     font-family: var(--font-mono-stack);
     font-size: var(--text-mono-xs);
     font-weight: var(--weight-regular);
@@ -618,6 +835,116 @@ body {
     background: none;
     border: none;
     padding: 0;
+  }
+
+  /* Accent badge — use sparingly (one accent beat per panel) */
+  .badge-accent {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-xs);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--color-accent);
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-none);
+  }
+
+  /* Design-system panel surfaces */
+  .ds-panel {
+    border: var(--border-subtle);
+    border-radius: var(--radius-none);
+    padding: var(--space-6);
+    transition:
+      background-color var(--duration-medium) var(--ease-out),
+      border-color var(--duration-medium) var(--ease-out),
+      color var(--duration-medium) var(--ease-out);
+  }
+
+  .ds-panel-light {
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+  }
+
+  .ds-panel-muted {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+  }
+
+  .ds-panel-dark {
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
+    border-color: transparent;
+  }
+
+  .ds-panel-dark .font-meta,
+  .ds-panel-dark .type-kicker,
+  .ds-panel-dark .type-label {
+    color: var(--color-silver);
+  }
+
+  /* Heatmap intensity cells */
+  .heatmap-cell {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: var(--radius-none);
+    transition:
+      transform var(--duration-micro) var(--ease-out),
+      background-color var(--duration-small) var(--ease-out),
+      box-shadow var(--duration-small) var(--ease-out);
+  }
+
+  .heatmap-cell:hover {
+    transform: scale(1.35);
+    z-index: 1;
+  }
+
+  /* Colourful intensity on warm paper — tertiary → accent mixes → full accent.
+     Mixes use warm greys / ink only (never cool grey). */
+  .heatmap-cell-0 {
+    background: var(--color-bg-tertiary);
+  }
+
+  .heatmap-cell-1 {
+    background: color-mix(
+      in srgb,
+      var(--color-accent) 28%,
+      var(--color-bg-tertiary)
+    );
+  }
+
+  .heatmap-cell-2 {
+    background: color-mix(in srgb, var(--color-accent) 48%, var(--color-light));
+  }
+
+  .heatmap-cell-3 {
+    background: color-mix(in srgb, var(--color-accent) 72%, var(--color-ink-3));
+  }
+
+  .heatmap-cell-4 {
+    background: var(--color-accent);
+  }
+
+  .ds-panel-dark .heatmap-cell-0 {
+    background: var(--color-ink-3);
+  }
+
+  .ds-panel-dark .heatmap-cell-1 {
+    background: color-mix(in srgb, var(--color-accent) 35%, var(--color-ink-3));
+  }
+
+  .ds-panel-dark .heatmap-cell-2 {
+    background: color-mix(in srgb, var(--color-accent) 55%, var(--color-ink-2));
+  }
+
+  .ds-panel-dark .heatmap-cell-3 {
+    background: color-mix(in srgb, var(--color-accent) 80%, var(--color-ink));
+  }
+
+  .ds-panel-dark .heatmap-cell-4 {
+    background: var(--color-accent);
   }
 
   /* ── Lesson reader · §11.1 ─────────────────────────────────────────────── */
@@ -699,6 +1026,217 @@ body {
   .narrow-column {
     max-width: var(--narrow-max-width);
     margin: 0 auto;
+  }
+
+  /* ── Quiz options · component library `.quiz-opt` ──────────────────────── */
+
+  .quiz-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    width: 100%;
+    padding: 16px 20px;
+    text-align: left;
+    border: var(--border-subtle);
+    border-radius: var(--radius-none);
+    background: var(--color-bg-primary);
+    transition:
+      background-color var(--duration-small) var(--ease-out),
+      border-color var(--duration-small) var(--ease-out);
+  }
+
+  .quiz-opt:hover:not(:disabled) {
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-border-strong);
+  }
+
+  .quiz-opt .letter {
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-sm);
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .quiz-opt .text {
+    font-size: var(--text-ui-md);
+    font-weight: var(--weight-light);
+    color: var(--color-text-primary);
+  }
+
+  .quiz-opt.correct {
+    background: var(--color-bg-inverse);
+    border-color: var(--color-bg-inverse);
+  }
+
+  .quiz-opt.correct .letter {
+    color: var(--color-accent);
+  }
+
+  .quiz-opt.correct .text {
+    color: var(--color-text-inverse);
+  }
+
+  .quiz-opt.incorrect {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-border-subtle);
+  }
+
+  .quiz-opt.incorrect .text {
+    color: var(--color-text-tertiary);
+  }
+
+  /* ── Brand geometric patterns · docs/references/geometric-patterns.html ─
+     Greyscale only. Vermilion appears solely on `.pattern-reveal`. */
+
+  .pattern-ledger {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      var(--color-light) 0 1px,
+      transparent 1px 34px
+    );
+  }
+
+  .pattern-columns {
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--color-light) 0 1px,
+      transparent 1px calc(100% / 12)
+    );
+  }
+
+  .pattern-hatch {
+    background-image: repeating-linear-gradient(
+      115deg,
+      var(--color-mid) 0 1px,
+      transparent 1px 9px
+    );
+  }
+
+  .pattern-hatch-fine {
+    position: relative;
+  }
+
+  .pattern-hatch-fine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.16;
+    background-image: repeating-linear-gradient(
+      115deg,
+      var(--color-ink) 0 1px,
+      transparent 1px 9px
+    );
+    pointer-events: none;
+  }
+
+  /* Cross hatch — intended on Ink fields */
+  .pattern-cross {
+    position: relative;
+  }
+
+  .pattern-cross::before,
+  .pattern-cross::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  .pattern-cross::before {
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--color-white-tone) 0 1px,
+      transparent 1px 12px
+    );
+  }
+
+  .pattern-cross::after {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--color-white-tone) 0 1px,
+      transparent 1px 12px
+    );
+  }
+
+  .pattern-blueprint {
+    position: relative;
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        var(--color-light) 0 1px,
+        transparent 1px 16px
+      ),
+      repeating-linear-gradient(
+        to right,
+        var(--color-light) 0 1px,
+        transparent 1px 16px
+      );
+  }
+
+  .pattern-blueprint::before,
+  .pattern-blueprint::after {
+    content: "";
+    position: absolute;
+    height: 1px;
+    width: 141.4%;
+    top: 50%;
+    left: 50%;
+    background: var(--color-ink);
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .pattern-blueprint::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  .pattern-blueprint::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+
+  .pattern-vitrine {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pattern-vitrine > .r {
+    position: absolute;
+    border: 1px solid var(--color-light);
+    pointer-events: none;
+  }
+
+  .pattern-vitrine > .r1 {
+    inset: 12%;
+  }
+
+  .pattern-vitrine > .r2 {
+    inset: 24%;
+  }
+
+  .pattern-vitrine > .r3 {
+    inset: 36%;
+    border-color: var(--color-ink);
+  }
+
+  /* Vermilion only as reveal line — never woven into pattern fills */
+  .pattern-reveal {
+    position: relative;
+  }
+
+  .pattern-reveal::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--color-accent);
+    transform: scaleX(0.42);
+    transform-origin: left;
+    pointer-events: none;
   }
 }
 
@@ -894,7 +1432,38 @@ body {
   animation: streak-settle var(--duration-medium) var(--ease-out) both;
 }
 
-/* ─── Reduced motion · §7.5 ─────────────────────────────────────────────── */
+/* ─── Interactions · docs/INTERACTIONS.md ───────────────────────────────── */
+
+.stagger-item {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 700ms var(--ease-out),
+    transform 700ms var(--ease-out);
+}
+
+.stagger-item.on,
+.stagger-item[data-on="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.skeleton-pulse {
+  background: var(--color-bg-tertiary);
+  animation: skeleton-pulse 1600ms ease-in-out infinite;
+}
+
+/* ─── Reduced motion · §7.5 / INTERACTIONS.md ───────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   *,

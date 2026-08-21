@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { QuizQuestion } from "@/lib/api/schemas";
 import { StepProgress } from "@/components/StepProgress";
+import { Button } from "@/components/Button";
 
 type Props = {
   questions: QuizQuestion[];
@@ -10,6 +11,8 @@ type Props = {
     answers: { questionId: string; selectedIndex: number }[],
   ) => void;
 };
+
+const LETTERS = ["A", "B", "C", "D", "E", "F"] as const;
 
 export function QuizFlow({ questions, onComplete }: Props) {
   const [index, setIndex] = useState(0);
@@ -59,32 +62,30 @@ export function QuizFlow({ questions, onComplete }: Props) {
         totalSteps={questions.length}
         label="Quiz"
       />
-      <h1
-        className="mt-2 font-display text-[1.65rem] font-light leading-snug text-ink"
-        style={{ fontVariationSettings: "'SOFT' 50, 'WONK' 1" }}
-      >
+      <h1 className="mt-2 font-display text-display-xs font-light leading-snug text-ink">
         {q.prompt}
       </h1>
       <ul className="mt-8 space-y-3">
         {q.options.map((opt, optIndex) => {
-          let style = "border-border bg-paper-secondary hover:border-ink";
+          let stateClass = "";
           if (revealed && optIndex === q.correctIndex) {
-            style = "border-ink bg-ink text-paper";
+            stateClass = "correct";
           } else if (revealed && optIndex === selectedIndex && !correct) {
-            style =
-              "border-border bg-paper-tertiary text-ink-muted line-through";
+            stateClass = "incorrect";
           } else if (!revealed && selectedIndex === optIndex) {
-            style = "border-ink bg-ink text-paper";
+            stateClass = "correct";
           }
+          const letter = LETTERS[optIndex] ?? String(optIndex + 1);
           return (
             <li key={opt}>
               <button
                 type="button"
                 disabled={revealed}
                 onClick={() => choose(optIndex)}
-                className={`w-full rounded-none border px-4 py-4 text-left text-[15px] min-h-[52px] transition-colors ${style}`}
+                className={`quiz-opt focus-ring min-h-[52px] ${stateClass}`}
               >
-                {opt}
+                <span className="letter">{letter}</span>
+                <span className="text">{opt}</span>
               </button>
             </li>
           );
@@ -121,9 +122,9 @@ export function QuizFlow({ questions, onComplete }: Props) {
       {revealed && (
         <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md md:left-[84px]">
           <div className="mx-auto max-w-lg md:max-w-xl lg:max-w-2xl">
-            <button type="button" onClick={next} className="btn-primary w-full">
+            <Button onClick={next} className="w-full">
               {isLast ? "How did that land?" : "Next question"}
-            </button>
+            </Button>
           </div>
         </div>
       )}

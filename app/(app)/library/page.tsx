@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { LibraryPathCard } from "@/components/LibraryPathCard";
@@ -9,6 +8,7 @@ import { PageShell } from "@/components/PageShell";
 import { TabPills } from "@/components/TabPills";
 import type { LibraryResponse } from "@/lib/api/schemas";
 import { getLibrary } from "@/lib/api/client";
+import { Button } from "@/components/Button";
 
 type Tab = keyof LibraryResponse;
 
@@ -48,21 +48,21 @@ function LibraryContent() {
     <>
       <div className="mt-2 flex items-center justify-between gap-3">
         <p className="text-sm text-ink-muted">Your paths</p>
-        <Link href="/new" className="btn-secondary h-9 px-3 text-sm">
+        <Button href="/new" variant="secondary" size="small">
           New path
-        </Link>
+        </Button>
       </div>
 
       {lib && totalPaths > 0 && (
         <div className="mt-7 grid grid-cols-2 divide-x divide-border border-y border-border py-5">
           <div className="px-4 sm:px-6">
-            <p className="font-display text-4xl leading-none tracking-[-0.04em] text-ink">
+            <p className="font-display text-4xl leading-none tracking-tighter text-ink">
               {masteredCount}
             </p>
             <p className="mt-2 font-meta">mastered</p>
           </div>
           <div className="px-4 sm:px-6">
-            <p className="font-display text-4xl leading-none tracking-[-0.04em] text-ink">
+            <p className="font-display text-4xl leading-none tracking-tighter text-ink">
               {exploringCount}
             </p>
             <p className="mt-2 font-meta">exploring</p>

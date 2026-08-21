@@ -24,6 +24,12 @@ export function createStripeClient(secret = requireStripeSecret()): Stripe {
   return new Stripe(secret);
 }
 
+/** True when Checkout can run (secret + Academy price). Webhook also needs STRIPE_WEBHOOK_SECRET. */
+export function isStripeBillingConfigured(): boolean {
+  const env = getEnv();
+  return Boolean(env.STRIPE_SECRET_KEY.trim() && env.STRIPE_PRICE_ID.trim());
+}
+
 async function defaultGetUser(): Promise<{
   id: string;
   email?: string;
@@ -48,7 +54,7 @@ function appBaseUrl(): string {
 }
 
 export function stripePriceId(): string {
-  return process.env.STRIPE_PRICE_ID?.trim() || "";
+  return getEnv().STRIPE_PRICE_ID.trim();
 }
 
 export type CheckoutResult =
@@ -70,11 +76,12 @@ export async function createCheckoutSession(
   }
 
   const priceId = deps?.priceId ?? stripePriceId();
-  if (!priceId && !deps?.stripe) {
+  // Reject even when tests inject a Stripe mock — callers must pass priceId.
+  if (!priceId) {
     return {
       ok: false,
       code: "not_configured",
-      message: "Stripe price is not configured",
+      message: "Billing is not configured on this environment yet.",
       status: 503,
     };
   }
@@ -86,7 +93,7 @@ export async function createCheckoutSession(
     return {
       ok: false,
       code: "not_configured",
-      message: "Stripe is not configured",
+      message: "Billing is not configured on this environment yet.",
       status: 503,
     };
   }
@@ -128,11 +135,14 @@ export async function createCheckoutSession(
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
-    line_items: [{ price: priceId || "price_test", quantity: 1 }],
+    line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${base}/today?upgraded=1`,
     cancel_url: `${base}/upgrade`,
     client_reference_id: user.id,
     metadata: { curi_user_id: user.id },
+    subscription_data: {
+      metadata: { curi_user_id: user.id },
+    },
   });
 
   if (!session.url) {
@@ -172,7 +182,7 @@ export async function createPortalSession(
     return {
       ok: false,
       code: "not_configured",
-      message: "Stripe is not configured",
+      message: "Billing is not configured on this environment yet.",
       status: 503,
     };
   }

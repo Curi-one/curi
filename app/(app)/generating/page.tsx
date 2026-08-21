@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowRight, Check, Loader2, Lock, Sparkles } from "lucide-react";
@@ -8,6 +7,8 @@ import { PageShell } from "@/components/PageShell";
 import { Wordmark } from "@/components/Wordmark";
 import { getMe, postCourse } from "@/lib/api/client";
 import { loadClarifySession, saveClarifySession } from "@/lib/clarify-store";
+import { loadPreferences } from "@/lib/profile/preferences";
+import { Button } from "@/components/Button";
 
 const WARMUP_MSGS = [
   "Analysing your choices…",
@@ -114,10 +115,19 @@ export default function GeneratingPage() {
     }
     setTopic(session.topic);
 
+    const localPrefs = loadPreferences("guest");
     postCourse({
       topic: session.topic,
       depth: session.depth,
       clarifications: session.answers,
+      ...(session.details ? { details: session.details } : {}),
+      learningProfile: {
+        seq: localPrefs.seq,
+        anchor: localPrefs.anchor,
+        length: localPrefs.length,
+        rigor: localPrefs.rigor,
+        jargon: localPrefs.jargon,
+      },
     })
       .then((res) => {
         setCourseId(res.courseId);
@@ -155,9 +165,9 @@ export default function GeneratingPage() {
       <PageShell withTabPad={false}>
         <Wordmark href="/" underline={false} />
         <p className="mt-8 text-ink-muted">{error}</p>
-        <Link href="/clarify" className="btn-primary mt-4 inline-block">
+        <Button href="/clarify" className="mt-4">
           Back to clarify
-        </Link>
+        </Button>
       </PageShell>
     );
   }
@@ -204,10 +214,7 @@ export default function GeneratingPage() {
                   <p className="font-meta text-ink-muted">
                     {totalLessons}-lesson founder path
                   </p>
-                  <h1
-                    className="mt-2 font-display text-3xl font-light tracking-tight text-ink sm:text-4xl"
-                    style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
-                  >
+                  <h1 className="mt-2 font-display text-3xl font-light tracking-tight text-ink sm:text-4xl">
                     {topic}
                   </h1>
                 </div>
@@ -268,7 +275,7 @@ export default function GeneratingPage() {
                             {num}
                           </span>
                           <div className="min-w-0 flex-1">
-                            <p className="font-display text-[1.05rem] font-light leading-snug text-ink sm:text-lg">
+                            <p className="font-sans text-ui-lg font-light leading-snug text-ink">
                               {lesson.title}
                             </p>
                             <p className="lesson-blurb mt-1.5 text-sm leading-relaxed text-ink-muted">
@@ -298,7 +305,7 @@ export default function GeneratingPage() {
                           {num}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="font-display text-[1.05rem] font-light leading-snug text-ink sm:text-lg">
+                          <p className="font-sans text-ui-lg font-light leading-snug text-ink">
                             {lesson.title}
                           </p>
                           <p className="lesson-blurb mt-1.5 text-sm leading-relaxed text-ink-muted">
@@ -332,7 +339,7 @@ export default function GeneratingPage() {
                           {num}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="font-display text-[1.05rem] font-light leading-snug text-ink sm:text-lg">
+                          <p className="font-sans text-ui-lg font-light leading-snug text-ink">
                             {lesson.title}
                           </p>
                           <p className="lesson-blurb mt-1.5 text-sm leading-relaxed text-ink-muted">

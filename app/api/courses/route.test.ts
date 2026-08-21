@@ -71,4 +71,32 @@ describe("POST /api/courses", () => {
 
     expect(response.status).toBe(400);
   });
+
+  it("accepts optional details within the character limit", async () => {
+    const response = await POST(
+      courseRequest({
+        topic: "Bayesian thinking",
+        depth: "essentials",
+        clarifications: [{ questionId: "focus", answer: "Curiosity" }],
+        details: "I prefer concrete examples over theory.",
+      }, "details-guest"),
+    );
+
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.courseId).toBeTruthy();
+  });
+
+  it("rejects details over 500 characters", async () => {
+    const response = await POST(
+      courseRequest({
+        topic: "Bayesian thinking",
+        depth: "essentials",
+        clarifications: [],
+        details: "x".repeat(501),
+      }, "details-too-long"),
+    );
+
+    expect(response.status).toBe(400);
+  });
 });

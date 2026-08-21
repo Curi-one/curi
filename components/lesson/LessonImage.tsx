@@ -1,4 +1,5 @@
 import type { LessonVisualBlock } from "@/lib/api/schemas";
+import { topicArt, topicPatternStyle } from "@/lib/ui/topic-swatch";
 
 type Props = {
   /** Visual returned by the lesson API / Perplexity. */
@@ -7,6 +8,7 @@ type Props = {
 
 export function LessonImage({ visual }: Props) {
   const { title, caption, imageUrl } = visual;
+  const art = topicArt(title);
 
   return (
     <figure className="my-10 border-y border-border py-6">
@@ -20,27 +22,41 @@ export function LessonImage({ visual }: Props) {
               className="absolute inset-0 h-full w-full object-cover"
             />
           ) : (
-            <>
-              <div className="absolute inset-0 bg-gradient-to-br from-paper via-paper-secondary to-paper-tertiary" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(193,18,31,0.08),transparent_42%)]" />
-              <div className="absolute left-8 top-8 h-24 w-24 rounded-none border border-border" />
-              <div className="absolute bottom-8 right-8 h-32 w-32 rounded-none border border-border/70" />
-              <div className="absolute bottom-10 left-8 right-8 grid grid-cols-5 gap-3">
-                {[1, 2, 3, 4, 5].map((item) => (
-                  <div key={item} className="h-20 border-x border-border/50" />
-                ))}
+            <div
+              className="absolute inset-0"
+              style={{ background: art.field }}
+              data-testid="lesson-image-fallback"
+              aria-hidden
+            >
+              <div
+                className="absolute inset-0 opacity-[0.16]"
+                style={topicPatternStyle(art.pattern)}
+              />
+              <div
+                className="absolute inset-0 flex select-none items-end justify-end font-display"
+                style={{
+                  color: art.glyphColor,
+                  opacity: 0.9,
+                  fontSize: "7.5rem",
+                  fontWeight: 300,
+                  lineHeight: 0.78,
+                  fontStyle: "italic",
+                  letterSpacing: "-0.02em",
+                  paddingRight: "8%",
+                  paddingBottom: "4%",
+                }}
+              >
+                {art.glyph}
               </div>
-            </>
+            </div>
           )}
         </div>
         <figcaption className="flex flex-col justify-end border-l-0 pl-0 pt-4 lg:border-l lg:border-border lg:pl-6 lg:pt-0">
-          <div className="text-xs uppercase tracking-[0.24em] text-ink-muted">
-            Visual note
-          </div>
-          <div className="mt-3 font-display text-2xl font-light leading-tight text-ink sm:text-3xl">
+          <div className="wall-label">Visual note</div>
+          <div className="mt-3 font-display text-display-2xs leading-tight text-ink sm:text-display-xs">
             {title}
           </div>
-          <p className="mt-4 text-base leading-7 text-ink-muted">{caption}</p>
+          <p className="caption mt-4">{caption}</p>
         </figcaption>
       </div>
     </figure>

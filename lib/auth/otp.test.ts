@@ -199,38 +199,73 @@ describe("migratePending", () => {
     vi.clearAllMocks();
   });
 
-  it("inserts courses, course_lessons, lesson_activity from pending then deletes", async () => {
-    const pendingRows = [
-      {
-        id: "pending-1",
-        topic: "Stoicism",
-        depth: "essentials",
-        clarifications: [{ questionId: "focus", answer: "Practice" }],
-        outline: [
-          { index: 0, title: "L0" },
-          { index: 1, title: "L1" },
-        ],
-        expires_at: "2026-08-21T12:00:00.000Z",
-        lesson_feels: { "0": "just_right" },
-      },
-    ];
+  type PendingFixture = {
+    id: string;
+    topic: string;
+    depth?: string;
+    outline?: { index: number; title: string }[];
+    lesson_feels?: Record<string, string>;
+    created_at?: string;
+  };
 
-    const pendingSelectEq = vi.fn().mockReturnValue({
-      gt: vi.fn().mockResolvedValue({ data: pendingRows, error: null }),
-    });
+  /**
+   * Admin double covering every table migratePending touches, including the
+   * active-course count that drives the free-plan cap.
+   */
+  function mockAdmin(options: {
+    pending: PendingFixture[];
+    plan?: string;
+    activeCount?: number;
+  }) {
+    const rows = options.pending.map((row) => ({
+      id: row.id,
+      topic: row.topic,
+      depth: row.depth ?? "essentials",
+      clarifications: [{ questionId: "focus", answer: "Practice" }],
+      outline: row.outline ?? [
+        { index: 0, title: "L0" },
+        { index: 1, title: "L1" },
+      ],
+      expires_at: "2026-08-21T12:00:00.000Z",
+      lesson_feels: row.lesson_feels ?? {},
+      created_at: row.created_at ?? "2026-08-19T00:00:00.000Z",
+    }));
+
+    const gt = vi.fn().mockResolvedValue({ data: rows, error: null });
+    const pendingSelectEq = vi.fn().mockReturnValue({ gt });
     const pendingSelect = vi.fn().mockReturnValue({ eq: pendingSelectEq });
     const pendingDeleteEq = vi.fn().mockResolvedValue({ error: null });
     const pendingDelete = vi.fn().mockReturnValue({ eq: pendingDeleteEq });
 
-    const courseSingle = vi.fn().mockResolvedValue({
-      data: { id: "course-1" },
-      error: null,
+    const inserted: Record<string, unknown>[] = [];
+    let nextCourse = 0;
+    const courseInsert = vi.fn((row: Record<string, unknown>) => {
+      inserted.push(row);
+      nextCourse += 1;
+      const id = `course-${nextCourse}`;
+      return {
+        select: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: { id }, error: null }),
+        }),
+      };
     });
-    const courseSelect = vi.fn().mockReturnValue({ single: courseSingle });
-    const courseInsert = vi.fn().mockReturnValue({ select: courseSelect });
+
+    // .select("id", { count: "exact", head: true }).eq(...).eq(...)
+    const coursesCountSelect = vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({
+          count: options.activeCount ?? 0,
+          error: null,
+        }),
+      }),
+    });
 
     const lessonsInsert = vi.fn().mockResolvedValue({ error: null });
     const activityInsert = vi.fn().mockResolvedValue({ error: null });
+    const usersMaybeSingle = vi.fn().mockResolvedValue({
+      data: { timezone: "UTC", plan: options.plan ?? "free" },
+      error: null,
+    });
 
     const from = vi.fn((table: string) => {
       if (table === "pending_courses") {
@@ -239,17 +274,12 @@ describe("migratePending", () => {
       if (table === "users") {
         return {
           select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              maybeSingle: vi.fn().mockResolvedValue({
-                data: { timezone: "UTC" },
-                error: null,
-              }),
-            }),
+            eq: vi.fn().mockReturnValue({ maybeSingle: usersMaybeSingle }),
           }),
         };
       }
       if (table === "courses") {
-        return { insert: courseInsert };
+        return { insert: courseInsert, select: coursesCountSelect };
       }
       if (table === "course_lessons") {
         return { insert: lessonsInsert };
@@ -260,22 +290,49 @@ describe("migratePending", () => {
       throw new Error(`unexpected table ${table}`);
     });
 
+    return {
+      client: { from } as never,
+      from,
+      gt,
+      inserted,
+      courseInsert,
+      lessonsInsert,
+      activityInsert,
+      pendingSelect,
+      pendingSelectEq,
+      pendingDeleteEq,
+    };
+  }
+
+  it("inserts courses, course_lessons, lesson_activity from pending then deletes", async () => {
+    const admin = mockAdmin({
+      pending: [
+        {
+          id: "pending-1",
+          topic: "Stoicism",
+          lesson_feels: { "0": "just_right" },
+        },
+      ],
+    });
+
     const result = await migratePending("anon-session", "user-1", {
-      createAdminClient: () => ({ from }) as never,
+      createAdminClient: () => admin.client,
       now: () => now,
     });
 
-    expect(result).toEqual({ migratedPathIds: ["course-1"] });
-    expect(from).toHaveBeenCalledWith("pending_courses");
-    expect(pendingSelect).toHaveBeenCalledWith(
-      "id, topic, depth, clarifications, outline, expires_at, lesson_feels",
+    expect(result).toEqual({
+      migratedPathIds: ["course-1"],
+      shelvedPathIds: [],
+    });
+    expect(admin.pendingSelect).toHaveBeenCalledWith(
+      "id, topic, depth, clarifications, outline, expires_at, lesson_feels, created_at",
     );
-    expect(pendingSelectEq).toHaveBeenCalledWith(
+    expect(admin.pendingSelectEq).toHaveBeenCalledWith(
       "anonymous_id",
       "anon-session",
     );
 
-    expect(courseInsert).toHaveBeenCalledWith(
+    expect(admin.courseInsert).toHaveBeenCalledWith(
       expect.objectContaining({
         user_id: "user-1",
         topic: "Stoicism",
@@ -288,20 +345,12 @@ describe("migratePending", () => {
       }),
     );
 
-    expect(lessonsInsert).toHaveBeenCalledWith([
-      expect.objectContaining({
-        course_id: "course-1",
-        index: 0,
-        title: "L0",
-      }),
-      expect.objectContaining({
-        course_id: "course-1",
-        index: 1,
-        title: "L1",
-      }),
+    expect(admin.lessonsInsert).toHaveBeenCalledWith([
+      expect.objectContaining({ course_id: "course-1", index: 0, title: "L0" }),
+      expect.objectContaining({ course_id: "course-1", index: 1, title: "L1" }),
     ]);
 
-    expect(activityInsert).toHaveBeenCalledWith([
+    expect(admin.activityInsert).toHaveBeenCalledWith([
       {
         user_id: "user-1",
         course_id: "course-1",
@@ -311,38 +360,136 @@ describe("migratePending", () => {
       },
     ]);
 
-    expect(pendingDeleteEq).toHaveBeenCalledWith("id", "pending-1");
+    expect(admin.pendingDeleteEq).toHaveBeenCalledWith("id", "pending-1");
   });
 
   it("skips expired rows (query filters expires_at > now)", async () => {
-    const gt = vi.fn().mockResolvedValue({ data: [], error: null });
-    const pendingEq = vi.fn().mockReturnValue({ gt });
-    const pendingSelect = vi.fn().mockReturnValue({ eq: pendingEq });
-    const usersMaybeSingle = vi.fn().mockResolvedValue({
-      data: { timezone: "UTC" },
-      error: null,
-    });
-    const from = vi.fn((table: string) => {
-      if (table === "pending_courses") {
-        return { select: pendingSelect };
-      }
-      if (table === "users") {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({ maybeSingle: usersMaybeSingle }),
-          }),
-        };
-      }
-      throw new Error(`unexpected table ${table}`);
-    });
+    const admin = mockAdmin({ pending: [] });
 
     const result = await migratePending("anon-session", "user-1", {
-      createAdminClient: () => ({ from }) as never,
+      createAdminClient: () => admin.client,
       now: () => now,
     });
 
-    expect(result).toEqual({ migratedPathIds: [] });
-    expect(gt).toHaveBeenCalledWith("expires_at", now.toISOString());
+    expect(result).toEqual({ migratedPathIds: [], shelvedPathIds: [] });
+    expect(admin.gt).toHaveBeenCalledWith("expires_at", now.toISOString());
+  });
+
+  it("shelves a pending path when the free plan is already at the cap", async () => {
+    const admin = mockAdmin({
+      pending: [{ id: "pending-1", topic: "Third path" }],
+      plan: "free",
+      activeCount: 2,
+    });
+
+    const result = await migratePending("anon-session", "user-1", {
+      createAdminClient: () => admin.client,
+      now: () => now,
+    });
+
+    expect(result).toEqual({
+      migratedPathIds: [],
+      shelvedPathIds: ["course-1"],
+    });
+    expect(admin.courseInsert).toHaveBeenCalledWith(
+      expect.objectContaining({ status: "shelved" }),
+    );
+  });
+
+  it("fills remaining free slots and shelves the overflow", async () => {
+    const admin = mockAdmin({
+      pending: [
+        { id: "pending-1", topic: "A", created_at: "2026-08-19T01:00:00Z" },
+        { id: "pending-2", topic: "B", created_at: "2026-08-19T02:00:00Z" },
+        { id: "pending-3", topic: "C", created_at: "2026-08-19T03:00:00Z" },
+      ],
+      plan: "free",
+      activeCount: 1,
+    });
+
+    const result = await migratePending("anon-session", "user-1", {
+      createAdminClient: () => admin.client,
+      now: () => now,
+    });
+
+    // 1 slot left of 2 → one active, two shelved.
+    expect(result.migratedPathIds).toHaveLength(1);
+    expect(result.shelvedPathIds).toHaveLength(2);
+    expect(
+      admin.inserted.filter((row) => row.status === "active"),
+    ).toHaveLength(1);
+    expect(
+      admin.inserted.filter((row) => row.status === "shelved"),
+    ).toHaveLength(2);
+  });
+
+  it("gives the active slot to the path the guest actually worked through", async () => {
+    const admin = mockAdmin({
+      pending: [
+        { id: "pending-1", topic: "Untouched", created_at: "2026-08-19T01:00:00Z" },
+        {
+          id: "pending-2",
+          topic: "Worked",
+          lesson_feels: { "0": "just_right" },
+          created_at: "2026-08-19T05:00:00Z",
+        },
+      ],
+      plan: "free",
+      activeCount: 1,
+    });
+
+    await migratePending("anon-session", "user-1", {
+      createAdminClient: () => admin.client,
+      now: () => now,
+    });
+
+    const active = admin.inserted.find((row) => row.status === "active");
+    expect(active).toMatchObject({ topic: "Worked" });
+  });
+
+  it("does not cap Academy members", async () => {
+    const admin = mockAdmin({
+      pending: [
+        { id: "pending-1", topic: "A" },
+        { id: "pending-2", topic: "B" },
+        { id: "pending-3", topic: "C" },
+      ],
+      plan: "academy",
+      activeCount: 9,
+    });
+
+    const result = await migratePending("anon-session", "user-1", {
+      createAdminClient: () => admin.client,
+      now: () => now,
+    });
+
+    expect(result.migratedPathIds).toHaveLength(3);
+    expect(result.shelvedPathIds).toEqual([]);
+  });
+
+  it("imports a fully-finished pending path as completed, not against the cap", async () => {
+    const admin = mockAdmin({
+      pending: [
+        {
+          id: "pending-1",
+          topic: "Done",
+          outline: [{ index: 0, title: "L0" }],
+          lesson_feels: { "0": "just_right" },
+        },
+      ],
+      plan: "free",
+      activeCount: 2,
+    });
+
+    const result = await migratePending("anon-session", "user-1", {
+      createAdminClient: () => admin.client,
+      now: () => now,
+    });
+
+    expect(result.shelvedPathIds).toEqual([]);
+    expect(admin.courseInsert).toHaveBeenCalledWith(
+      expect.objectContaining({ status: "completed" }),
+    );
   });
 });
 

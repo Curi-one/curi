@@ -14,14 +14,13 @@ type Props = {
 /** Wordmark: Cu*ri* — roman "Cu", italic "ri", vermilion rule beneath (§3.1–3.2). */
 export function Wordmark({ href = "/", size = "sm", underline = true }: Props) {
   const type =
-    size === "md" ? "text-[22px] tracking-tight" : "text-[19px] tracking-tight";
+    size === "md"
+      ? "text-display-2xs tracking-tight"
+      : "text-[19px] tracking-tight";
 
   const mark = (
     <span className="relative inline-block px-0.5 py-0.5 leading-none">
-      <span
-        className={`font-display font-light leading-none text-ink ${type}`}
-        style={{ fontVariationSettings: "'SOFT' 60, 'WONK' 1" }}
-      >
+      <span className={`font-display font-light leading-none text-ink ${type}`}>
         Cu<em className="italic">ri</em>
       </span>
       {underline && (

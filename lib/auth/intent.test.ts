@@ -72,3 +72,29 @@ describe("sanitizeReturnTo", () => {
     expect(sanitizeReturnTo("/profile")).toBe("/profile");
   });
 });
+
+describe("sanitizeReturnTo hardening", () => {
+  it("keeps a same-origin path with its query", () => {
+    expect(sanitizeReturnTo("/library?tab=shelved")).toBe(
+      "/library?tab=shelved",
+    );
+  });
+
+  const REJECTED: (string | null | undefined)[] = [
+    "//evil.example", // protocol-relative
+    "/\\evil.example", // backslash protocol-relative
+    "https://evil.example",
+    "javascript:alert(1)",
+    "",
+    null,
+    undefined,
+  ];
+
+  it.each(REJECTED)("rejects %s", (input) => {
+    expect(sanitizeReturnTo(input)).toBe("/today");
+  });
+
+  it("rejects control characters that could split a header", () => {
+    expect(sanitizeReturnTo("/today\r\nSet-Cookie: a=b")).toBe("/today");
+  });
+});

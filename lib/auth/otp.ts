@@ -1,8 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { LessonFeel, Plan, UserSession } from "@/lib/api/schemas";
 import { LessonFeelSchema } from "@/lib/api/schemas";
+import { authEmailRedirectTo } from "@/lib/auth/email-redirect";
 import { buildFingerprint } from "@/lib/cache/fingerprint";
+import { activePathSlotsRemaining } from "@/lib/courses/active-limit";
 import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
+import { normalizePlan } from "@/lib/plans";
 import { getEnv } from "@/lib/env";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -37,7 +40,15 @@ export type VerifyOtpResult = {
 };
 
 export type MigratePendingResult = {
+  /** Imported as active paths. */
   migratedPathIds: string[];
+  /**
+   * Imported as shelved because the account had no free active slots left.
+   * Guests are uncapped by design (auth comes after the first quiz), so this
+   * is where the free 2-active-path cap is actually applied to the guest →
+   * member hand-off. Dropping the rows instead would silently destroy work.
+   */
+  shelvedPathIds: string[];
 };
 
 type OutlineLesson = { index: number; title: string };
@@ -50,6 +61,7 @@ type PendingCourseRow = {
   outline: unknown;
   expires_at: string;
   lesson_feels: unknown;
+  created_at: string | null;
 };
 
 function parseOutline(raw: unknown): OutlineLesson[] {
@@ -122,30 +134,6 @@ function progressFromFeels(feels: Record<number, LessonFeel>): number {
     return 0;
   }
   return Math.max(...indices) + 1;
-}
-
-function authEmailRedirectTo(returnTo?: string): string {
-  const appEnv = process.env.APP_ENV;
-  let base: string;
-  if (appEnv === "production") {
-    base = "https://www.curi.one/auth/callback";
-  } else if (appEnv === "staging") {
-    base = "https://stage.curi.one/auth/callback";
-  } else {
-    base = "http://localhost:3000/auth/callback";
-  }
-  const safe = returnTo?.trim();
-  if (
-    safe &&
-    safe.startsWith("/") &&
-    !safe.startsWith("//") &&
-    safe !== "/today"
-  ) {
-    const url = new URL(base);
-    url.searchParams.set("next", safe);
-    return url.toString();
-  }
-  return base;
 }
 
 export type RequestOtpResult = {
@@ -289,8 +277,12 @@ export function classifyAuthError(message: string): {
 
 /**
  * Migrate guest pending_courses for anonymous session → member courses.
- * Reads: id, topic, depth, clarifications, outline, expires_at, lesson_feels
- * (pending_courses also has anonymous_id, clarify_step, created_at — filtered via eq/gt).
+ *
+ * Applies the free active-path cap: a signed-out visitor can start any number
+ * of pending paths, so importing them all unconditionally is a cap bypass
+ * (sign out → start N paths → sign back in). Paths that do not fit are
+ * imported as `shelved`, newest-progress-first so the path the user actually
+ * worked through keeps the active slot.
  */
 export async function migratePending(
   sessionId: string,
@@ -303,7 +295,7 @@ export async function migratePending(
   const { data: rows, error } = await admin
     .from("pending_courses")
     .select(
-      "id, topic, depth, clarifications, outline, expires_at, lesson_feels",
+      "id, topic, depth, clarifications, outline, expires_at, lesson_feels, created_at",
     )
     .eq("anonymous_id", sessionId)
     .gt("expires_at", now.toISOString());
@@ -314,7 +306,7 @@ export async function migratePending(
 
   const { data: profile } = await admin
     .from("users")
-    .select("timezone")
+    .select("timezone, plan")
     .eq("id", userId)
     .maybeSingle();
   const timezone =
@@ -322,23 +314,45 @@ export async function migratePending(
       ? profile.timezone
       : DEFAULT_TIMEZONE;
   const activityDate = todayInTimezone(timezone, now);
+  const plan = normalizePlan(
+    typeof profile?.plan === "string" ? profile.plan : null,
+  );
 
   const migratedPathIds: string[] = [];
+  const shelvedPathIds: string[] = [];
   const pending = (rows ?? []) as PendingCourseRow[];
 
-  for (const row of pending) {
-    const depth = row.depth;
-    if (depth !== "essentials" && depth !== "fluent" && depth !== "thorough") {
-      continue;
-    }
+  // Parse first so ordering can consider progress, and invalid rows never
+  // consume a slot.
+  const candidates = pending
+    .map((row) => {
+      const depth = row.depth;
+      if (depth !== "essentials" && depth !== "fluent" && depth !== "thorough") {
+        return null;
+      }
+      const outline = parseOutline(row.outline);
+      if (outline.length === 0) {
+        return null;
+      }
+      const feels = parseLessonFeels(row.lesson_feels);
+      return {
+        row,
+        depth,
+        outline,
+        feels,
+        progress: progressFromFeels(feels),
+        createdAt: row.created_at ? Date.parse(row.created_at) : 0,
+      };
+    })
+    .filter((c): c is NonNullable<typeof c> => c !== null)
+    .sort((a, b) => b.progress - a.progress || a.createdAt - b.createdAt);
 
-    const outline = parseOutline(row.outline);
-    if (outline.length === 0) {
-      continue;
-    }
+  let slotsRemaining = await activePathSlotsRemaining(admin, userId, plan);
+
+  for (const candidate of candidates) {
+    const { row, depth, outline, feels, progress } = candidate;
 
     const clarifications = parseClarifications(row.clarifications);
-    const feels = parseLessonFeels(row.lesson_feels);
     const fingerprint = buildFingerprint({
       topicNormalized: normalizeTopic(row.topic),
       depth,
@@ -346,9 +360,17 @@ export async function migratePending(
       cacheType: "path_outline",
     });
 
-    const progress = progressFromFeels(feels);
     const total = outline.length;
-    const status = progress >= total ? "completed" : "active";
+    let status: "active" | "completed" | "shelved";
+    if (progress >= total) {
+      // Mastered paths never occupy an active slot.
+      status = "completed";
+    } else if (slotsRemaining > 0) {
+      status = "active";
+      slotsRemaining -= 1;
+    } else {
+      status = "shelved";
+    }
 
     const { data: course, error: courseError } = await admin
       .from("courses")
@@ -415,10 +437,14 @@ export async function migratePending(
       );
     }
 
-    migratedPathIds.push(course.id as string);
+    if (status === "shelved") {
+      shelvedPathIds.push(course.id as string);
+    } else {
+      migratedPathIds.push(course.id as string);
+    }
   }
 
-  return { migratedPathIds };
+  return { migratedPathIds, shelvedPathIds };
 }
 
 export async function updateUserName(

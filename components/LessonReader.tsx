@@ -5,15 +5,18 @@ import {
   useEffect,
   useRef,
   useState,
-  type CSSProperties,
   type ReactNode,
 } from "react";
 import { ArrowLeft, ChevronDown, Globe2, X } from "lucide-react";
+import { Button } from "@/components/Button";
 import { EquationBlock } from "@/components/lesson/EquationBlock";
 import { LessonImage } from "@/components/lesson/LessonImage";
+import { LessonMarkdown } from "@/components/lesson/LessonMarkdown";
 import { ShareableFact } from "@/components/lesson/ShareableFact";
 import type { LessonResponse } from "@/lib/api/schemas";
 import {
+  applyReaderThemeToDocument,
+  clearReaderThemeFromDocument,
   DEFAULT_READER_SETTINGS,
   loadReaderSettings,
   READER_FONTS,
@@ -33,13 +36,6 @@ type Props = {
   isGuest?: boolean;
 };
 
-function stripInlineMarkdown(text: string): string {
-  return text
-    .replace(/\*\*([^*]+)\*\*/g, "$1")
-    .replace(/\*([^*]+)\*/g, "$1")
-    .trim();
-}
-
 function estimateReadMinutes(body: string[]): number {
   const words = body.join("").split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
@@ -56,81 +52,6 @@ function domainInitials(title: string, url: string): string {
       .slice(0, 2)
       .toUpperCase();
   }
-}
-
-function applyBionic(text: string): ReactNode[] {
-  return text.split(/(\s+)/).map((token, i) => {
-    if (/^\s+$/.test(token) || token.length < 2) {
-      return <span key={i}>{token}</span>;
-    }
-    const cut = Math.ceil(token.length * 0.4);
-    return (
-      <span key={i}>
-        <strong className="font-semibold">{token.slice(0, cut)}</strong>
-        {token.slice(cut)}
-      </span>
-    );
-  });
-}
-
-const CITATION_REGEX = /(\[\d+\])/g;
-
-/** Splits plain text on`[n]` citation markers and renders each as a tappable button. */
-function renderTextWithCitations(
-  text: string,
-  bionic: boolean,
-  onCitationClick?: (sourceIndex: number) => void,
-): ReactNode[] {
-  const segments = text.split(CITATION_REGEX);
-  return segments.map((segment, i) => {
-    const match = /^\[(\d+)\]$/.exec(segment);
-    if (match) {
-      const n = Number(match[1]);
-      return (
-        <button
-          key={`citation-${i}`}
-          type="button"
-          onClick={() => onCitationClick?.(n - 1)}
-          aria-label={`View source ${n}`}
-          className="citation-ref relative mx-0.5 inline-flex align-baseline text-[0.7em] font-medium text-ink hover:text-ink-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-default before:absolute before:-inset-3 before:content-['']"
-        >
-          [{n}]
-        </button>
-      );
-    }
-    return <span key={i}>{bionic ? applyBionic(segment) : segment}</span>;
-  });
-}
-
-function renderParagraph(
-  text: string,
-  bionic: boolean,
-  onCitationClick?: (sourceIndex: number) => void,
-) {
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      const inner = part.slice(2, -2);
-      return (
-        <strong key={i} className="font-medium text-ink">
-          {renderTextWithCitations(inner, bionic, onCitationClick)}
-        </strong>
-      );
-    }
-    if (part.startsWith("*") && part.endsWith("*")) {
-      const inner = part.slice(1, -1);
-      return (
-        <em key={i} className="italic text-ink/90">
-          {renderTextWithCitations(inner, bionic, onCitationClick)}
-        </em>
-      );
-    }
-    return (
-      <span key={i}>
-        {renderTextWithCitations(part, bionic, onCitationClick)}
-      </span>
-    );
-  });
 }
 
 function findScrollParent(el: HTMLElement | null): HTMLElement | null {
@@ -178,10 +99,10 @@ export function LessonReader({
   const takeaways = lesson.takeaways ?? [];
   const readMins = estimateReadMinutes(lesson.body);
   const total = totalLessons ?? Math.max(lessonIndex + 1, 1);
-  const showEditorial = lesson.body.length >= 3;
   const apiVisuals = lesson.visuals ?? [];
   const useApiVisuals = apiVisuals.length > 0;
   const shareable = lesson.shareableFact;
+  const bodyMarkdown = lesson.body.join("\n\n");
 
   const theme =
     READER_THEMES.find((t) => t.id === settings.theme) ?? READER_THEMES[0];
@@ -198,6 +119,16 @@ export function LessonReader({
   useEffect(() => {
     saveReaderSettings(settings);
   }, [settings]);
+
+  useEffect(() => {
+    applyReaderThemeToDocument(settings.theme);
+  }, [settings.theme]);
+
+  useEffect(() => {
+    return () => {
+      clearReaderThemeFromDocument();
+    };
+  }, []);
 
   useEffect(() => {
     const article = articleRef.current;
@@ -276,98 +207,32 @@ export function LessonReader({
     setShowSources(true);
   }
 
-  const mainParas = lesson.body;
-
-  /** Insert LessonImage after first para; ShareableFact near end. */
-  function renderBody() {
-    if (mainParas.length === 0) return null;
-
+  function renderVisualsAndShareable(): ReactNode[] {
     const nodes: ReactNode[] = [];
-    const imageAfter = showEditorial ? 0 : -1;
-    const shareAfter =
-      showEditorial && mainParas.length >= 2 ? mainParas.length - 1 : -1;
-
-    mainParas.forEach((para, i) => {
-      const clean = stripInlineMarkdown(para);
-      const firstLetter = clean.charAt(0);
-      const rest = clean.slice(1);
-      const isFirst = i === 0;
-
-      nodes.push(
-        <p key={`p-${i}`}>
-          {isFirst && firstLetter ? (
-            <>
-              <span
-                className="float-left mr-3 mt-1 font-display text-5xl font-light leading-[0.78] text-ink sm:text-7xl"
-                style={{ fontVariationSettings: "'SOFT' 55, 'WONK' 1" }}
-                aria-hidden
-              >
-                {firstLetter}
-              </span>
-              {settings.bionic
-                ? renderTextWithCitations(rest, true, handleCitationClick)
-                : renderParagraph(
-                    para.startsWith(firstLetter)
-                      ? para.slice(firstLetter.length)
-                      : rest,
-                    false,
-                    handleCitationClick,
-                  )}
-            </>
-          ) : (
-            renderParagraph(para, settings.bionic, handleCitationClick)
-          )}
-        </p>,
-      );
-
-      if (i === imageAfter) {
-        if (useApiVisuals) {
-          apiVisuals.forEach((visual, vi) => {
-            nodes.push(
-              <LessonImage key={`lesson-image-${vi}`} visual={visual} />,
-            );
-            if (visual.equation) {
-              nodes.push(
-                <EquationBlock key={`equation-block-${vi}`} visual={visual} />,
-              );
-            }
-          });
-        }
-      }
-      if (i === shareAfter && shareable) {
+    if (useApiVisuals) {
+      apiVisuals.forEach((visual, vi) => {
         nodes.push(
-          <ShareableFact
-            key="shareable"
-            topic={topicLabel || lesson.title}
-            title={lesson.title}
-            fact={shareable}
-          />,
+          <LessonImage key={`lesson-image-${vi}`} visual={visual} />,
         );
-      }
-    });
-
+        if (visual.equation) {
+          nodes.push(
+            <EquationBlock key={`equation-block-${vi}`} visual={visual} />,
+          );
+        }
+      });
+    }
+    if (shareable) {
+      nodes.push(
+        <ShareableFact
+          key="shareable"
+          topic={topicLabel || lesson.title}
+          title={lesson.title}
+          fact={shareable}
+        />,
+      );
+    }
     return nodes;
   }
-
-  const articleStyle: CSSProperties =
-    settings.theme === "light"
-      ? {}
-      : {
-          background: theme.bg,
-          color: theme.fg,
-          // Local token remap — keeps app chrome untouched
-          ["--color-ink" as string]: theme.fg,
-          ["--color-ink-muted" as string]: theme.muted,
-          ["--color-border" as string]: theme.border,
-          ["--color-paper" as string]: theme.bg,
-          ["--color-paper-secondary" as string]: theme.card,
-          ["--color-paper-tertiary" as string]: theme.border,
-          ["--color-bg-primary" as string]: theme.bg,
-          ["--color-bg-secondary" as string]: theme.card,
-          ["--color-text-primary" as string]: theme.fg,
-          ["--color-text-secondary" as string]: theme.muted,
-          ["--color-border-subtle" as string]: theme.border,
-        };
 
   return (
     <>
@@ -383,8 +248,7 @@ export function LessonReader({
 
       <div
         ref={wrapperRef}
-        className="mx-auto w-full max-w-[724px] animate-fade-in"
-        style={articleStyle}
+        className="mx-auto w-full max-w-content animate-fade-in"
       >
         {/* Top nav: back (optional) · Aa settings · counter */}
         <div className="mb-8 flex items-center justify-between gap-3">
@@ -413,8 +277,8 @@ export function LessonReader({
                   : "border-border text-ink-muted hover:border-ink/25 hover:text-ink"
               }`}
             >
-              <span className="font-ui text-[13px] font-light">A</span>
-              <span className="text-[10px] font-semibold">a</span>
+              <span className="font-ui text-ui-xs font-light">A</span>
+              <span className="text-ui-4xs font-semibold">a</span>
             </button>
 
             {showReaderSettings && (
@@ -428,7 +292,7 @@ export function LessonReader({
                 }
               >
                 <div className="px-4 pb-3 pt-4">
-                  <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-muted">
+                  <p className="mb-2.5 text-ui-4xs font-semibold uppercase tracking-widest text-ink-muted">
                     Size
                   </p>
                   <div className="flex items-center gap-2">
@@ -492,7 +356,7 @@ export function LessonReader({
                 <div className="mx-4 h-px bg-border" />
 
                 <div className="px-4 py-3">
-                  <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-muted">
+                  <p className="mb-2.5 text-ui-4xs font-semibold uppercase tracking-widest text-ink-muted">
                     Font
                   </p>
                   <div className="grid grid-cols-3 gap-1.5">
@@ -517,7 +381,7 @@ export function LessonReader({
                         >
                           Aa
                         </span>
-                        <span className="text-[9px] font-semibold uppercase tracking-[0.14em] opacity-70">
+                        <span className="text-mono-xs font-semibold uppercase tracking-wider opacity-70">
                           {f.label}
                         </span>
                       </button>
@@ -528,7 +392,7 @@ export function LessonReader({
                 <div className="mx-4 h-px bg-border" />
 
                 <div className="px-4 py-3">
-                  <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-muted">
+                  <p className="mb-2.5 text-ui-4xs font-semibold uppercase tracking-widest text-ink-muted">
                     Theme
                   </p>
                   <div className="grid grid-cols-4 gap-2">
@@ -563,7 +427,7 @@ export function LessonReader({
                             />
                           )}
                         </span>
-                        <span className="text-[9px] font-medium uppercase tracking-[0.1em] text-ink-muted">
+                        <span className="text-mono-xs font-medium uppercase tracking-wider text-ink-muted">
                           {t.label}
                         </span>
                       </button>
@@ -581,10 +445,10 @@ export function LessonReader({
                     aria-pressed={settings.bionic}
                   >
                     <div className="text-left">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-muted">
+                      <p className="text-ui-4xs font-semibold uppercase tracking-widest text-ink-muted">
                         Bionic reading
                       </p>
-                      <p className="mt-0.5 text-[10px] leading-snug text-ink-muted/70">
+                      <p className="mt-0.5 text-ui-4xs leading-snug text-ink-muted/70">
                         Bold fixation points guide the eye
                       </p>
                     </div>
@@ -611,13 +475,13 @@ export function LessonReader({
             )}
           </div>
 
-          <span className="text-xs uppercase tracking-[0.28em] text-ink-muted">
+          <span className="text-xs uppercase tracking-ultra text-ink-muted">
             {lessonIndex + 1} / {total}
           </span>
         </div>
 
         {isGuest && (
-          <div className="mb-8 overflow-hidden rounded-none border border-border bg-paper-secondary/60">
+          <div className="mb-8 overflow-hidden rounded-none border border-border bg-paper-secondary">
             <div className="flex items-center gap-0 divide-x divide-border">
               {[
                 {
@@ -646,16 +510,16 @@ export function LessonReader({
                   }`}
                 >
                   <span
-                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-ui-4xs font-semibold ${
                       step.done ? "bg-ink text-paper" : "border border-border"
                     }`}
                   >
                     {step.done ? "✓" : step.n}
                   </span>
-                  <span className="text-[11px] leading-snug sm:hidden">
+                  <span className="text-ui-3xs leading-snug sm:hidden">
                     {step.short}
                   </span>
-                  <span className="hidden text-[11px] leading-snug sm:inline">
+                  <span className="hidden text-ui-3xs leading-snug sm:inline">
                     {step.label}
                   </span>
                 </div>
@@ -668,20 +532,17 @@ export function LessonReader({
           ref={articleRef}
           className="pb-[calc(8rem+env(safe-area-inset-bottom))]"
         >
-          <div className="mb-6 flex flex-wrap items-center gap-2.5 text-xs uppercase tracking-[0.3em] text-ink-muted">
+          <div className="wall-label mb-6 flex-wrap">
             <span>
               Lesson {lessonIndex + 1}
               {topicLabel ? ` · ${topicLabel}` : ""}
             </span>
-            <span className="border border-border px-3 py-1 tracking-[0.18em] text-ink/70">
+            <span className="border border-border px-3 py-1 tracking-widest text-ink/70">
               Today
             </span>
           </div>
 
-          <h1
-            className="font-display text-4xl font-light leading-[0.97] tracking-[-0.045em] text-ink sm:text-5xl sm:text-[3.6rem]"
-            style={{ fontVariationSettings: "'SOFT' 55, 'WONK' 1" }}
-          >
+          <h1 className="font-display display-section text-display-sm leading-tight tracking-tighter text-ink sm:text-display-md">
             {lesson.title}
           </h1>
 
@@ -706,7 +567,7 @@ export function LessonReader({
                 className="flex w-full items-center justify-between py-3.5 text-left"
                 aria-expanded={takeawaysOpen}
               >
-                <span className="text-xs uppercase tracking-[0.24em] text-ink-muted">
+                <span className="text-xs uppercase tracking-widest text-ink-muted">
                   {takeaways.length} things from this lesson
                 </span>
                 <ChevronDown
@@ -721,7 +582,7 @@ export function LessonReader({
                   {takeaways.map((t, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-4 text-sm leading-[1.7] text-ink/80"
+                      className="flex items-start gap-4 text-sm leading-loose text-ink/80"
                     >
                       <span className="takeaway-number">{i + 1}</span>
                       {t}
@@ -742,19 +603,22 @@ export function LessonReader({
               lineHeight: sizeCfg.leading,
             }}
           >
-            {renderBody()}
+            {bodyMarkdown ? (
+              <LessonMarkdown
+                markdown={bodyMarkdown}
+                bionic={settings.bionic}
+                onCitationClick={handleCitationClick}
+              />
+            ) : null}
+            {renderVisualsAndShareable()}
           </div>
         </article>
 
         <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md md:left-[84px]">
-          <div className="mx-auto w-full max-w-[724px]">
-            <button
-              type="button"
-              onClick={onStartQuiz}
-              className="btn-primary w-full"
-            >
+          <div className="mx-auto w-full max-w-content">
+            <Button onClick={onStartQuiz} className="w-full">
               Take the quiz
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -773,7 +637,7 @@ export function LessonReader({
           >
             <div className="flex shrink-0 items-start justify-between border-b border-border px-6 py-5">
               <div>
-                <div className="text-xs uppercase tracking-[0.26em] text-ink-muted">
+                <div className="text-xs uppercase tracking-widest text-ink-muted">
                   Sources
                 </div>
                 <div className="mt-1 font-display text-lg font-light leading-snug text-ink">
@@ -790,8 +654,8 @@ export function LessonReader({
               </button>
             </div>
 
-            <div className="shrink-0 border-b border-border bg-paper-secondary/60 px-6 py-3">
-              <p className="text-[11px] leading-relaxed text-ink-muted">
+            <div className="shrink-0 border-b border-border bg-paper-secondary px-6 py-3">
+              <p className="text-ui-3xs leading-relaxed text-ink-muted">
                 These references informed the lesson content. Curi synthesises
                 ideas across sources — always read the originals for full
                 context.
@@ -825,17 +689,17 @@ export function LessonReader({
                         className={`group flex items-start gap-3.5 rounded-none border p-4 transition-all ${
                           isActive
                             ? "border-ink bg-paper-tertiary"
-                            : "border-border bg-paper-secondary/40 hover:border-ink/20 hover:bg-paper"
+                            : "border-border bg-paper-secondary hover:border-ink/20 hover:bg-paper"
                         }`}
                       >
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-paper-tertiary text-[10px] font-semibold text-ink-muted">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-paper-tertiary text-ui-4xs font-semibold text-ink-muted">
                           {domainInitials(source.title, source.url)}
                         </div>
                         <div className="min-w-0 flex-1">
                           <span className="text-sm font-medium text-ink group-hover:underline">
                             {source.title}
                           </span>
-                          <div className="mt-1.5 flex items-center gap-1 text-[10px] text-ink-muted/50">
+                          <div className="mt-1.5 flex items-center gap-1 text-ui-4xs text-ink-muted/50">
                             <Globe2
                               className="h-2.5 w-2.5 shrink-0"
                               aria-hidden

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Button } from "@/components/Button";
 
 type Props = {
   message: string;
@@ -17,20 +17,18 @@ export function EmptyState({
 }: Props) {
   return (
     <div className="surface-card p-8 text-center">
-      <p className="text-[15px] font-light leading-relaxed text-ink-muted">
+      <p className="text-ui-md font-light leading-relaxed text-ink-muted">
         {message}
       </p>
       {(actionHref && actionLabel) || (secondaryHref && secondaryLabel) ? (
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
           {actionHref && actionLabel && (
-            <Link href={actionHref} className="btn-primary inline-block">
-              {actionLabel}
-            </Link>
+            <Button href={actionHref}>{actionLabel}</Button>
           )}
           {secondaryHref && secondaryLabel && (
-            <Link href={secondaryHref} className="btn-secondary inline-block">
+            <Button href={secondaryHref} variant="secondary">
               {secondaryLabel}
-            </Link>
+            </Button>
           )}
         </div>
       ) : null}
