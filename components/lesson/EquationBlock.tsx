@@ -18,13 +18,15 @@ export function looksLikeMath(equation: string): boolean {
 }
 
 function renderEquationHtml(equation: string): string | null {
-  if (!looksLikeMath(equation)) return null;
   const tex = equation.trim().replace(/^\$+|\$+$/g, "");
+  if (!tex) return null;
+  // Prefer KaTeX whenever it parses; conceptual slogans fall back to display type.
   try {
     return katex.renderToString(tex, {
       throwOnError: true,
       displayMode: true,
       output: "html",
+      strict: "ignore",
     });
   } catch {
     return null;

@@ -214,9 +214,9 @@ export const MOCK_PATH_1_LESSONS: Record<number, MockLessonContent> = {
         title: "Silence vs scale",
         caption:
           "Billions of stars suggest many chances for life; the empty sky suggests a bottleneck somewhere.",
-        equation: "Expectation ≫ Evidence",
+        equation: "N = R_* \\cdot f_p \\cdot n_e \\cdot f_l \\cdot f_i \\cdot f_c \\cdot L",
         formulaNote:
-          "The paradox is not that life is impossible — it is that our priors and observations disagree.",
+          "Drake’s terms structure the debate — each factor is uncertain; the product frames why silence is surprising.",
       },
     ],
     sources: [

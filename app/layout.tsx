@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Fraunces, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { DevPersonaToggle } from "@/components/DevPersonaToggle";
 import "./globals.css";
+/** KaTeX styles for lesson math — must load globally; client-only imports were dropped from the CSS bundle. */
+import "katex/dist/katex.min.css";
 
 /** Brand trio only (docs/BRAND.md §5): Fraunces · Plus Jakarta Sans · JetBrains Mono. */
 const fraunces = Fraunces({

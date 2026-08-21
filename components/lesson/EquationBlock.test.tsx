@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { EquationBlock } from "@/components/lesson/EquationBlock";
 
 describe("EquationBlock", () => {
-  it("renders an API visual equation and formula note when provided", () => {
-    render(
+  it("renders working equation label and formula note", () => {
+    const { container } = render(
       <EquationBlock
         visual={{
           title: "API",
@@ -15,13 +15,12 @@ describe("EquationBlock", () => {
       />,
     );
     expect(screen.getByText("Working equation")).toBeInTheDocument();
-    expect(
-      screen.getByText("Contribution margin explained simply"),
-    ).toBeInTheDocument();
     expect(screen.getByText("From payload")).toBeInTheDocument();
+    // Plain English still goes through KaTeX as identifiers when parseable.
+    expect(container.querySelector(".katex")).toBeTruthy();
   });
 
-  it("renders KaTeX markup when the equation looks like math", () => {
+  it("renders KaTeX markup for compact math", () => {
     const { container } = render(
       <EquationBlock
         visual={{
@@ -37,8 +36,8 @@ describe("EquationBlock", () => {
     expect(screen.getByText("Mass-energy")).toBeInTheDocument();
   });
 
-  it("falls back to plain text when KaTeX cannot parse the equation", () => {
-    render(
+  it("renders KaTeX for symbolic equations including plain identities", () => {
+    const { container } = render(
       <EquationBlock
         visual={{
           title: "API",
@@ -47,7 +46,21 @@ describe("EquationBlock", () => {
         }}
       />,
     );
-    expect(screen.getByText("Deal = Economics + Control")).toBeInTheDocument();
+    expect(container.querySelector(".katex")).toBeTruthy();
+  });
+
+  it("falls back to plain text when KaTeX cannot parse the equation", () => {
+    render(
+      <EquationBlock
+        visual={{
+          title: "API",
+          caption: "cap",
+          equation: "\\frac{a{b}",
+        }}
+      />,
+    );
+    expect(screen.getByText("\\frac{a{b}")).toBeInTheDocument();
+    expect(document.querySelector(".katex")).toBeNull();
   });
 
   it("renders nothing when the API visual has no equation", () => {

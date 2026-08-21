@@ -23,6 +23,11 @@ describe("brand font CSS variable wiring", () => {
     );
   });
 
+  it("imports KaTeX CSS from the root layout so math styles ship in production", () => {
+    const layout = readFileSync(join(process.cwd(), "app/layout.tsx"), "utf8");
+    expect(layout).toMatch(/katex\/dist\/katex\.min\.css/);
+  });
+
   it("defines font stacks with literal fallbacks on :root", () => {
     const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
     expect(css).toMatch(
