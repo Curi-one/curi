@@ -3,6 +3,11 @@ import { createStripeClient } from "@/lib/billing/checkout";
 import { handleStripeEvent } from "@/lib/billing/webhooks";
 import { getEnv } from "@/lib/env";
 
+/**
+ * Stripe signature verify needs the raw request body.
+ * middleware.ts matcher already excludes `/api/*`, so this Route Handler
+ * receives the unmodified body (no auth middleware buffering).
+ */
 export async function POST(request: Request) {
   const env = getEnv();
   const secret = env.STRIPE_WEBHOOK_SECRET.trim();

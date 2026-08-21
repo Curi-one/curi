@@ -45,10 +45,12 @@ After rotating: Redeploy the affected environment.
 
 ## Stripe webhook
 
+Full ops guide (Dashboard setup, Vercel env, QA, CLI, launch checklist): **[`docs/STRIPE.md`](./STRIPE.md)**.
+
 Endpoint: `POST /api/billing/webhook`
 
-- Staging: Stripe test mode webhook → `https://stage.curi.one/api/billing/webhook`
-- Production: live mode webhook → `https://www.curi.one/api/billing/webhook`
+- Staging (test mode): `https://stage.curi.one/api/billing/webhook`
+- Production (live mode): `https://www.curi.one/api/billing/webhook` (or Production URL from Vercel until custom domain is attached)
 - Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
 
 ## Staging seed

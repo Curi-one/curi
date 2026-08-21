@@ -11,6 +11,8 @@ const envSchema = z.object({
   PERPLEXITY_API_KEY: z.string().default(""),
   STRIPE_SECRET_KEY: z.string().default(""),
   STRIPE_WEBHOOK_SECRET: z.string().default(""),
+  /** Academy $10/mo recurring Price id (test or live). */
+  STRIPE_PRICE_ID: z.string().default(""),
   SENTRY_DSN: z.string().default(""),
   CRON_SECRET: z.string().default(""),
   RESEND_API_KEY: z.string().default(""),
@@ -54,6 +56,7 @@ function readRawEnv(): Record<string, string | undefined> {
     PERPLEXITY_API_KEY: process.env.PERPLEXITY_API_KEY,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    STRIPE_PRICE_ID: process.env.STRIPE_PRICE_ID,
     SENTRY_DSN: process.env.SENTRY_DSN,
     CRON_SECRET: process.env.CRON_SECRET,
     RESEND_API_KEY: process.env.RESEND_API_KEY,

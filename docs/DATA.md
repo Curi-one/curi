@@ -130,4 +130,4 @@ Explore catalogue (F3) is static in v1 — `CATALOGUE_PATHS` / `CATALOGUE_BOOKS`
 
 ## Deferred
 
-Stripe columns, flashcards, referrals, semantic similarity matching (v2 — fuzzy cache beyond exact fingerprint), DB-backed browse catalogue.
+Flashcards, referrals, semantic similarity matching (v2 — fuzzy cache beyond exact fingerprint), DB-backed browse catalogue.

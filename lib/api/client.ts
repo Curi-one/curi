@@ -231,11 +231,31 @@ export function patchPreferences(
   });
 }
 
-export function postCheckout() {
-  return apiFetch<BillingCheckoutResponse>("/api/billing/checkout", {
+export async function postCheckout(): Promise<BillingCheckoutResponse> {
+  const res = await fetch("/api/billing/checkout", {
     method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({}),
   });
+
+  let data: BillingCheckoutResponse = { url: null };
+  try {
+    data = (await res.json()) as BillingCheckoutResponse;
+  } catch {
+    // Non-JSON body — keep defaults.
+  }
+
+  if (res.ok && data.url) {
+    invalidateClientCache();
+    return data;
+  }
+
+  return {
+    url: null,
+    code: data.code ?? (res.status === 503 ? "not_configured" : "error"),
+    message: data.message,
+  };
 }
 
 export function postBillingPortal() {
