@@ -1,5 +1,7 @@
 import {
   MARK_GLYPH_FONT_SIZE,
+  markGlyphOpacity,
+  markPatternOpacity,
   topicArt,
   topicPatternStyle,
   trackMarkTier,
@@ -47,8 +49,11 @@ export function TopicThumbnail({
     >
       {showPattern ? (
         <div
-          className="absolute inset-0 opacity-[0.16]"
-          style={topicPatternStyle(art.pattern)}
+          className="absolute inset-0"
+          style={{
+            ...topicPatternStyle(art.pattern),
+            opacity: markPatternOpacity("field"),
+          }}
         />
       ) : null}
       {showGlyph ? (
@@ -56,7 +61,8 @@ export function TopicThumbnail({
           className="absolute inset-0 flex select-none items-center justify-center font-display"
           style={{
             color: glyphColor,
-            opacity: accent || tier === "small" ? 1 : 0.9,
+            opacity:
+              accent || tier === "small" ? 1 : markGlyphOpacity("field"),
             fontSize:
               tier === "small" ? `${size * 0.48}px` : MARK_GLYPH_FONT_SIZE,
             fontWeight: 300,
