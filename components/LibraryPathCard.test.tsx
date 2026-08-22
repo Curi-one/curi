@@ -1,5 +1,4 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { LibraryPathCard } from "@/components/LibraryPathCard";
 import type { PathSummary } from "@/lib/api/schemas";
@@ -56,10 +55,11 @@ describe("LibraryPathCard", () => {
       ok: true,
       courseId: path.id,
     });
-    const user = userEvent.setup();
     render(<LibraryPathCard path={path} tab="shelved" />);
-    await user.click(screen.getByRole("button", { name: "Continue" }));
-    expect(patchRestoreCourse).toHaveBeenCalledWith(path.id);
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    await vi.waitFor(() => {
+      expect(patchRestoreCourse).toHaveBeenCalledWith(path.id);
+    });
     expect(mockPush).toHaveBeenCalledWith(
       "/courses/course-shelved/lessons/2?from=library",
     );
@@ -69,9 +69,10 @@ describe("LibraryPathCard", () => {
     vi.mocked(patchRestoreCourse).mockRejectedValue(
       new ApiError("Free plan allows up to 2 active paths.", 403, "path_limit"),
     );
-    const user = userEvent.setup();
     render(<LibraryPathCard path={path} tab="shelved" />);
-    await user.click(screen.getByRole("button", { name: "Continue" }));
-    expect(mockPush).toHaveBeenCalledWith("/upgrade");
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    await vi.waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith("/upgrade");
+    });
   });
 });
