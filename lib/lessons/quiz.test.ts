@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChatCompletionResult } from "@/lib/ai/perplexity";
 import { buildFingerprint } from "@/lib/cache/fingerprint";
 import { clarificationsToMap, normalizeTopic } from "@/lib/courses/outline";
-import { getQuiz, submitQuiz } from "@/lib/lessons/quiz";
+import {
+  getQuiz,
+  shuffleQuizQuestionOptions,
+  submitQuiz,
+} from "@/lib/lessons/quiz";
 
 vi.mock("@/lib/ai/perplexity", () => ({
   quizModel: () => "sonar",
@@ -84,6 +88,47 @@ const CACHED_QUESTIONS = [
   },
 ];
 
+describe("shuffleQuizQuestionOptions", () => {
+  it("keeps the correct option string at correctIndex after shuffle", () => {
+    const q = {
+      id: "q-alpha",
+      prompt: "Which is right?",
+      options: ["right", "wrong1", "wrong2", "wrong3"],
+      correctIndex: 0,
+      explanation: "Because right.",
+    };
+    const shuffled = shuffleQuizQuestionOptions(q);
+    expect(shuffled.options[shuffled.correctIndex]).toBe("right");
+    expect(shuffled.options).toHaveLength(4);
+    expect(new Set(shuffled.options)).toEqual(new Set(q.options));
+  });
+
+  it("is deterministic for the same id+prompt", () => {
+    const q = {
+      id: "q-stable",
+      prompt: "Same prompt",
+      options: ["right", "wrong1", "wrong2", "wrong3"],
+      correctIndex: 0,
+    };
+    const a = shuffleQuizQuestionOptions(q);
+    const b = shuffleQuizQuestionOptions(q);
+    expect(a).toEqual(b);
+  });
+
+  it("does not always leave correctIndex at 0 across question ids", () => {
+    const base = {
+      prompt: "Which is right?",
+      options: ["right", "wrong1", "wrong2", "wrong3"],
+      correctIndex: 0,
+    };
+    const indices = Array.from({ length: 24 }, (_, i) =>
+      shuffleQuizQuestionOptions({ ...base, id: `q-${i}` }).correctIndex,
+    );
+    expect(indices.some((i) => i !== 0)).toBe(true);
+    expect(new Set(indices).size).toBeGreaterThan(1);
+  });
+});
+
 describe("getQuiz", () => {
   const lookup = vi.fn();
   const store = vi.fn();
@@ -128,14 +173,45 @@ describe("getQuiz", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.data.questions).toHaveLength(3);
+    const expected = shuffleQuizQuestionOptions(CACHED_QUESTIONS[0]!);
     expect(result.data.questions[0]).toMatchObject({
       id: "q1",
-      correctIndex: 0,
+      correctIndex: expected.correctIndex,
+      options: expected.options,
       explanation: "Because A.",
     });
     expect(lookup).toHaveBeenCalledWith(quizFingerprint(0));
     expect(chatCompletion).not.toHaveBeenCalled();
     expect(store).not.toHaveBeenCalled();
+  });
+
+  it("instructs the model that correct answer position must vary", async () => {
+    loadCourse.mockResolvedValueOnce({
+      kind: "pending",
+      topic: TOPIC,
+      depth: DEPTH,
+      clarifications: CLARIFICATIONS,
+      lessons: LESSONS,
+    });
+    lookup.mockResolvedValueOnce(null);
+    vi.mocked(chatCompletion).mockResolvedValueOnce(completion(QUIZ_JSON));
+
+    await getQuiz(
+      { courseId: "c1", lessonIndex: 0, sessionId: "anon-1" },
+      {
+        lookup,
+        store,
+        loadCourse,
+        upsertQuizQuestions,
+        loadBodySummary,
+        complete: chatCompletion,
+      },
+    );
+
+    const messages = vi.mocked(chatCompletion).mock.calls[0]?.[0]?.messages;
+    const joined = messages?.map((m) => m.content).join("\n") ?? "";
+    expect(joined).toMatch(/correct answer position must vary/i);
+    expect(joined).not.toContain('"correctIndex":0');
   });
 
   it("generates and stores quiz on cache miss", async () => {
@@ -206,6 +282,8 @@ describe("submitQuiz", () => {
       sources: [],
     });
 
+    const shuffled = CACHED_QUESTIONS.map((q) => shuffleQuizQuestionOptions(q));
+
     const result = await submitQuiz(
       {
         courseId: "c1",
@@ -213,9 +291,9 @@ describe("submitQuiz", () => {
         sessionId: "anon-1",
         request: {
           answers: [
-            { questionId: "q1", selectedIndex: 0 },
+            { questionId: "q1", selectedIndex: shuffled[0]!.correctIndex },
             { questionId: "q2", selectedIndex: 0 },
-            { questionId: "q3", selectedIndex: 1 },
+            { questionId: "q3", selectedIndex: shuffled[2]!.correctIndex },
           ],
           lessonFeel: "too_hard",
         },
@@ -238,9 +316,11 @@ describe("submitQuiz", () => {
       questionId: "q1",
       correct: true,
       explanation: "Because A.",
-      correctIndex: 0,
+      correctIndex: shuffled[0]!.correctIndex,
     });
-    expect(result.data.feedback[1].correct).toBe(false);
+    expect(result.data.feedback[1].correct).toBe(
+      0 === shuffled[1]!.correctIndex,
+    );
     expect(persistFeel).toHaveBeenCalledWith(
       expect.objectContaining({
         lessonFeel: "too_hard",

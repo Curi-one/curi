@@ -71,13 +71,15 @@ Output JSON (cache type: `lesson_body`):
 
 | Field | Required | Notes |
 |---|---|---|
-| `body` | Yes | Markdown string; shown as-is after blank-line paragraph split |
+| `body` | Yes | Markdown string; must end with `## Summary` (2–4 sentences). Shown as-is after blank-line paragraph split |
 | `sources` | Yes | `{ title, url }[]` — also merge `search_results` |
-| `takeaways` | Yes | Exactly **3** key takeaways for “things from this lesson” |
+| `takeaways` | Yes | Exactly **3** key takeaways for “things from this lesson” (JSON field; not inside body) |
 | `shareableFact` | Yes | `{ fact, reflection }` tied to lesson + broader path topic |
-| `visuals` | When helpful | 0–3 `{ title, caption, equation?, formulaNote?, imageUrl? }` |
+| `visuals` | When helpful | Prefer 1–2 when a diagram/chart/map/formula/image clarifies a concept. `{ title, caption, equation?, formulaNote?, imageUrl? }` — skip caption-only (no equation, no imageUrl). `imageUrl` only real public https URLs |
 
-Reader uses API takeaways / shareable fact / visuals when present; curated fallbacks only for older cache rows missing those fields.
+Path progression (additive with feel modifiers): early lessons = foundations; mid = mechanisms/worked examples; late = synthesis/mastery tone so each step feels smarter than the last.
+
+Reader uses API takeaways / shareable fact / visuals when present; curated fallbacks only for older cache rows missing those fields. UI renders `LessonImage` only when `imageUrl` is set; `EquationBlock` when `equation` is set.
 
 Modifier mapping: see CONTENT-CACHE.md.
 
@@ -87,10 +89,10 @@ Modifier mapping: see CONTENT-CACHE.md.
 
 Two parts in the **UI flow** (see FLOWS.md):
 
-1. **MCQ** — Perplexity-generated; cache type `quiz`; per-answer feedback + sources.  
+1. **MCQ** — Perplexity-generated; cache type `quiz`; per-answer feedback + sources. Options are **shuffled server-side** on read (deterministic per question id) so the correct answer is not always A — including for cached quizzes.  
 2. **Lesson feel** — app UI only; no LLM; stored on `lesson_activity`.
 
-Quiz generation input: lesson title, topic, body summary. Cache key: fingerprint without difficulty modifier.
+Quiz generation input: lesson title, topic, body summary. Cache key: fingerprint without difficulty modifier. Prompt instructs that correct answer position must vary.
 
 ---
 

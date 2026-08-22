@@ -494,12 +494,29 @@ function parseLessonBodyJson(
   }
 }
 
+function pathProgressionHint(
+  lessonIndex: number,
+  totalLessons: number,
+): string {
+  const total = Math.max(totalLessons, 1);
+  const position = lessonIndex / Math.max(total - 1, 1);
+  const step = `Lesson ${lessonIndex + 1} of ${total}.`;
+  if (total === 1 || position <= 0.34) {
+    return `${step} Early path — foundations, definitions, and intuition. Make the learner feel oriented.`;
+  }
+  if (position <= 0.67) {
+    return `${step} Mid path — mechanisms, connections, and worked examples. Make the learner feel more capable than the previous lesson.`;
+  }
+  return `${step} Late path — synthesis, edge cases, and “you can now…” mastery tone. Make the learner feel ready to use this knowledge.`;
+}
+
 function buildMessages(input: {
   topic: string;
   depth: DepthSlug;
   clarifications: ClarificationItem[];
   lessonIndex: number;
   lessonTitle: string;
+  totalLessons: number;
   modifier: DifficultyModifier;
   learningProfile: LearningProfile;
 }): PerplexityMessage[] {
@@ -514,13 +531,16 @@ function buildMessages(input: {
     `Depth band: ${input.depth}`,
     `Lesson index: ${input.lessonIndex} (0-based)`,
     `Lesson title: ${input.lessonTitle}`,
+    `Path length: ${input.totalLessons} lessons`,
+    pathProgressionHint(input.lessonIndex, input.totalLessons),
     `Difficulty modifier: ${input.modifier}`,
     `Modifier instruction: ${MODIFIER_HINTS[input.modifier]}`,
     lengthHint,
     ...learningProfilePromptLines(input.learningProfile),
     "Write the lesson body as proper markdown (paragraphs separated by blank lines; short ##/### headings sparingly; lists when useful; inline $...$ and block $$...$$ for equations when helpful).",
+    "Always end the markdown body with a ## Summary section (2–4 sentences) that synthesizes what the learner should now understand — even for short lessons. Takeaways stay in the separate JSON field (not inside body).",
+    "Prefer 1–2 visuals when a diagram, chart, map, formula figure, or concrete image clarifies the concept (not decorative). Do not emit caption-only visuals with no equation and no imageUrl.",
     "Also return exactly 3 takeaways and 1 shareableFact tied to this lesson and the broader path topic.",
-    "Add visuals (0–3) only when a figure, diagram caption, or equation materially helps understanding (visuals[].equation can accompany in-body math).",
     "Return ONLY valid JSON matching the schema in the system message.",
   ];
 
@@ -554,10 +574,12 @@ Return ONLY valid JSON (no markdown fences, no commentary) matching:
 
 Rules:
 - body is the teaching content: proper markdown. Use short ## / ### headings sparingly, lists when useful, and inline $...$ / block $$...$$ for equations when helpful (in addition to visuals[].equation). Separate short paragraphs with blank lines. The app renders markdown (GFM + math). Do not put takeaways inside body.
+- body MUST end with a ## Summary section (2–4 sentences) synthesizing what the learner should now understand. Always include Summary, even for short lessons.
+- Escalate depth across the path: early = foundations/definitions/intuition; mid = mechanisms/connections/worked examples; late = synthesis/edge cases/mastery (“you can now…”). Each lesson should make the reader feel more capable than the previous one. Feel modifiers still apply on top.
 - Stay on the lesson title; use the path topic for broader context only.
-- takeaways: exactly 3 memorable, concrete insights from THIS lesson (not generic advice).
+- takeaways: exactly 3 memorable, concrete insights from THIS lesson (not generic advice). Keep them in the JSON field only.
 - shareableFact: one punchy fact + short reflection clearly related to the lesson and/or broader path topic — suitable to share on social.
-- visuals: omit or [] when text alone is enough. When helpful, include title+caption; add equation/formulaNote for formulas. For visuals[].equation use bare TeX only (e.g. \\frac{a}{b} or E=mc^2) — do NOT wrap in \\[ \\], \\( \\), or $ delimiters. imageUrl only if a real public https image URL would help (never invent broken URLs).
+- visuals: prefer 1–2 when a diagram, chart, map, formula figure, or concrete image clarifies a concept. Omit or [] when text alone is enough. Never emit a visual that is only title/caption with no equation and no imageUrl (those become empty visual notes). For formulas use visuals[].equation (bare TeX only, e.g. \\frac{a}{b} or E=mc^2 — do NOT wrap in \\[ \\], \\( \\), or $ delimiters) and/or body math; those render as equation blocks, not fake images. imageUrl only if a real public https URL that depicts the concept (never invent broken URLs; omit imageUrl rather than fake).
 - Prefer accurate, source-backed claims.`,
     },
     { role: "user", content: lines.join("\n") },
@@ -729,6 +751,7 @@ export async function getLessonBody(
       clarifications: course.clarifications,
       lessonIndex: params.lessonIndex,
       lessonTitle: lesson.title,
+      totalLessons: course.lessons.length,
       modifier,
       learningProfile,
     }),

@@ -1053,6 +1053,8 @@ body {
   .quiz-opt .letter {
     font-family: var(--font-mono-stack);
     font-size: var(--text-mono-sm);
+    line-height: var(--leading-normal);
+    min-width: 1.25rem;
     color: var(--color-text-tertiary);
     flex-shrink: 0;
   }
@@ -1060,6 +1062,7 @@ body {
   .quiz-opt .text {
     font-size: var(--text-ui-md);
     font-weight: var(--weight-light);
+    line-height: var(--leading-normal);
     color: var(--color-text-primary);
   }
 

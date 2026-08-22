@@ -161,9 +161,62 @@ function sourceFromRefs(refs: unknown): Source | undefined {
   return undefined;
 }
 
+/** FNV-1a 32-bit hash for a stable shuffle seed. */
+function hashSeed(input: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/** Mulberry32 PRNG — deterministic from seed. */
+function mulberry32(seed: number): () => number {
+  let a = seed;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Deterministic Fisher–Yates shuffle keyed by question id + prompt.
+ * Same cached question always yields the same option order; different ids
+ * vary correctIndex so the correct answer is not stuck at A.
+ */
+export function shuffleQuizQuestionOptions<
+  T extends {
+    id: string;
+    prompt: string;
+    options: string[];
+    correctIndex: number;
+  },
+>(q: T): T {
+  const n = q.options.length;
+  if (n <= 1) return q;
+
+  const indices = Array.from({ length: n }, (_, i) => i);
+  const rand = mulberry32(hashSeed(`${q.id}\0${q.prompt}`));
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    const tmp = indices[i]!;
+    indices[i] = indices[j]!;
+    indices[j] = tmp;
+  }
+
+  const options = indices.map((i) => q.options[i]!);
+  const correctIndex = indices.indexOf(q.correctIndex);
+  return { ...q, options, correctIndex };
+}
+
 function toQuizResponse(questions: QuizQuestionPayload[]): QuizResponse {
   return {
-    questions: questions.map((q) => {
+    questions: questions.map((raw) => {
+      const q = shuffleQuizQuestionOptions(raw);
       const source = sourceFromRefs(q.source_refs);
       const item = {
         id: q.id,
@@ -225,7 +278,8 @@ function buildQuizMessages(input: {
     "Body summary:",
     input.bodySummary,
     "Generate 3–5 multiple-choice questions that test this lesson only.",
-    'Return ONLY valid JSON: {"questions":[{"id":"q1","prompt":"...","options":["a","b","c","d"],"correctIndex":0,"explanation":"..."}]}',
+    'Return ONLY valid JSON: {"questions":[{"id":"q1","prompt":"...","options":["a","b","c","d"],"correctIndex":number,"explanation":"..."}]}',
+    "Correct answer position must vary across questions; never put every correct answer at index 0.",
   ];
 
   if (input.clarifications.length > 0) {
@@ -244,6 +298,7 @@ Return ONLY valid JSON (no markdown fences) with 3–5 questions:
 
 Rules:
 - correctIndex is 0-based into options.
+- Correct answer position must vary; never put every correct answer at index 0.
 - explanation must say why the correct answer is right (1–2 sentences).
 - Stay within the lesson; do not quiz the whole path.`,
     },
@@ -678,7 +733,8 @@ export async function submitQuiz(
     return { ok: false, code: "not_found", message: "Quiz not found" };
   }
 
-  const feedback = hit.payload.questions.map((q) => {
+  const feedback = hit.payload.questions.map((raw) => {
+    const q = shuffleQuizQuestionOptions(raw);
     const answer = params.request.answers.find((a) => a.questionId === q.id);
     const selectedIndex = answer?.selectedIndex ?? -1;
     return {

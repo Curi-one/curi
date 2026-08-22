@@ -203,7 +203,8 @@ describe("LessonReader", () => {
             {
               title: "API visual title",
               caption: "API visual caption",
-              equation: "API = Visual × Equation",
+              imageUrl: "https://example.com/diagram.png",
+              equation: "API = Visual \\times Equation",
             },
           ],
         }}
@@ -220,7 +221,59 @@ describe("LessonReader", () => {
       screen.getByText(/API shareable fact about this lesson/),
     ).toBeInTheDocument();
     expect(screen.getByText("API visual title")).toBeInTheDocument();
+    expect(screen.queryByText("Visual note")).not.toBeInTheDocument();
     expect(screen.getByText("Working equation")).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "API visual title" }),
+    ).toHaveAttribute("src", "https://example.com/diagram.png");
+  });
+
+  it("renders equation-only visuals without a glyph LessonImage card", () => {
+    render(
+      <LessonReader
+        lesson={{
+          ...lesson,
+          visuals: [
+            {
+              title: "Equation only",
+              caption: "Should not become a visual note card",
+              equation: "E = mc^2",
+            },
+          ],
+        }}
+        lessonIndex={0}
+        topic="Physics"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Working equation")).toBeInTheDocument();
+    expect(screen.queryByText("Equation only")).not.toBeInTheDocument();
+    expect(screen.queryByText("Visual note")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("lesson-image-fallback")).not.toBeInTheDocument();
+  });
+
+  it("skips caption-only visuals with no image and no equation", () => {
+    render(
+      <LessonReader
+        lesson={{
+          ...lesson,
+          visuals: [
+            {
+              title: "Empty visual note",
+              caption: "Caption with nothing to show",
+            },
+          ],
+        }}
+        lessonIndex={0}
+        topic="Topic"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText("Empty visual note")).not.toBeInTheDocument();
+    expect(screen.queryByText("Visual note")).not.toBeInTheDocument();
+    expect(screen.queryByText("Working equation")).not.toBeInTheDocument();
   });
 
   it("does not show any visual when the API returns no visuals, regardless of topic", () => {
