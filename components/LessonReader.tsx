@@ -26,6 +26,7 @@ import {
   saveReaderSettings,
   type ReaderSettings,
 } from "@/lib/lessons/reader-settings";
+import { quizCtaCopy } from "@/lib/lessons/quiz-cta";
 
 type Props = {
   lesson: LessonResponse;
@@ -91,6 +92,11 @@ export function LessonReader({
   const useApiVisuals = apiVisuals.length > 0;
   const shareable = lesson.shareableFact;
   const bodyMarkdown = lesson.body.join("\n\n");
+  const quizCta = quizCtaCopy(
+    lesson.title,
+    topicLabel || lesson.title,
+    lessonIndex,
+  );
 
   const theme =
     READER_THEMES.find((t) => t.id === settings.theme) ?? READER_THEMES[0];
@@ -557,7 +563,7 @@ export function LessonReader({
           </header>
 
           {takeaways.length > 0 && (
-            <div className="mt-6 border-t border-border">
+            <div className="mt-6">
               <button
                 id="lesson-takeaways-trigger"
                 type="button"
@@ -600,10 +606,8 @@ export function LessonReader({
             </div>
           )}
 
-          <div className="mb-8 h-px bg-border" />
-
           <div
-            className="space-y-8 text-ink"
+            className="pt-8 text-ink"
             style={{
               fontFamily: fontCfg.family,
               fontSize: sizeCfg.size,
@@ -617,14 +621,23 @@ export function LessonReader({
                 onCitationClick={handleCitationClick}
               />
             ) : null}
-            {renderVisualsAndShareable()}
+            {(useApiVisuals || shareable) && (
+              <div
+                className={`divide-y divide-border ${bodyMarkdown ? "mt-10 border-t border-border pt-10" : ""}`}
+              >
+                {renderVisualsAndShareable()}
+              </div>
+            )}
           </div>
         </article>
 
         <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md md:left-[84px]">
           <div className="mx-auto w-full max-w-content">
+            <p className="mb-2.5 text-center font-ui text-ui-3xs leading-snug text-ink-muted">
+              {quizCta.hint}
+            </p>
             <Button onClick={onStartQuiz} className="w-full">
-              Take the quiz
+              {quizCta.label}
             </Button>
           </div>
         </div>

@@ -15,7 +15,7 @@ export function LessonImage({ visual }: Props) {
   const art = topicArt(title);
 
   return (
-    <figure className="my-10 border-y border-border py-6">
+    <figure className="py-10">
       <div className="grid gap-6 lg:grid-cols-[0.72fr_1fr] lg:items-stretch">
         <div className="relative min-h-[200px] overflow-hidden rounded-none border border-border bg-paper-secondary">
           {imageUrl ? (

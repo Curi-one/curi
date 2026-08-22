@@ -30,7 +30,7 @@ describe("LessonReader", () => {
     document.documentElement.removeAttribute("style");
     document.body.removeAttribute("style");
   });
-  it("renders title, Sources, and Take the quiz from API data alone", () => {
+  it("renders title, Sources, and quiz CTA from API data alone", () => {
     render(
       <LessonReader
         lesson={lesson}
@@ -49,9 +49,10 @@ describe("LessonReader", () => {
     expect(
       screen.getByRole("button", { name: /sources/i }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /take the quiz/i }),
-    ).toBeInTheDocument();
+    const quizButton = screen.getByRole("button", {
+      name: /prove it|connect the dots|stress-test|explain it to a friend|what would you do|still curious/i,
+    });
+    expect(quizButton).toBeInTheDocument();
   });
 
   it("renders markdown body content in order with no peeled-off 'So what?' section", () => {
