@@ -32,7 +32,7 @@ export function TabBar() {
               className={`focus-ring relative flex h-12 flex-1 flex-col items-center justify-center gap-0.5 text-ui-4xs tracking-wide transition-colors duration-200 ${
                 active
                   ? "font-medium text-ink"
-                  : "text-ink-muted hover:bg-ink/[0.04] hover:text-ink/80"
+                  : "text-ink-muted hover:bg-highlight hover:text-ink/80"
               }`}
             >
               {active && (

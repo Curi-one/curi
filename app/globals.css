@@ -24,6 +24,19 @@
   --color-white-tone: #fafafa; /* primary page background */
   --color-pale: #eeeeee; /* tertiary / hover */
 
+  /* Dark chrome — Cursor-like dull gray (remapped via html.dark only) */
+  --color-dark-bg: #1e1e1e;
+  --color-dark-bg-2: #252526;
+  --color-dark-bg-3: #2d2d2d;
+  --color-dark-fg: #cccccc;
+  --color-dark-fg-muted: #9d9d9d;
+  --color-dark-fg-faint: #6e6e6e;
+  --color-dark-border: #333333;
+  --color-dark-border-strong: #454545;
+  --color-dark-inverse: #d4d4d4;
+  --color-dark-inverse-2: #bdbdbd;
+  --color-dark-inverse-fg: #1e1e1e;
+
   /* Background */
   --color-bg-primary: var(--color-white-tone);
   --color-bg-secondary: var(--color-paper-tone);
@@ -211,27 +224,39 @@
   --color-streak: var(
     --color-text-primary
   ); /* default streak tone; multi-day heat uses .streak-heat-* → accent */
+
+  /* Overlays & subtle fills — theme-aware */
+  --color-scrim: color-mix(in srgb, var(--mark-field) 35%, transparent);
+  --color-scrim-heavy: color-mix(in srgb, var(--mark-field) 55%, transparent);
+  --color-highlight: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+  --color-highlight-strong: color-mix(
+    in srgb,
+    var(--color-text-primary) 10%,
+    transparent
+  );
 }
 
-/* Dark chrome — remapped onto neutral Ink tones. */
+/* Dark chrome — dull gray, not near-black (Cursor-like). */
 html.dark {
-  --color-bg-primary: var(--color-ink);
-  --color-bg-secondary: var(--color-ink-2);
-  --color-bg-tertiary: var(--color-ink-3);
-  --color-text-primary: var(--color-white-tone);
-  --color-text-secondary: var(--color-silver);
-  --color-text-tertiary: var(--color-mid);
-  --color-border-subtle: var(--color-ink-3);
-  --color-border-default: var(--color-mid);
-  --color-border-strong: var(--color-white-tone);
-  --color-text-inverse: var(--color-ink);
-  --color-bg-inverse: var(--color-white-tone);
-  --color-bg-inverse-2: var(--color-paper-tone);
-  --color-correct-text: var(--color-ink);
+  color-scheme: dark;
+  --color-bg-primary: var(--color-dark-bg);
+  --color-bg-secondary: var(--color-dark-bg-2);
+  --color-bg-tertiary: var(--color-dark-bg-3);
+  --color-text-primary: var(--color-dark-fg);
+  --color-text-secondary: var(--color-dark-fg-muted);
+  --color-text-tertiary: var(--color-dark-fg-faint);
+  --color-border-subtle: var(--color-dark-border);
+  --color-border-default: var(--color-dark-border-strong);
+  --color-border-strong: var(--color-dark-fg-faint);
+  --color-text-inverse: var(--color-dark-inverse-fg);
+  --color-bg-inverse: var(--color-dark-inverse);
+  --color-bg-inverse-2: var(--color-dark-inverse-2);
+  --color-bg-inverse-3: var(--color-mid);
+  --color-correct-text: var(--color-dark-inverse-fg);
 }
 
 html {
-  background: var(--color-ink);
+  background: var(--color-bg-primary);
 }
 
 body {
@@ -612,7 +637,7 @@ body {
     left: 0;
     top: 1rem;
     width: 2px;
-    background: var(--color-ink);
+    background: var(--color-text-primary);
     opacity: 0.3;
     transition: opacity 300ms var(--ease-out);
   }
@@ -966,13 +991,18 @@ body {
     width: 2.25rem;
     height: 1.25rem;
     border-radius: var(--radius-none);
-    background: color-mix(in srgb, var(--color-ink) 18%, var(--color-bg-tertiary));
-    box-shadow: inset 0 1px 2px color-mix(in srgb, var(--color-ink) 12%, transparent);
+    background: color-mix(
+      in srgb,
+      var(--color-text-primary) 18%,
+      var(--color-bg-tertiary)
+    );
+    box-shadow: inset 0 1px 2px
+      color-mix(in srgb, var(--color-text-primary) 12%, transparent);
     transition: background-color var(--duration-small) var(--ease-standard);
   }
 
   .setting-toggle-track.is-checked {
-    background: var(--color-ink);
+    background: var(--color-text-primary);
   }
 
   .setting-toggle-thumb {
@@ -983,7 +1013,8 @@ body {
     height: 0.875rem;
     border-radius: var(--radius-none);
     background: var(--color-bg-primary);
-    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-ink) 18%, transparent);
+    box-shadow: 0 1px 2px
+      color-mix(in srgb, var(--color-text-primary) 18%, transparent);
     transform: translateX(0);
     transition:
       transform var(--duration-small) var(--ease-out),
@@ -1721,7 +1752,7 @@ body {
   .pattern-ledger {
     background-image: repeating-linear-gradient(
       to bottom,
-      var(--color-light) 0 1px,
+      var(--color-border-subtle) 0 1px,
       transparent 1px 34px
     );
   }
@@ -1729,7 +1760,7 @@ body {
   .pattern-columns {
     background-image: repeating-linear-gradient(
       to right,
-      var(--color-light) 0 1px,
+      var(--color-border-subtle) 0 1px,
       transparent 1px calc(100% / 12)
     );
   }
@@ -1753,7 +1784,7 @@ body {
     opacity: 0.16;
     background-image: repeating-linear-gradient(
       115deg,
-      var(--color-ink) 0 1px,
+      var(--color-text-primary) 0 1px,
       transparent 1px 9px
     );
     pointer-events: none;
@@ -1794,12 +1825,12 @@ body {
     background-image:
       repeating-linear-gradient(
         to bottom,
-        var(--color-light) 0 1px,
+        var(--color-border-subtle) 0 1px,
         transparent 1px 16px
       ),
       repeating-linear-gradient(
         to right,
-        var(--color-light) 0 1px,
+        var(--color-border-subtle) 0 1px,
         transparent 1px 16px
       );
   }
@@ -1812,7 +1843,7 @@ body {
     width: 141.4%;
     top: 50%;
     left: 50%;
-    background: var(--color-ink);
+    background: var(--color-text-primary);
     opacity: 0.3;
     pointer-events: none;
   }
@@ -2102,7 +2133,7 @@ body {
   inset-block: 0;
   left: 0;
   width: 2px;
-  background: var(--color-ink);
+  background: var(--color-text-primary);
   transform: scaleY(0);
   transform-origin: top;
   transition: transform var(--duration-medium) var(--ease-out);
@@ -2153,8 +2184,8 @@ body {
 }
 
 .today-action-card:hover .today-action-arrow {
-  border-color: var(--color-ink);
-  color: var(--color-ink);
+  border-color: var(--color-text-primary);
+  color: var(--color-text-primary);
   transform: translateX(3px);
 }
 
@@ -2223,7 +2254,7 @@ body {
 }
 
 .landing-topic-wrap:focus-within {
-  border-color: var(--color-ink);
+  border-color: var(--color-text-primary);
 }
 
 .landing-topic-input {
@@ -2252,13 +2283,13 @@ body {
   align-items: center;
   justify-content: center;
   border: 0;
-  background: var(--color-ink);
-  color: var(--color-bg-primary);
+  background: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
   transition: background-color var(--duration-micro) var(--ease-out);
 }
 
 .landing-topic-submit:hover:not(:disabled) {
-  background: var(--color-ink-2);
+  background: var(--color-bg-inverse-2);
 }
 
 .landing-topic-submit:disabled {

@@ -59,7 +59,7 @@ export function LessonSourcesPanel({
   return (
     <>
       <div
-        className="sources-panel-backdrop fixed inset-0 z-40 bg-ink/20 backdrop-blur-[2px] md:left-[var(--sidebar-width)]"
+        className="sources-panel-backdrop fixed inset-0 z-40 bg-scrim backdrop-blur-[2px] md:left-[var(--sidebar-width)]"
         onClick={onClose}
         aria-hidden
       />

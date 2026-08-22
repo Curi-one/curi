@@ -73,7 +73,7 @@ export function ProgressPathRow({ path, mastered = false }: Props) {
             {path.topic}
           </p>
           {mastered && (
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center bg-ink/[0.06] ring-1 ring-border">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center bg-highlight ring-1 ring-border">
               <Trophy className="h-3 w-3 text-ink-muted" strokeWidth={2.2} aria-hidden />
             </span>
           )}

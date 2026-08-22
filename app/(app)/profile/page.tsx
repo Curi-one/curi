@@ -37,18 +37,13 @@ import {
   SEQ_OPTIONS,
 } from "@/lib/profile/preview-samples";
 
-type Theme = "system" | "light" | "dark";
-type ProfileTab = "account" | "learning" | "email" | "plan";
+import {
+  applyAppTheme,
+  readStoredTheme,
+  type AppTheme,
+} from "@/lib/ui/app-theme";
 
-function applyTheme(theme: Theme) {
-  const root = document.documentElement;
-  if (theme === "dark") {
-    root.classList.add("dark");
-  } else {
-    root.classList.remove("dark");
-  }
-  localStorage.setItem("curi-theme", theme);
-}
+type ProfileTab = "account" | "learning" | "email" | "plan";
 
 const PLAN_FREE_ROWS = [
   { label: "Up to 2 active paths", on: true },
@@ -78,7 +73,7 @@ export default function ProfilePage() {
   const [tab, setTab] = useState<ProfileTab>("account");
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
-  const [theme, setTheme] = useState<Theme>("system");
+  const [theme, setTheme] = useState<AppTheme>("system");
   const [portalLoading, setPortalLoading] = useState(false);
   const [portalMessage, setPortalMessage] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
@@ -88,10 +83,10 @@ export default function ProfilePage() {
   const prefsFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("curi-theme") as Theme | null;
+    const stored = readStoredTheme();
     if (stored) {
       setTheme(stored);
-      applyTheme(stored);
+      applyAppTheme(stored);
     }
   }, []);
 
@@ -211,9 +206,9 @@ export default function ProfilePage() {
     router.push("/");
   }
 
-  function onThemeChange(next: Theme) {
+  function onThemeChange(next: AppTheme) {
     setTheme(next);
-    applyTheme(next);
+    applyAppTheme(next);
   }
 
   if (loading) {
@@ -577,7 +572,7 @@ export default function ProfilePage() {
                 return (
                   <li key={row} className="flex items-center gap-2.5 text-sm">
                     <span
-                      className="flex h-4 w-4 shrink-0 items-center justify-center rounded-none bg-ink/10"
+                      className="flex h-4 w-4 shrink-0 items-center justify-center rounded-none bg-highlight-strong"
                       aria-hidden
                     >
                       <Check className="h-2.5 w-2.5 stroke-[2.5] text-ink/70" />
@@ -593,7 +588,7 @@ export default function ProfilePage() {
                 >
                   <span
                     className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-none ${
-                      row.on ? "bg-ink/10" : "bg-paper-secondary"
+                      row.on ? "bg-highlight-strong" : "bg-paper-secondary"
                     }`}
                     aria-hidden
                   >

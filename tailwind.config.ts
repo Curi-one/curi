@@ -65,6 +65,10 @@ const config: Config = {
         "accent-dark": "var(--color-accent-dark)",
         // Streak is Ink, never Vermilion (§11.3)
         streak: "var(--color-streak)",
+        scrim: "var(--color-scrim)",
+        "scrim-heavy": "var(--color-scrim-heavy)",
+        highlight: "var(--color-highlight)",
+        "highlight-strong": "var(--color-highlight-strong)",
       },
       fontFamily: {
         // Brand trio only (§5) — override Tailwind defaults so `font-sans` /

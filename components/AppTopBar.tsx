@@ -40,13 +40,13 @@ export function AppTopBar({
           <>
             <Link
               href="/progress"
-              className="inline-flex h-9 items-center rounded-none px-2.5 text-xs text-ink-muted transition-colors hover:bg-ink/[0.04] hover:text-ink focus-ring"
+              className="inline-flex h-9 items-center rounded-none px-2.5 text-xs text-ink-muted transition-colors hover:bg-highlight hover:text-ink focus-ring"
             >
               Progress
             </Link>
             <Link
               href="/new"
-              className="inline-flex h-9 items-center rounded-none px-2.5 text-xs text-ink-muted transition-colors hover:bg-ink/[0.04] hover:text-ink focus-ring"
+              className="inline-flex h-9 items-center rounded-none px-2.5 text-xs text-ink-muted transition-colors hover:bg-highlight hover:text-ink focus-ring"
               aria-label="Create a new path"
             >
               New
