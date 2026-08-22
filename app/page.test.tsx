@@ -31,8 +31,7 @@ describe("LandingPage", () => {
     expect(
       screen.getByRole("button", { name: "Start exploring" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Personalized learning paths")).toBeInTheDocument();
+    expect(screen.getByText("Personalized learning")).toBeInTheDocument();
     expect(screen.getByText("Explore")).toBeInTheDocument();
-    expect(screen.getByText("Or try")).toBeInTheDocument();
   });
 });

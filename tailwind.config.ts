@@ -33,11 +33,23 @@ const config: Config = {
     extend: {
       colors: {
         // Greyscale — eight tones (§4.2)
-        ink: "var(--color-ink)",
+        // `ink` is the PRIMARY-TEXT ROLE, not the raw #0A0908 tone. It has to
+        // flip with the theme: bound to the tone, `text-ink` rendered
+        // Ink-on-Ink in dark mode and every heading on every screen vanished.
+        // Because --color-text-primary and --color-bg-inverse resolve to the
+        // same value in both themes, `bg-ink` keeps working as the inverse
+        // fill (dark chip on light, light chip on dark).
+        // Need the literal dark tone on a surface that never flips? Use the
+        // `mark-*` colours below.
+        ink: "var(--color-text-primary)",
         "ink-2": "var(--color-ink-2)",
         "ink-3": "var(--color-ink-3)",
         "ink-muted": "var(--color-ink-muted)",
         "ink-faint": "var(--color-ink-faint)",
+        // Track marks — theme-independent, never remapped by html.dark.
+        "mark-field": "var(--mark-field)",
+        "mark-fg": "var(--mark-fg)",
+        "mark-meta": "var(--mark-meta)",
         mid: "var(--color-mid)",
         silver: "var(--color-silver)",
         light: "var(--color-light)",

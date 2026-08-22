@@ -1,4 +1,5 @@
 import {
+  MARK_GLYPH_FONT_SIZE,
   topicArt,
   topicPatternStyle,
   trackMarkTier,
@@ -30,13 +31,18 @@ export function TopicThumbnail({
   if (accent) {
     glyphColor = "var(--color-accent)";
   } else if (tier === "small") {
-    glyphColor = "var(--color-silver)";
+    glyphColor = "var(--mark-meta)";
   }
 
   return (
     <div
       className="group/thumb relative shrink-0 overflow-hidden rounded-none"
-      style={{ width: size, height: size, background: art.field }}
+      style={{
+        width: size,
+        height: size,
+        background: art.field,
+        containerType: "size",
+      }}
       aria-hidden
     >
       {showPattern ? (
@@ -51,7 +57,8 @@ export function TopicThumbnail({
           style={{
             color: glyphColor,
             opacity: accent || tier === "small" ? 1 : 0.9,
-            fontSize: size * (tier === "small" ? 0.48 : 0.42),
+            fontSize:
+              tier === "small" ? `${size * 0.48}px` : MARK_GLYPH_FONT_SIZE,
             fontWeight: 300,
             letterSpacing: "-0.02em",
             lineHeight: 1,
@@ -62,7 +69,7 @@ export function TopicThumbnail({
         </div>
       ) : null}
       {showPattern ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-[#C1121F] transition-transform duration-medium ease-out group-hover/thumb:scale-x-100" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-accent transition-transform duration-medium ease-out group-hover/thumb:scale-x-100" />
       ) : null}
     </div>
   );

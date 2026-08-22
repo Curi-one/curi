@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Library, Sparkles } from "lucide-react";
 import type { FeedResponse } from "@/lib/api/schemas";
 import { LessonFeedCard } from "@/components/LessonFeedCard";
+import { TodayEmptyActionCard } from "@/components/TodayEmptyActionCard";
 
 type Props = FeedResponse & {
   streak?: number;
@@ -54,52 +55,22 @@ export function TodayView({
           </p>
         </div>
 
-        <div className="space-y-3">
-          <Link
+        <div className="space-y-4">
+          <TodayEmptyActionCard
             href="/explore"
-            className="group interactive-card focus-ring flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left hover:border-ink/30"
-          >
-            <div>
-              <div className="flex items-center gap-2 font-medium text-ink">
-                <Library
-                  className="h-4 w-4 shrink-0 text-ink-muted"
-                  aria-hidden
-                />
-                Browse founder paths
-              </div>
-              <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
-                Venture capital, term sheets, SAFEs, cap tables, unit economics
-                — curated for first-time founders.
-              </p>
-            </div>
-            <ArrowRight
-              className="ml-4 h-4 w-4 shrink-0 text-ink-muted/40 transition group-hover:text-ink"
-              aria-hidden
-            />
-          </Link>
-
-          <Link
+            wallLabel="Curated library"
+            title="Browse founder paths"
+            description="Venture capital, term sheets, SAFEs, cap tables, unit economics — curated for first-time founders."
+            icon={Library}
+            primary
+          />
+          <TodayEmptyActionCard
             href="/new"
-            className="group interactive-card focus-ring flex w-full items-center justify-between border border-border bg-paper-secondary px-6 py-5 text-left hover:border-ink/30"
-          >
-            <div>
-              <div className="flex items-center gap-2 font-medium text-ink">
-                <Sparkles
-                  className="h-4 w-4 shrink-0 text-ink-muted"
-                  aria-hidden
-                />
-                Create a custom path
-              </div>
-              <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
-                Type a specific topic — best for founder-finance angles not in
-                the library yet.
-              </p>
-            </div>
-            <ArrowRight
-              className="ml-4 h-4 w-4 shrink-0 text-ink-muted/40 transition group-hover:text-ink"
-              aria-hidden
-            />
-          </Link>
+            wallLabel="Your topic"
+            title="Create a custom path"
+            description="Type a specific topic — best for founder-finance angles not in the library yet."
+            icon={Sparkles}
+          />
         </div>
       </div>
     );

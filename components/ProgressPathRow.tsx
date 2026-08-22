@@ -29,7 +29,7 @@ export function ProgressPathRow({ path, mastered = false }: Props) {
       className="group focus-ring interactive-card relative flex overflow-hidden border border-border bg-paper-secondary transition-[border-color,filter] duration-[300ms] ease-out hover:border-ink/25 hover:brightness-[1.02]"
     >
       <div
-        className="relative flex w-[4.5rem] shrink-0 flex-col justify-between overflow-hidden p-2.5 text-paper sm:w-20"
+        className="relative flex w-[4.5rem] shrink-0 items-center justify-center overflow-hidden p-2.5 text-mark-fg sm:w-20"
         style={{ background: art.field }}
       >
         <div
@@ -37,22 +37,23 @@ export function ProgressPathRow({ path, mastered = false }: Props) {
           style={topicPatternStyle(art.pattern)}
           aria-hidden
         />
-        <span className="relative z-[1] font-meta text-[8px] uppercase tracking-[0.2em] text-accent">
-          {mark.domainName}
-        </span>
+        {/* Medium tier renders glyph + pattern only — the domain label and
+            call number are large-tier chrome (TRACK-MARKS.md size tiers), and
+            at 8px in a 72px field they were both cramped and, in Vermilion,
+            spending the screen's accent budget once per row. */}
         <span
-          className="relative z-[1] select-none font-display text-2xl font-light italic leading-none"
+          className="relative z-[1] select-none font-display text-3xl font-light italic leading-none"
           style={{ color: art.glyphColor }}
           aria-hidden
         >
           {art.glyph}
         </span>
         <div
-          className="absolute inset-x-0 bottom-0 z-[2] h-[2px] bg-white/15"
+          className="absolute inset-x-0 bottom-0 z-[2] h-[2px] bg-mark-fg/15"
           aria-hidden
         >
           <div
-            className="h-full bg-accent transition-all duration-500 ease-out"
+            className="h-full bg-mark-fg/75 transition-all duration-500 ease-out"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -70,7 +71,7 @@ export function ProgressPathRow({ path, mastered = false }: Props) {
           )}
         </div>
         <p className="mt-1 font-meta text-[10px] tracking-[0.12em] text-ink-muted">
-          {mark.call}
+          {mark.domainName} · {mark.call}
         </p>
         <p className="mt-2 font-meta text-[10px] uppercase tracking-[0.14em] text-ink-faint">
           {mastered
@@ -79,7 +80,7 @@ export function ProgressPathRow({ path, mastered = false }: Props) {
         </p>
         <div className="mt-2.5 h-[2px] overflow-hidden bg-paper-tertiary">
           <div
-            className="h-full bg-accent transition-all duration-700 ease-out"
+            className="h-full bg-ink transition-all duration-700 ease-out"
             style={{ width: `${pct}%` }}
           />
         </div>

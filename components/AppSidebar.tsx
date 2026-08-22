@@ -104,7 +104,7 @@ export function AppSidebar() {
 
   return (
     <aside
-      className="relative hidden h-screen w-[84px] shrink-0 flex-col border-r border-border/70 bg-paper-secondary md:flex"
+      className="relative hidden h-screen w-[84px] shrink-0 flex-col border-r border-border/70 bg-paper md:flex"
       aria-label="Primary"
     >
       <div className="flex justify-center px-3 pb-4 pt-5">

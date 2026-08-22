@@ -4,11 +4,9 @@ export const FOUNDER_HEADLINE_SUBJECTS = [
   "term sheets",
   "SAFE notes",
   "cap tables",
-  "venture capital",
+  "fundraising",
+  "dilution",
   "unit economics",
-  "liquidation preferences",
-  "founder dilution",
-  "investor meetings",
 ] as const;
 
 export const FOUNDER_TOPIC_SUGGESTIONS = [

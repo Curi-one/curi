@@ -31,3 +31,4 @@ coverage/
 # IDE
 .idea/
 .vscode/
+.env*

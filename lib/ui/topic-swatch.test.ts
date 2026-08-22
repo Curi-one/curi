@@ -143,9 +143,19 @@ describe("topicArt", () => {
     const art = topicArt("Calculus");
     expect(art.glyph).toBe(mark.glyph);
     expect(art.pattern).toBe(mark.pattern);
-    expect(art.field.toUpperCase()).toBe("#0A0908");
-    expect(art.glyphColor.toUpperCase()).toBe("#FAF9F5");
     expect(art.align).toBe("br");
+    // Theme-independent mark tokens, with the literal tone as fallback. A
+    // track mark is a dark Ink field in BOTH themes, so it must not resolve
+    // through a token that html.dark remaps.
+    expect(art.field).toBe("var(--mark-field, #0A0908)");
+    expect(art.glyphColor).toBe("var(--mark-fg, #FAF9F5)");
+  });
+
+  it("never resolves the field through a theme-flipping token", () => {
+    const art = topicArt("Calculus");
+    for (const value of [art.field, art.glyphColor]) {
+      expect(value).not.toMatch(/--color-(paper|bg-primary|text-primary)/);
+    }
   });
 
   it("is deterministic", () => {
@@ -159,7 +169,7 @@ describe("topicSwatch", () => {
     const art = topicArt("Constitutional Law");
     expect(field).toBe(art.field);
     expect(glyphColor).toBe(art.glyphColor);
-    expect(glyphColor.toUpperCase()).toBe("#FAF9F5");
+    expect(glyphColor).toBe("var(--mark-fg, #FAF9F5)");
   });
 
   it("is deterministic", () => {

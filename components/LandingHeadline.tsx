@@ -37,7 +37,7 @@ export function LandingHeadline() {
 
   return (
     <h1
-      className="font-display display-hero text-display-xs tracking-tight break-words text-ink sm:text-display-md"
+      className="landing-headline font-display display-hero text-display-sm tracking-tight break-words text-ink sm:text-display-lg"
       style={{
         lineHeight: 1.1,
       }}

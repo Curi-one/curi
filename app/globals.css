@@ -187,6 +187,19 @@
   /* Legacy alias — `--ease-spring` is `--ease-out`. Prefer --ease-out. */
   --ease-spring: var(--ease-out);
 
+  /* ── Theme-independent surfaces ────────────────────────────────────────
+     Track marks (docs/TRACK-MARKS.md) are ALWAYS a dark Ink field, in either
+     theme — the mark is subject identity, not page chrome. Anything drawn on
+     one must therefore use a tone that never flips.
+
+     Using `text-paper` on a mark is the bug this prevents: `paper` resolves to
+     the page background, which becomes Ink in dark mode, so the label turned
+     Ink-on-Ink and vanished. These four are raw tones by definition and are
+     deliberately NOT remapped in `html.dark`. */
+  --mark-field: var(--color-ink);
+  --mark-fg: var(--color-white-tone);
+  --mark-meta: var(--color-silver);
+
   /* ── Tailwind utility aliases (see tailwind.config.ts) ─────────────────── */
   --color-paper: var(--color-bg-primary);
   --color-paper-secondary: var(--color-bg-secondary);
@@ -901,8 +914,10 @@ body {
     z-index: 1;
   }
 
+  /* Today is the single Vermilion beat on this screen (§1.2). The ramp below
+     is monochrome so this one marker carries the accent budget alone. */
   .heatmap-cell-today {
-    outline: 2px solid var(--color-ink);
+    outline: 2px solid var(--color-accent);
     outline-offset: 1px;
   }
 
@@ -950,8 +965,16 @@ body {
     transform: translateX(1rem) scale(0.94);
   }
 
-  /* Colourful intensity on warm paper — tertiary → accent mixes → full accent.
-     Mixes use warm greys / ink only (never cool grey). */
+  /* Monochrome intensity ramp — density reads through VALUE, not hue
+     (§1.4: hierarchy is built through scale and weight, never colour).
+
+     This was a five-step Vermilion scale, which put the accent on every
+     active day in a 26-week grid: ~180 potential Vermilion elements on a
+     screen whose budget is one (§1.2), and it made the streak Vermilion,
+     which UX-PRINCIPLES forbids outright.
+
+     Both ends are semantic tokens, so the ramp inverts correctly in dark
+     mode: empty stays the recessive surface, full becomes the primary tone. */
   .heatmap-cell-0 {
     background: var(--color-bg-tertiary);
   }
@@ -959,41 +982,63 @@ body {
   .heatmap-cell-1 {
     background: color-mix(
       in srgb,
-      var(--color-accent) 28%,
+      var(--color-text-primary) 20%,
       var(--color-bg-tertiary)
     );
   }
 
   .heatmap-cell-2 {
-    background: color-mix(in srgb, var(--color-accent) 48%, var(--color-light));
+    background: color-mix(
+      in srgb,
+      var(--color-text-primary) 42%,
+      var(--color-bg-tertiary)
+    );
   }
 
   .heatmap-cell-3 {
-    background: color-mix(in srgb, var(--color-accent) 72%, var(--color-ink-3));
+    background: color-mix(
+      in srgb,
+      var(--color-text-primary) 68%,
+      var(--color-bg-tertiary)
+    );
   }
 
   .heatmap-cell-4 {
-    background: var(--color-accent);
+    background: var(--color-text-primary);
   }
 
+
+  /* Showcase dark panel — same monochrome ramp, inverted onto the Ink field. */
   .ds-panel-dark .heatmap-cell-0 {
     background: var(--color-ink-3);
   }
 
   .ds-panel-dark .heatmap-cell-1 {
-    background: color-mix(in srgb, var(--color-accent) 35%, var(--color-ink-3));
+    background: color-mix(
+      in srgb,
+      var(--color-white-tone) 22%,
+      var(--color-ink-3)
+    );
   }
 
   .ds-panel-dark .heatmap-cell-2 {
-    background: color-mix(in srgb, var(--color-accent) 55%, var(--color-ink-2));
+    background: color-mix(
+      in srgb,
+      var(--color-white-tone) 45%,
+      var(--color-ink-3)
+    );
   }
 
   .ds-panel-dark .heatmap-cell-3 {
-    background: color-mix(in srgb, var(--color-accent) 80%, var(--color-ink));
+    background: color-mix(
+      in srgb,
+      var(--color-white-tone) 70%,
+      var(--color-ink-3)
+    );
   }
 
   .ds-panel-dark .heatmap-cell-4 {
-    background: var(--color-accent);
+    background: var(--color-white-tone);
   }
 
   /* ── Lesson reader · §11.1 ─────────────────────────────────────────────── */
@@ -1063,6 +1108,17 @@ body {
       padding-left: var(--grid-margin-desktop);
       padding-right: var(--grid-margin-desktop);
     }
+  }
+
+  /** Member chrome — one continuous paper canvas (same as landing). */
+  .app-main {
+    background: var(--color-bg-primary);
+    min-height: 100%;
+  }
+
+  .app-main .app-shell {
+    background: transparent;
+    min-height: 100%;
   }
 
   /* Lesson reading column (§11.1) */
@@ -1270,7 +1326,8 @@ body {
 
   .pattern-vitrine > .r3 {
     inset: 36%;
-    border-color: var(--color-ink);
+    /* Semantic: this ring sits on a theme surface, so it must flip with it. */
+    border-color: var(--color-text-primary);
   }
 
   /* Vermilion only as reveal line — never woven into pattern fills */
@@ -1392,19 +1449,214 @@ body {
   transform: scaleX(1);
 }
 
-/* Landing accent dot — opacity only, no glow ring (§16.2 no type/shape effects) */
-@keyframes landing-pulse-dot {
-  0%,
-  100% {
-    opacity: 1;
+/* Today empty-state action cards */
+.today-action-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: var(--border-subtle);
+  background: var(--color-bg-primary);
+  text-align: left;
+  transition:
+    border-color var(--duration-medium) var(--ease-out),
+    background-color var(--duration-medium) var(--ease-out);
+}
+
+.today-action-card:hover {
+  border-color: var(--color-border-default);
+  background: var(--color-bg-secondary);
+}
+
+.today-action-inner {
+  padding: var(--space-6);
+}
+
+.today-action-edge {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 2px;
+  background: var(--color-ink);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform var(--duration-medium) var(--ease-out);
+}
+
+.today-action-card:hover .today-action-edge {
+  transform: scaleY(1);
+}
+
+.today-action-card-primary:hover .today-action-edge {
+  background: var(--color-accent);
+}
+
+.today-action-icon {
+  display: flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-subtle);
+  color: var(--color-text-tertiary);
+  transition:
+    border-color var(--duration-medium) var(--ease-out),
+    color var(--duration-medium) var(--ease-out),
+    background-color var(--duration-medium) var(--ease-out);
+}
+
+.today-action-card:hover .today-action-icon {
+  border-color: var(--color-border-default);
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.today-action-arrow {
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-subtle);
+  color: var(--color-text-tertiary);
+  transition:
+    border-color var(--duration-medium) var(--ease-out),
+    color var(--duration-medium) var(--ease-out),
+    transform var(--duration-medium) var(--ease-out);
+}
+
+.today-action-card:hover .today-action-arrow {
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .today-action-edge,
+  .today-action-arrow,
+  .reveal-line {
+    transition: none;
   }
-  50% {
-    opacity: 0.4;
+
+  .today-action-card:hover .today-action-arrow {
+    transform: none;
   }
 }
 
-.landing-pulse-dot {
-  animation: landing-pulse-dot 2.4s var(--ease-standard) infinite;
+/* ── Landing (curi-v3 reference) ─────────────────────────────────────────── */
+
+.landing-kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-7);
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-mono-xs);
+  font-weight: var(--weight-regular);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.landing-kicker-dot {
+  height: 6px;
+  width: 6px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+
+.landing-headline {
+  margin-bottom: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .landing-headline {
+    margin-bottom: var(--space-8);
+  }
+}
+
+.landing-lede {
+  margin-bottom: var(--space-9, 36px);
+  max-width: 480px;
+  font-size: var(--text-ui-lg);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.landing-topic-wrap {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  margin-bottom: 14px;
+  border: var(--border-strong);
+  background: var(--color-bg-primary);
+  transition: border-color var(--duration-micro) var(--ease-out);
+}
+
+.landing-topic-wrap:focus-within {
+  border-color: var(--color-ink);
+}
+
+.landing-topic-input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  padding: var(--space-4) 18px;
+  font-family: var(--font-ui-stack);
+  font-size: 15px;
+  font-weight: var(--weight-light);
+  line-height: var(--leading-snug);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.landing-topic-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.landing-topic-submit {
+  display: flex;
+  height: 52px;
+  width: 52px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: var(--color-ink);
+  color: var(--color-bg-primary);
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+
+.landing-topic-submit:hover:not(:disabled) {
+  background: var(--color-ink-2);
+}
+
+.landing-topic-submit:disabled {
+  opacity: 0.2;
+}
+
+.landing-depth-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-5);
+  margin-bottom: var(--space-10);
+}
+
+.landing-depth-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-mono-xs);
+  font-weight: var(--weight-regular);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
 }
 
 /* ─── Generation warmup ─────────────────────────────────────────────────── */

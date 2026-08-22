@@ -1,5 +1,9 @@
 import type { LessonVisualBlock } from "@/lib/api/schemas";
-import { topicArt, topicPatternStyle } from "@/lib/ui/topic-swatch";
+import {
+  MARK_GLYPH_FONT_SIZE,
+  topicArt,
+  topicPatternStyle,
+} from "@/lib/ui/topic-swatch";
 
 type Props = {
   /** Visual returned by the lesson API / Perplexity. Prefer calling with imageUrl. */
@@ -24,7 +28,7 @@ export function LessonImage({ visual }: Props) {
           ) : (
             <div
               className="absolute inset-0"
-              style={{ background: art.field }}
+              style={{ background: art.field, containerType: "size" }}
               data-testid="lesson-image-fallback"
               aria-hidden
             >
@@ -37,7 +41,7 @@ export function LessonImage({ visual }: Props) {
                 style={{
                   color: art.glyphColor,
                   opacity: 0.9,
-                  fontSize: "7.5rem",
+                  fontSize: MARK_GLYPH_FONT_SIZE,
                   fontWeight: 300,
                   lineHeight: 0.78,
                   fontStyle: "italic",
