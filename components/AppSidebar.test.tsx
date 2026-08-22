@@ -15,6 +15,8 @@ vi.mock("@/lib/api/client", () => ({
       email: "ada@example.com",
     },
   }),
+  getProgress: vi.fn().mockResolvedValue({ streak: 5 }),
+  getFeed: vi.fn().mockResolvedValue({ due: [{ id: "1" }] }),
 }));
 
 describe("AppSidebar", () => {
@@ -28,11 +30,11 @@ describe("AppSidebar", () => {
     expect(screen.queryByText("Daily")).toBeNull();
   });
 
-  it("shows profile avatar only in footer", async () => {
+  it("shows streak and profile avatar in footer", async () => {
     render(<AppSidebar />);
 
-    expect(await screen.findByLabelText("Ada Lovelace")).toBeTruthy();
+    expect(await screen.findByLabelText(/5-day streak/)).toBeTruthy();
+    expect(screen.getByLabelText("Ada Lovelace")).toBeTruthy();
     expect(screen.queryByText("Upgrade")).toBeNull();
-    expect(screen.queryByRole("link", { name: /streak/i })).toBeNull();
   });
 });

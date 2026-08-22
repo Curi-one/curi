@@ -65,14 +65,11 @@ describe("theme token contract", () => {
     }
   });
 
-  it("keeps the heatmap ramp monochrome, with Vermilion only on today", () => {
+  it("uses a vermilion intensity ramp with accent on today", () => {
     const start = css.indexOf(".heatmap-cell-0");
     const end = css.indexOf(".ds-panel-dark .heatmap-cell-0");
     const ramp = css.slice(start, end);
-    // The ramp used a 5-step Vermilion scale — up to ~180 accent elements on
-    // a screen whose budget is one (§1.2), and it made the streak Vermilion,
-    // which UX-PRINCIPLES forbids.
-    expect(ramp).not.toMatch(/--color-accent/);
+    expect(ramp).toMatch(/--color-accent/);
     expect(css).toMatch(
       /\.heatmap-cell-today\s*\{[^}]*var\(--color-accent\)/,
     );

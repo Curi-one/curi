@@ -244,11 +244,11 @@ export default function ProfilePage() {
   const streak = progress?.streak ?? 0;
 
   return (
-    <main className="app-shell pb-12 pt-4 md:pb-12">
-      <div className="mb-8 flex items-center justify-between gap-3">
+    <main className="app-shell profile-shell pb-12 pt-4 md:pb-12">
+      <div className="profile-top">
         <Link
           href="/today"
-          className="inline-flex min-h-11 items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
+          className="inline-flex min-h-11 items-center gap-1.5 font-meta text-mono-xs uppercase tracking-wider text-ink-muted transition-opacity hover:text-ink hover:opacity-100"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Today
@@ -263,19 +263,22 @@ export default function ProfilePage() {
         </Button>
       </div>
 
-      <header className="mb-7 flex items-center gap-4">
+      <header className="profile-identity">
         <UserAvatar name={displayName} size={56} />
-        <div className="min-w-0">
-          <p className="truncate text-xl font-medium leading-none tracking-tight text-ink">
-            {displayName}
-          </p>
-          <p className="mt-1.5 truncate text-sm text-ink-muted">
+        <div className="profile-identity-meta">
+          <p className="profile-identity-kicker">Your account</p>
+          <p className="profile-identity-name truncate">{displayName}</p>
+          <p className="profile-identity-email truncate">
             {session.email ?? "—"}
           </p>
         </div>
       </header>
 
-      <div className="flex overflow-x-auto rounded-none border border-border p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div
+        className="profile-tabs"
+        role="tablist"
+        aria-label="Profile settings"
+      >
         {(
           [
             ["account", "Account"],
@@ -287,10 +290,12 @@ export default function ProfilePage() {
           <button
             key={id}
             type="button"
+            role="tab"
+            id={`profile-tab-${id}`}
+            aria-selected={tab === id}
+            aria-controls={`profile-panel-${id}`}
             onClick={() => setTab(id)}
-            className={`min-h-11 shrink-0 rounded-none px-3 text-center text-xs transition-colors sm:text-sm ${
-              tab === id ? "bg-ink text-paper" : "text-ink-muted hover:text-ink"
-            }`}
+            className="profile-tab focus-ring min-h-11"
           >
             {label}
           </button>
@@ -298,13 +303,19 @@ export default function ProfilePage() {
       </div>
 
       {tab === "account" && (
-        <div className="mt-5 space-y-4">
-          <section className="surface-card p-4">
-            <h2 className="text-base font-medium text-ink">Account</h2>
-            <p className="mt-1 text-sm text-ink-muted">
+        <div
+          key="account"
+          id="profile-panel-account"
+          role="tabpanel"
+          aria-labelledby="profile-tab-account"
+          className="profile-panel space-y-4"
+        >
+          <section className="profile-section">
+            <h2 className="profile-section-title">Account</h2>
+            <p className="profile-section-lede">
               Name and email used across Curi.
             </p>
-            <label className="mt-4 block">
+            <label className="mt-5 block">
               <span className="type-kicker">Name</span>
               <div className="mt-2 flex gap-2">
                 <input
@@ -328,29 +339,26 @@ export default function ProfilePage() {
             {saveMessage && (
               <p className="mt-2 text-sm text-ink-muted">{saveMessage}</p>
             )}
-            <div className="mt-4">
+            <div className="mt-5">
               <p className="type-kicker">Email</p>
               <p className="mt-1 text-lg text-ink">{session.email ?? "—"}</p>
             </div>
           </section>
 
-          <section className="surface-card p-4">
-            <h2 className="text-base font-medium text-ink">Appearance</h2>
-            <p className="mt-1 text-sm text-ink-muted">
+          <section className="profile-section">
+            <h2 className="profile-section-title">Appearance</h2>
+            <p className="profile-section-lede">
               Display preference for this device.
             </p>
-            <p className="type-kicker mt-4">Theme</p>
+            <p className="type-kicker mt-5">Theme</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {(["system", "light", "dark"] as const).map((t) => (
                 <button
                   key={t}
                   type="button"
+                  aria-pressed={theme === t}
                   onClick={() => onThemeChange(t)}
-                  className={`rounded-none px-4 py-2 text-sm capitalize ${
-                    theme === t
-                      ? "bg-ink text-paper"
-                      : "border border-border text-ink"
-                  }`}
+                  className="profile-theme-btn focus-ring min-h-11"
                 >
                   {t}
                 </button>
@@ -361,9 +369,17 @@ export default function ProfilePage() {
       )}
 
       {tab === "learning" && (
-        <div className="mt-5">
-          <p className="mb-8 flex gap-2 text-sm text-ink-muted">
-            <span className="font-display italic text-accent">×</span>
+        <div
+          key="learning"
+          id="profile-panel-learning"
+          role="tabpanel"
+          aria-labelledby="profile-tab-learning"
+          className="profile-panel"
+        >
+          <p className="profile-philosophy">
+            <span className="profile-philosophy-mark" aria-hidden>
+              ×
+            </span>
             <span>
               This applies to every course you&apos;re taking. What you&apos;re
               working toward, and where you&apos;re starting, is asked
@@ -371,24 +387,21 @@ export default function ProfilePage() {
             </span>
           </p>
 
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-14 lg:items-start">
-            <section className="surface-card p-4 sm:p-5">
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-10">
+            <section className="profile-section p-4 sm:p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-display text-xl  tracking-tight text-ink">
+                  <h2 className="profile-section-title">
                     How you like things explained
                   </h2>
-                  <p className="mt-2 text-sm text-ink-muted">
+                  <p className="profile-section-lede">
                     Not what you&apos;re learning — how Curi should teach it.
                     Set it once; the preview shows it on three unrelated
                     subjects.
                   </p>
                 </div>
                 {prefsSaved && (
-                  <p
-                    className="shrink-0 text-xs text-ink-muted"
-                    aria-live="polite"
-                  >
+                  <p className="profile-saved" aria-live="polite">
                     Saved
                   </p>
                 )}
@@ -446,7 +459,7 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className="mt-8 flex flex-wrap items-baseline justify-between gap-4 border-t border-border pt-5">
+              <div className="profile-section-footer">
                 <p className="max-w-sm text-sm text-ink-muted">
                   Applies the moment you save it, to every course, current and
                   future.
@@ -454,7 +467,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={resetLearningDefaults}
-                  className="border-b border-border-strong pb-0.5 font-meta text-ui-3xs uppercase tracking-wider text-ink hover:border-ink"
+                  className="border-b border-border-strong pb-0.5 font-meta text-ui-3xs uppercase tracking-wider text-ink transition-opacity hover:opacity-70"
                 >
                   Reset to defaults
                 </button>
@@ -467,17 +480,23 @@ export default function ProfilePage() {
       )}
 
       {tab === "email" && (
-        <section className="surface-card mt-5 p-4">
+        <section
+          key="email"
+          id="profile-panel-email"
+          role="tabpanel"
+          aria-labelledby="profile-tab-email"
+          className="profile-panel profile-section"
+        >
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h2 className="text-base font-medium text-ink">Daily email</h2>
-              <p className="mt-1 text-sm text-ink-muted">
+              <h2 className="profile-section-title">Daily email</h2>
+              <p className="profile-section-lede">
                 A short curiosity peek — heading + snapshot that brings you back
                 to the app.
               </p>
             </div>
             {prefsSaved && (
-              <p className="shrink-0 text-xs text-ink-muted" aria-live="polite">
+              <p className="profile-saved" aria-live="polite">
                 Saved
               </p>
             )}
@@ -521,15 +540,21 @@ export default function ProfilePage() {
       )}
 
       {tab === "plan" && (
-        <section className="surface-card mt-5 p-4">
+        <section
+          key="plan"
+          id="profile-panel-plan"
+          role="tabpanel"
+          aria-labelledby="profile-tab-plan"
+          className="profile-panel profile-section"
+        >
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h2 className="text-base font-medium text-ink">Your plan</h2>
-              <p className="mt-1 text-sm text-ink-muted">
+              <h2 className="profile-section-title">Your plan</h2>
+              <p className="profile-section-lede">
                 {isAcademy ? "Curi Academy · renews monthly" : "Free plan"}
               </p>
             </div>
-            <span className="shrink-0 rounded-none border border-border px-3 py-1 text-xs text-ink">
+            <span className="profile-plan-badge">
               {isAcademy ? "Academy" : "Free"}
             </span>
           </div>

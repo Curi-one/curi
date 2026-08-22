@@ -11,9 +11,10 @@ import {
   Sparkles,
   type LucideProps,
 } from "lucide-react";
+import { StreakIndicator } from "@/components/StreakIndicator";
 import { Wordmark } from "@/components/Wordmark";
 import { UserAvatar } from "@/components/UserAvatar";
-import { getMe, type UserSession } from "@/lib/api/client";
+import { getFeed, getMe, getProgress, type UserSession } from "@/lib/api/client";
 
 type LucideIcon = ComponentType<LucideProps>;
 
@@ -71,19 +72,25 @@ function pathActive(pathname: string, key: string): boolean {
 }
 
 /**
- * Desktop rail — 64px icon column. Labels appear on hover/focus only.
- * Mobile uses TabBar instead.
+ * Desktop rail — 64px icon column. Labels on hover/focus; streak above profile.
  */
 export function AppSidebar() {
   const pathname = usePathname();
   const [session, setSession] = useState<UserSession | null>(null);
+  const [streak, setStreak] = useState(0);
+  const [dueCount, setDueCount] = useState(0);
 
   useEffect(() => {
-    getMe()
-      .then((me) => setSession(me.session))
+    Promise.all([getMe(), getProgress(), getFeed()])
+      .then(([me, progress, feed]) => {
+        setSession(me.session);
+        setStreak(progress.streak);
+        setDueCount(feed.due.length);
+      })
       .catch(() => setSession(null));
   }, []);
 
+  const streakAtRisk = streak > 0 && dueCount > 0;
   const displayName =
     session?.name?.trim() || session?.email?.split("@")[0] || "You";
 
@@ -109,6 +116,25 @@ export function AppSidebar() {
       </nav>
 
       <div className="app-sidebar-footer">
+        {streak > 0 && (
+          <Link
+            href="/progress"
+            className="app-sidebar-streak focus-ring"
+            aria-label={
+              streakAtRisk
+                ? `${streak}-day streak — keep it alive today`
+                : `${streak}-day streak`
+            }
+          >
+            <StreakIndicator
+              streak={streak}
+              atRisk={streakAtRisk}
+              size="md"
+              countClassName="text-mono-sm font-semibold"
+            />
+          </Link>
+        )}
+
         <Link
           href="/profile"
           aria-label={displayName}
