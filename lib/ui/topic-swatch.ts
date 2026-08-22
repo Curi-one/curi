@@ -282,6 +282,33 @@ export function topicSwatch(topic: string): [field: string, glyphColor: string] 
  */
 export const MARK_GLYPH_FONT_SIZE = "min(38cqw, 56cqh)";
 
+/** Pattern on an Ink field with no readable UI copy on the field (~16%, HTML `.field`). */
+export const MARK_PATTERN_OPACITY = 0.16;
+
+/** Pattern when readable text shares the Ink field — texture recedes so copy wins. */
+export const MARK_PATTERN_OPACITY_WITH_TEXT = 0.07;
+
+/** Decorative geometry on paper/light surfaces behind copy. */
+export const MARK_SURFACE_PATTERN_OPACITY = 0.04;
+
+/** Glyph on an Ink field alone — BRAND.md §6.2 (40–60%). */
+export const MARK_GLYPH_OPACITY = 0.5;
+
+/** Glyph when readable text shares the Ink field. */
+export const MARK_GLYPH_OPACITY_WITH_TEXT = 0.24;
+
+export type MarkImageryMode = "field" | "withText";
+
+export function markPatternOpacity(mode: MarkImageryMode): number {
+  return mode === "withText"
+    ? MARK_PATTERN_OPACITY_WITH_TEXT
+    : MARK_PATTERN_OPACITY;
+}
+
+export function markGlyphOpacity(mode: MarkImageryMode): number {
+  return mode === "withText" ? MARK_GLYPH_OPACITY_WITH_TEXT : MARK_GLYPH_OPACITY;
+}
+
 /**
  * CSS for track-mark pattern families.
  *
