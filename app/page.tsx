@@ -5,16 +5,12 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowUp, BookOpen, Clock3, SlidersHorizontal } from "lucide-react";
 import { LandingHeadline } from "@/components/LandingHeadline";
 import { Wordmark } from "@/components/Wordmark";
-import { FOUNDER_TOPIC_SUGGESTIONS } from "@/lib/content/founder-catalogue";
-import { getMe } from "@/lib/api/client";
 import { Button } from "@/components/Button";
+import { getMe } from "@/lib/api/client";
 
 const AUTH_HOME = "/auth?intent=signin&returnTo=%2F";
 const SIGNUP_HOME = "/auth?intent=signup&returnTo=%2F";
-
-const QUICK_BATCH = 4;
-const QUICK_CYCLE = 4000;
-const FADE_DURATION = 280;
+const TOPIC_PLACEHOLDER = "What are you curious to learn...";
 
 const DEPTH_TEASERS = [
   { label: "3 min/day", icon: Clock3 },
@@ -26,17 +22,6 @@ export default function LandingPage() {
   const router = useRouter();
   const topicInputRef = useRef<HTMLInputElement>(null);
   const [topic, setTopic] = useState("");
-  const [inputFocused, setInputFocused] = useState(false);
-  const [quickIdx, setQuickIdx] = useState(0);
-  const [quickVisible, setQuickVisible] = useState(true);
-
-  const quickBatches = Math.ceil(
-    FOUNDER_TOPIC_SUGGESTIONS.length / QUICK_BATCH,
-  );
-  const quickTopics = FOUNDER_TOPIC_SUGGESTIONS.slice(
-    quickIdx * QUICK_BATCH,
-    (quickIdx + 1) * QUICK_BATCH,
-  );
 
   useEffect(() => {
     void getMe()
@@ -49,18 +34,6 @@ export default function LandingPage() {
         // Stay on landing when session lookup fails.
       });
   }, [router]);
-
-  useEffect(() => {
-    if (quickBatches <= 1) return;
-    const id = setInterval(() => {
-      setQuickVisible(false);
-      setTimeout(() => {
-        setQuickIdx((b) => (b + 1) % quickBatches);
-        setQuickVisible(true);
-      }, FADE_DURATION);
-    }, QUICK_CYCLE);
-    return () => clearInterval(id);
-  }, [quickBatches]);
 
   function start(nextTopic: string) {
     const trimmed = nextTopic.trim();
@@ -77,45 +50,31 @@ export default function LandingPage() {
     <main className="app-shell flex flex-col pb-10 pt-6 animate-fade-in sm:pb-14 sm:pt-10">
       <header className="flex items-center justify-between">
         <Wordmark />
-        <nav className="flex items-center gap-1" aria-label="Account">
-          <Button href={AUTH_HOME} variant="ghost" size="small">
+        <nav className="flex items-center gap-2" aria-label="Account">
+          <Button href={AUTH_HOME} variant="secondary" size="small">
             Sign in
           </Button>
-          <Button href={SIGNUP_HOME} variant="secondary" size="small">
+          <Button href={SIGNUP_HOME} variant="primary" size="small">
             Sign up
           </Button>
         </nav>
       </header>
 
       <div className="mx-auto mt-10 w-full max-w-xl sm:mt-14">
-        <p className="mb-4 flex items-center gap-2 font-meta">
-          <span
-            className="landing-pulse-dot h-1.5 w-1.5 rounded-full bg-ink-muted"
-            aria-hidden
-          />
-          Personalized learning paths
+        <p className="landing-kicker">
+          <span className="landing-kicker-dot" aria-hidden />
+          Personalized learning
         </p>
 
         <LandingHeadline />
 
-        <p className="mt-6 text-ui-md font-light leading-loose text-ink-muted">
-          Type any topic and get a path built for you.
-          <br className="hidden sm:block" />
-          You choose the depth — one lesson a day. Free to start — no account
-          until after your first lesson.
+        <p className="landing-lede">
+          Any topic, one lesson a day. No account until after your first lesson.
         </p>
 
-        <form onSubmit={onSubmit} className="mb-3 mt-8">
+        <form onSubmit={onSubmit}>
           <div
-            className="flex cursor-text items-center gap-3 rounded-none border border-transparent px-5 py-[15px] transition-[background-color,border-color] duration-200 hover:border-border/80"
-            style={{
-              background: inputFocused
-                ? "color-mix(in srgb, var(--color-ink) 4.5%, transparent)"
-                : "var(--color-bg-secondary)",
-              borderColor: inputFocused
-                ? "var(--color-border-default)"
-                : undefined,
-            }}
+            className="landing-topic-wrap cursor-text"
             onMouseDown={(e) => {
               if ((e.target as HTMLElement).closest("button")) return;
               topicInputRef.current?.focus();
@@ -127,18 +86,16 @@ export default function LandingPage() {
               type="text"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              onFocus={() => setInputFocused(true)}
-              onBlur={() => setInputFocused(false)}
-              placeholder="What do you want to learn..."
-              className="min-w-0 flex-1 border-0 bg-transparent text-ui-xl leading-snug text-ink outline-none placeholder:text-ink-muted/40 focus-visible:ring-0"
+              placeholder={TOPIC_PLACEHOLDER}
+              className="landing-topic-input focus-visible:ring-0"
               autoComplete="off"
               autoFocus
-              aria-label="What do you want to explore?"
+              aria-label="What are you curious to learn?"
             />
             <button
               type="submit"
               disabled={!topic.trim()}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-none bg-ink text-paper transition-all duration-150 hover:scale-[1.07] active:scale-95 disabled:opacity-20"
+              className="landing-topic-submit focus-ring"
               aria-label="Start exploring"
             >
               <ArrowUp className="h-4 w-4" aria-hidden />
@@ -146,42 +103,13 @@ export default function LandingPage() {
           </div>
         </form>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pl-1">
+        <div className="landing-depth-row">
           {DEPTH_TEASERS.map(({ label, icon: Icon }) => (
-            <span
-              key={label}
-              className="flex items-center gap-1.5 text-ui-2xs text-ink-muted/80"
-            >
-              <Icon className="h-3 w-3 shrink-0 opacity-50" aria-hidden />
+            <span key={label} className="landing-depth-item">
+              <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
               {label}
             </span>
           ))}
-        </div>
-
-        <div className="mt-8 sm:mt-10">
-          <p className="mb-2.5 font-meta opacity-55">Or try</p>
-          <div
-            className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            style={{
-              opacity: quickVisible ? 1 : 0,
-              transition: `opacity ${FADE_DURATION}ms ease`,
-            }}
-          >
-            {quickTopics.map((suggestion) => (
-              <button
-                key={suggestion}
-                type="button"
-                onClick={() => start(suggestion)}
-                className="interactive-chip focus-ring min-h-11 shrink-0 rounded-none px-3.5 py-2 text-ui-xs text-ink-muted"
-                style={{
-                  background:
-                    "color-mix(in srgb, var(--color-ink) 4%, transparent)",
-                }}
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </main>

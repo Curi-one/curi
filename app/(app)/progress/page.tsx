@@ -9,40 +9,33 @@ import { PageShell } from "@/components/PageShell";
 import { ProgressPathRow } from "@/components/ProgressPathRow";
 import { getLibrary, getProgress } from "@/lib/api/client";
 import type { PathSummary } from "@/lib/api/schemas";
-import { topicArt, topicPatternStyle } from "@/lib/ui/topic-swatch";
 
-function StatCard({
-  label,
-  value,
-  pattern = "vitrine",
-}: {
-  label: string;
-  value: number;
-  pattern?: "vitrine" | "ledger" | "radiate";
-}) {
-  const art = topicArt(label);
+function StatCard({ label, value }: { label: string; value: number }) {
   return (
     <div className="relative overflow-hidden border border-border bg-paper-secondary px-4 py-4">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.08]"
-        style={topicPatternStyle(pattern)}
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute -right-2 -top-2 font-display text-5xl font-light italic leading-none text-ink/[0.04]"
-        aria-hidden
-      >
-        {art.glyph}
-      </div>
-      <p className="relative z-[1] font-meta text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+      <p className="font-meta text-[10px] uppercase tracking-[0.2em] text-ink-muted">
         {label}
       </p>
-      <p className="relative z-[1] mt-2 font-display text-4xl tabular-nums leading-none tracking-tight text-ink">
+      <p className="mt-2 font-display text-4xl tabular-nums leading-none tracking-tight text-ink">
         {value}
       </p>
     </div>
   );
 }
+
+/*
+ * StatCard previously carried a track-mark pattern and glyph. Both were wrong:
+ *
+ * - The pattern families draw near-white lines and are specified for dark Ink
+ *   fields only. On this light card they were invisible in light mode and
+ *   appeared only once dark mode inverted the surface beneath them.
+ * - The glyph came from `topicArt("Active paths")`, i.e. the classifier run
+ *   over a UI label. It matched no domain, fell through to GEN, and rendered a
+ *   dagger. BRAND §6 requires a glyph to connect to the content's subject and
+ *   never to be decorative; a stat tile has no subject to connect to.
+ *
+ * A stat tile is a number and its label. That is the whole composition.
+ */
 
 export default function ProgressPage() {
   const [streak, setStreak] = useState(0);
@@ -91,19 +84,14 @@ export default function ProgressPage() {
       className="pt-4"
     >
       <div className="animate-fade-in mt-6 grid grid-cols-2 gap-3">
-        <StatCard label="Active paths" value={stats.active} pattern="ledger" />
-        <StatCard label="Mastered" value={stats.mastered} pattern="radiate" />
+        <StatCard label="Active paths" value={stats.active} />
+        <StatCard label="Mastered" value={stats.mastered} />
       </div>
 
-      <section className="animate-fade-in relative mt-8 overflow-hidden border border-border bg-paper-secondary p-5 sm:p-6">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.06]"
-          style={topicPatternStyle("columns")}
-          aria-hidden
-        />
-        <div className="relative z-[1]">
-          <Heatmap activityByDay={activityByDay} streak={streak} />
-        </div>
+      {/* No pattern layer: the families are white-on-Ink and this is a light
+          surface — see the StatCard note above. */}
+      <section className="animate-fade-in mt-8 border border-border bg-paper-secondary p-5 sm:p-6">
+        <Heatmap activityByDay={activityByDay} streak={streak} />
       </section>
 
       <section className="animate-fade-in mt-10">

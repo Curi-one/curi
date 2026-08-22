@@ -102,20 +102,38 @@ describe("requestOtp", () => {
 });
 
 describe("staging OTP bypass", () => {
-  it("only accepts the fixed code on staging", () => {
+  it("accepts the fixed code on staging and local real Supabase", () => {
     vi.stubEnv("APP_ENV", "staging");
+    vi.stubEnv("USE_MOCK_API", "false");
     expect(isStagingOtpBypass("118833")).toBe(true);
     expect(isStagingOtpBypass("000000")).toBe(false);
     vi.unstubAllEnvs();
-    vi.stubEnv("APP_ENV", "production");
+
+    vi.stubEnv("APP_ENV", "local");
+    vi.stubEnv("USE_MOCK_API", "false");
+    expect(isStagingOtpBypass("118833")).toBe(true);
+    vi.unstubAllEnvs();
+
+    vi.stubEnv("APP_ENV", "local");
+    vi.stubEnv("USE_MOCK_API", "true");
     expect(isStagingOtpBypass("118833")).toBe(false);
+    vi.unstubAllEnvs();
+
+    vi.stubEnv("APP_ENV", "production");
+    vi.stubEnv("USE_MOCK_API", "false");
+    expect(isStagingOtpBypass("118833")).toBe(false);
+    vi.unstubAllEnvs();
   });
 
-  it("signs in via admin magic link on staging", async () => {
+  it("signs in via admin magic link when bypass is allowed", async () => {
     vi.stubEnv("APP_ENV", "staging");
+    vi.stubEnv("USE_MOCK_API", "false");
     const createUser = vi
       .fn()
-      .mockResolvedValue({ data: { user: {} }, error: null });
+      .mockResolvedValue({
+        data: { user: {} },
+        error: { message: "User already registered" },
+      });
     const generateLink = vi.fn().mockResolvedValue({
       data: { properties: { hashed_token: "hash-token" } },
       error: null,

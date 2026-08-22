@@ -12,11 +12,14 @@ const path: PathSummary = {
 };
 
 describe("ProgressPathRow", () => {
-  it("renders track-mark cover and red progress bar", () => {
+  it("renders track-mark cover and a monochrome progress bar", () => {
     const { container } = render(<ProgressPathRow path={path} />);
     expect(screen.getByText("Venture capital")).toBeInTheDocument();
     expect(screen.getByRole("link")).toHaveAttribute("href", "/library/course-1");
-    expect(container.querySelector(".bg-accent")).toBeTruthy();
+    expect(container.querySelector(".bg-ink")).toBeTruthy();
+    // A list row must not spend the screen's single accent (§1.2).
+    expect(container.querySelector(".bg-accent")).toBeNull();
+    expect(container.querySelector(".text-accent")).toBeNull();
   });
 
   it("shows mastered copy when mastered", () => {

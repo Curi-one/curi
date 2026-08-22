@@ -46,8 +46,30 @@ describe("LibraryPathCard", () => {
     expect(link).toHaveAttribute("href", "/library/course-shelved");
     expect(link.className).toMatch(/aspect-square/);
     expect(screen.getByText("Constitutional Law")).toBeInTheDocument();
-    const progressFill = container.querySelector(".bg-accent");
-    expect(progressFill).toBeTruthy();
+    // Progress reads in the mark foreground, not Vermilion: a grid renders
+    // this card N times and the accent budget is once per screen (§1.2).
+    expect(container.querySelector(".bg-mark-fg\\/75")).toBeTruthy();
+    expect(container.querySelector(".bg-accent")).toBeNull();
+  });
+
+  it("spends no Vermilion at rest — a grid would multiply it by card count", () => {
+    const { container } = render(
+      <LibraryPathCard path={path} tab="exploring" />,
+    );
+    expect(container.querySelector(".text-accent")).toBeNull();
+    expect(container.querySelector(".bg-accent")).toBeNull();
+    // Hover is allowed to carry the accent: it resolves to one card at a time.
+    expect(container.innerHTML).toContain("group-hover:text-accent");
+  });
+
+  it("draws on the mark field with theme-independent tones", () => {
+    const { container } = render(
+      <LibraryPathCard path={path} tab="exploring" />,
+    );
+    // `text-paper` here resolved to the page background, which becomes Ink in
+    // dark mode — the card's own field is Ink, so the text disappeared.
+    expect(container.querySelector(".text-paper")).toBeNull();
+    expect(screen.getByRole("link").className).toMatch(/text-mark-fg/);
   });
 
   it("shows Shelved chip and Continue restores then navigates", async () => {

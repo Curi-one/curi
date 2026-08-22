@@ -183,6 +183,18 @@ export async function POST(request: Request) {
     return response;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Auth failed";
+    if (/SUPABASE_SERVICE_ROLE_KEY|supabase_not_configured/i.test(message)) {
+      console.error("auth route failed — missing Supabase service role", err);
+      return jsonWithSession(
+        {
+          error:
+            "Local setup incomplete: add SUPABASE_SERVICE_ROLE_KEY to .env.local (Supabase → Settings → API → service_role), then restart pnpm dev.",
+          code: "config_error",
+        },
+        sessionId,
+        { status: 503 },
+      );
+    }
     const classified = classifyAuthError(message);
     // Only the two user-actionable classes get a specific message. Anything
     // else is an internal fault — do not echo the raw error to the client.

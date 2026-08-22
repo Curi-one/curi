@@ -208,7 +208,7 @@ function AuthContent() {
   const subcopy = authEmailSubcopy(intent, step, email, emailSent);
 
   return (
-    <div className="flex min-h-[70vh] flex-col animate-fade-in">
+    <div className="flex flex-col animate-fade-in">
       <Wordmark />
       {showPendingBanner && (
         <div className="mt-8 rounded-none border border-border bg-paper-secondary px-4 py-3">
@@ -291,7 +291,7 @@ function AuthContent() {
         </p>
       )}
 
-      <div className="mt-auto pt-8">
+      <div className="mt-8">
         {(step === "email" || step === "code" || step === "name") && (
           <Button
             disabled={
@@ -309,24 +309,28 @@ function AuthContent() {
 
         {step === "link" && (
           <div className="space-y-3">
-            <Button
-              variant="secondary"
-              loading={loading}
-              onClick={() => void submit()}
-              className="w-full"
-            >
-              Resend sign-in link
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setError(null);
-                setStep("code");
-              }}
-              className="w-full justify-center"
-            >
-              Enter a code instead
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="primary"
+                size="small"
+                onClick={() => {
+                  setError(null);
+                  setStep("code");
+                }}
+                className="min-h-[44px] flex-1 basis-[8.5rem]"
+              >
+                Enter code
+              </Button>
+              <Button
+                variant="secondary"
+                size="small"
+                loading={loading}
+                onClick={() => void submit()}
+                className="min-h-[44px] flex-1 basis-[8.5rem]"
+              >
+                Resend link
+              </Button>
+            </div>
             <button
               type="button"
               onClick={() => {
@@ -363,39 +367,21 @@ function AuthContent() {
         ) : (
           intent !== "save" &&
           step === "email" && (
-            <p className="mt-4 text-center text-sm text-ink-muted">
-              {intent === "signup" ? (
-                <>
-                  Already have an account?{""}
-                  <Link
-                    href={`/auth?intent=signin&returnTo=${encodeURIComponent(returnTo)}`}
-                    className="link-subtle inline"
-                  >
-                    Sign in
-                  </Link>
-                </>
-              ) : (
-                <>
-                  New here?{""}
-                  <Link
-                    href={`/auth?intent=signup&returnTo=${encodeURIComponent(returnTo)}`}
-                    className="link-subtle inline"
-                  >
-                    Create an account
-                  </Link>
-                </>
-              )}
+            <p className="mt-6 flex flex-wrap items-baseline justify-center gap-x-2 text-sm text-ink-muted">
+              <span>
+                {intent === "signup"
+                  ? "Already have an account?"
+                  : "New here?"}
+              </span>
+              <Link
+                href={`/auth?intent=${intent === "signup" ? "signin" : "signup"}&returnTo=${encodeURIComponent(returnTo)}`}
+                className="link-subtle inline"
+              >
+                {intent === "signup" ? "Sign in" : "Create an account"}
+              </Link>
             </p>
           )
         )}
-
-        {(intent === "signin" || intent === "signup") &&
-          step !== "link" &&
-          !fromQuiz && (
-            <Link href="/" className="link-subtle mt-4 block text-center">
-              Back to start
-            </Link>
-          )}
       </div>
     </div>
   );

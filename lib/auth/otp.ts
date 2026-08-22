@@ -180,18 +180,30 @@ export async function requestOtp(
 
 const OTP_TYPES = ["email", "magiclink", "signup"] as const;
 
-/** Fixed OTP for stage.curi.one when Supabase mail is rate-limited. Never enabled in production. */
+/** Fixed OTP for non-production when Supabase mail is rate-limited. Never in production or mock mode. */
 export const STAGING_OTP_CODE = "118833";
 
+/** Staging host and local dev against real Supabase (Option 2). */
+export function allowsStagingOtpBypass(): boolean {
+  const env = getEnv();
+  if (env.APP_ENV === "production") {
+    return false;
+  }
+  if (env.USE_MOCK_API) {
+    return false;
+  }
+  return true;
+}
+
 export function isStagingOtpBypass(code: string | undefined): boolean {
-  return getEnv().APP_ENV === "staging" && code?.trim() === STAGING_OTP_CODE;
+  return allowsStagingOtpBypass() && code?.trim() === STAGING_OTP_CODE;
 }
 
 export async function signInWithStagingOtp(
   email: string,
   deps?: OtpDeps,
 ): Promise<VerifyOtpResult> {
-  if (getEnv().APP_ENV !== "staging") {
+  if (!allowsStagingOtpBypass()) {
     throw new Error("Invalid code");
   }
 
@@ -199,10 +211,16 @@ export async function signInWithStagingOtp(
   const createServer = deps?.createServerClient ?? createClient;
   const supabase = await createServer();
 
-  await admin.auth.admin.createUser({
+  const { error: createError } = await admin.auth.admin.createUser({
     email,
     email_confirm: true,
   });
+  if (
+    createError &&
+    !/already (been )?registered|already exists/i.test(createError.message)
+  ) {
+    throw new Error(createError.message);
+  }
 
   const { data: link, error: linkError } = await admin.auth.admin.generateLink({
     type: "magiclink",

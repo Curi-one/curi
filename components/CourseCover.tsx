@@ -1,5 +1,6 @@
 import {
   buildTrackMark,
+  MARK_GLYPH_FONT_SIZE,
   topicArt,
   topicPatternStyle,
   trackMarkTier,
@@ -41,7 +42,13 @@ export function CourseCover({
   return (
     <div
       className={`group/cover relative shrink-0 overflow-hidden ${rounded} ${className}`}
-      style={{ height, width: width ?? undefined, background: art.field }}
+      style={{
+        height,
+        width: width ?? undefined,
+        background: art.field,
+        // Enables the cqw/cqh units the glyph is sized in.
+        containerType: "size",
+      }}
       aria-hidden
     >
       {showPattern ? (
@@ -50,18 +57,21 @@ export function CourseCover({
           style={topicPatternStyle(art.pattern)}
         />
       ) : null}
+      {/* Positioned, not padded: the reference mark sets bottom:-6% so the
+          glyph is cropped by the field edge. Sizing off the container rather
+          than the height prop keeps it proportional on wide covers. */}
       <div
-        className="pointer-events-none absolute inset-0 flex select-none items-end justify-end font-display"
+        className="pointer-events-none absolute select-none font-display"
         style={{
           color: art.glyphColor,
           opacity: 0.9,
-          fontSize: height * 0.38,
+          fontSize: MARK_GLYPH_FONT_SIZE,
           fontWeight: 300,
           lineHeight: 0.78,
           fontStyle: "italic",
           letterSpacing: "-0.02em",
-          paddingRight: "6%",
-          paddingBottom: "2%",
+          right: "6%",
+          bottom: "-6%",
         }}
       >
         {art.glyph}
@@ -71,13 +81,13 @@ export function CourseCover({
           <span className="font-meta text-[length:max(8px,2.6cqw)] uppercase tracking-[0.25em] text-accent">
             {meta.domain}
           </span>
-          <span className="font-meta text-[length:max(8px,2.6cqw)] tracking-[0.1em] text-silver">
+          <span className="font-meta text-[length:max(8px,2.6cqw)] tracking-[0.1em] text-mark-meta">
             {meta.call}
           </span>
         </div>
       ) : null}
       {/* Vermilion reveal — 2px bottom edge on hover only (BRAND §6.4) */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-[#C1121F] transition-transform duration-medium ease-out group-hover/cover:scale-x-100" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[2px] origin-left scale-x-0 bg-accent transition-transform duration-medium ease-out group-hover/cover:scale-x-100" />
     </div>
   );
 }

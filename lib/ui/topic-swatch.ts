@@ -183,8 +183,11 @@ const DOMAIN_ORDER: DomainKey[] = [
   "LAW",
 ];
 
-const FIELD_INK = "#0A0908";
-const GLYPH_COLOR = "#FAF9F5";
+/* Theme-independent by design — a track mark is a dark Ink field in either
+   theme (see --mark-* in globals.css). Literal hex fallbacks keep the mark
+   correct if the stylesheet has not loaded yet. */
+const FIELD_INK = "var(--mark-field, #0A0908)";
+const GLYPH_COLOR = "var(--mark-fg, #FAF9F5)";
 
 /**
  * djb2-style hash matching track-marks.html `hashStr`
@@ -269,13 +272,33 @@ export function topicSwatch(topic: string): [field: string, glyphColor: string] 
 }
 
 /**
- * CSS for track-mark pattern families on dark ink fields.
- * Apply on a layer with ~16% opacity (HTML `.field { opacity: .16 }`).
+ * Glyph sizing for a track mark, matching `track-marks.html`
+ * (`font-size: 38cqw`) while staying sane on non-square fields.
+ *
+ * The reference marks are square, so 38% of the container width is also 38%
+ * of its height. A wide cover (e.g. 600x100) would render a 228px glyph in a
+ * 100px box, so the height term caps it. Requires `container-type: size` on
+ * the field element.
+ */
+export const MARK_GLYPH_FONT_SIZE = "min(38cqw, 56cqh)";
+
+/**
+ * CSS for track-mark pattern families.
+ *
+ * `color` defaults to the mark foreground because these families are
+ * specified for **dark Ink fields only** (TRACK-MARKS.md). Painting the
+ * default onto a light surface draws near-white lines on near-white paper —
+ * invisible in light mode, and visible only once dark mode inverts the
+ * surface underneath. Pass an explicit colour for any other field, or use no
+ * pattern at all.
+ *
+ * Apply on a layer at ~16% opacity (HTML `.field { opacity: .16 }`).
  */
 export function topicPatternStyle(
   pattern: TopicPattern,
+  color = "var(--mark-fg, #FAF9F5)",
 ): Record<string, string> {
-  const white = "var(--color-white-tone, #FAF9F5)";
+  const white = color;
   switch (pattern) {
     case "blueprint":
       return {

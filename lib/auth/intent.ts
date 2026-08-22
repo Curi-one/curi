@@ -69,7 +69,7 @@ export function authEmailSubcopy(
   }
   switch (intent) {
     case "signin":
-      return "Enter your email. We'll send a sign-in link and code — no password.";
+      return "Email only — we'll send a link and code.";
     case "signup":
       return "Enter your email to create your account. No password needed.";
     case "save":
