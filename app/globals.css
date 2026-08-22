@@ -953,8 +953,7 @@ body {
     z-index: 1;
   }
 
-  /* Today is the single Vermilion beat on this screen (§1.2). The ramp below
-     is monochrome so this one marker carries the accent budget alone. */
+  /* Today marker — outline on the current day cell. */
   .heatmap-cell-today {
     outline: 2px solid var(--color-accent);
     outline-offset: 1px;
@@ -1004,16 +1003,7 @@ body {
     transform: translateX(1rem) scale(0.94);
   }
 
-  /* Monochrome intensity ramp — density reads through VALUE, not hue
-     (§1.4: hierarchy is built through scale and weight, never colour).
-
-     This was a five-step Vermilion scale, which put the accent on every
-     active day in a 26-week grid: ~180 potential Vermilion elements on a
-     screen whose budget is one (§1.2), and it made the streak Vermilion,
-     which UX-PRINCIPLES forbids outright.
-
-     Both ends are semantic tokens, so the ramp inverts correctly in dark
-     mode: empty stays the recessive surface, full becomes the primary tone. */
+  /* Vermilion intensity ramp — lesson density through accent mix. */
   .heatmap-cell-0 {
     background: var(--color-bg-tertiary);
   }
@@ -1021,7 +1011,7 @@ body {
   .heatmap-cell-1 {
     background: color-mix(
       in srgb,
-      var(--color-text-primary) 20%,
+      var(--color-accent) 22%,
       var(--color-bg-tertiary)
     );
   }
@@ -1029,7 +1019,7 @@ body {
   .heatmap-cell-2 {
     background: color-mix(
       in srgb,
-      var(--color-text-primary) 42%,
+      var(--color-accent) 44%,
       var(--color-bg-tertiary)
     );
   }
@@ -1037,17 +1027,17 @@ body {
   .heatmap-cell-3 {
     background: color-mix(
       in srgb,
-      var(--color-text-primary) 68%,
+      var(--color-accent) 68%,
       var(--color-bg-tertiary)
     );
   }
 
   .heatmap-cell-4 {
-    background: var(--color-text-primary);
+    background: var(--color-accent);
   }
 
 
-  /* Showcase dark panel — same monochrome ramp, inverted onto the Ink field. */
+  /* Showcase dark panel — accent ramp on Ink field. */
   .ds-panel-dark .heatmap-cell-0 {
     background: var(--color-ink-3);
   }
@@ -1055,7 +1045,7 @@ body {
   .ds-panel-dark .heatmap-cell-1 {
     background: color-mix(
       in srgb,
-      var(--color-white-tone) 22%,
+      var(--color-accent) 28%,
       var(--color-ink-3)
     );
   }
@@ -1063,7 +1053,7 @@ body {
   .ds-panel-dark .heatmap-cell-2 {
     background: color-mix(
       in srgb,
-      var(--color-white-tone) 45%,
+      var(--color-accent) 48%,
       var(--color-ink-3)
     );
   }
@@ -1071,13 +1061,13 @@ body {
   .ds-panel-dark .heatmap-cell-3 {
     background: color-mix(
       in srgb,
-      var(--color-white-tone) 70%,
+      var(--color-accent) 72%,
       var(--color-ink-3)
     );
   }
 
   .ds-panel-dark .heatmap-cell-4 {
-    background: var(--color-white-tone);
+    background: var(--color-accent);
   }
 
   /* ── Lesson reader · §11.1 ─────────────────────────────────────────────── */
@@ -1320,8 +1310,25 @@ body {
   .app-sidebar-footer {
     margin-top: auto;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
     padding-bottom: var(--space-5);
+  }
+
+  .app-sidebar-streak {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    opacity: 0.62;
+    transition: opacity var(--duration-micro) var(--ease-standard);
+  }
+
+  .app-sidebar-streak:hover,
+  .app-sidebar-streak:focus-visible {
+    opacity: 1;
   }
 
   .app-sidebar-profile {
@@ -2276,6 +2283,206 @@ body {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-text-tertiary);
+}
+
+/* ── Profile · editorial settings ────────────────────────────────────────── */
+
+@keyframes profile-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-shell {
+  max-width: var(--narrow-max-width);
+  margin-inline: auto;
+}
+
+.profile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
+
+.profile-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-6);
+  border-bottom: var(--border-bold);
+}
+
+.profile-identity-meta {
+  min-width: 0;
+}
+
+.profile-identity-kicker {
+  margin-bottom: var(--space-2);
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-mono-xs);
+  letter-spacing: var(--tracking-ultra);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.profile-identity-name {
+  font-family: var(--font-display-stack);
+  font-size: var(--text-display-xs);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+
+.profile-identity-email {
+  margin-top: var(--space-2);
+  font-size: var(--text-ui-sm);
+  color: var(--color-text-secondary);
+}
+
+.profile-tabs {
+  display: flex;
+  gap: var(--space-4);
+  overflow-x: auto;
+  margin-bottom: var(--space-6);
+  border-bottom: var(--border-subtle);
+  scrollbar-width: none;
+}
+
+.profile-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.profile-tab {
+  flex-shrink: 0;
+  margin-bottom: -1px;
+  padding: var(--space-3) var(--space-1);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-mono-xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  transition:
+    color var(--duration-micro) var(--ease-standard),
+    border-color var(--duration-micro) var(--ease-standard);
+}
+
+.profile-tab:hover {
+  color: var(--color-text-secondary);
+}
+
+.profile-tab[aria-selected="true"] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-text-primary);
+}
+
+.profile-panel {
+  animation: profile-panel-enter var(--duration-medium) var(--ease-out) both;
+}
+
+.profile-section {
+  border: var(--border-subtle);
+  background: var(--color-bg-primary);
+  padding: var(--space-5);
+}
+
+.profile-section + .profile-section {
+  margin-top: var(--space-4);
+}
+
+.profile-section-title {
+  font-family: var(--font-display-stack);
+  font-size: var(--text-ui-xl);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+
+.profile-section-lede {
+  margin-top: var(--space-2);
+  font-size: var(--text-ui-sm);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.profile-philosophy {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+  padding: var(--space-4) var(--space-5);
+  border-left: var(--border-accent);
+  background: color-mix(in srgb, var(--color-accent) 4%, var(--color-bg-primary));
+  font-size: var(--text-ui-sm);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.profile-philosophy-mark {
+  flex-shrink: 0;
+  font-family: var(--font-display-stack);
+  font-style: italic;
+  color: var(--color-accent);
+}
+
+.profile-saved {
+  flex-shrink: 0;
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-mono-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.profile-plan-badge {
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-subtle);
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-mono-xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.profile-theme-btn {
+  padding: var(--space-2) var(--space-4);
+  border: var(--border-subtle);
+  background: transparent;
+  font-size: var(--text-ui-sm);
+  color: var(--color-text-primary);
+  text-transform: capitalize;
+  transition: background-color var(--duration-micro) var(--ease-standard);
+}
+
+.profile-theme-btn[aria-pressed="true"] {
+  border-color: var(--color-text-primary);
+  background: var(--color-text-primary);
+  color: var(--color-text-inverse);
+}
+
+.profile-section-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding-top: var(--space-5);
+  border-top: var(--border-subtle);
 }
 
 /* ─── Generation warmup ─────────────────────────────────────────────────── */
