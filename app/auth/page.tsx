@@ -15,6 +15,7 @@ import {
 import { resolveAuthLanding, shouldCollectName } from "@/lib/auth/callback";
 import {
   authEmailHeadline,
+  authEmailKicker,
   authEmailSubcopy,
   resolveAuthIntent,
   sanitizeReturnTo,
@@ -204,184 +205,177 @@ function AuthContent() {
     return <LoadingState label="Checking session…" minHeight="min-h-[50vh]" />;
   }
 
+  const kicker = authEmailKicker(intent, step);
   const headline = authEmailHeadline(intent, step);
   const subcopy = authEmailSubcopy(intent, step, email, emailSent);
 
   return (
-    <div className="flex flex-col animate-fade-in">
+    <div className="auth-shell animate-fade-in">
       <Wordmark />
+
       {showPendingBanner && (
-        <div className="mt-8 rounded-none border border-border bg-paper-secondary px-4 py-3">
-          <p className="font-meta">Pending path</p>
-          <p className="mt-1 text-sm text-ink">
+        <div className="auth-pending">
+          <p className="auth-pending-kicker">Pending path</p>
+          <p className="auth-pending-copy">
             {pendingTopic
               ? `We'll attach “${pendingTopic}” to your account after you sign in.`
               : "Your first lesson will attach to your account after you sign in."}
           </p>
         </div>
       )}
-      <h1
-        className={`type-display text-display-xs sm:text-display-sm text-ink ${
-          showPendingBanner ? "mt-8" : "mt-12"
-        }`}
-      >
-        {headline}
-      </h1>
-      <p className="type-lede mt-4 max-w-md">{subcopy}</p>
 
-      {step === "email" && (
-        <input
-          autoFocus
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="input-field mt-8"
-          placeholder="you@example.com"
-          autoComplete="email"
-        />
-      )}
+      <div key={step} className="auth-panel">
+        <p className="auth-kicker">
+          <span className="auth-kicker-dot" aria-hidden />
+          {kicker}
+        </p>
+        <h1 className="auth-title">{headline}</h1>
+        <p className="auth-lede">{subcopy}</p>
 
-      {step === "link" && (
-        <div className="mt-8 flex items-center gap-4 rounded-none border border-border bg-paper-secondary px-5 py-6">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-none bg-paper-secondary text-ink">
-            <Mail className="h-5 w-5" aria-hidden />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-ink">Waiting for your tap</p>
-            <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+        {step === "email" && (
+          <input
+            autoFocus
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input-field auth-field"
+            placeholder="you@example.com"
+            autoComplete="email"
+          />
+        )}
+
+        {step === "link" && (
+          <div className="auth-waiting">
+            <Mail className="auth-waiting-icon" aria-hidden />
+            <p className="auth-waiting-title">Waiting for your tap</p>
+            <p className="auth-waiting-copy">
               The link signs you in automatically. Return here if you use a code
               instead.
             </p>
           </div>
-        </div>
-      )}
-
-      {step === "code" && (
-        <input
-          autoFocus
-          value={code}
-          onChange={(e) =>
-            setCode(e.target.value.replace(/\D/g, "").slice(0, 8))
-          }
-          className="input-field mt-8 tracking-ultra"
-          placeholder="000000"
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          maxLength={8}
-        />
-      )}
-
-      {step === "name" && (
-        <input
-          autoFocus
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="input-field mt-8"
-          placeholder="Alex"
-          autoComplete="given-name"
-        />
-      )}
-
-      {error && (
-        <p
-          className="mt-4 text-ui-xs leading-relaxed text-ink-faint"
-          role="alert"
-        >
-          {error}
-        </p>
-      )}
-
-      <div className="mt-8">
-        {(step === "email" || step === "code" || step === "name") && (
-          <Button
-            disabled={
-              loading ||
-              (step === "email" && !email.trim()) ||
-              (step === "code" && (code.length < 6 || code.length === 7)) ||
-              (step === "name" && !name.trim())
-            }
-            onClick={() => void submit()}
-            className="w-full"
-          >
-            {step === "name" ? "Finish" : "Continue"}
-          </Button>
         )}
 
-        {step === "link" && (
-          <div className="space-y-3">
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="primary"
-                size="small"
+        {step === "code" && (
+          <input
+            autoFocus
+            value={code}
+            onChange={(e) =>
+              setCode(e.target.value.replace(/\D/g, "").slice(0, 8))
+            }
+            className="input-field auth-field auth-code-input"
+            placeholder="000000"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={8}
+          />
+        )}
+
+        {step === "name" && (
+          <input
+            autoFocus
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="input-field auth-field"
+            placeholder="Alex"
+            autoComplete="given-name"
+          />
+        )}
+
+        {error && (
+          <p className="auth-error" role="alert">
+            {error}
+          </p>
+        )}
+
+        <div className="auth-actions">
+          {(step === "email" || step === "code" || step === "name") && (
+            <Button
+              disabled={
+                loading ||
+                (step === "email" && !email.trim()) ||
+                (step === "code" && (code.length < 6 || code.length === 7)) ||
+                (step === "name" && !name.trim())
+              }
+              onClick={() => void submit()}
+              className="w-full"
+            >
+              {step === "name" ? "Finish" : "Continue"}
+            </Button>
+          )}
+
+          {step === "link" && (
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="primary"
+                  size="small"
+                  onClick={() => {
+                    setError(null);
+                    setStep("code");
+                  }}
+                  className="min-h-[44px] flex-1 basis-[8.5rem]"
+                >
+                  Enter code
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="small"
+                  loading={loading}
+                  onClick={() => void submit()}
+                  className="min-h-[44px] flex-1 basis-[8.5rem]"
+                >
+                  Resend link
+                </Button>
+              </div>
+              <button
+                type="button"
                 onClick={() => {
                   setError(null);
-                  setStep("code");
+                  setStep("email");
                 }}
-                className="min-h-[44px] flex-1 basis-[8.5rem]"
+                className="link-subtle mx-auto block"
               >
-                Enter code
-              </Button>
-              <Button
-                variant="secondary"
-                size="small"
-                loading={loading}
-                onClick={() => void submit()}
-                className="min-h-[44px] flex-1 basis-[8.5rem]"
-              >
-                Resend link
-              </Button>
+                Use a different email
+              </button>
             </div>
+          )}
+
+          {step === "code" && (
             <button
               type="button"
               onClick={() => {
                 setError(null);
-                setStep("email");
+                setStep("link");
               }}
-              className="link-subtle mx-auto block"
+              className="link-subtle mt-4 block w-full text-center"
             >
-              Use a different email
+              Back to email link
             </button>
-          </div>
-        )}
+          )}
 
-        {step === "code" && (
-          <button
-            type="button"
-            onClick={() => {
-              setError(null);
-              setStep("link");
-            }}
-            className="link-subtle mt-4 block w-full text-center"
-          >
-            Back to email link
-          </button>
-        )}
-
-        {fromQuiz ? (
-          <Link
-            href={lessonBackHref}
-            className="link-subtle mt-4 block text-center"
-          >
-            Back to lesson
-          </Link>
-        ) : (
-          intent !== "save" &&
-          step === "email" && (
-            <p className="mt-6 flex flex-wrap items-baseline justify-center gap-x-2 text-sm text-ink-muted">
-              <span>
-                {intent === "signup"
-                  ? "Already have an account?"
-                  : "New here?"}
-              </span>
-              <Link
-                href={`/auth?intent=${intent === "signup" ? "signin" : "signup"}&returnTo=${encodeURIComponent(returnTo)}`}
-                className="link-subtle inline"
-              >
-                {intent === "signup" ? "Sign in" : "Create an account"}
-              </Link>
-            </p>
-          )
-        )}
+          {fromQuiz ? (
+            <Link href={lessonBackHref} className="link-subtle mt-4 block text-center">
+              Back to lesson
+            </Link>
+          ) : (
+            intent !== "save" &&
+            step === "email" && (
+              <p className="auth-alt-link">
+                <span>
+                  {intent === "signup"
+                    ? "Already have an account?"
+                    : "New here?"}{" "}
+                </span>
+                <Link
+                  href={`/auth?intent=${intent === "signup" ? "signin" : "signup"}&returnTo=${encodeURIComponent(returnTo)}`}
+                  className="link-subtle inline"
+                >
+                  {intent === "signup" ? "Sign in" : "Create an account"}
+                </Link>
+              </p>
+            )
+          )}
+        </div>
       </div>
     </div>
   );
