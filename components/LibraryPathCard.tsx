@@ -125,7 +125,7 @@ export function LibraryPathCard({ path, tab }: Props) {
         aria-hidden
       >
         <div
-          className="h-full bg-paper transition-all duration-500"
+          className="h-full bg-accent transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
