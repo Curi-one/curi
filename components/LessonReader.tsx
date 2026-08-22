@@ -7,11 +7,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ArrowLeft, ChevronDown, Globe2, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, Globe2 } from "lucide-react";
 import { Button } from "@/components/Button";
 import { EquationBlock } from "@/components/lesson/EquationBlock";
 import { LessonImage } from "@/components/lesson/LessonImage";
 import { LessonMarkdown } from "@/components/lesson/LessonMarkdown";
+import { LessonSourcesPanel } from "@/components/lesson/LessonSourcesPanel";
 import { ShareableFact } from "@/components/lesson/ShareableFact";
 import type { LessonResponse } from "@/lib/api/schemas";
 import {
@@ -39,19 +40,6 @@ type Props = {
 function estimateReadMinutes(body: string[]): number {
   const words = body.join("").split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
-}
-
-function domainInitials(title: string, url: string): string {
-  try {
-    const host = new URL(url).hostname.replace(/^www\./, "");
-    const label = host.split(".")[0] || title;
-    return label.slice(0, 2).toUpperCase();
-  } catch {
-    return title
-      .replace(/^(The |A |An )/i, "")
-      .slice(0, 2)
-      .toUpperCase();
-  }
 }
 
 function findScrollParent(el: HTMLElement | null): HTMLElement | null {
@@ -177,15 +165,6 @@ export function LessonReader({
     document.addEventListener("mousedown", onOutside);
     return () => document.removeEventListener("mousedown", onOutside);
   }, [showReaderSettings]);
-
-  useEffect(() => {
-    if (!showSources) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") closeSources();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [showSources]);
 
   useEffect(() => {
     if (!showSources || activeSourceIndex == null) return;
@@ -530,32 +509,42 @@ export function LessonReader({
           ref={articleRef}
           className="pb-[calc(8rem+env(safe-area-inset-bottom))]"
         >
-          <div className="wall-label mb-6 flex-wrap">
-            <span>
-              Lesson {lessonIndex + 1}
-              {topicLabel ? ` · ${topicLabel}` : ""}
-            </span>
-            <span className="border border-border px-3 py-1 tracking-widest text-ink/70">
-              Today
-            </span>
-          </div>
+          <header
+            className="lesson-title-sticky"
+            data-testid="lesson-title-sticky"
+          >
+            <div className="wall-label mb-6 flex-wrap">
+              <span>
+                Lesson {lessonIndex + 1}
+                {topicLabel ? ` · ${topicLabel}` : ""}
+              </span>
+              <span className="border border-border px-3 py-1 tracking-widest text-ink/70">
+                Today
+              </span>
+            </div>
 
-          <h1 className="font-display display-section text-display-sm leading-tight tracking-tighter text-ink sm:text-display-md">
-            {lesson.title}
-          </h1>
+            <h1 className="font-display display-section text-display-sm leading-tight tracking-tighter text-ink sm:text-display-md">
+              {lesson.title}
+            </h1>
 
-          <div className="mt-5 flex flex-wrap items-center gap-2.5">
-            <span className="text-xs text-ink-muted">{readMins} min read</span>
-            <div className="mx-1 h-3 w-px bg-border" />
-            <button
-              type="button"
-              onClick={() => setShowSources(true)}
-              className="flex items-center gap-2 border border-border bg-paper px-3.5 py-1.5 text-xs font-medium text-ink/70 transition-colors hover:border-ink/30 hover:text-ink"
-            >
-              <Globe2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              Sources
-            </button>
-          </div>
+            <div className="mt-5 flex flex-wrap items-center gap-2.5">
+              <span className="text-xs text-ink-muted">{readMins} min read</span>
+              <div className="mx-1 h-3 w-px bg-border" />
+              <button
+                type="button"
+                onClick={() => setShowSources(true)}
+                className="flex items-center gap-2 border border-border bg-paper px-3.5 py-1.5 text-xs font-medium text-ink/70 transition-colors duration-small ease-out hover:border-ink/30 hover:text-ink"
+              >
+                <Globe2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                Sources
+                {lesson.sources.length > 0 ? (
+                  <span className="font-meta text-[10px] tabular-nums tracking-wider text-ink-muted">
+                    · {lesson.sources.length}
+                  </span>
+                ) : null}
+              </button>
+            </div>
+          </header>
 
           {takeaways.length > 0 && (
             <div className="mt-6 border-t border-border">
@@ -647,99 +636,14 @@ export function LessonReader({
         </div>
       </div>
 
-      {showSources && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-ink/10 backdrop-blur-[1px]"
-            onClick={closeSources}
-            aria-hidden
-          />
-          <div
-            role="dialog"
-            aria-label="Sources"
-            className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[400px] flex-col border-l border-border bg-paper"
-          >
-            <div className="flex shrink-0 items-start justify-between border-b border-border px-6 py-5">
-              <div>
-                <div className="text-xs uppercase tracking-widest text-ink-muted">
-                  Sources
-                </div>
-                <div className="mt-1 font-display text-lg font-light leading-snug text-ink">
-                  {topicLabel || lesson.title}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={closeSources}
-                className="mt-0.5 flex min-h-11 min-w-11 items-center justify-center rounded-none text-ink-muted transition hover:bg-paper-secondary hover:text-ink"
-                aria-label="Close sources"
-              >
-                <X className="h-4 w-4" aria-hidden />
-              </button>
-            </div>
-
-            <div className="shrink-0 border-b border-border bg-paper-secondary px-6 py-3">
-              <p className="text-ui-3xs leading-relaxed text-ink-muted">
-                These references informed the lesson content. Curi synthesises
-                ideas across sources — always read the originals for full
-                context.
-              </p>
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-4 py-4">
-              {lesson.sources.length === 0 ? (
-                <p className="px-2 py-6 text-sm text-ink-muted">
-                  No sources listed for this lesson yet.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {lesson.sources.map((source, i) => {
-                    let host = source.url;
-                    try {
-                      host = new URL(source.url).hostname.replace(/^www\./, "");
-                    } catch {
-                      /* keep url */
-                    }
-                    const isActive = activeSourceIndex === i;
-                    return (
-                      <a
-                        key={source.url}
-                        ref={(el) => {
-                          sourceRowRefs.current[i] = el;
-                        }}
-                        href={source.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`group flex items-start gap-3.5 rounded-none border p-4 transition-all ${
-                          isActive
-                            ? "border-ink bg-paper-tertiary"
-                            : "border-border bg-paper-secondary hover:border-ink/20 hover:bg-paper"
-                        }`}
-                      >
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-paper-tertiary text-ui-4xs font-semibold text-ink-muted">
-                          {domainInitials(source.title, source.url)}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <span className="text-sm font-medium text-ink group-hover:underline">
-                            {source.title}
-                          </span>
-                          <div className="mt-1.5 flex items-center gap-1 text-ui-4xs text-ink-muted/50">
-                            <Globe2
-                              className="h-2.5 w-2.5 shrink-0"
-                              aria-hidden
-                            />
-                            <span className="truncate">{host}</span>
-                          </div>
-                        </div>
-                      </a>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+      <LessonSourcesPanel
+        open={showSources}
+        lesson={lesson}
+        topicLabel={topicLabel}
+        activeSourceIndex={activeSourceIndex}
+        onClose={closeSources}
+        sourceRowRefs={sourceRowRefs}
+      />
     </>
   );
 }

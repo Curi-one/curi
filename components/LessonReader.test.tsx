@@ -129,7 +129,22 @@ describe("LessonReader", () => {
     expect(screen.queryByText("Working equation")).not.toBeInTheDocument();
   });
 
-  it("opens sources panel from Sources button", () => {
+  it("keeps the lesson title section sticky while scrolling", () => {
+    render(
+      <LessonReader
+        lesson={lesson}
+        lessonIndex={0}
+        topic="Unit Economics"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId("lesson-title-sticky")).toHaveClass(
+      "lesson-title-sticky",
+    );
+  });
+
+  it("opens branded sources panel from Sources button", () => {
     render(
       <LessonReader
         lesson={lesson}
@@ -140,6 +155,9 @@ describe("LessonReader", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: /sources/i }));
+    expect(screen.getByRole("dialog")).toHaveClass("sources-panel");
+    expect(screen.getByText(/2 references/i)).toBeInTheDocument();
+    expect(screen.getByTestId("lesson-source-1")).toBeInTheDocument();
     expect(screen.getByText(/these references informed/i)).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /a16z — Unit Economics/i }),

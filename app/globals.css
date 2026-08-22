@@ -1493,6 +1493,52 @@ body {
   animation: slide-up var(--duration-medium) var(--ease-out) both;
 }
 
+@keyframes sources-panel-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes sources-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sources-panel {
+  animation: sources-panel-in var(--duration-medium) var(--ease-out) both;
+}
+
+.sources-panel-backdrop {
+  animation: sources-backdrop-in var(--duration-medium) var(--ease-out) both;
+}
+
+/* Lesson reader — sticky title block (§11.1 provenance + title) */
+.lesson-title-sticky {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  margin-bottom: var(--space-6);
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-5);
+  background: color-mix(in srgb, var(--color-bg-primary) 94%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: var(--border-bold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sources-panel,
+  .sources-panel-backdrop {
+    animation-duration: 0.01ms;
+  }
+}
+
 /* Wordmark underline draw-in (§7.4) */
 @keyframes underline-draw {
   from {
