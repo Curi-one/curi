@@ -63,4 +63,27 @@ describe("daily lesson email html", () => {
     expect(html).not.toContain("Two numbers usually govern");
     expect(html).not.toContain("Key takeaways");
   });
+
+  it("includes all body paragraphs and takeaways for Full format", () => {
+    const html = renderDailyLessonEmail(payload);
+    expect(html).toContain("A startup raises $200k on a SAFE with a $5M cap.");
+    expect(html).toContain("Two numbers usually govern the conversion.");
+    expect(html).toContain("Key takeaways");
+    expect(html).toContain("One");
+    expect(html).toContain("Two");
+    expect(html).toContain("Three");
+  });
+
+  it("omits body paragraphs and takeaways for Headlines format", () => {
+    const html = renderDailyLessonEmail({
+      ...payload,
+      emailFormat: "Headlines",
+    });
+    expect(html).not.toContain(
+      "A startup raises $200k on a SAFE with a $5M cap.",
+    );
+    expect(html).not.toContain("Two numbers usually govern the conversion.");
+    expect(html).not.toContain("Key takeaways");
+    expect(html).toContain("ready in Curi");
+  });
 });

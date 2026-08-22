@@ -2,7 +2,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DepthSlug } from "@/lib/api/schemas";
 import { parseDepth } from "@/lib/courses/summary";
 import { buildFeed } from "@/lib/feed/build-feed";
-import { markdownToParagraphs } from "@/lib/lessons/body";
+import {
+  defaultLoadCourse,
+  getLessonBody,
+  markdownToParagraphs,
+} from "@/lib/lessons/body";
 import { computeStreak } from "@/lib/streak";
 import { appBaseUrl } from "@/lib/email/urls";
 import {
@@ -159,6 +163,10 @@ async function loadEnrichment(
   };
 }
 
+export type BuildDailyLessonEmailPayloadDeps = {
+  getLessonBody?: typeof getLessonBody;
+};
+
 export async function buildDailyLessonEmailPayload(
   params: {
     userId: string;
@@ -173,6 +181,7 @@ export async function buildDailyLessonEmailPayload(
   now = new Date(),
   /** QA: treat active paths as due even if already completed today. */
   sample = false,
+  deps?: BuildDailyLessonEmailPayloadDeps,
 ): Promise<DailyLessonEmailPayload | null> {
   const today = todayInTimezone(params.timezone, now);
   const [courses, activityDates, activityRowsResult] = await Promise.all([
@@ -235,7 +244,38 @@ export async function buildDailyLessonEmailPayload(
   }
 
   const enrichment = await loadEnrichment(featuredLesson.cacheKey, admin);
-  const bodyParagraphs = markdownToParagraphs(featuredLesson.body);
+  let bodyParagraphs = markdownToParagraphs(featuredLesson.body);
+  let takeaways = enrichment.takeaways;
+  let pullQuote = enrichment.pullQuote;
+
+  // Cron/preview may run before the learner opens today's lesson — stored body
+  // is empty. Generate cache-first so Full/Summary emails still include content.
+  if (params.emailFormat !== "Headlines" && bodyParagraphs.length === 0) {
+    const resolveBody = deps?.getLessonBody ?? getLessonBody;
+    const result = await resolveBody(
+      {
+        courseId: featuredCourse.id,
+        lessonIndex: featuredCourse.progress,
+        sessionId: params.userId,
+      },
+      {
+        admin,
+        loadCourse: (p) =>
+          defaultLoadCourse({ ...p, userId: params.userId }, admin),
+      },
+    );
+    if (result.ok) {
+      bodyParagraphs = result.data.body;
+      if (result.data.takeaways && result.data.takeaways.length > 0) {
+        takeaways = result.data.takeaways;
+      }
+      const fact = result.data.shareableFact;
+      if (fact) {
+        pullQuote = fact.reflection ?? fact.fact;
+      }
+    }
+  }
+
   const tomorrowTitle =
     featuredCourse.progress + 1 < featuredCourse.total
       ? await loadTomorrowTitle(
@@ -286,8 +326,8 @@ export async function buildDailyLessonEmailPayload(
       lessonIndex: featuredCourse.progress,
       totalLessons: featuredCourse.total,
       bodyParagraphs,
-      pullQuote: enrichment.pullQuote,
-      takeaways: enrichment.takeaways,
+      pullQuote,
+      takeaways,
       tomorrowTitle,
     },
     alsoDue,

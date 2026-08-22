@@ -172,6 +172,22 @@ export default function ProfilePage() {
     persistPrefs({ ...prefs, [key]: value });
   }
 
+  async function openEmailPreview() {
+    if (prefsSaveTimer.current) {
+      clearTimeout(prefsSaveTimer.current);
+      prefsSaveTimer.current = null;
+    }
+    if (session?.kind === "member") {
+      try {
+        const res = await patchPreferences(prefs);
+        setPrefs(res.preferences);
+      } catch {
+        // Navigate anyway; preview uses server prefs (may be slightly stale).
+      }
+    }
+    router.push("/email-preview");
+  }
+
   async function openPortal() {
     setPortalLoading(true);
     setPortalMessage(null);
@@ -525,12 +541,13 @@ export default function ProfilePage() {
 
             <div className="h-px bg-border" aria-hidden />
 
-            <Link
-              href="/email-preview"
+            <button
+              type="button"
+              onClick={() => void openEmailPreview()}
               className="inline-flex min-h-11 items-center text-sm text-ink underline decoration-border-strong underline-offset-4 hover:decoration-ink"
             >
               Preview today&apos;s email
-            </Link>
+            </button>
 
             <p className="text-xs leading-relaxed text-ink-muted">
               Daily emails send once per day at your chosen time when you have
