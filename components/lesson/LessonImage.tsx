@@ -1,6 +1,8 @@
 import type { LessonVisualBlock } from "@/lib/api/schemas";
 import {
   MARK_GLYPH_FONT_SIZE,
+  markGlyphOpacity,
+  markPatternOpacity,
   topicArt,
   topicPatternStyle,
 } from "@/lib/ui/topic-swatch";
@@ -33,14 +35,17 @@ export function LessonImage({ visual }: Props) {
               aria-hidden
             >
               <div
-                className="absolute inset-0 opacity-[0.16]"
-                style={topicPatternStyle(art.pattern)}
+                className="absolute inset-0"
+                style={{
+                  ...topicPatternStyle(art.pattern),
+                  opacity: markPatternOpacity("field"),
+                }}
               />
               <div
                 className="absolute inset-0 flex select-none items-end justify-end font-display"
                 style={{
                   color: art.glyphColor,
-                  opacity: 0.9,
+                  opacity: markGlyphOpacity("field"),
                   fontSize: MARK_GLYPH_FONT_SIZE,
                   fontWeight: 300,
                   lineHeight: 0.78,
