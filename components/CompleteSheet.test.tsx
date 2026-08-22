@@ -65,7 +65,7 @@ describe("CompleteSheet", () => {
         nextLessonTitle="Dilution basics"
       />,
     );
-    expect(screen.getByText(/Fundraising/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Fundraising/).length).toBeGreaterThan(0);
     expect(screen.getByText(/Lesson 2 of 10/)).toBeInTheDocument();
     expect(screen.getByText("What is a valuation?")).toBeInTheDocument();
     expect(screen.getByText("4-day streak")).toBeInTheDocument();
@@ -101,11 +101,9 @@ describe("CompleteSheet", () => {
       screen.getByText(/Lesson 2 of 8 · unlocks tomorrow/),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/A short look ahead so you know what tomorrow holds/),
-    ).toBeInTheDocument();
-    // TopicThumbnail is aria-hidden; assert the cover field is present via glyph art container
-    const thumb = container.querySelector('[aria-hidden="true"]');
-    expect(thumb).toBeTruthy();
+      screen.queryByText(/A short look ahead so you know what tomorrow holds/),
+    ).not.toBeInTheDocument();
+    expect(container.querySelector(".complete-next-lesson")).toBeTruthy();
   });
 
   it("uses lesson-number title framing when provided and paths remain", () => {

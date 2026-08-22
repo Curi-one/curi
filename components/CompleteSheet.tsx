@@ -1,8 +1,8 @@
 "use client";
 
-import { Flame, Lock } from "lucide-react";
+import { Flame } from "lucide-react";
 import { Button } from "@/components/Button";
-import { TopicThumbnail } from "@/components/TopicThumbnail";
+import { NextLessonPreviewCard } from "@/components/NextLessonPreviewCard";
 
 export type CompleteSheetProps = {
   open: boolean;
@@ -47,11 +47,6 @@ export function CompleteSheet({
 
   const showNextPreview = !pathMastered;
 
-  const nextMeta =
-    lessonNumber != null && totalLessons != null
-      ? `Lesson ${lessonNumber + 1} of ${totalLessons} · unlocks tomorrow`
-      : "Unlocks tomorrow";
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
@@ -68,7 +63,7 @@ export function CompleteSheet({
         aria-modal="true"
         aria-labelledby="complete-sheet-title"
       >
-        <div className="shrink-0 px-7 pb-6 pt-7">
+        <div className="shrink-0 px-7 pb-5 pt-7">
           {(courseTopic || lessonNumber != null) && (
             <div className="mb-2 font-meta text-ink-muted">
               {courseTopic}
@@ -108,37 +103,15 @@ export function CompleteSheet({
           )}
         </div>
 
-        <div className="mx-7 h-px shrink-0 bg-border" />
-
         <div className="min-h-0 flex-1 overflow-y-auto">
           {showNextPreview && (
-            <div className="px-7 py-5">
-              <div className="mb-4 font-meta text-ink-muted">
-                Up next · Tomorrow
-              </div>
-              <div className="flex items-start gap-4">
-                {(nextLessonTitle || courseTopic) && (
-                  <TopicThumbnail
-                    topic={nextLessonTitle ?? courseTopic!}
-                    size={72}
-                  />
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="font-display text-xl font-light leading-snug tracking-tight text-ink">
-                    {nextLessonTitle ?? "Your next lesson"}
-                  </div>
-                  <p className="mt-2 text-ui-3xs leading-relaxed text-ink-muted">
-                    {nextMeta}
-                  </p>
-                  <p className="mt-3 text-ui-sm leading-relaxed text-ink-muted/80">
-                    A short look ahead so you know what tomorrow holds.
-                  </p>
-                </div>
-                <Lock
-                  className="mt-1 h-3.5 w-3.5 shrink-0 text-ink-muted/40"
-                  aria-hidden
-                />
-              </div>
+            <div className="px-7 pb-5">
+              <NextLessonPreviewCard
+                courseTopic={courseTopic}
+                nextLessonTitle={nextLessonTitle}
+                lessonNumber={lessonNumber}
+                totalLessons={totalLessons}
+              />
             </div>
           )}
         </div>
