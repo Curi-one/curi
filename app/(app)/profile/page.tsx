@@ -49,21 +49,6 @@ function applyTheme(theme: Theme) {
   localStorage.setItem("curi-theme", theme);
 }
 
-const EMAIL_TIME_OPTIONS = [
-  { value: "early-morning", label: "Early morning · 6 AM" },
-  { value: "morning", label: "Morning · 8 AM" },
-  { value: "midday", label: "Midday · 12 PM" },
-  { value: "afternoon", label: "Afternoon · 3 PM" },
-  { value: "evening", label: "Evening · 6 PM" },
-  { value: "night", label: "Night · 9 PM" },
-] as const;
-
-const EMAIL_FORMAT_OPTIONS = [
-  { value: "Full", label: "Full lesson" },
-  { value: "Summary", label: "Summary + open in app" },
-  { value: "Headlines", label: "Headlines only" },
-] as const;
-
 const PLAN_FREE_ROWS = [
   { label: "Up to 2 active paths", on: true },
   { label: "Daily lessons + quizzes", on: true },
@@ -486,7 +471,8 @@ export default function ProfilePage() {
             <div>
               <h2 className="text-base font-medium text-ink">Daily email</h2>
               <p className="mt-1 text-sm text-ink-muted">
-                Your lesson digest, delivered on your schedule.
+                A short curiosity peek — heading + snapshot that brings you back
+                to the app.
               </p>
             </div>
             {prefsSaved && (
@@ -499,36 +485,10 @@ export default function ProfilePage() {
           <div className="mt-6 space-y-5">
             <SettingToggle
               label="Send daily email"
-              hint="One email per day, covering all your active paths."
+              hint="Arrives 7 AM local · heading + peek for each day's lessons."
               checked={prefs.emailEnabled}
               onChange={(v) => patchPrefs("emailEnabled", v)}
             />
-
-            {prefs.emailEnabled && (
-              <>
-                <div className="h-px bg-border" aria-hidden />
-                <SettingChips
-                  label="Delivery time"
-                  value={prefs.emailTime}
-                  onChange={(v) => patchPrefs("emailTime", v)}
-                  options={[...EMAIL_TIME_OPTIONS]}
-                />
-                <div className="h-px bg-border" aria-hidden />
-                <SettingChips
-                  label="Email format"
-                  hint="How much lesson content to include."
-                  value={prefs.emailFormat}
-                  onChange={(v) => patchPrefs("emailFormat", v)}
-                  options={[...EMAIL_FORMAT_OPTIONS]}
-                />
-                <SettingToggle
-                  label="Weekend delivery"
-                  hint="Send lessons on Saturday and Sunday."
-                  checked={prefs.emailWeekends}
-                  onChange={(v) => patchPrefs("emailWeekends", v)}
-                />
-              </>
-            )}
 
             <div className="h-px bg-border" aria-hidden />
 
@@ -550,8 +510,10 @@ export default function ProfilePage() {
             </button>
 
             <p className="text-xs leading-relaxed text-ink-muted">
-              Daily emails send once per day at your chosen time when you have
-              lessons due. Weekly digest delivery is coming soon.
+              Daily emails send once per day at 7 AM in your timezone when you
+              have lessons due — including weekends. Manage preferences or
+              unsubscribe from any email footer. Weekly digest delivery is
+              coming soon.
             </p>
           </div>
         </section>

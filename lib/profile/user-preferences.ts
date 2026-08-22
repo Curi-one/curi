@@ -13,12 +13,17 @@ export type EmailPreferences = {
 
 export type UserPreferences = LearningProfile & EmailPreferences;
 
-/** Opt-in email defaults; learning profile matches prototype starters. */
+/**
+ * Opt-in email defaults; learning profile matches prototype starters.
+ * `emailFormat` is always Curiosity on the send path. `emailTime` /
+ * `emailWeekends` remain in the DB for back-compat but are ignored
+ * (fixed 7 AM local, every day including weekends).
+ */
 export const DEFAULT_EMAIL_PREFERENCES: EmailPreferences = {
   emailEnabled: false,
   emailTime: "morning",
-  emailFormat: "Full",
-  emailWeekends: false,
+  emailFormat: "Curiosity",
+  emailWeekends: true,
   emailWeeklyDigest: false,
 };
 

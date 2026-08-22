@@ -79,9 +79,9 @@ curl -s "https://stage.curi.one/api/cron/daily-email?force=1&email=you@example.c
   -H "Authorization: Bearer $CRON_SECRET"
 ```
 
-`force=1` skips delivery hour, weekend, and already-sent-today checks (for manual QA). Optional `email=` limits to one inbox.
+`force=1` skips delivery hour and already-sent-today checks (for manual QA). Optional `email=` limits to one inbox.
 
-User must have **Email → Send daily email** on, a due lesson today, and the current hour must match their delivery time (user timezone).
+User must have **Email → Send daily email** on, a due lesson today, and the current local hour must be **7 AM** (user timezone). Emails are a curiosity peek (lesson heading + short snapshot + CTA into the app), every day including weekends.
 
 Preview (no send): Profile → Email → **Preview today's email**, or `GET /api/me/email-preview` when signed in.
 

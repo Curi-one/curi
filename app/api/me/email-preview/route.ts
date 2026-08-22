@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAuthenticatedUserId } from "@/lib/auth/user-id";
 import { buildDailyLessonEmailPayload } from "@/lib/email/build-daily-payload";
 import {
+  CURIOSITY_EMAIL_FORMAT,
   dailyLessonSubject,
   renderDailyLessonEmail,
 } from "@/lib/email/daily-lesson-html";
@@ -23,7 +24,7 @@ export async function GET() {
       .maybeSingle(),
     admin
       .from("user_preferences")
-      .select("email_format, unsubscribe_token")
+      .select("unsubscribe_token")
       .eq("user_id", userId)
       .maybeSingle(),
   ]);
@@ -44,7 +45,7 @@ export async function GET() {
       name: user.name,
       plan: user.plan,
       timezone: user.timezone || DEFAULT_TIMEZONE,
-      emailFormat: String(prefs?.email_format ?? "Full"),
+      emailFormat: CURIOSITY_EMAIL_FORMAT,
       unsubscribeToken: token,
     },
     admin,

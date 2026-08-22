@@ -21,7 +21,7 @@ describe("profile preferences (local fallback)", () => {
     expect(DEFAULT_PREFERENCES.length).toBe("medium");
     expect(DEFAULT_PREFERENCES.seq).toBe("straight");
     expect(DEFAULT_PREFERENCES.emailTime).toBe("morning");
-    expect(DEFAULT_PREFERENCES.emailFormat).toBe("Full");
+    expect(DEFAULT_PREFERENCES.emailFormat).toBe("Curiosity");
   });
 
   it("migrates legacy lessonDepth values to length", () => {

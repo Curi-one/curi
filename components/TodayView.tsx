@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight, Library, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, ChevronDown, Library, Sparkles } from "lucide-react";
 import type { FeedResponse } from "@/lib/api/schemas";
 import { LessonFeedCard } from "@/components/LessonFeedCard";
+
+const UPCOMING_OPEN_KEY = "curi:today-upcoming-open";
 
 type Props = FeedResponse & {
   streak?: number;
@@ -9,6 +14,23 @@ type Props = FeedResponse & {
   /** Shown after Stripe Checkout success (`/today?upgraded=1`). */
   upgradeConfirmed?: boolean;
 };
+
+function readUpcomingOpen(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return sessionStorage.getItem(UPCOMING_OPEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeUpcomingOpen(open: boolean) {
+  try {
+    sessionStorage.setItem(UPCOMING_OPEN_KEY, open ? "1" : "0");
+  } catch {
+    // ignore quota / private mode
+  }
+}
 
 export function TodayView({
   due,
@@ -20,6 +42,12 @@ export function TodayView({
 }: Props) {
   const total = due.length + done.length;
   const empty = total === 0;
+
+  const [upcomingOpen, setUpcomingOpen] = useState(false);
+
+  useEffect(() => {
+    setUpcomingOpen(readUpcomingOpen());
+  }, []);
 
   /** Course ids that still owe today's lesson — used to pick the tomorrow lock copy. */
   const courseIdsPendingToday = new Set(
@@ -103,13 +131,21 @@ export function TodayView({
     );
   }
 
+  function toggleUpcoming() {
+    setUpcomingOpen((prev) => {
+      const next = !prev;
+      writeUpcomingOpen(next);
+      return next;
+    });
+  }
+
   return (
     <div className="pb-4">
       {upgradeBanner}
       <header className="mb-10">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h1 className="type-display-xl text-ink">Today</h1>
+            <h1 className="type-display-xl text-ink">Your lessons</h1>
             {due.length > 0 && (
               <p className="type-kicker-mark mt-4 normal-case tracking-wider text-ink-muted">
                 {due.length} of {total} still to read
@@ -131,26 +167,52 @@ export function TodayView({
         <div className="editorial-rule mt-8" aria-hidden />
       </header>
 
-      {groups.map((group) => (
-        <section key={group.daysAgo} className="mb-10 last:mb-6">
-          <h2 className="type-kicker-mark mb-4">{group.label}</h2>
-          <ul className="space-y-3">
-            {group.items.map((item) => (
-              <li key={item.id}>
-                <LessonFeedCard
-                  item={item}
-                  lockedCopy={
-                    item.status === "locked" &&
-                    courseIdsPendingToday.has(item.courseId)
-                      ? "Unlocks after today's lesson"
-                      : "Unlocks tomorrow"
-                  }
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      {groups.map((group) => {
+        const isUpcoming = group.daysAgo === -1;
+        const showItems = !isUpcoming || upcomingOpen;
+
+        return (
+          <section key={group.daysAgo} className="mb-10 last:mb-6">
+            {isUpcoming ? (
+              <h2 className="mb-4">
+                <button
+                  type="button"
+                  onClick={toggleUpcoming}
+                  className="focus-ring type-kicker-mark flex w-full items-center justify-between gap-2 rounded-none text-left"
+                  aria-expanded={upcomingOpen}
+                >
+                  <span>{group.label}</span>
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 text-ink-muted transition-transform duration-200 ${
+                      upcomingOpen ? "rotate-180" : ""
+                    }`}
+                    aria-hidden
+                  />
+                </button>
+              </h2>
+            ) : (
+              <h2 className="type-kicker-mark mb-4">{group.label}</h2>
+            )}
+            {showItems ? (
+              <ul className="space-y-3">
+                {group.items.map((item) => (
+                  <li key={item.id}>
+                    <LessonFeedCard
+                      item={item}
+                      lockedCopy={
+                        item.status === "locked" &&
+                        courseIdsPendingToday.has(item.courseId)
+                          ? "Unlocks after today's lesson"
+                          : "Unlocks tomorrow"
+                      }
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+        );
+      })}
 
       <div className="mt-12 text-center">
         <Link

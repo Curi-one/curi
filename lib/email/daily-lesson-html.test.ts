@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  curiositySnapshot,
   dailyLessonSubject,
   renderDailyLessonEmail,
 } from "@/lib/email/daily-lesson-html";
@@ -9,7 +10,7 @@ const payload = {
   userName: "Awais",
   streak: 8,
   dateLabel: "21 August 2026",
-  emailFormat: "Full",
+  emailFormat: "Curiosity",
   featured: {
     topic: "Term Sheets",
     depthLabel: "Essentials",
@@ -44,46 +45,63 @@ describe("daily lesson email html", () => {
     );
   });
 
-  it("renders prototype chrome and lesson content", () => {
+  it("renders curiosity peek with title, snapshot, and strong CTA — not full lesson", () => {
     const html = renderDailyLessonEmail(payload);
     expect(html).toContain("How a SAFE converts to equity");
     expect(html).toContain("Also due today");
     expect(html).toContain("The Nash equilibrium");
-    expect(html).toContain("Key takeaways");
-    expect(html).toContain("Unsubscribe");
-  });
-
-  it("respects summary format by truncating body", () => {
-    const html = renderDailyLessonEmail({
-      ...payload,
-      alsoDue: [],
-      emailFormat: "Summary",
-    });
-    expect(html).toContain("A startup raises $200k");
-    expect(html).not.toContain("Two numbers usually govern");
-    expect(html).not.toContain("Key takeaways");
-  });
-
-  it("includes all body paragraphs and takeaways for Full format", () => {
-    const html = renderDailyLessonEmail(payload);
-    expect(html).toContain("A startup raises $200k on a SAFE with a $5M cap.");
-    expect(html).toContain("Two numbers usually govern the conversion.");
-    expect(html).toContain("Key takeaways");
     expect(html).toContain("One");
-    expect(html).toContain("Two");
-    expect(html).toContain("Three");
-  });
-
-  it("omits body paragraphs and takeaways for Headlines format", () => {
-    const html = renderDailyLessonEmail({
-      ...payload,
-      emailFormat: "Headlines",
-    });
+    expect(html).toContain("Open today's lessons →");
+    expect(html).toContain("Unsubscribe");
+    // Curiosity: first takeaway only — not the full takeaways list or body
+    expect(html).not.toContain("Key takeaways");
+    expect(html).not.toContain("Two");
+    expect(html).not.toContain("Three");
     expect(html).not.toContain(
       "A startup raises $200k on a SAFE with a $5M cap.",
     );
     expect(html).not.toContain("Two numbers usually govern the conversion.");
-    expect(html).not.toContain("Key takeaways");
-    expect(html).toContain("ready in Curi");
+  });
+
+  it("prefers first takeaway for snapshot", () => {
+    expect(curiositySnapshot(payload.featured)).toBe("One");
+  });
+
+  it("falls back to pullQuote then truncated body then calm line", () => {
+    expect(
+      curiositySnapshot({
+        ...payload.featured,
+        takeaways: [],
+      }),
+    ).toBe("The cap sets a ceiling on the price used to convert.");
+
+    expect(
+      curiositySnapshot({
+        ...payload.featured,
+        takeaways: [],
+        pullQuote: undefined,
+      }),
+    ).toBe("A startup raises $200k on a SAFE with a $5M cap.");
+
+    const long =
+      "Word ".repeat(60).trim() +
+      " end.";
+    const snap = curiositySnapshot({
+      ...payload.featured,
+      takeaways: [],
+      pullQuote: undefined,
+      bodyParagraphs: [long],
+    });
+    expect(snap.length).toBeLessThanOrEqual(201);
+    expect(snap.endsWith("…")).toBe(true);
+
+    expect(
+      curiositySnapshot({
+        ...payload.featured,
+        takeaways: [],
+        pullQuote: undefined,
+        bodyParagraphs: [],
+      }),
+    ).toBe("Today's lesson is ready");
   });
 });

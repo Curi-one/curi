@@ -13,7 +13,10 @@ import {
   buildSignedEmailOpenUrl,
   lessonPagePath,
 } from "@/lib/email/signed-open-link";
-import type { DailyLessonEmailPayload } from "@/lib/email/daily-lesson-html";
+import {
+  CURIOSITY_EMAIL_FORMAT,
+  type DailyLessonEmailPayload,
+} from "@/lib/email/daily-lesson-html";
 import { todayInTimezone } from "@/lib/timezone";
 
 const DEPTH_LABELS: Record<DepthSlug, string> = {
@@ -174,7 +177,8 @@ export async function buildDailyLessonEmailPayload(
     name: string | null;
     plan: string;
     timezone: string;
-    emailFormat: string;
+    /** Ignored — send path always uses Curiosity. Kept for call-site compatibility. */
+    emailFormat?: string;
     unsubscribeToken: string;
   },
   admin: SupabaseClient,
@@ -248,9 +252,14 @@ export async function buildDailyLessonEmailPayload(
   let takeaways = enrichment.takeaways;
   let pullQuote = enrichment.pullQuote;
 
-  // Cron/preview may run before the learner opens today's lesson — stored body
-  // is empty. Generate cache-first so Full/Summary emails still include content.
-  if (params.emailFormat !== "Headlines" && bodyParagraphs.length === 0) {
+  // Curiosity emails only need a short snapshot. If nothing is stored yet
+  // (cron before open), generate cache-first so we can peek takeaway / quote /
+  // first paragraph — never rendered as a full lesson body.
+  const needsSnapshotMaterial =
+    takeaways.length === 0 &&
+    !pullQuote &&
+    bodyParagraphs.length === 0;
+  if (needsSnapshotMaterial) {
     const resolveBody = deps?.getLessonBody ?? getLessonBody;
     const result = await resolveBody(
       {
@@ -318,7 +327,7 @@ export async function buildDailyLessonEmailPayload(
     userName: params.name?.trim() || params.email.split("@")[0] || "Learner",
     streak,
     dateLabel,
-    emailFormat: params.emailFormat,
+    emailFormat: CURIOSITY_EMAIL_FORMAT,
     featured: {
       topic: featuredCourse.topic,
       depthLabel: DEPTH_LABELS[featuredCourse.depth],
