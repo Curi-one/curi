@@ -18,6 +18,7 @@ import {
   postQuiz,
 } from "@/lib/api/client";
 import type { LessonFeel as LessonFeelType } from "@/lib/api/schemas";
+import type { TrackCertificateResponse } from "@/lib/certificates/types";
 
 type Phase = "quiz" | "feel" | "done";
 
@@ -28,9 +29,11 @@ type SheetState = {
   streak?: number;
   lessonTitle?: string;
   courseTopic?: string;
+  courseId?: string;
   lessonNumber?: number;
   totalLessons?: number;
   nextLessonTitle?: string;
+  certificate?: TrackCertificateResponse["certificate"];
 };
 
 export default function QuizPage() {
@@ -121,12 +124,14 @@ export default function QuizPage() {
         streak,
         lessonTitle: courseMeta.lessonTitle,
         courseTopic: courseMeta.topic,
+        courseId: params.courseId,
         lessonNumber: Number.isFinite(lessonIndex)
           ? lessonIndex + 1
           : undefined,
         totalLessons: courseMeta.totalLessons,
         nextLessonTitle:
           result.pathMastered === true ? undefined : courseMeta.nextLessonTitle,
+        certificate: result.certificate,
       });
       setPhase("done");
     } catch {
@@ -207,9 +212,11 @@ export default function QuizPage() {
         streak={sheet.streak}
         lessonTitle={sheet.lessonTitle}
         courseTopic={sheet.courseTopic}
+        courseId={sheet.courseId}
         lessonNumber={sheet.lessonNumber}
         totalLessons={sheet.totalLessons}
         nextLessonTitle={sheet.nextLessonTitle}
+        certificate={sheet.certificate}
         onClose={() =>
           setSheet({ open: false, allDone: false, pathMastered: false })
         }

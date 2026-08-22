@@ -175,6 +175,12 @@ export function getCourseMap(courseId: string) {
   return apiFetch<CourseMapResponse>(`/api/courses/${courseId}`);
 }
 
+export function getTrackCertificate(courseId: string) {
+  return apiFetch<import("@/lib/certificates/types").TrackCertificateResponse>(
+    `/api/courses/${courseId}/certificate`,
+  );
+}
+
 export type ExploreResponse = {
   paths: CataloguePath[];
   books: CatalogueBook[];
