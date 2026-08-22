@@ -1215,6 +1215,10 @@ body {
     }
   }
 
+  .app-shell.lesson-reader-page {
+    overflow-x: visible;
+  }
+
   /** Member chrome — one continuous paper canvas (same as landing). */
   .app-main {
     background: var(--color-bg-primary);
@@ -1856,17 +1860,65 @@ body {
   animation: sources-backdrop-in var(--duration-medium) var(--ease-out) both;
 }
 
-/* Lesson reader — sticky title block (§11.1 provenance + title) */
+.lesson-reader-root {
+  overflow: visible;
+}
 .lesson-title-sticky {
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
   margin-bottom: var(--space-6);
+  margin-left: calc(-1 * var(--grid-margin-mobile));
+  margin-right: calc(-1 * var(--grid-margin-mobile));
   padding-top: var(--space-2);
   padding-bottom: var(--space-5);
+  padding-left: var(--grid-margin-mobile);
+  padding-right: var(--grid-margin-mobile);
   background: color-mix(in srgb, var(--color-bg-primary) 94%, transparent);
   backdrop-filter: blur(10px);
   border-bottom: var(--border-bold);
+}
+
+@media (min-width: 768px) {
+  .lesson-title-sticky {
+    margin-left: calc(-1 * var(--grid-margin-tablet));
+    margin-right: calc(-1 * var(--grid-margin-tablet));
+    padding-left: var(--grid-margin-tablet);
+    padding-right: var(--grid-margin-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .lesson-title-sticky {
+    margin-left: calc(-1 * var(--grid-margin-desktop));
+    margin-right: calc(-1 * var(--grid-margin-desktop));
+    padding-left: var(--grid-margin-desktop);
+    padding-right: var(--grid-margin-desktop);
+  }
+}
+
+/* Full-viewport read progress — pinned to bottom edge above quiz dock */
+.lesson-read-progress {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: calc(var(--z-sticky) + 5);
+  height: 3px;
+  pointer-events: none;
+  background: var(--color-bg-tertiary);
+}
+
+.lesson-quiz-dock {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 3px;
+  z-index: var(--z-sticky);
+}
+
+@media (min-width: 768px) {
+  .lesson-quiz-dock {
+    inset-inline-start: 84px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
