@@ -9,6 +9,8 @@ export type CataloguePath = {
   depth: DepthSlug;
   /** Browse category (F3). See docs/DATA.md taxonomy note. */
   category: string;
+  /** Optional sub-group within category for large catalogues. */
+  subcategory?: string;
   tag?: string;
 };
 
@@ -20,6 +22,7 @@ export type CatalogueBook = {
   pathCount: number;
   /** Browse category (F3). See docs/DATA.md taxonomy note. */
   category: string;
+  subcategory?: string;
   tag?: string;
 };
 
@@ -64,7 +67,18 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
       "How VC funds work and what first-time founders need before the first institutional round.",
     depth: "fluent",
     category: "Raising & deal terms",
+    subcategory: "Fundraising",
     tag: "Fundraising",
+  },
+  {
+    id: "catalogue-pitch-decks",
+    topic: "Pitch Decks",
+    description:
+      "Story, traction, and the slides investors actually read before they take a meeting.",
+    depth: "essentials",
+    category: "Raising & deal terms",
+    subcategory: "Fundraising",
+    tag: "Pitch",
   },
   {
     id: "catalogue-term-sheets",
@@ -73,6 +87,7 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
       "Valuation, preferences, and governance — the clauses that become real when you sign.",
     depth: "fluent",
     category: "Raising & deal terms",
+    subcategory: "Deal structure",
     tag: "Deals",
   },
   {
@@ -82,6 +97,7 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
       "Simple until they convert. The ownership math founders need before the priced round.",
     depth: "essentials",
     category: "Raising & deal terms",
+    subcategory: "Deal structure",
     tag: "Instruments",
   },
   {
@@ -91,7 +107,28 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
       "Ownership, dilution, and option pools — the spreadsheet investors actually read.",
     depth: "essentials",
     category: "Raising & deal terms",
+    subcategory: "Equity",
     tag: "Equity",
+  },
+  {
+    id: "catalogue-dilution",
+    topic: "Dilution",
+    description:
+      "How each round reshapes ownership — and why founders underestimate it.",
+    depth: "essentials",
+    category: "Raising & deal terms",
+    subcategory: "Equity",
+    tag: "Equity",
+  },
+  {
+    id: "catalogue-board-dynamics",
+    topic: "Board Dynamics",
+    description:
+      "Governance, consent rights, and the working relationship that outlasts any term sheet.",
+    depth: "fluent",
+    category: "Raising & deal terms",
+    subcategory: "Governance",
+    tag: "Governance",
   },
   {
     id: "catalogue-unit-economics",
@@ -100,6 +137,17 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
       "CAC, LTV, payback, and the customer-level math investors expect you to know.",
     depth: "essentials",
     category: "While you're building",
+    subcategory: "Metrics",
+    tag: "Metrics",
+  },
+  {
+    id: "catalogue-cohort-analysis",
+    topic: "Cohort Analysis",
+    description:
+      "Retention curves that tell the truth about product-market fit before revenue does.",
+    depth: "fluent",
+    category: "While you're building",
+    subcategory: "Metrics",
     tag: "Metrics",
   },
   {
@@ -109,6 +157,7 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
       "How companies actually make money, and why the model matters more than the product.",
     depth: "essentials",
     category: "While you're building",
+    subcategory: "Strategy",
     tag: "Models",
   },
   {
@@ -118,7 +167,28 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
       "The perception games behind every price a customer agrees to pay.",
     depth: "essentials",
     category: "While you're building",
+    subcategory: "Go-to-market",
     tag: "Pricing",
+  },
+  {
+    id: "catalogue-customer-discovery",
+    topic: "Customer Discovery",
+    description:
+      "Interviews, hypotheses, and the discipline of learning before you build.",
+    depth: "essentials",
+    category: "While you're building",
+    subcategory: "Product",
+    tag: "Product",
+  },
+  {
+    id: "catalogue-product-market-fit",
+    topic: "Product-Market Fit",
+    description:
+      "Signals, false positives, and the messy middle between idea and traction.",
+    depth: "fluent",
+    category: "While you're building",
+    subcategory: "Product",
+    tag: "Product",
   },
   {
     id: "catalogue-behavioral-economics",
@@ -127,6 +197,7 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
       "The cognitive biases that quietly shape decisions classical economics assumes away.",
     depth: "fluent",
     category: "Decisions & behavior",
+    subcategory: "Psychology",
     tag: "Economics",
   },
   {
@@ -136,7 +207,28 @@ export const CATALOGUE_PATHS: CataloguePath[] = [
       "Leverage, anchoring, and the preparation that decides a deal before anyone speaks.",
     depth: "essentials",
     category: "Decisions & behavior",
+    subcategory: "Negotiation",
     tag: "Negotiation",
+  },
+  {
+    id: "catalogue-mental-models",
+    topic: "Mental Models",
+    description:
+      "Frameworks for clearer thinking when the problem has no obvious answer.",
+    depth: "essentials",
+    category: "Decisions & behavior",
+    subcategory: "Psychology",
+    tag: "Thinking",
+  },
+  {
+    id: "catalogue-game-theory",
+    topic: "Game Theory",
+    description:
+      "Incentives, equilibria, and why rational actors still produce irrational outcomes.",
+    depth: "fluent",
+    category: "Decisions & behavior",
+    subcategory: "Strategy",
+    tag: "Strategy",
   },
 ];
 
@@ -148,6 +240,7 @@ export const CATALOGUE_BOOKS: CatalogueBook[] = [
     description: "Biases, heuristics, and how we really decide.",
     pathCount: 12,
     category: "Behavioral economics",
+    subcategory: "Decision science",
     tag: "Decisions",
   },
   {
@@ -158,6 +251,7 @@ export const CATALOGUE_BOOKS: CatalogueBook[] = [
       "The behavioural economics of why people buy — anchoring, relativity, and the power of defaults.",
     pathCount: 9,
     category: "Behavioral economics",
+    subcategory: "Decision science",
     tag: "Pricing",
   },
   {
@@ -168,7 +262,19 @@ export const CATALOGUE_BOOKS: CatalogueBook[] = [
       "Improving decisions without removing choice — the architecture behind every default.",
     pathCount: 8,
     category: "Behavioral economics",
+    subcategory: "Design",
     tag: "Design",
+  },
+  {
+    id: "book-influence",
+    title: "Influence",
+    author: "Robert Cialdini",
+    description:
+      "Reciprocity, scarcity, and the psychology of persuasion in markets and teams.",
+    pathCount: 10,
+    category: "Behavioral economics",
+    subcategory: "Persuasion",
+    tag: "Persuasion",
   },
   {
     id: "book-sapiens",
@@ -177,6 +283,7 @@ export const CATALOGUE_BOOKS: CatalogueBook[] = [
     description: "A brief history of humankind in digestible paths.",
     pathCount: 18,
     category: "Founder mindset",
+    subcategory: "History",
     tag: "History",
   },
   {
@@ -187,7 +294,51 @@ export const CATALOGUE_BOOKS: CatalogueBook[] = [
       "Monopoly, not competition, is the goal — what that means for how you build and pitch.",
     pathCount: 8,
     category: "Founder mindset",
+    subcategory: "Strategy",
     tag: "Strategy",
+  },
+  {
+    id: "book-lean-startup",
+    title: "The Lean Startup",
+    author: "Eric Ries",
+    description:
+      "Build-measure-learn loops and the discipline of validated learning.",
+    pathCount: 11,
+    category: "Founder mindset",
+    subcategory: "Building",
+    tag: "Building",
+  },
+  {
+    id: "book-hard-thing",
+    title: "The Hard Thing About Hard Things",
+    author: "Ben Horowitz",
+    description:
+      "Leading through the moments no playbook covers — layoffs, pivots, and wartime CEO.",
+    pathCount: 14,
+    category: "Founder mindset",
+    subcategory: "Leadership",
+    tag: "Leadership",
+  },
+  {
+    id: "book-high-output",
+    title: "High Output Management",
+    author: "Andy Grove",
+    description:
+      "Meetings, metrics, and managerial leverage — operations for scaling teams.",
+    pathCount: 10,
+    category: "Operating a company",
+    subcategory: "Management",
+    tag: "Management",
+  },
+  {
+    id: "book-measure",
+    title: "Measure What Matters",
+    author: "John Doerr",
+    description: "OKRs and the rhythm of focus at growing companies.",
+    pathCount: 7,
+    category: "Operating a company",
+    subcategory: "Management",
+    tag: "OKRs",
   },
 ];
 

@@ -27,4 +27,14 @@ describe("getExploreCatalogue", () => {
     );
     expect(catalogue.bookCategories.length).toBeGreaterThanOrEqual(2);
   });
+
+  it("derives taxonomy trees with subcategories", () => {
+    const catalogue = getExploreCatalogue();
+
+    expect(catalogue.pathTaxonomy.length).toBeGreaterThanOrEqual(2);
+    expect(catalogue.bookTaxonomy.length).toBeGreaterThanOrEqual(2);
+    for (const group of catalogue.pathTaxonomy) {
+      expect(group.subcategories.length).toBeGreaterThan(0);
+    }
+  });
 });

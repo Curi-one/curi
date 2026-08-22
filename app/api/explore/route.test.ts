@@ -35,4 +35,12 @@ describe("GET /api/explore", () => {
       body.books.every((b: { category?: string }) => Boolean(b.category)),
     ).toBe(true);
   });
+
+  it("returns category taxonomy with subcategories", async () => {
+    const res = await GET();
+    const body = await res.json();
+    expect(body.pathTaxonomy.length).toBeGreaterThanOrEqual(2);
+    expect(body.bookTaxonomy.length).toBeGreaterThanOrEqual(2);
+    expect(body.pathTaxonomy[0]?.subcategories.length).toBeGreaterThan(0);
+  });
 });
