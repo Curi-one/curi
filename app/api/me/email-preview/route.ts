@@ -60,5 +60,6 @@ export async function GET() {
   return NextResponse.json({
     subject: dailyLessonSubject(payload),
     html: renderDailyLessonEmail(payload),
+    emailFormat: payload.emailFormat,
   });
 }

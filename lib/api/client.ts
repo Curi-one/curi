@@ -219,7 +219,10 @@ export function getPreferences() {
 }
 
 export function getEmailPreview() {
-  return apiFetch<{ subject: string; html: string }>("/api/me/email-preview");
+  return apiFetch<{ subject: string; html: string; emailFormat?: string }>(
+    "/api/me/email-preview",
+    { skipCache: true },
+  );
 }
 
 export function patchPreferences(
