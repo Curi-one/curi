@@ -20,5 +20,6 @@ export const EMAIL_TIME_HOURS: Record<string, number> = {
 
 /** Always returns the fixed 7 AM hour; chip labels are ignored. */
 export function emailTimeToHour(_emailTime?: string): number {
+  void _emailTime;
   return FIXED_EMAIL_DELIVERY_HOUR;
 }
