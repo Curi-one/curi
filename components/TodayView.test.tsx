@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it } from "vitest";
 import { TodayView } from "@/components/TodayView";
 import type {
   FeedDayGroup,
@@ -43,6 +44,10 @@ function lessonItem(overrides: Partial<FeedLessonItem>): FeedLessonItem {
 }
 
 describe("TodayView", () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
+
   it("renders day groups with available and completed lesson cards", () => {
     const groups: FeedDayGroup[] = [
       {
@@ -78,7 +83,10 @@ describe("TodayView", () => {
       />,
     );
 
-    expect(screen.getAllByText("Today").length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Your lessons" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Today")).toBeInTheDocument();
     expect(screen.getByText("Stoicism")).toBeInTheDocument();
     expect(screen.getByText("Sleep science")).toBeInTheDocument();
     expect(screen.getByText("1 of 2 still to read")).toBeInTheDocument();
@@ -123,7 +131,8 @@ describe("TodayView", () => {
     expect(screen.getByText("Completed")).toBeInTheDocument();
   });
 
-  it("renders a locked tomorrow section with unlock copy", () => {
+  it("collapses upcoming by default and expands on toggle", async () => {
+    const user = userEvent.setup();
     const groups: FeedDayGroup[] = [
       {
         daysAgo: -1,
@@ -161,14 +170,57 @@ describe("TodayView", () => {
       />,
     );
 
-    expect(screen.getByText("Tomorrow")).toBeInTheDocument();
+    const toggle = screen.getByRole("button", { name: "Tomorrow" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(
+      screen.queryByText("Unlocks after today's lesson"),
+    ).not.toBeInTheDocument();
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
     expect(
       screen.getByText("Unlocks after today's lesson"),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /control/ })).not.toBeNull();
+    expect(sessionStorage.getItem("curi:today-upcoming-open")).toBe("1");
   });
 
-  it("does not show an all-caught-up card when nothing is due", () => {
+  it("restores upcoming open state from sessionStorage", async () => {
+    sessionStorage.setItem("curi:today-upcoming-open", "1");
+    const groups: FeedDayGroup[] = [
+      {
+        daysAgo: -1,
+        label: "Tomorrow",
+        items: [
+          lessonItem({
+            id: "a-tomorrow",
+            courseId: "a",
+            status: "locked",
+          }),
+        ],
+      },
+    ];
+
+    render(
+      <TodayView
+        due={[]}
+        done={done}
+        groups={groups}
+        streak={3}
+        streakAtRisk={false}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Tomorrow" })).toHaveAttribute(
+        "aria-expanded",
+        "true",
+      );
+    });
+    expect(screen.getByText("Unlocks tomorrow")).toBeInTheDocument();
+  });
+
+  it("does not show an all-caught-up card when nothing is due", async () => {
+    sessionStorage.setItem("curi:today-upcoming-open", "1");
     const groups: FeedDayGroup[] = [
       {
         daysAgo: -1,
@@ -194,7 +246,9 @@ describe("TodayView", () => {
     );
 
     expect(screen.queryByText(/all caught up/i)).not.toBeInTheDocument();
-    expect(screen.getByText("Unlocks tomorrow")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Unlocks tomorrow")).toBeInTheDocument();
+    });
   });
 
   it("shows welcome headline and full-width action rows when empty", () => {

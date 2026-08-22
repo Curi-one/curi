@@ -2,46 +2,47 @@ import { describe, expect, it } from "vitest";
 import {
   alreadySentDailyEmail,
   isDeliveryHour,
-  isWeekendBlocked,
   shouldSendDailyEmail,
 } from "@/lib/email/eligibility";
 
 describe("daily email eligibility", () => {
   const prefs = {
     emailEnabled: true,
-    emailTime: "morning",
-    emailWeekends: false,
   };
 
   it("blocks when email is disabled", () => {
     expect(
       shouldSendDailyEmail(
-        { ...prefs, emailEnabled: false },
+        { emailEnabled: false },
         null,
         "UTC",
-        new Date("2026-08-21T08:00:00Z"),
+        new Date("2026-08-21T07:00:00Z"),
       ),
     ).toBe(false);
   });
 
-  it("blocks weekend delivery when weekends are off", () => {
+  it("allows weekend delivery at 7 AM (weekends always on)", () => {
     // 2026-08-22 is Saturday in UTC
     expect(
-      isWeekendBlocked(false, "UTC", new Date("2026-08-22T08:00:00Z")),
-    ).toBe(true);
-    expect(
       shouldSendDailyEmail(
         prefs,
         null,
         "UTC",
-        new Date("2026-08-22T08:00:00Z"),
+        new Date("2026-08-22T07:00:00Z"),
       ),
-    ).toBe(false);
+    ).toBe(true);
   });
 
-  it("allows delivery on weekday at preferred hour", () => {
+  it("allows delivery at fixed 7 AM hour regardless of legacy emailTime", () => {
+    expect(isDeliveryHour("UTC", new Date("2026-08-21T07:00:00Z"))).toBe(true);
+    expect(isDeliveryHour("UTC", new Date("2026-08-21T08:00:00Z"))).toBe(false);
     expect(
-      isDeliveryHour("morning", "UTC", new Date("2026-08-21T08:00:00Z")),
+      shouldSendDailyEmail(
+        { ...prefs, emailTime: "evening", emailWeekends: false },
+        null,
+        "UTC",
+        new Date("2026-08-21T07:00:00Z"),
+      ),
     ).toBe(true);
     expect(
       shouldSendDailyEmail(
@@ -50,15 +51,15 @@ describe("daily email eligibility", () => {
         "UTC",
         new Date("2026-08-21T08:00:00Z"),
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("skips when already sent today in user timezone", () => {
     expect(
       alreadySentDailyEmail(
-        "2026-08-21T07:30:00Z",
+        "2026-08-21T06:30:00Z",
         "UTC",
-        new Date("2026-08-21T08:00:00Z"),
+        new Date("2026-08-21T07:00:00Z"),
       ),
     ).toBe(true);
   });

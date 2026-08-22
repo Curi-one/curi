@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildDailyLessonEmailPayload } from "@/lib/email/build-daily-payload";
 import {
+  CURIOSITY_EMAIL_FORMAT,
   dailyLessonSubject,
   renderDailyLessonEmail,
 } from "@/lib/email/daily-lesson-html";
@@ -39,7 +40,7 @@ export type DailyEmailDispatchDeps = {
   admin?: SupabaseClient;
   now?: () => Date;
   send?: typeof sendEmail;
-  /** Manual test: skip hour, weekend, and already-sent-today gates. */
+  /** Manual test: skip hour and already-sent-today gates. */
   force?: boolean;
   /** Manual test: send only to this address (case-insensitive). */
   onlyEmail?: string;
@@ -112,14 +113,11 @@ export async function dispatchDailyLessonEmails(
         ? user.timezone
         : DEFAULT_TIMEZONE;
 
+    // email_time / email_weekends columns are ignored — fixed 7 AM local, every day.
     const eligibleNow =
       deps?.force === true ||
       shouldSendDailyEmail(
-        {
-          emailEnabled: pref.email_enabled,
-          emailTime: pref.email_time,
-          emailWeekends: pref.email_weekends,
-        },
+        { emailEnabled: pref.email_enabled },
         pref.last_email_sent_at,
         timezone,
         now,
@@ -146,7 +144,7 @@ export async function dispatchDailyLessonEmails(
           name: user.name,
           plan: user.plan,
           timezone,
-          emailFormat: pref.email_format,
+          emailFormat: CURIOSITY_EMAIL_FORMAT,
           unsubscribeToken: token,
         },
         admin,

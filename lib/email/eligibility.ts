@@ -1,4 +1,4 @@
-import { emailTimeToHour } from "@/lib/email/time-slots";
+import { FIXED_EMAIL_DELIVERY_HOUR } from "@/lib/email/time-slots";
 import {
   dayOfWeekInTimezone,
   hourInTimezone,
@@ -7,8 +7,10 @@ import {
 
 export type DailyEmailPrefs = {
   emailEnabled: boolean;
-  emailTime: string;
-  emailWeekends: boolean;
+  /** Ignored — delivery is always 7 AM local. Kept for call-site compatibility. */
+  emailTime?: string;
+  /** Ignored — weekends always allowed. Kept for call-site compatibility. */
+  emailWeekends?: boolean;
 };
 
 export function alreadySentDailyEmail(
@@ -22,6 +24,7 @@ export function alreadySentDailyEmail(
   return sentDay === today;
 }
 
+/** @deprecated Weekends are always allowed; kept for older tests/callers. */
 export function isWeekendBlocked(
   emailWeekends: boolean,
   timezone: string,
@@ -32,14 +35,14 @@ export function isWeekendBlocked(
   return dow === 0 || dow === 6;
 }
 
-export function isDeliveryHour(
-  emailTime: string,
-  timezone: string,
-  now: Date,
-): boolean {
-  return hourInTimezone(timezone, now) === emailTimeToHour(emailTime);
+export function isDeliveryHour(timezone: string, now: Date): boolean {
+  return hourInTimezone(timezone, now) === FIXED_EMAIL_DELIVERY_HOUR;
 }
 
+/**
+ * Send when enabled, not already sent today, and local hour is 7.
+ * Ignores legacy email_time / email_weekends prefs.
+ */
 export function shouldSendDailyEmail(
   prefs: DailyEmailPrefs,
   lastEmailSentAt: string | null | undefined,
@@ -47,7 +50,6 @@ export function shouldSendDailyEmail(
   now: Date,
 ): boolean {
   if (!prefs.emailEnabled) return false;
-  if (isWeekendBlocked(prefs.emailWeekends, timezone, now)) return false;
   if (alreadySentDailyEmail(lastEmailSentAt, timezone, now)) return false;
-  return isDeliveryHour(prefs.emailTime, timezone, now);
+  return isDeliveryHour(timezone, now);
 }

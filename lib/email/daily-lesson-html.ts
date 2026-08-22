@@ -1,3 +1,5 @@
+export const CURIOSITY_EMAIL_FORMAT = "Curiosity" as const;
+
 export type DailyLessonFeatured = {
   topic: string;
   depthLabel: string;
@@ -21,6 +23,7 @@ export type DailyLessonEmailPayload = {
   userName: string;
   streak: number;
   dateLabel: string;
+  /** Always Curiosity; legacy Full/Summary/Headlines map to the same template. */
   emailFormat: string;
   featured: DailyLessonFeatured;
   alsoDue: DailyLessonAlsoDue[];
@@ -46,29 +49,34 @@ function stripMarkdown(text: string): string {
     .trim();
 }
 
-function formatParagraphs(paragraphs: string[]): string {
-  return paragraphs
-    .map(
-      (p) =>
-        `<p style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:15px;font-weight:300;line-height:1.75;color:#0A0908;margin:16px 0 0;">${escapeHtml(stripMarkdown(p))}</p>`,
-    )
-    .join("");
-}
+const SNAPSHOT_FALLBACK = "Today's lesson is ready";
+const SNAPSHOT_MAX_CHARS = 200;
 
-function bodyForFormat(
-  payload: DailyLessonEmailPayload,
-): { paragraphs: string[]; showTakeaways: boolean } {
-  const { featured, emailFormat } = payload;
-  if (emailFormat === "Headlines") {
-    return { paragraphs: [], showTakeaways: false };
+/**
+ * Short peek into the lesson — never the full body or takeaways list.
+ * Prefer first takeaway → pullQuote → first body paragraph (truncated) → calm fallback.
+ */
+export function curiositySnapshot(featured: DailyLessonFeatured): string {
+  const firstTakeaway = featured.takeaways.find(
+    (t) => typeof t === "string" && t.trim().length > 0,
+  );
+  if (firstTakeaway) {
+    return stripMarkdown(firstTakeaway);
   }
-  if (emailFormat === "Summary") {
-    return {
-      paragraphs: featured.bodyParagraphs.slice(0, 1),
-      showTakeaways: false,
-    };
+  if (featured.pullQuote?.trim()) {
+    return stripMarkdown(featured.pullQuote);
   }
-  return { paragraphs: featured.bodyParagraphs, showTakeaways: true };
+  const firstPara = featured.bodyParagraphs.find(
+    (p) => typeof p === "string" && p.trim().length > 0,
+  );
+  if (firstPara) {
+    const plain = stripMarkdown(firstPara);
+    if (plain.length <= SNAPSHOT_MAX_CHARS) return plain;
+    const cut = plain.slice(0, SNAPSHOT_MAX_CHARS);
+    const lastSpace = cut.lastIndexOf(" ");
+    return `${(lastSpace > 40 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+  }
+  return SNAPSHOT_FALLBACK;
 }
 
 export function dailyLessonSubject(payload: DailyLessonEmailPayload): string {
@@ -97,30 +105,13 @@ export function renderDailyLessonEmail(payload: DailyLessonEmailPayload): string
     ? `${totalDue} active paths`
     : `${featured.topic} · ${featured.depthLabel}`;
   const dayNum = Math.max(streak, 1);
-  const { paragraphs, showTakeaways } = bodyForFormat(payload);
+  const snapshot = curiositySnapshot(featured);
 
   const featuredLabel = hasMultiple
     ? `<div style="padding:20px 36px 0;font-family:'JetBrains Mono','Courier New',monospace;font-size:8px;letter-spacing:0.25em;text-transform:uppercase;color:#C1121F;">Featured · ${escapeHtml(featured.topic)}</div>`
     : "";
 
-  const bodyHtml =
-    payload.emailFormat === "Headlines"
-      ? `<p style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:15px;line-height:1.6;color:#0A0908;margin:0;">Your ${totalDue} lesson${totalDue === 1 ? "" : "s"} for today ${totalDue === 1 ? "is" : "are"} ready in Curi.</p>`
-      : formatParagraphs(paragraphs);
-
-  const pullQuote = featured.pullQuote
-    ? `<div style="padding:4px 36px 24px 60px;border-left:2px solid #C1121F;margin:0 36px 8px;"><p style="font-family:'Fraunces',Georgia,'Times New Roman',serif;font-style:italic;font-size:17px;font-weight:300;line-height:1.6;color:#0A0908;margin:0;">${escapeHtml(stripMarkdown(featured.pullQuote))}</p></div>`
-    : "";
-
-  const takeaways =
-    showTakeaways && featured.takeaways.length > 0
-      ? `<div style="padding:24px 36px;border-top:1px solid #D4D0C8;"><div style="font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#9E9B94;margin-bottom:14px;">Key takeaways</div>${featured.takeaways
-          .map(
-            (t, i) =>
-              `<div style="display:flex;gap:12px;align-items:flex-start;margin-top:${i > 0 ? 10 : 0}px;"><span style="font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;color:#C1121F;line-height:24px;">${String(i + 1).padStart(2, "0")}</span><span style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:14px;line-height:1.6;color:#0A0908;">${escapeHtml(stripMarkdown(t))}</span></div>`,
-          )
-          .join("")}</div>`
-      : "";
+  const snapshotHtml = `<p style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:15px;font-weight:300;line-height:1.75;color:#0A0908;margin:0;">${escapeHtml(snapshot)}</p>`;
 
   const alsoDueHtml = hasMultiple
     ? `<div style="border-top:1px solid #D4D0C8;background:#EEEDE9;"><div style="padding:20px 36px 8px;font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#9E9B94;">Also due today</div>${alsoDue
@@ -129,10 +120,6 @@ export function renderDailyLessonEmail(payload: DailyLessonEmailPayload): string
               `<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 36px;border-bottom:${i === alsoDue.length - 1 ? "none" : "1px solid #D4D0C8"};"><div style="flex:1;min-width:0;"><div style="font-family:'JetBrains Mono','Courier New',monospace;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:#9E9B94;margin-bottom:4px;">${escapeHtml(course.topic)}</div><div style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:14px;line-height:1.4;color:#0A0908;">${escapeHtml(course.lessonTitle)}</div></div><a href="${escapeHtml(course.lessonUrl)}" style="flex-shrink:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:11px;font-weight:600;color:#0A0908;text-decoration:none;border:1px solid #D4D0C8;padding:7px 14px;">Read →</a></div>`,
           )
           .join("")}</div>`
-    : "";
-
-  const tomorrow = featured.tomorrowTitle
-    ? `<div style="padding:20px 36px 28px;background:#EEEDE9;border-top:1px solid #D4D0C8;"><div style="font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#9E9B94;margin-bottom:8px;">Tomorrow · ${escapeHtml(featured.topic)}</div><div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:17px;color:#0A0908;line-height:1.3;">${escapeHtml(featured.tomorrowTitle)}</div></div>`
     : "";
 
   return `<!DOCTYPE html>
@@ -153,15 +140,12 @@ export function renderDailyLessonEmail(payload: DailyLessonEmailPayload): string
         <tr><td style="padding:${hasMultiple ? "10px" : "32px"} 36px 0;">
           <div style="font-family:'Fraunces',Georgia,serif;font-size:30px;font-weight:400;line-height:1.1;letter-spacing:-0.02em;color:#0A0908;">${escapeHtml(featured.lessonTitle)}</div>
         </td></tr>
-        <tr><td style="padding:20px 36px;">${bodyHtml}</td></tr>
-        ${pullQuote ? `<tr><td>${pullQuote}</td></tr>` : ""}
-        ${takeaways ? `<tr><td>${takeaways}</td></tr>` : ""}
+        <tr><td style="padding:20px 36px;">${snapshotHtml}</td></tr>
         ${alsoDueHtml ? `<tr><td>${alsoDueHtml}</td></tr>` : ""}
         <tr><td style="padding:28px 36px;border-top:1px solid #D4D0C8;">
           <a href="${escapeHtml(ctaUrl)}" style="display:block;text-align:center;background:#0A0908;color:#FAF9F5;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.04em;padding:14px 28px;text-decoration:none;">${ctaLabel} →</a>
           <p style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:11px;color:#9E9B94;text-align:center;margin:12px 0 0;">${dayNum} day streak — keep it alive</p>
         </td></tr>
-        ${tomorrow ? `<tr><td>${tomorrow}</td></tr>` : ""}
         <tr><td style="padding:20px 36px;border-top:1px solid #D4D0C8;background:#F4F1E8;">
           <table role="presentation" width="100%"><tr>
             <td style="font-family:'Fraunces',Georgia,serif;font-size:18px;color:#0A0908;">Cu<em style="font-style:italic;">ri</em></td>

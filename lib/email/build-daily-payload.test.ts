@@ -35,12 +35,11 @@ const baseParams = {
   name: "Awais",
   plan: "free",
   timezone: "UTC",
-  emailFormat: "Full",
   unsubscribeToken: "tok",
 };
 
 describe("buildDailyLessonEmailPayload", () => {
-  it("generates body via getLessonBody when stored content is empty and format is Full", async () => {
+  it("generates snapshot material via getLessonBody when stored content is empty", async () => {
     const admin = mockAdmin({
       courses: () => ({
         data: [
@@ -96,6 +95,7 @@ describe("buildDailyLessonEmailPayload", () => {
     );
 
     expect(payload).not.toBeNull();
+    expect(payload!.emailFormat).toBe("Curiosity");
     expect(resolveBody).toHaveBeenCalledWith(
       {
         courseId: "course-1",
@@ -121,7 +121,7 @@ describe("buildDailyLessonEmailPayload", () => {
     );
   });
 
-  it("does not call getLessonBody for Headlines when body is empty", async () => {
+  it("does not call getLessonBody when takeaways already exist for snapshot", async () => {
     const admin = mockAdmin({
       courses: () => ({
         data: [
@@ -141,7 +141,15 @@ describe("buildDailyLessonEmailPayload", () => {
         error: null,
       }),
       lesson_content: () => ({
-        data: { body: "", cache_key: null },
+        data: { body: "", cache_key: "ck-1" },
+        error: null,
+      }),
+      content_cache: () => ({
+        data: {
+          payload: {
+            takeaways: ["Already cached peek"],
+          },
+        },
         error: null,
       }),
     });
@@ -149,7 +157,7 @@ describe("buildDailyLessonEmailPayload", () => {
     const resolveBody = vi.fn<typeof getLessonBody>();
 
     const payload = await buildDailyLessonEmailPayload(
-      { ...baseParams, emailFormat: "Headlines" },
+      baseParams,
       admin,
       new Date("2026-08-21T12:00:00Z"),
       true,
@@ -158,7 +166,8 @@ describe("buildDailyLessonEmailPayload", () => {
 
     expect(payload).not.toBeNull();
     expect(resolveBody).not.toHaveBeenCalled();
-    expect(payload!.featured.bodyParagraphs).toEqual([]);
+    expect(payload!.featured.takeaways).toEqual(["Already cached peek"]);
+    expect(payload!.emailFormat).toBe("Curiosity");
   });
 
   it("keeps stored body without calling getLessonBody when content exists", async () => {
@@ -205,5 +214,6 @@ describe("buildDailyLessonEmailPayload", () => {
       "Stored paragraph one.",
       "Stored paragraph two.",
     ]);
+    expect(payload!.emailFormat).toBe("Curiosity");
   });
 });

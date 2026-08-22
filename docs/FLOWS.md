@@ -173,7 +173,7 @@ Ops: [`docs/STRIPE.md`](./STRIPE.md) (staging test mode + production live mode).
 
 **Progress:** streak count, 26-week heatmap, active and mastered paths.
 
-**Profile:** name, email, theme (system), plan, sign out. Learning and email preferences persist in `user_preferences`. Daily lesson email sends via hourly cron when `email_enabled`, respecting delivery time, weekends, and format.
+**Profile:** name, email, theme (system), plan, sign out. Learning and email preferences persist in `user_preferences`. Daily lesson email sends via hourly cron when `email_enabled`, at **7 AM** in the user timezone (every day including weekends). Format is a fixed curiosity peek (heading + short snapshot + CTA); legacy `email_time` / `email_weekends` / format columns are ignored by the send path.
 
 ---
 
