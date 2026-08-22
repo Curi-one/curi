@@ -290,6 +290,21 @@ describe("LessonReader", () => {
     expect(screen.queryByText("Working equation")).not.toBeInTheDocument();
   });
 
+  it("shows a bottom reading progress bar in brand accent", () => {
+    render(
+      <LessonReader
+        lesson={lesson}
+        lessonIndex={0}
+        topic="Unit Economics"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    const bar = screen.getByTestId("lesson-read-progress");
+    expect(bar).toHaveAttribute("role", "progressbar");
+    expect(bar.querySelector(".bg-accent")).toBeTruthy();
+  });
+
   it("clears the citation highlight when the sources drawer is closed", () => {
     render(
       <LessonReader
