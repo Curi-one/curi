@@ -1230,6 +1230,181 @@ body {
     min-height: 100%;
   }
 
+  /* ── Desktop sidebar rail · prototype Sidebar, INTERACTIONS.md ─────────── */
+
+  @keyframes sidebar-enter {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .app-sidebar {
+    width: 84px;
+    background: var(--color-bg-secondary);
+    border-right: 1px solid var(--color-border-subtle);
+    animation: sidebar-enter var(--duration-medium) var(--ease-out) both;
+  }
+
+  .app-sidebar-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-5) var(--space-3) var(--space-4);
+  }
+
+  .app-sidebar-brand-tag {
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-mono-2xs);
+    letter-spacing: var(--tracking-ultra);
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    line-height: var(--leading-none);
+  }
+
+  .app-sidebar-divider {
+    margin-inline: var(--space-3);
+    height: 1px;
+    background: color-mix(in srgb, var(--color-border-subtle) 80%, transparent);
+  }
+
+  .app-sidebar-divider--spaced {
+    margin-block: var(--space-3);
+  }
+
+  .app-sidebar-nav {
+    margin-top: var(--space-3);
+    padding-inline: var(--space-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .app-sidebar-nav-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 6px;
+    width: 100%;
+    border-radius: var(--radius-none);
+    color: color-mix(in srgb, var(--color-text-secondary) 68%, transparent);
+    text-decoration: none;
+    transition: background-color var(--duration-micro) var(--ease-standard);
+  }
+
+  .app-sidebar-nav-item:hover {
+    background-color: color-mix(in srgb, var(--color-text-primary) 5%, transparent);
+    color: color-mix(in srgb, var(--color-text-primary) 84%, transparent);
+  }
+
+  .app-sidebar-nav-item:active {
+    transform: scale(0.97);
+  }
+
+  .app-sidebar-nav-item[aria-current="page"] {
+    background-color: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+    color: var(--color-text-primary);
+  }
+
+  .app-sidebar-nav-item[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    inset-block: var(--space-2);
+    inset-inline-start: 0;
+    width: 2px;
+    background: var(--color-accent);
+  }
+
+  .app-sidebar-nav-item--accent:not([aria-current="page"]) {
+    color: color-mix(in srgb, var(--color-accent) 78%, var(--color-text-secondary));
+  }
+
+  .app-sidebar-nav-item--accent:not([aria-current="page"]):hover {
+    color: var(--color-accent);
+  }
+
+  .app-sidebar-nav-label {
+    font-size: var(--text-ui-4xs);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-none);
+    letter-spacing: var(--tracking-wide);
+    opacity: 0.7;
+  }
+
+  .app-sidebar-nav-item[aria-current="page"] .app-sidebar-nav-label,
+  .app-sidebar-nav-item:hover .app-sidebar-nav-label {
+    opacity: 1;
+  }
+
+  .app-sidebar-section {
+    padding-inline: var(--space-2);
+  }
+
+  .app-sidebar-footer {
+    margin-top: auto;
+    padding-inline: var(--space-2);
+    padding-bottom: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .app-sidebar-footer-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 6px;
+    width: 100%;
+    border-radius: var(--radius-none);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: background-color var(--duration-micro) var(--ease-standard);
+  }
+
+  .app-sidebar-footer-item:hover {
+    background-color: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  }
+
+  .app-sidebar-footer-item:active {
+    transform: scale(0.97);
+  }
+
+  .app-sidebar-footer-item--streak:hover {
+    background-color: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  }
+
+  .app-sidebar-footer-label {
+    font-size: var(--text-ui-4xs);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-none);
+    letter-spacing: var(--tracking-wide);
+    color: color-mix(in srgb, var(--color-text-secondary) 72%, transparent);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .app-sidebar-footer-item:hover .app-sidebar-footer-label {
+    color: var(--color-text-secondary);
+  }
+
+  .app-sidebar-profile-avatar {
+    transition: box-shadow var(--duration-micro) var(--ease-standard);
+  }
+
+  .app-sidebar-footer-item:hover .app-sidebar-profile-avatar {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+  }
+
   /* Lesson reading column (§11.1) */
   .reader-column {
     max-width: var(--content-max-width);
