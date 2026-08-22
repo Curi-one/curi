@@ -921,6 +921,50 @@ body {
     outline-offset: 1px;
   }
 
+  /* Setting toggle — square thumb, zero radius (BRAND.md §9) */
+  .setting-toggle-track {
+    position: relative;
+    display: inline-block;
+    width: 2.25rem;
+    height: 1.25rem;
+    border-radius: var(--radius-none);
+    background: color-mix(in srgb, var(--color-ink) 18%, var(--color-bg-tertiary));
+    box-shadow: inset 0 1px 2px color-mix(in srgb, var(--color-ink) 12%, transparent);
+    transition: background-color var(--duration-small) var(--ease-standard);
+  }
+
+  .setting-toggle-track.is-checked {
+    background: var(--color-ink);
+  }
+
+  .setting-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: var(--radius-none);
+    background: var(--color-bg-primary);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-ink) 18%, transparent);
+    transform: translateX(0);
+    transition:
+      transform var(--duration-small) var(--ease-out),
+      background-color var(--duration-small) var(--ease-standard);
+  }
+
+  .setting-toggle-track.is-checked .setting-toggle-thumb {
+    transform: translateX(1rem);
+    background: var(--color-accent);
+  }
+
+  .setting-toggle-track:active .setting-toggle-thumb {
+    transform: translateX(0) scale(0.94);
+  }
+
+  .setting-toggle-track.is-checked:active .setting-toggle-thumb {
+    transform: translateX(1rem) scale(0.94);
+  }
+
   /* Monochrome intensity ramp — density reads through VALUE, not hue
      (§1.4: hierarchy is built through scale and weight, never colour).
 

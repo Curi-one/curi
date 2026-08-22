@@ -20,6 +20,10 @@ describe("SettingToggle", () => {
     fireEvent.click(sw);
     expect(onChange).toHaveBeenCalledWith(true);
 
+    const track = sw.querySelector(".setting-toggle-track");
+    expect(track).toBeTruthy();
+    expect(track?.querySelector(".rounded-full")).toBeNull();
+
     rerender(
       <SettingToggle
         label="Send daily email"
@@ -30,6 +34,11 @@ describe("SettingToggle", () => {
     expect(
       screen.getByRole("switch", { name: "Send daily email" }),
     ).toHaveAttribute("aria-checked", "true");
+    expect(
+      screen.getByRole("switch", { name: "Send daily email" }).querySelector(
+        ".setting-toggle-track.is-checked",
+      ),
+    ).toBeTruthy();
   });
 });
 
