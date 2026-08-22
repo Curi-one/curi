@@ -1147,7 +1147,12 @@ body {
     background: var(--color-bg-primary);
     transition:
       background-color var(--duration-small) var(--ease-out),
-      border-color var(--duration-small) var(--ease-out);
+      border-color var(--duration-small) var(--ease-out),
+      transform 0ms;
+  }
+
+  .quiz-opt:active:not(:disabled) {
+    transform: translateY(1px);
   }
 
   .quiz-opt:hover:not(:disabled) {
@@ -1162,6 +1167,7 @@ body {
     min-width: 1.25rem;
     color: var(--color-text-tertiary);
     flex-shrink: 0;
+    transition: color var(--duration-small) var(--ease-out);
   }
 
   .quiz-opt .text {
@@ -1169,6 +1175,7 @@ body {
     font-weight: var(--weight-light);
     line-height: var(--leading-normal);
     color: var(--color-text-primary);
+    transition: color var(--duration-small) var(--ease-out);
   }
 
   .quiz-opt.correct {
@@ -1191,6 +1198,39 @@ body {
 
   .quiz-opt.incorrect .text {
     color: var(--color-text-tertiary);
+  }
+
+  .quiz-opt.correct:hover,
+  .quiz-opt.incorrect:hover {
+    border-color: inherit;
+  }
+
+  /* Quiz question stagger — INTERACTIONS.md: 700ms ease-out, 130ms between items */
+  .quiz-stagger-item {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 700ms var(--ease-out),
+      transform 700ms var(--ease-out);
+  }
+
+  .quiz-stagger-item.is-on {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Quiz feedback — modal-scale reveal, 350ms ease-out */
+  .quiz-feedback {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity var(--duration-medium) var(--ease-out),
+      transform var(--duration-medium) var(--ease-out);
+  }
+
+  .quiz-feedback.is-on {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   /* ── Brand geometric patterns · docs/references/geometric-patterns.html ─

@@ -55,6 +55,29 @@ describe("QuizFlow", () => {
     expect(link).toHaveAttribute("href", "https://astrobiology.nasa.gov/");
   });
 
+  it("staggers question prompt and options on reveal", () => {
+    const { container } = render(
+      <QuizFlow
+        questions={[
+          {
+            id: "q1",
+            prompt: "Who posed the paradox?",
+            options: ["Sagan", "Fermi"],
+            correctIndex: 1,
+          },
+        ]}
+        onComplete={vi.fn()}
+      />,
+    );
+
+    expect(container.querySelectorAll(".quiz-stagger-item").length).toBeGreaterThan(
+      0,
+    );
+    expect(screen.getByRole("heading", { level: 1 })).toHaveClass(
+      "quiz-stagger-item",
+    );
+  });
+
   it("renders option letter and text together for each choice", () => {
     render(
       <QuizFlow
