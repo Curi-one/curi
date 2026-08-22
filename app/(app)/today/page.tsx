@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
-import { LoadingState } from "@/components/LoadingState";
+import { TodayFeedSkeleton } from "@/components/TodayFeedSkeleton";
 import { TodayView } from "@/components/TodayView";
 import {
   getFeed,
@@ -67,7 +67,7 @@ function TodayContent() {
 
   return (
     <>
-      {!ready && <LoadingState label="Loading your feed…" />}
+      {!ready && <TodayFeedSkeleton />}
       {feed && ready && (
         <TodayView
           {...feed}
@@ -83,7 +83,7 @@ function TodayContent() {
 export default function TodayPage() {
   return (
     <PageShell withTabPad={false} className="pt-4">
-      <Suspense fallback={<LoadingState label="Loading your feed…" />}>
+      <Suspense fallback={<TodayFeedSkeleton />}>
         <TodayContent />
       </Suspense>
     </PageShell>

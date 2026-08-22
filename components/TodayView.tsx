@@ -6,6 +6,10 @@ import type { FeedResponse } from "@/lib/api/schemas";
 import { LessonFeedCard } from "@/components/LessonFeedCard";
 import { StreakLabel } from "@/components/StreakIndicator";
 import { TodayEmptyActionCard } from "@/components/TodayEmptyActionCard";
+import {
+  feedStaggerDelay,
+  useStaggerReveal,
+} from "@/lib/ui/use-stagger-reveal";
 
 type Props = FeedResponse & {
   streak?: number;
@@ -24,6 +28,10 @@ export function TodayView({
 }: Props) {
   const total = due.length + done.length;
   const empty = total === 0;
+  const staggerVisible = useStaggerReveal(groups);
+
+  /** Flat index for stagger delay across all cards in order. */
+  let cardIndex = 0;
 
   /** Course ids that still owe today's lesson — used to pick the tomorrow lock copy. */
   const courseIdsPendingToday = new Set(
@@ -44,7 +52,7 @@ export function TodayView({
 
   if (empty) {
     return (
-      <div className="mx-auto w-full max-w-[580px] pb-4 pt-2">
+      <div className="feed-enter mx-auto w-full max-w-[580px] pb-4 pt-2">
         {upgradeBanner}
         <div className="mb-10 border-b border-border pb-10">
           <h1 className="type-display-xl text-ink">
@@ -78,7 +86,7 @@ export function TodayView({
   }
 
   return (
-    <div className="pb-4">
+    <div className="feed-enter pb-4">
       {upgradeBanner}
       <header className="mb-10">
         <div className="flex items-start justify-between gap-3">
@@ -103,21 +111,33 @@ export function TodayView({
 
       {groups.map((group) => (
         <section key={group.daysAgo} className="mb-10 last:mb-6">
-          <h2 className="type-kicker-mark mb-4">{group.label}</h2>
+          <h2
+            className={`feed-stagger-item type-kicker-mark mb-4${staggerVisible ? " is-visible" : ""}`}
+            style={feedStaggerDelay(cardIndex++)}
+          >
+            {group.label}
+          </h2>
           <ul className="space-y-3">
-            {group.items.map((item) => (
-              <li key={item.id}>
-                <LessonFeedCard
-                  item={item}
-                  lockedCopy={
-                    item.status === "locked" &&
-                    courseIdsPendingToday.has(item.courseId)
-                      ? "Unlocks after today's lesson"
-                      : "Unlocks tomorrow"
-                  }
-                />
-              </li>
-            ))}
+            {group.items.map((item) => {
+              const delayIndex = cardIndex++;
+              return (
+                <li
+                  key={item.id}
+                  className={`feed-stagger-item${staggerVisible ? " is-visible" : ""}`}
+                  style={feedStaggerDelay(delayIndex)}
+                >
+                  <LessonFeedCard
+                    item={item}
+                    lockedCopy={
+                      item.status === "locked" &&
+                      courseIdsPendingToday.has(item.courseId)
+                        ? "Unlocks after today's lesson"
+                        : "Unlocks tomorrow"
+                    }
+                  />
+                </li>
+              );
+            })}
           </ul>
         </section>
       ))}
