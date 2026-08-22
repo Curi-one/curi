@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { emailPage, escapeHtml } from "@/lib/email/brand-theme";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -9,7 +10,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
  */
 
 function page(title: string, body: string, form?: string): NextResponse {
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>${title}</title></head><body style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;padding:40px;max-width:480px;margin:auto;"><h1 style="font-family:'Fraunces',Georgia,serif;font-weight:300;">${title}</h1><p>${body}</p>${form ?? ""}</body></html>`;
+  const html = emailPage({
+    title,
+    heading: title,
+    bodyHtml: body,
+    actionHtml: form,
+  });
   return new NextResponse(html, {
     status: 200,
     headers: {
@@ -17,6 +23,11 @@ function page(title: string, body: string, form?: string): NextResponse {
       "Cache-Control": "no-store",
     },
   });
+}
+
+function unsubscribeButton(token: string): string {
+  const escaped = escapeHtml(token);
+  return `<form method="post" action="/api/email/unsubscribe"><input type="hidden" name="token" value="${escaped}"><button type="submit" style="display:inline-block;background:#0A0908;color:#FAF9F5;font-family:'Plus Jakarta Sans','Helvetica Neue',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.04em;padding:14px 28px;border:none;border-bottom:3px solid #C1121F;cursor:pointer;">Unsubscribe</button></form>`;
 }
 
 function tokenFrom(url: string): string | null {
@@ -30,11 +41,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "invalid" }, { status: 400 });
   }
 
-  const escaped = token.replace(/"/g, "&quot;");
   return page(
     "Turn off daily lessons?",
-    "Confirm below and we'll stop sending your daily lesson email. You can re-enable it anytime in Profile → Email.",
-    `<form method="post" action="/api/email/unsubscribe"><input type="hidden" name="token" value="${escaped}"><button type="submit" style="margin-top:16px;padding:12px 20px;border:1px solid #1a1a1a;background:#1a1a1a;color:#fff;font-size:15px;cursor:pointer;">Unsubscribe</button></form>`,
+    "<p>Confirm below and we'll stop sending your daily lesson email. You can re-enable it anytime in Profile → Email.</p>",
+    unsubscribeButton(token),
   );
 }
 
@@ -73,6 +83,6 @@ export async function POST(request: Request) {
 
   return page(
     "Unsubscribed",
-    "Daily lesson emails are turned off. You can re-enable them anytime in Profile → Email.",
+    "<p>Daily lesson emails are turned off. You can re-enable them anytime in Profile → Email.</p>",
   );
 }
