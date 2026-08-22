@@ -19,6 +19,7 @@ describe("ShareableFact", () => {
     );
 
     expect(screen.getByText(`“${fact.fact}”`)).toBeInTheDocument();
+    expect(screen.getByText(/fun fact · venture capital/i)).toBeInTheDocument();
     expect(screen.getByText(fact.reflection)).toBeInTheDocument();
 
     const xLink = screen.getByRole("link", { name: /share on x/i });
