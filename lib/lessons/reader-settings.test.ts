@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { BRAND_PALETTE } from "@/lib/brand/palette";
 import {
   applyReaderThemeToDocument,
   clearReaderThemeFromDocument,
@@ -8,17 +9,17 @@ import {
 describe("themeToCssVars", () => {
   it("maps a reader theme to CSS custom properties", () => {
     const vars = themeToCssVars("dark");
-    expect(vars["--color-ink"]).toBe("#FAF9F5");
-    expect(vars["--color-paper"]).toBe("#0A0908");
-    expect(vars["--color-bg-primary"]).toBe("#0A0908");
-    expect(vars["--color-text-primary"]).toBe("#FAF9F5");
-    expect(vars["--color-border"]).toBe("#2E2C28");
+    expect(vars["--color-ink"]).toBe(BRAND_PALETTE.white);
+    expect(vars["--color-paper"]).toBe(BRAND_PALETTE.ink);
+    expect(vars["--color-bg-primary"]).toBe(BRAND_PALETTE.ink);
+    expect(vars["--color-text-primary"]).toBe(BRAND_PALETTE.white);
+    expect(vars["--color-border"]).toBe(BRAND_PALETTE.ink3);
   });
 
   it("maps light theme backgrounds to paper tokens", () => {
     const vars = themeToCssVars("light");
-    expect(vars["--color-bg-primary"]).toBe("#FAF9F5");
-    expect(vars["--color-ink"]).toBe("#0A0908");
+    expect(vars["--color-bg-primary"]).toBe(BRAND_PALETTE.white);
+    expect(vars["--color-ink"]).toBe(BRAND_PALETTE.ink);
   });
 });
 
@@ -33,10 +34,8 @@ describe("applyReaderThemeToDocument / clearReaderThemeFromDocument", () => {
     applyReaderThemeToDocument("dark");
     expect(
       document.documentElement.style.getPropertyValue("--color-ink").trim(),
-    ).toBe("#FAF9F5");
-    expect(document.documentElement.style.backgroundColor).toBe(
-      "rgb(10, 9, 8)",
-    );
+    ).toBe(BRAND_PALETTE.white);
+    expect(document.documentElement.style.backgroundColor).toBe("rgb(10, 10, 10)");
 
     clearReaderThemeFromDocument();
     expect(

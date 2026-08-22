@@ -103,7 +103,7 @@ describe("LessonReader", () => {
     await waitFor(() => {
       expect(
         document.documentElement.style.getPropertyValue("--color-ink").trim(),
-      ).toBe("#FAF9F5");
+      ).toBe("#fafafa");
     });
 
     unmount();

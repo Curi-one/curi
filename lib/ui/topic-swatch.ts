@@ -5,7 +5,7 @@
  * HTML refs: docs/references/track-marks.html, track-avatars-small.html
  *
  * Greyscale only: imagery is never rendered in colour (BRAND.md §6.3).
- * Fields use warm Ink — never cold hsl(0 0% n%) (WEBSITE-DESIGN-RULES §1.1).
+ * Fields use neutral Ink — never warm hsl casts (WEBSITE-DESIGN-RULES §1.1).
  */
 
 export type DomainKey =
@@ -186,8 +186,8 @@ const DOMAIN_ORDER: DomainKey[] = [
 /* Theme-independent by design — a track mark is a dark Ink field in either
    theme (see --mark-* in globals.css). Literal hex fallbacks keep the mark
    correct if the stylesheet has not loaded yet. */
-const FIELD_INK = "var(--mark-field, #0A0908)";
-const GLYPH_COLOR = "var(--mark-fg, #FAF9F5)";
+const FIELD_INK = "var(--mark-field, #0A0A0A)";
+const GLYPH_COLOR = "var(--mark-fg, #FAFAFA)";
 
 /**
  * djb2-style hash matching track-marks.html `hashStr`
@@ -323,7 +323,7 @@ export function markGlyphOpacity(mode: MarkImageryMode): number {
  */
 export function topicPatternStyle(
   pattern: TopicPattern,
-  color = "var(--mark-fg, #FAF9F5)",
+  color = "var(--mark-fg, #FAFAFA)",
 ): Record<string, string> {
   const white = color;
   switch (pattern) {

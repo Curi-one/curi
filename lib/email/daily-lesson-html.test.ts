@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { BRAND_PALETTE } from "@/lib/brand/palette";
 import {
   curiositySnapshot,
   dailyLessonSubject,
@@ -53,7 +54,7 @@ describe("daily lesson email html", () => {
     expect(html).toContain("One");
     expect(html).toContain("Open today's lessons →");
     expect(html).toContain("fonts.googleapis.com");
-    expect(html).toContain("#C1121F");
+    expect(html).toContain(BRAND_PALETTE.accent);
     expect(html).toContain("Unsubscribe");
     // Curiosity: first takeaway only — not the full takeaways list or body
     expect(html).not.toContain("Key takeaways");

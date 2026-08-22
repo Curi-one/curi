@@ -33,7 +33,7 @@ const config: Config = {
     extend: {
       colors: {
         // Greyscale — eight tones (§4.2)
-        // `ink` is the PRIMARY-TEXT ROLE, not the raw #0A0908 tone. It has to
+        // `ink` is the PRIMARY-TEXT ROLE, not the raw #0A0A0A tone. It has to
         // flip with the theme: bound to the tone, `text-ink` rendered
         // Ink-on-Ink in dark mode and every heading on every screen vanished.
         // Because --color-text-primary and --color-bg-inverse resolve to the

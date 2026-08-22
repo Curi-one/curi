@@ -3,16 +3,8 @@
  * Table-based HTML for client compatibility; inline styles on components.
  */
 
-export const EMAIL_COLORS = {
-  ink: "#0A0908",
-  mid: "#6B6760",
-  silver: "#9E9B94",
-  light: "#D4D0C8",
-  paper: "#F4F1E8",
-  white: "#FAF9F5",
-  canvas: "#EEEDE9",
-  accent: "#C1121F",
-} as const;
+export { EMAIL_COLORS } from "@/lib/brand/email-colors";
+import { EMAIL_COLORS } from "@/lib/brand/email-colors";
 
 export const EMAIL_FONTS = {
   display: "'Fraunces', Georgia, 'Times New Roman', serif",
