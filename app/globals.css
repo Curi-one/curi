@@ -1388,18 +1388,17 @@ body {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* Branded loader — wordmark + sweeping vermilion rule (BRAND.md §3.2) */
-.loader-wordmark-track {
-  position: absolute;
-  inset-inline: 2px;
-  bottom: 0;
+.loader-line-track {
+  position: relative;
   height: 2.5px;
   overflow: hidden;
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
 
-.loader-wordmark-line {
+.loader-line-sweep {
   position: absolute;
   inset-block: 0;
+  left: 0;
   width: 38%;
   background: var(--color-accent);
   animation: loader-line-sweep var(--duration-slow) var(--ease-standard) infinite;
@@ -1418,7 +1417,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .loader-wordmark-line {
+  .loader-line-sweep {
     animation-duration: 0.01ms;
     left: 31%;
   }
