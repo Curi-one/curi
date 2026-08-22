@@ -30,7 +30,7 @@ describe("LessonReader", () => {
     document.documentElement.removeAttribute("style");
     document.body.removeAttribute("style");
   });
-  it("renders title, Sources, and Take the quiz from API data alone", () => {
+  it("renders title, Sources, and quiz CTA from API data alone", () => {
     render(
       <LessonReader
         lesson={lesson}
@@ -49,9 +49,10 @@ describe("LessonReader", () => {
     expect(
       screen.getByRole("button", { name: /sources/i }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /take the quiz/i }),
-    ).toBeInTheDocument();
+    const quizButton = screen.getByRole("button", {
+      name: /prove it|connect the dots|stress-test|explain it to a friend|what would you do|still curious/i,
+    });
+    expect(quizButton).toBeInTheDocument();
   });
 
   it("renders markdown body content in order with no peeled-off 'So what?' section", () => {
@@ -129,7 +130,22 @@ describe("LessonReader", () => {
     expect(screen.queryByText("Working equation")).not.toBeInTheDocument();
   });
 
-  it("opens sources panel from Sources button", () => {
+  it("keeps the lesson title section sticky while scrolling", () => {
+    render(
+      <LessonReader
+        lesson={lesson}
+        lessonIndex={0}
+        topic="Unit Economics"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId("lesson-title-sticky")).toHaveClass(
+      "lesson-title-sticky",
+    );
+  });
+
+  it("opens branded sources panel from Sources button", () => {
     render(
       <LessonReader
         lesson={lesson}
@@ -140,6 +156,9 @@ describe("LessonReader", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: /sources/i }));
+    expect(screen.getByRole("dialog")).toHaveClass("sources-panel");
+    expect(screen.getByText(/2 references/i)).toBeInTheDocument();
+    expect(screen.getByTestId("lesson-source-1")).toBeInTheDocument();
     expect(screen.getByText(/these references informed/i)).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /a16z — Unit Economics/i }),
@@ -183,6 +202,34 @@ describe("LessonReader", () => {
       name: /First Round — Startup Metrics/i,
     });
     expect(otherLink).not.toHaveClass("border-ink");
+  });
+
+  it("toggles takeaways accordion with brand motion panel", () => {
+    render(
+      <LessonReader
+        lesson={{
+          ...lesson,
+          takeaways: ["Takeaway alpha", "Takeaway beta", "Takeaway gamma"],
+        }}
+        lessonIndex={0}
+        topic="Unit Economics"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: /3 things from this lesson/i,
+    });
+    const panel = screen.getByTestId("lesson-takeaways-accordion");
+
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(panel).toHaveClass("is-open");
+    expect(screen.getByText("Takeaway alpha")).toBeInTheDocument();
+
+    fireEvent.click(trigger);
+
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(panel).not.toHaveClass("is-open");
   });
 
   it("shows API-provided takeaways, shareable fact, and visuals when present in the payload", () => {
@@ -288,6 +335,21 @@ describe("LessonReader", () => {
 
     expect(screen.queryByText("Visual note")).not.toBeInTheDocument();
     expect(screen.queryByText("Working equation")).not.toBeInTheDocument();
+  });
+
+  it("shows a bottom reading progress bar in brand accent", () => {
+    render(
+      <LessonReader
+        lesson={lesson}
+        lessonIndex={0}
+        topic="Unit Economics"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    const bar = screen.getByTestId("lesson-read-progress");
+    expect(bar).toHaveAttribute("role", "progressbar");
+    expect(bar.querySelector(".bg-accent")).toBeTruthy();
   });
 
   it("clears the citation highlight when the sources drawer is closed", () => {

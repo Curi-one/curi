@@ -7,11 +7,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ArrowLeft, ChevronDown, Globe2, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, Globe2 } from "lucide-react";
 import { Button } from "@/components/Button";
 import { EquationBlock } from "@/components/lesson/EquationBlock";
 import { LessonImage } from "@/components/lesson/LessonImage";
 import { LessonMarkdown } from "@/components/lesson/LessonMarkdown";
+import { LessonSourcesPanel } from "@/components/lesson/LessonSourcesPanel";
 import { ShareableFact } from "@/components/lesson/ShareableFact";
 import type { LessonResponse } from "@/lib/api/schemas";
 import {
@@ -25,6 +26,7 @@ import {
   saveReaderSettings,
   type ReaderSettings,
 } from "@/lib/lessons/reader-settings";
+import { quizCtaCopy } from "@/lib/lessons/quiz-cta";
 
 type Props = {
   lesson: LessonResponse;
@@ -39,19 +41,6 @@ type Props = {
 function estimateReadMinutes(body: string[]): number {
   const words = body.join("").split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
-}
-
-function domainInitials(title: string, url: string): string {
-  try {
-    const host = new URL(url).hostname.replace(/^www\./, "");
-    const label = host.split(".")[0] || title;
-    return label.slice(0, 2).toUpperCase();
-  } catch {
-    return title
-      .replace(/^(The |A |An )/i, "")
-      .slice(0, 2)
-      .toUpperCase();
-  }
 }
 
 function findScrollParent(el: HTMLElement | null): HTMLElement | null {
@@ -103,6 +92,11 @@ export function LessonReader({
   const useApiVisuals = apiVisuals.length > 0;
   const shareable = lesson.shareableFact;
   const bodyMarkdown = lesson.body.join("\n\n");
+  const quizCta = quizCtaCopy(
+    lesson.title,
+    topicLabel || lesson.title,
+    lessonIndex,
+  );
 
   const theme =
     READER_THEMES.find((t) => t.id === settings.theme) ?? READER_THEMES[0];
@@ -179,15 +173,6 @@ export function LessonReader({
   }, [showReaderSettings]);
 
   useEffect(() => {
-    if (!showSources) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") closeSources();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [showSources]);
-
-  useEffect(() => {
     if (!showSources || activeSourceIndex == null) return;
     const row = sourceRowRefs.current[activeSourceIndex];
     row?.scrollIntoView?.({ behavior: "smooth", block: "center" });
@@ -244,16 +229,6 @@ export function LessonReader({
 
   return (
     <>
-      <div
-        aria-hidden
-        className="pointer-events-none fixed top-0 left-0 right-0 z-50 h-0.5 md:left-[84px]"
-      >
-        <div
-          className="h-full bg-ink/30 transition-[width] duration-200 ease-out"
-          style={{ width: `${readProgress * 100}%` }}
-        />
-      </div>
-
       <div
         ref={wrapperRef}
         className="mx-auto w-full max-w-content animate-fade-in"
@@ -540,71 +515,89 @@ export function LessonReader({
           ref={articleRef}
           className="pb-[calc(8rem+env(safe-area-inset-bottom))]"
         >
-          <div className="wall-label mb-6 flex-wrap">
-            <span>
-              Lesson {lessonIndex + 1}
-              {topicLabel ? ` · ${topicLabel}` : ""}
-            </span>
-            <span className="border border-border px-3 py-1 tracking-widest text-ink/70">
-              Today
-            </span>
-          </div>
+          <header
+            className="lesson-title-sticky"
+            data-testid="lesson-title-sticky"
+          >
+            <div className="wall-label mb-6 flex-wrap">
+              <span>
+                Lesson {lessonIndex + 1}
+                {topicLabel ? ` · ${topicLabel}` : ""}
+              </span>
+              <span className="border border-border px-3 py-1 tracking-widest text-ink/70">
+                Today
+              </span>
+            </div>
 
-          <h1 className="font-display display-section text-display-sm leading-tight tracking-tighter text-ink sm:text-display-md">
-            {lesson.title}
-          </h1>
+            <h1 className="font-display display-section text-display-sm leading-tight tracking-tighter text-ink sm:text-display-md">
+              {lesson.title}
+            </h1>
 
-          <div className="mt-5 flex flex-wrap items-center gap-2.5">
-            <span className="text-xs text-ink-muted">{readMins} min read</span>
-            <div className="mx-1 h-3 w-px bg-border" />
-            <button
-              type="button"
-              onClick={() => setShowSources(true)}
-              className="flex items-center gap-2 border border-border bg-paper px-3.5 py-1.5 text-xs font-medium text-ink/70 transition-colors hover:border-ink/30 hover:text-ink"
-            >
-              <Globe2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              Sources
-            </button>
-          </div>
-
-          {takeaways.length > 0 && (
-            <div className="mt-6 border-t border-border">
+            <div className="mt-5 flex flex-wrap items-center gap-2.5">
+              <span className="text-xs text-ink-muted">{readMins} min read</span>
+              <div className="mx-1 h-3 w-px bg-border" />
               <button
                 type="button"
-                onClick={() => setTakeawaysOpen((o) => !o)}
-                className="flex w-full items-center justify-between py-3.5 text-left"
-                aria-expanded={takeawaysOpen}
+                onClick={() => setShowSources(true)}
+                className="flex items-center gap-2 border border-border bg-paper px-3.5 py-1.5 text-xs font-medium text-ink/70 transition-colors duration-small ease-out hover:border-ink/30 hover:text-ink"
               >
-                <span className="text-xs uppercase tracking-widest text-ink-muted">
+                <Globe2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                Sources
+                {lesson.sources.length > 0 ? (
+                  <span className="font-meta text-[10px] tabular-nums tracking-wider text-ink-muted">
+                    · {lesson.sources.length}
+                  </span>
+                ) : null}
+              </button>
+            </div>
+          </header>
+
+          {takeaways.length > 0 && (
+            <div className="mt-6">
+              <button
+                id="lesson-takeaways-trigger"
+                type="button"
+                onClick={() => setTakeawaysOpen((o) => !o)}
+                className="flex w-full items-center justify-between py-3.5 text-left text-ink-muted transition-colors duration-small ease-out hover:text-ink"
+                aria-expanded={takeawaysOpen}
+                aria-controls="lesson-takeaways-panel"
+              >
+                <span className="text-xs uppercase tracking-widest">
                   {takeaways.length} things from this lesson
                 </span>
                 <ChevronDown
-                  className={`h-4 w-4 shrink-0 text-ink-muted/60 transition-transform duration-200 ${
+                  className={`h-4 w-4 shrink-0 opacity-60 transition-transform duration-small ease-standard ${
                     takeawaysOpen ? "rotate-180" : ""
                   }`}
                   aria-hidden
                 />
               </button>
-              {takeawaysOpen && (
-                <ul className="space-y-4 pb-5">
-                  {takeaways.map((t, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-4 text-sm leading-loose text-ink/80"
-                    >
-                      <span className="takeaway-number">{i + 1}</span>
-                      {t}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <div
+                id="lesson-takeaways-panel"
+                role="region"
+                aria-labelledby="lesson-takeaways-trigger"
+                className={`lesson-accordion${takeawaysOpen ? " is-open" : ""}`}
+                data-testid="lesson-takeaways-accordion"
+              >
+                <div className="lesson-accordion-panel">
+                  <ul className="lesson-accordion-content space-y-4 pb-5">
+                    {takeaways.map((t, i) => (
+                      <li
+                        key={i}
+                        className="flex items-start gap-4 text-sm leading-loose text-ink/80"
+                      >
+                        <span className="takeaway-number">{i + 1}</span>
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
 
-          <div className="mb-8 h-px bg-border" />
-
           <div
-            className="space-y-8 text-ink"
+            className="pt-8 text-ink"
             style={{
               fontFamily: fontCfg.family,
               fontSize: sizeCfg.size,
@@ -618,112 +611,52 @@ export function LessonReader({
                 onCitationClick={handleCitationClick}
               />
             ) : null}
-            {renderVisualsAndShareable()}
+            {(useApiVisuals || shareable) && (
+              <div
+                className={`divide-y divide-border ${bodyMarkdown ? "mt-10 border-t border-border pt-10" : ""}`}
+              >
+                {renderVisualsAndShareable()}
+              </div>
+            )}
           </div>
         </article>
 
-        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md md:left-[84px]">
-          <div className="mx-auto w-full max-w-content">
-            <Button onClick={onStartQuiz} className="w-full">
-              Take the quiz
-            </Button>
+        <div className="fixed bottom-0 left-0 right-0 z-30 md:left-[84px]">
+          <div
+            role="progressbar"
+            aria-label="Reading progress"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(readProgress * 100)}
+            className="pointer-events-none h-[3px] bg-paper-tertiary"
+            data-testid="lesson-read-progress"
+          >
+            <div
+              className="h-full bg-accent transition-[width] duration-200 ease-out"
+              style={{ width: `${readProgress * 100}%` }}
+            />
+          </div>
+          <div className="border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md">
+            <div className="mx-auto w-full max-w-content">
+              <p className="mb-2.5 text-center font-ui text-ui-3xs leading-snug text-ink-muted">
+                {quizCta.hint}
+              </p>
+              <Button onClick={onStartQuiz} className="w-full">
+                {quizCta.label}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
-      {showSources && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-ink/10 backdrop-blur-[1px]"
-            onClick={closeSources}
-            aria-hidden
-          />
-          <div
-            role="dialog"
-            aria-label="Sources"
-            className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[400px] flex-col border-l border-border bg-paper"
-          >
-            <div className="flex shrink-0 items-start justify-between border-b border-border px-6 py-5">
-              <div>
-                <div className="text-xs uppercase tracking-widest text-ink-muted">
-                  Sources
-                </div>
-                <div className="mt-1 font-display text-lg font-light leading-snug text-ink">
-                  {topicLabel || lesson.title}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={closeSources}
-                className="mt-0.5 flex min-h-11 min-w-11 items-center justify-center rounded-none text-ink-muted transition hover:bg-paper-secondary hover:text-ink"
-                aria-label="Close sources"
-              >
-                <X className="h-4 w-4" aria-hidden />
-              </button>
-            </div>
-
-            <div className="shrink-0 border-b border-border bg-paper-secondary px-6 py-3">
-              <p className="text-ui-3xs leading-relaxed text-ink-muted">
-                These references informed the lesson content. Curi synthesises
-                ideas across sources — always read the originals for full
-                context.
-              </p>
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-4 py-4">
-              {lesson.sources.length === 0 ? (
-                <p className="px-2 py-6 text-sm text-ink-muted">
-                  No sources listed for this lesson yet.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {lesson.sources.map((source, i) => {
-                    let host = source.url;
-                    try {
-                      host = new URL(source.url).hostname.replace(/^www\./, "");
-                    } catch {
-                      /* keep url */
-                    }
-                    const isActive = activeSourceIndex === i;
-                    return (
-                      <a
-                        key={source.url}
-                        ref={(el) => {
-                          sourceRowRefs.current[i] = el;
-                        }}
-                        href={source.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`group flex items-start gap-3.5 rounded-none border p-4 transition-all ${
-                          isActive
-                            ? "border-ink bg-paper-tertiary"
-                            : "border-border bg-paper-secondary hover:border-ink/20 hover:bg-paper"
-                        }`}
-                      >
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-paper-tertiary text-ui-4xs font-semibold text-ink-muted">
-                          {domainInitials(source.title, source.url)}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <span className="text-sm font-medium text-ink group-hover:underline">
-                            {source.title}
-                          </span>
-                          <div className="mt-1.5 flex items-center gap-1 text-ui-4xs text-ink-muted/50">
-                            <Globe2
-                              className="h-2.5 w-2.5 shrink-0"
-                              aria-hidden
-                            />
-                            <span className="truncate">{host}</span>
-                          </div>
-                        </div>
-                      </a>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+      <LessonSourcesPanel
+        open={showSources}
+        lesson={lesson}
+        topicLabel={topicLabel}
+        activeSourceIndex={activeSourceIndex}
+        onClose={closeSources}
+        sourceRowRefs={sourceRowRefs}
+      />
     </>
   );
 }

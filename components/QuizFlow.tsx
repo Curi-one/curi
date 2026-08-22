@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { QuizQuestion } from "@/lib/api/schemas";
 import { StepProgress } from "@/components/StepProgress";
 import { Button } from "@/components/Button";
@@ -13,6 +13,21 @@ type Props = {
 };
 
 const LETTERS = ["A", "B", "C", "D", "E", "F"] as const;
+const STAGGER_MS = 130;
+
+function useStaggerReveal(trigger: unknown) {
+  const [on, setOn] = useState(false);
+
+  useEffect(() => {
+    setOn(false);
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setOn(true));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [trigger]);
+
+  return on;
+}
 
 export function QuizFlow({ questions, onComplete }: Props) {
   const [index, setIndex] = useState(0);
@@ -24,6 +39,8 @@ export function QuizFlow({ questions, onComplete }: Props) {
 
   const q = questions[index];
   const isLast = index === questions.length - 1;
+  const questionOn = useStaggerReveal(index);
+  const feedbackOn = useStaggerReveal(revealed ? index : null);
 
   function choose(optionIndex: number) {
     if (revealed) return;
@@ -56,44 +73,65 @@ export function QuizFlow({ questions, onComplete }: Props) {
       : "Check the lesson sources for more detail.";
 
   return (
-    <div className="flex min-h-[70vh] flex-col pb-28 animate-fade-in">
-      <StepProgress
-        step={index + 1}
-        totalSteps={questions.length}
-        label="Quiz"
-      />
-      <h1 className="mt-2 font-display text-display-xs font-light leading-snug text-ink">
-        {q.prompt}
-      </h1>
-      <ul className="mt-8 space-y-3">
-        {q.options.map((opt, optIndex) => {
-          let stateClass = "";
-          if (revealed && optIndex === q.correctIndex) {
-            stateClass = "correct";
-          } else if (revealed && optIndex === selectedIndex && !correct) {
-            stateClass = "incorrect";
-          } else if (!revealed && selectedIndex === optIndex) {
-            stateClass = "correct";
-          }
-          const letter = LETTERS[optIndex] ?? String(optIndex + 1);
-          return (
-            <li key={opt}>
-              <button
-                type="button"
-                disabled={revealed}
-                onClick={() => choose(optIndex)}
-                className={`quiz-opt focus-ring min-h-[52px] ${stateClass}`}
+    <div className="flex min-h-[70vh] flex-col pb-28">
+      <div key={index} className="quiz-question">
+        <div
+          className={`quiz-stagger-item ${questionOn ? "is-on" : ""}`}
+          style={{ transitionDelay: "0ms" }}
+        >
+          <StepProgress
+            step={index + 1}
+            totalSteps={questions.length}
+            label="Quiz"
+          />
+        </div>
+        <h1
+          className={`quiz-stagger-item mt-2 font-display text-display-xs font-light leading-snug text-ink ${
+            questionOn ? "is-on" : ""
+          }`}
+          style={{ transitionDelay: `${STAGGER_MS}ms` }}
+        >
+          {q.prompt}
+        </h1>
+        <ul className="mt-8 space-y-3">
+          {q.options.map((opt, optIndex) => {
+            let stateClass = "";
+            if (revealed && optIndex === q.correctIndex) {
+              stateClass = "correct";
+            } else if (revealed && optIndex === selectedIndex && !correct) {
+              stateClass = "incorrect";
+            } else if (!revealed && selectedIndex === optIndex) {
+              stateClass = "correct";
+            }
+            const letter = LETTERS[optIndex] ?? String(optIndex + 1);
+            return (
+              <li
+                key={opt}
+                className={`quiz-stagger-item ${questionOn ? "is-on" : ""}`}
+                style={{
+                  transitionDelay: `${(optIndex + 2) * STAGGER_MS}ms`,
+                }}
               >
-                <span className="letter">{letter}</span>
-                <span className="text">{opt}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                <button
+                  type="button"
+                  disabled={revealed}
+                  onClick={() => choose(optIndex)}
+                  className={`quiz-opt focus-ring min-h-[52px] ${stateClass}`}
+                >
+                  <span className="letter">{letter}</span>
+                  <span className="text">{opt}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
       {revealed && (
         <div
-          className={`mt-8 rounded-none border p-4 ${
+          className={`quiz-feedback mt-8 rounded-none border p-4 ${
+            feedbackOn ? "is-on" : ""
+          } ${
             correct
               ? "border-ink/20 bg-paper-secondary"
               : "border-border bg-paper-secondary"
@@ -119,8 +157,9 @@ export function QuizFlow({ questions, onComplete }: Props) {
           )}
         </div>
       )}
+
       {revealed && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md md:left-[84px]">
+        <div className="animate-slide-up fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md md:left-[84px]">
           <div className="mx-auto max-w-lg md:max-w-xl lg:max-w-2xl">
             <Button onClick={next} className="w-full">
               {isLast ? "How did that land?" : "Next question"}

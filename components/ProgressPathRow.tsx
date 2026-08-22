@@ -7,6 +7,8 @@ import { depthLabel } from "@/lib/ui/constants";
 import {
   buildTrackMark,
   endowedPct,
+  markGlyphOpacity,
+  markPatternOpacity,
   topicArt,
   topicPatternStyle,
 } from "@/lib/ui/topic-swatch";
@@ -33,8 +35,11 @@ export function ProgressPathRow({ path, mastered = false }: Props) {
         style={{ background: art.field }}
       >
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.16]"
-          style={topicPatternStyle(art.pattern)}
+          className="pointer-events-none absolute inset-0"
+          style={{
+            ...topicPatternStyle(art.pattern),
+            opacity: markPatternOpacity("field"),
+          }}
           aria-hidden
         />
         {/* Medium tier renders glyph + pattern only — the domain label and
@@ -43,7 +48,10 @@ export function ProgressPathRow({ path, mastered = false }: Props) {
             spending the screen's accent budget once per row. */}
         <span
           className="relative z-[1] select-none font-display text-3xl font-light italic leading-none"
-          style={{ color: art.glyphColor }}
+          style={{
+            color: art.glyphColor,
+            opacity: markGlyphOpacity("field"),
+          }}
           aria-hidden
         >
           {art.glyph}

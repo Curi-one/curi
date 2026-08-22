@@ -4,18 +4,21 @@ import { Loader } from "@/components/Loader";
 import { LoadingState } from "@/components/LoadingState";
 
 describe("Loader", () => {
-  it("renders branded wordmark loader with sweeping line", () => {
+  it("renders wordmark without underline and a sweeping line instead of visible label", () => {
     const { container } = render(<Loader label="Loading feed…" />);
-    expect(screen.getByRole("status")).toBeInTheDocument();
-    expect(screen.getByText("Loading feed…")).toBeInTheDocument();
-    expect(container.querySelector(".loader-wordmark-line")).toBeTruthy();
+    const status = screen.getByRole("status");
+    expect(status).toHaveAttribute("aria-label", "Loading feed…");
+    expect(screen.queryByText("Loading feed…")).not.toBeInTheDocument();
+    expect(container.querySelector(".loader-line-sweep")).toBeTruthy();
+    expect(container.querySelector(".bg-accent")).toBeNull();
     expect(container.querySelector(".font-display")).toBeTruthy();
   });
 });
 
 describe("LoadingState", () => {
-  it("centres the loader with a default label", () => {
+  it("centres the loader and keeps the label for screen readers only", () => {
     render(<LoadingState />);
-    expect(screen.getByText("Loading…")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveAttribute("aria-label", "Loading…");
+    expect(screen.queryByText("Loading…")).not.toBeInTheDocument();
   });
 });

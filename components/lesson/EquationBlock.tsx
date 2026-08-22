@@ -31,7 +31,7 @@ export function EquationBlock({ visual }: Props) {
   const html = renderEquationHtml(equation);
 
   return (
-    <div className="my-10 border-y border-border py-6">
+    <div className="py-10">
       <div className="text-xs uppercase tracking-widest text-ink-muted">
         Working equation
       </div>

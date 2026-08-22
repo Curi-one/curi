@@ -540,7 +540,7 @@ function buildMessages(input: {
     "Write the lesson body as proper markdown (paragraphs separated by blank lines; short ##/### headings sparingly; lists when useful; inline $...$ and block $$...$$ for equations when helpful).",
     "Always end the markdown body with a ## Summary section (2–4 sentences) that synthesizes what the learner should now understand — even for short lessons. Takeaways stay in the separate JSON field (not inside body).",
     "Prefer 1–2 visuals when a diagram, chart, map, formula figure, or concrete image clarifies the concept (not decorative). Do not emit caption-only visuals with no equation and no imageUrl.",
-    "Also return exactly 3 takeaways and 1 shareableFact tied to this lesson and the broader path topic.",
+    "Also return exactly 3 takeaways and 1 shareableFact: a surprising fun fact tied to the broader path topic and/or this lesson — conversation-worthy, not generic motivation copy.",
     "Return ONLY valid JSON matching the schema in the system message.",
   ];
 
@@ -578,7 +578,7 @@ Rules:
 - Escalate depth across the path: early = foundations/definitions/intuition; mid = mechanisms/connections/worked examples; late = synthesis/edge cases/mastery (“you can now…”). Each lesson should make the reader feel more capable than the previous one. Feel modifiers still apply on top.
 - Stay on the lesson title; use the path topic for broader context only.
 - takeaways: exactly 3 memorable, concrete insights from THIS lesson (not generic advice). Keep them in the JSON field only.
-- shareableFact: one punchy fact + short reflection clearly related to the lesson and/or broader path topic — suitable to share on social.
+- shareableFact: one surprising fun fact about the path topic or a memorable hook from this lesson — the kind you'd share at dinner. fact = punchy hook (max ~2 sentences), clearly about the path topic or lesson subject; reflection = one playful line on why it's interesting or what it connects to. Not a lesson summary.
 - visuals: prefer 1–2 when a diagram, chart, map, formula figure, or concrete image clarifies a concept. Omit or [] when text alone is enough. Never emit a visual that is only title/caption with no equation and no imageUrl (those become empty visual notes). For formulas use visuals[].equation (bare TeX only, e.g. \\frac{a}{b} or E=mc^2 — do NOT wrap in \\[ \\], \\( \\), or $ delimiters) and/or body math; those render as equation blocks, not fake images. imageUrl only if a real public https URL that depicts the concept (never invent broken URLs; omit imageUrl rather than fake).
 - Prefer accurate, source-backed claims.`,
     },

@@ -1064,6 +1064,38 @@ body {
     padding-top: var(--space-1);
   }
 
+  /* Lesson takeaways accordion — height + opacity, brand motion tokens (§7) */
+  .lesson-accordion {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--duration-medium) var(--ease-in);
+  }
+
+  .lesson-accordion.is-open {
+    grid-template-rows: 1fr;
+    transition: grid-template-rows var(--duration-medium) var(--ease-out);
+  }
+
+  .lesson-accordion-panel {
+    overflow: hidden;
+  }
+
+  .lesson-accordion-content {
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      opacity var(--duration-small) var(--ease-in),
+      transform var(--duration-small) var(--ease-in);
+  }
+
+  .lesson-accordion.is-open .lesson-accordion-content {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--duration-small) var(--ease-out),
+      transform var(--duration-small) var(--ease-out);
+  }
+
   /* ── Streak · §11.3 — display element; heats to vermilion at multi-day peak ─ */
 
   .streak-number {
@@ -1180,7 +1212,12 @@ body {
     background: var(--color-bg-primary);
     transition:
       background-color var(--duration-small) var(--ease-out),
-      border-color var(--duration-small) var(--ease-out);
+      border-color var(--duration-small) var(--ease-out),
+      transform 0ms;
+  }
+
+  .quiz-opt:active:not(:disabled) {
+    transform: translateY(1px);
   }
 
   .quiz-opt:hover:not(:disabled) {
@@ -1195,6 +1232,7 @@ body {
     min-width: 1.25rem;
     color: var(--color-text-tertiary);
     flex-shrink: 0;
+    transition: color var(--duration-small) var(--ease-out);
   }
 
   .quiz-opt .text {
@@ -1202,6 +1240,7 @@ body {
     font-weight: var(--weight-light);
     line-height: var(--leading-normal);
     color: var(--color-text-primary);
+    transition: color var(--duration-small) var(--ease-out);
   }
 
   .quiz-opt.correct {
@@ -1224,6 +1263,39 @@ body {
 
   .quiz-opt.incorrect .text {
     color: var(--color-text-tertiary);
+  }
+
+  .quiz-opt.correct:hover,
+  .quiz-opt.incorrect:hover {
+    border-color: inherit;
+  }
+
+  /* Quiz question stagger — INTERACTIONS.md: 700ms ease-out, 130ms between items */
+  .quiz-stagger-item {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 700ms var(--ease-out),
+      transform 700ms var(--ease-out);
+  }
+
+  .quiz-stagger-item.is-on {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Quiz feedback — modal-scale reveal, 350ms ease-out */
+  .quiz-feedback {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity var(--duration-medium) var(--ease-out),
+      transform var(--duration-medium) var(--ease-out);
+  }
+
+  .quiz-feedback.is-on {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   /* ── Brand geometric patterns · docs/references/geometric-patterns.html ─
@@ -1389,18 +1461,17 @@ body {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* Branded loader — wordmark + sweeping vermilion rule (BRAND.md §3.2) */
-.loader-wordmark-track {
-  position: absolute;
-  inset-inline: 2px;
-  bottom: 0;
+.loader-line-track {
+  position: relative;
   height: 2.5px;
   overflow: hidden;
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
 
-.loader-wordmark-line {
+.loader-line-sweep {
   position: absolute;
   inset-block: 0;
+  left: 0;
   width: 38%;
   background: var(--color-accent);
   animation: loader-line-sweep var(--duration-slow) var(--ease-standard) infinite;
@@ -1419,7 +1490,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .loader-wordmark-line {
+  .loader-line-sweep {
     animation-duration: 0.01ms;
     left: 31%;
   }
@@ -1452,6 +1523,52 @@ body {
 
 .animate-slide-up {
   animation: slide-up var(--duration-medium) var(--ease-out) both;
+}
+
+@keyframes sources-panel-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes sources-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sources-panel {
+  animation: sources-panel-in var(--duration-medium) var(--ease-out) both;
+}
+
+.sources-panel-backdrop {
+  animation: sources-backdrop-in var(--duration-medium) var(--ease-out) both;
+}
+
+/* Lesson reader — sticky title block (§11.1 provenance + title) */
+.lesson-title-sticky {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  margin-bottom: var(--space-6);
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-5);
+  background: color-mix(in srgb, var(--color-bg-primary) 94%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: var(--border-bold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sources-panel,
+  .sources-panel-backdrop {
+    animation-duration: 0.01ms;
+  }
 }
 
 /* Wordmark underline draw-in (§7.4) */
