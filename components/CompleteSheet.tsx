@@ -1,8 +1,8 @@
 "use client";
 
-import { Flame } from "lucide-react";
 import { Button } from "@/components/Button";
 import { NextLessonPreviewCard } from "@/components/NextLessonPreviewCard";
+import { StreakLabel } from "@/components/StreakIndicator";
 
 export type CompleteSheetProps = {
   open: boolean;
@@ -91,9 +91,8 @@ export function CompleteSheet({
             </p>
           )}
           {streak != null && streak > 0 && (
-            <div className="mt-3 flex items-center gap-2 text-sm text-ink-muted">
-              <Flame className="h-4 w-4" aria-hidden />
-              {streak}-day streak
+            <div className="mt-3">
+              <StreakLabel streak={streak} className="text-sm" />
             </div>
           )}
           {lessonTitle && (

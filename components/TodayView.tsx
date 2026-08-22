@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Library, Sparkles } from "lucide-react";
 import type { FeedResponse } from "@/lib/api/schemas";
 import { LessonFeedCard } from "@/components/LessonFeedCard";
+import { StreakLabel } from "@/components/StreakIndicator";
 import { TodayEmptyActionCard } from "@/components/TodayEmptyActionCard";
 
 type Props = FeedResponse & {
@@ -91,14 +92,10 @@ export function TodayView({
           </div>
           <Link
             href="/progress"
-            className={`focus-ring inline-flex min-h-11 shrink-0 items-center gap-1 rounded-none px-2 font-meta transition-colors hover:bg-ink/[0.04] ${
-              streakAtRisk
-                ? "text-ink hover:text-ink"
-                : "text-ink-muted hover:text-ink"
-            }`}
+            className="focus-ring inline-flex min-h-11 shrink-0 items-center gap-1 rounded-none px-2 font-meta transition-colors hover:bg-ink/[0.04]"
           >
-            {streak} day streak
-            <ArrowRight className="h-3 w-3" aria-hidden />
+            <StreakLabel streak={streak} atRisk={streakAtRisk} />
+            <ArrowRight className="h-3 w-3 text-ink-muted" aria-hidden />
           </Link>
         </div>
         <div className="editorial-rule mt-8" aria-hidden />

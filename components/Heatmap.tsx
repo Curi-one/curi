@@ -7,6 +7,7 @@ import {
   datesToActivityByDay,
   type HeatmapCell,
 } from "@/lib/progress/heatmap-grid";
+import { streakHeat, streakHeatClassName } from "@/lib/ui/streak-heat";
 
 type Props = {
   /** Lesson counts keyed by ISO date (YYYY-MM-DD). */
@@ -48,6 +49,8 @@ export function Heatmap({ activityByDay, dates, streak, atRisk }: Props) {
     () => buildHeatmapGrid(normalized),
     [normalized],
   );
+  const heat = streakHeat(streak);
+  const heatClass = streakHeatClassName(heat, { atRisk });
 
   return (
     <div>
@@ -59,12 +62,8 @@ export function Heatmap({ activityByDay, dates, streak, atRisk }: Props) {
           </p>
         </div>
         <div className="flex items-baseline gap-5 text-right">
-          <div>
-            <span
-              className={`font-display text-3xl tabular-nums transition-colors duration-300 ${
-                atRisk ? "text-streak" : "text-ink"
-              }`}
-            >
+          <div className={heatClass}>
+            <span className="streak-heat-count font-display text-3xl tabular-nums">
               {streak}
             </span>
             <span className="ml-1.5 font-ui text-sm text-ink-muted">
@@ -91,7 +90,9 @@ export function Heatmap({ activityByDay, dates, streak, atRisk }: Props) {
       </div>
 
       {atRisk && (
-        <p className="mt-3 font-meta text-streak">Streak at risk today</p>
+        <p className={`mt-3 font-meta ${heatClass}`}>
+          <span className="streak-heat-count">Streak at risk today</span>
+        </p>
       )}
 
       <div className="mt-5 overflow-x-auto pb-1">
