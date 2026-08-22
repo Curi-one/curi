@@ -162,6 +162,7 @@
   --grid-max-width: 1440px;
   --content-max-width: 680px;
   --narrow-max-width: 480px;
+  --sidebar-width: 64px;
 
   /* ── Fraunces variable axes · §5.2 ──────────────────────────────────────
      Display type is always Light (300) with the optical axes turned up: the
@@ -1228,12 +1229,12 @@ body {
     min-height: 100%;
   }
 
-  /* ── Desktop sidebar rail · prototype Sidebar, INTERACTIONS.md ─────────── */
+  /* ── Desktop sidebar rail · minimal icon column ────────────────────────── */
 
   @keyframes sidebar-enter {
     from {
       opacity: 0;
-      transform: translateX(-8px);
+      transform: translateX(-6px);
     }
     to {
       opacity: 1;
@@ -1242,165 +1243,103 @@ body {
   }
 
   .app-sidebar {
-    width: 84px;
-    background: var(--color-bg-secondary);
-    border-right: 1px solid var(--color-border-subtle);
+    width: var(--sidebar-width);
+    background: var(--color-bg-primary);
     animation: sidebar-enter var(--duration-medium) var(--ease-out) both;
   }
 
   .app-sidebar-brand {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-1);
-    padding: var(--space-5) var(--space-3) var(--space-4);
-  }
-
-  .app-sidebar-brand-tag {
-    font-family: var(--font-mono-stack);
-    font-size: var(--text-mono-2xs);
-    letter-spacing: var(--tracking-ultra);
-    text-transform: uppercase;
-    color: var(--color-text-tertiary);
-    line-height: var(--leading-none);
-  }
-
-  .app-sidebar-divider {
-    margin-inline: var(--space-3);
-    height: 1px;
-    background: color-mix(in srgb, var(--color-border-subtle) 80%, transparent);
-  }
-
-  .app-sidebar-divider--spaced {
-    margin-block: var(--space-3);
+    justify-content: center;
+    padding: var(--space-5) var(--space-2) var(--space-4);
   }
 
   .app-sidebar-nav {
-    margin-top: var(--space-3);
-    padding-inline: var(--space-2);
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: var(--space-1);
+    padding-inline: var(--space-2);
   }
 
   .app-sidebar-nav-item {
     position: relative;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding: 10px 6px;
-    width: 100%;
-    border-radius: var(--radius-none);
-    color: color-mix(in srgb, var(--color-text-secondary) 68%, transparent);
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--color-text-primary);
+    opacity: 0.4;
     text-decoration: none;
-    transition: background-color var(--duration-micro) var(--ease-standard);
+    transition: opacity var(--duration-micro) var(--ease-standard);
   }
 
   .app-sidebar-nav-item:hover {
-    background-color: color-mix(in srgb, var(--color-text-primary) 5%, transparent);
-    color: color-mix(in srgb, var(--color-text-primary) 84%, transparent);
-  }
-
-  .app-sidebar-nav-item:active {
-    transform: scale(0.97);
+    opacity: 0.72;
   }
 
   .app-sidebar-nav-item[aria-current="page"] {
-    background-color: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
-    color: var(--color-text-primary);
-  }
-
-  .app-sidebar-nav-item[aria-current="page"]::before {
-    content: "";
-    position: absolute;
-    inset-block: var(--space-2);
-    inset-inline-start: 0;
-    width: 2px;
-    background: var(--color-accent);
-  }
-
-  .app-sidebar-nav-item--accent:not([aria-current="page"]) {
-    color: color-mix(in srgb, var(--color-accent) 78%, var(--color-text-secondary));
-  }
-
-  .app-sidebar-nav-item--accent:not([aria-current="page"]):hover {
-    color: var(--color-accent);
-  }
-
-  .app-sidebar-nav-label {
-    font-size: var(--text-ui-4xs);
-    font-weight: var(--weight-medium);
-    line-height: var(--leading-none);
-    letter-spacing: var(--tracking-wide);
-    opacity: 0.7;
-  }
-
-  .app-sidebar-nav-item[aria-current="page"] .app-sidebar-nav-label,
-  .app-sidebar-nav-item:hover .app-sidebar-nav-label {
     opacity: 1;
   }
 
-  .app-sidebar-section {
-    padding-inline: var(--space-2);
+  .app-sidebar-nav-item:active {
+    opacity: 0.55;
+  }
+
+  .app-sidebar-nav-item[aria-current="page"]:active {
+    opacity: 0.88;
+  }
+
+  .app-sidebar-tip {
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    padding: var(--space-1) var(--space-2);
+    font-family: var(--font-ui-stack);
+    font-size: var(--text-ui-3xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-wide);
+    line-height: var(--leading-none);
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    border: var(--border-subtle);
+    background: var(--color-bg-primary);
+    transition: opacity var(--duration-micro) var(--ease-standard);
+    z-index: var(--z-dropdown);
+  }
+
+  .app-sidebar-nav-item:hover .app-sidebar-tip,
+  .app-sidebar-nav-item:focus-visible .app-sidebar-tip {
+    opacity: 1;
   }
 
   .app-sidebar-footer {
     margin-top: auto;
-    padding-inline: var(--space-2);
+    display: flex;
+    justify-content: center;
     padding-bottom: var(--space-5);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
   }
 
-  .app-sidebar-footer-item {
+  .app-sidebar-profile {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding: 10px 6px;
-    width: 100%;
-    border-radius: var(--radius-none);
-    color: var(--color-text-secondary);
-    text-decoration: none;
-    transition: background-color var(--duration-micro) var(--ease-standard);
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    opacity: 0.55;
+    transition: opacity var(--duration-micro) var(--ease-standard);
   }
 
-  .app-sidebar-footer-item:hover {
-    background-color: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  .app-sidebar-profile:hover {
+    opacity: 0.85;
   }
 
-  .app-sidebar-footer-item:active {
-    transform: scale(0.97);
-  }
-
-  .app-sidebar-footer-item--streak:hover {
-    background-color: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
-  }
-
-  .app-sidebar-footer-label {
-    font-size: var(--text-ui-4xs);
-    font-weight: var(--weight-medium);
-    line-height: var(--leading-none);
-    letter-spacing: var(--tracking-wide);
-    color: color-mix(in srgb, var(--color-text-secondary) 72%, transparent);
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .app-sidebar-footer-item:hover .app-sidebar-footer-label {
-    color: var(--color-text-secondary);
-  }
-
-  .app-sidebar-profile-avatar {
-    transition: box-shadow var(--duration-micro) var(--ease-standard);
-  }
-
-  .app-sidebar-footer-item:hover .app-sidebar-profile-avatar {
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+  .app-sidebar-profile:focus-visible {
+    opacity: 1;
   }
 
   /* Lesson reading column (§11.1) */
@@ -2090,7 +2029,7 @@ body {
 
 @media (min-width: 768px) {
   .lesson-quiz-dock {
-    inset-inline-start: 84px;
+    inset-inline-start: var(--sidebar-width);
   }
 }
 

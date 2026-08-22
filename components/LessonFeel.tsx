@@ -46,7 +46,7 @@ export function LessonFeelDock({
   disabled: boolean;
 }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md md:left-[84px]">
+    <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md md:left-[var(--sidebar-width)]">
       <div className="mx-auto max-w-lg md:max-w-xl lg:max-w-2xl">
         <Button onClick={onContinue} disabled={disabled} className="w-full">
           Complete lesson
