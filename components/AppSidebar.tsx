@@ -29,31 +29,23 @@ function SidebarNavBtn({
   label,
   active,
   icon: Icon,
+  accent = false,
 }: {
   href: string;
   label: string;
   active: boolean;
   icon: LucideIcon;
+  accent?: boolean;
 }) {
   return (
     <Link
       href={href}
       aria-label={label}
       aria-current={active ? "page" : undefined}
-      className={`focus-ring flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 transition-colors ${
-        active
-          ? "bg-ink/[0.08] text-ink"
-          : "text-ink-muted/60 hover:bg-ink/[0.05] hover:text-ink/80"
-      }`}
+      className={`app-sidebar-nav-item focus-ring${accent ? " app-sidebar-nav-item--accent" : ""}`}
     >
       <Icon size={18} strokeWidth={active ? 2.1 : 1.6} aria-hidden />
-      <span
-        className={`text-ui-4xs font-medium leading-none tracking-wide ${
-          active ? "opacity-100" : "opacity-70"
-        }`}
-      >
-        {label}
-      </span>
+      <span className="app-sidebar-nav-label">{label}</span>
     </Link>
   );
 }
@@ -104,16 +96,19 @@ export function AppSidebar() {
 
   return (
     <aside
-      className="relative hidden h-screen w-[84px] shrink-0 flex-col border-r border-border/70 bg-paper md:flex"
+      className="app-sidebar relative hidden h-screen shrink-0 flex-col md:flex"
       aria-label="Primary"
     >
-      <div className="flex justify-center px-3 pb-4 pt-5">
+      <div className="app-sidebar-brand">
+        <span className="app-sidebar-brand-tag" aria-hidden>
+          Daily
+        </span>
         <Wordmark href="/today" size="sm" underline={false} />
       </div>
 
-      <div className="mx-3 h-px bg-border/60" aria-hidden />
+      <div className="app-sidebar-divider" aria-hidden />
 
-      <nav className="mt-3 flex flex-col gap-1 px-2" aria-label="Main">
+      <nav className="app-sidebar-nav" aria-label="Main">
         <SidebarNavBtn
           href="/today"
           label="Home"
@@ -140,28 +135,37 @@ export function AppSidebar() {
         />
       </nav>
 
-      <div className="mx-3 my-3 h-px bg-border/60" aria-hidden />
+      <div
+        className="app-sidebar-divider app-sidebar-divider--spaced"
+        aria-hidden
+      />
 
-      <div className="px-2">
+      <div className="app-sidebar-section">
         <SidebarNavBtn
           href="/new"
           label="New"
           active={pathActive(pathname, "create")}
           icon={Sparkles}
+          accent
         />
       </div>
 
-      <div className="mt-auto flex flex-col gap-1 px-2 pb-5">
+      <div className="app-sidebar-footer">
         {streak > 0 && (
           <Link
             href="/progress"
-            className="flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 transition-colors hover:bg-ink/[0.04]"
+            className="app-sidebar-footer-item app-sidebar-footer-item--streak focus-ring"
+            aria-label={
+              streakAtRisk
+                ? `${streak}-day streak — keep it alive today`
+                : `${streak}-day streak`
+            }
           >
             <StreakIndicator
               streak={streak}
               atRisk={streakAtRisk}
               size="md"
-              countClassName="text-mono-sm"
+              countClassName="text-mono-sm font-semibold"
             />
           </Link>
         )}
@@ -169,12 +173,11 @@ export function AppSidebar() {
         {!isAcademy && (
           <Link
             href="/upgrade"
-            className="flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 text-ink-muted transition hover:bg-ink/[0.04] hover:text-ink"
+            className="app-sidebar-footer-item focus-ring"
+            aria-label="Upgrade"
           >
             <ArrowUp size={18} strokeWidth={1.8} aria-hidden />
-            <span className="text-ui-4xs font-medium leading-none opacity-80">
-              Upgrade
-            </span>
+            <span className="app-sidebar-footer-label">Upgrade</span>
           </Link>
         )}
 
@@ -182,12 +185,12 @@ export function AppSidebar() {
           href="/profile"
           aria-label={displayName}
           title={displayName}
-          className="flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 transition-[background-color] duration-micro ease-out hover:bg-ink/[0.05]"
+          className="app-sidebar-footer-item focus-ring"
         >
-          <UserAvatar name={displayName} size={28} />
-          <span className="max-w-full truncate text-ui-4xs font-medium leading-none text-ink-muted/60">
-            {firstName}
+          <span className="app-sidebar-profile-avatar">
+            <UserAvatar name={displayName} size={28} />
           </span>
+          <span className="app-sidebar-footer-label">{firstName}</span>
         </Link>
       </div>
     </aside>
