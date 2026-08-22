@@ -14,6 +14,8 @@ import type {
   QuizSubmitResponse,
   UserSession,
 } from "@/lib/api/schemas";
+import { issueTrackCertificate } from "@/lib/certificates/issue";
+import type { TrackCertificate } from "@/lib/certificates/types";
 import { buildPathMapNodes, isLessonReadable } from "@/lib/courses/path-map";
 import { isPathDueToday } from "@/lib/due-today";
 import {
@@ -66,6 +68,7 @@ type SessionData = {
   pendingCourse: PendingCourse | null;
   timezone: string;
   preferences: UserPreferences;
+  certificates: Record<string, TrackCertificate>;
 };
 
 type StoreResult<T> =
@@ -141,6 +144,19 @@ function createGuestSession(): UserSession {
 }
 
 function seedDefaultMember(today: string): SessionData {
+  const paths = createDefaultMemberPaths(today);
+  const mastered = paths.find((p) => p.status === "mastered");
+  const certificates: Record<string, TrackCertificate> = {};
+  if (mastered) {
+    certificates[mastered.id] = issueTrackCertificate({
+      courseId: mastered.id,
+      recipientName: DEFAULT_MEMBER.name,
+      topic: mastered.topic,
+      lessonCount: mastered.lessonTitles.length,
+      streakAtCompletion: 14,
+    });
+  }
+
   return {
     session: {
       kind: "member",
@@ -148,11 +164,12 @@ function seedDefaultMember(today: string): SessionData {
       email: DEFAULT_MEMBER.email,
       plan: DEFAULT_MEMBER.plan,
     },
-    paths: createDefaultMemberPaths(today),
+    paths,
     activity: createDefaultMemberActivity(today),
     pendingCourse: null,
     timezone: DEFAULT_TIMEZONE,
     preferences: { ...DEFAULT_USER_PREFERENCES },
+    certificates,
   };
 }
 
@@ -186,6 +203,7 @@ class MockStore {
       pendingCourse: null,
       timezone: DEFAULT_TIMEZONE,
       preferences: { ...DEFAULT_USER_PREFERENCES },
+      certificates: {},
     };
     this.sessions.set(sessionId, created);
     return created;
@@ -463,14 +481,65 @@ class MockStore {
     const dates = activityDates(data.activity);
     const streak = computeStreak(dates);
     const feed = this.getFeed(sessionId);
+    const pathMastered = path.status === "mastered";
+
+    let certificate: TrackCertificate | undefined;
+    if (pathMastered) {
+      certificate =
+        data.certificates[courseId] ??
+        issueTrackCertificate({
+          courseId,
+          recipientName: data.session.name ?? "Learner",
+          topic: path.topic,
+          lessonCount: path.lessonTitles.length,
+          streakAtCompletion: streak,
+        });
+      data.certificates[courseId] = certificate;
+    }
 
     return {
       feedback,
       complete: true,
       streak,
       pathsStillDue: feed.due.length,
-      pathMastered: path.status === "mastered",
+      pathMastered,
+      certificate,
     };
+  }
+
+  getCertificate(
+    sessionId: string,
+    courseId: string,
+  ): StoreResult<TrackCertificate> {
+    const data = this.getOrCreateSession(sessionId);
+    const path = this.resolvePaths(data).find((p) => p.id === courseId);
+    if (!path) {
+      return { ok: false, code: "not_found", message: "Path not found" };
+    }
+    if (path.status !== "mastered") {
+      return {
+        ok: false,
+        code: "not_mastered",
+        message: "Certificate available when the path is mastered",
+      };
+    }
+
+    const existing = data.certificates[courseId];
+    if (existing) {
+      return { ok: true, data: existing };
+    }
+
+    const dates = activityDates(data.activity);
+    const streak = computeStreak(dates);
+    const certificate = issueTrackCertificate({
+      courseId,
+      recipientName: data.session.name ?? "Learner",
+      topic: path.topic,
+      lessonCount: path.lessonTitles.length,
+      streakAtCompletion: streak,
+    });
+    data.certificates[courseId] = certificate;
+    return { ok: true, data: certificate };
   }
 
   getLibrary(sessionId: string): LibraryResponse {
@@ -626,6 +695,7 @@ class MockStore {
       pendingCourse: null,
       timezone: DEFAULT_TIMEZONE,
       preferences: { ...DEFAULT_USER_PREFERENCES },
+      certificates: {},
     });
     return guest;
   }
@@ -679,6 +749,7 @@ class MockStore {
       pendingCourse: null,
       timezone: DEFAULT_TIMEZONE,
       preferences: { ...DEFAULT_USER_PREFERENCES },
+      certificates: {},
     });
   }
 

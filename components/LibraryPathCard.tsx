@@ -116,7 +116,7 @@ export function LibraryPathCard({ path, tab }: Props) {
         </p>
         <p className="mt-2 font-meta text-[10px] uppercase tracking-[0.14em] text-mark-fg/55">
           {tab === "mastered"
-            ? `${path.totalLessons} lessons · Mastered`
+            ? `${path.totalLessons} lessons · Mastered · Certificate ready`
             : `${depthLabel(path.depth)} · ${progressDone} of ${path.totalLessons}`}
         </p>
 

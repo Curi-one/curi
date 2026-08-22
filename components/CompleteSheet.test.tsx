@@ -9,10 +9,40 @@ describe("CompleteSheet", () => {
     );
     expect(screen.getByText("Path mastered")).toBeInTheDocument();
     expect(
+      screen.getByText(/Your certificate is issued/),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole("link", { name: "View in Library" }),
     ).toHaveAttribute("href", "/library?tab=mastered");
     expect(
       screen.getByRole("link", { name: "Back to Today" }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows certificate panel when path is mastered", () => {
+    render(
+      <CompleteSheet
+        open
+        allPathsDoneToday
+        pathMastered
+        courseId="mock-path-mastered"
+        certificate={{
+          courseId: "mock-path-mastered",
+          recipientName: "Awais Hussain",
+          topic: "Stoic Philosophy",
+          lessonCount: 14,
+          studyMinutes: 42,
+          streakAtCompletion: 14,
+          completedAt: "2025-08-22T12:00:00.000Z",
+          certificateId: "CUR-2025-0847",
+        }}
+        onClose={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId("track-certificate")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Share on X" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Download PNG" }),
     ).toBeInTheDocument();
   });
 

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TrackCertificateSchema } from "@/lib/certificates/types";
 import { DETAILS_MAX_CHARS } from "@/lib/clarify/details";
 
 export const DepthSlugSchema = z.enum(["essentials", "fluent", "thorough"]);
@@ -222,6 +223,7 @@ export const QuizSubmitResponseSchema = z.object({
   streak: z.number().int().nonnegative().optional(),
   pathsStillDue: z.number().int().nonnegative().optional(),
   pathMastered: z.boolean().optional(),
+  certificate: TrackCertificateSchema.optional(),
 });
 export type QuizSubmitResponse = z.infer<typeof QuizSubmitResponseSchema>;
 

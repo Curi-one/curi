@@ -1,8 +1,10 @@
 "use client";
 
 import { Button } from "@/components/Button";
+import { CertificatePanel } from "@/components/certificate/CertificatePanel";
 import { NextLessonPreviewCard } from "@/components/NextLessonPreviewCard";
 import { StreakLabel } from "@/components/StreakIndicator";
+import type { TrackCertificate } from "@/lib/certificates/types";
 
 export type CompleteSheetProps = {
   open: boolean;
@@ -12,9 +14,11 @@ export type CompleteSheetProps = {
   streak?: number;
   lessonTitle?: string;
   courseTopic?: string;
+  courseId?: string;
   lessonNumber?: number;
   totalLessons?: number;
   nextLessonTitle?: string;
+  certificate?: TrackCertificate;
 };
 
 export function CompleteSheet({
@@ -25,9 +29,11 @@ export function CompleteSheet({
   streak,
   lessonTitle,
   courseTopic,
+  courseId,
   lessonNumber,
   totalLessons,
   nextLessonTitle,
+  certificate,
 }: CompleteSheetProps) {
   if (!open) return null;
 
@@ -40,7 +46,7 @@ export function CompleteSheet({
         : "Lesson complete.";
 
   const body = pathMastered
-    ? "This path is complete. It lives in Library → Mastered. No certificate, just the work done."
+    ? "Your certificate is issued. It lives in Library → Mastered whenever you want it again."
     : allPathsDoneToday
       ? "Next lessons unlock tomorrow."
       : "You still have paths to read today.";
@@ -103,6 +109,15 @@ export function CompleteSheet({
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto">
+          {pathMastered && certificate && courseId ? (
+            <div className="px-7 pb-5">
+              <CertificatePanel
+                certificate={certificate}
+                courseId={courseId}
+                animate
+              />
+            </div>
+          ) : null}
           {showNextPreview && (
             <div className="px-7 pb-5">
               <NextLessonPreviewCard

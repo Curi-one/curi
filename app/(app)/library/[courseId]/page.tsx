@@ -3,16 +3,19 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { CertificatePanel } from "@/components/certificate/CertificatePanel";
 import { PageShell } from "@/components/PageShell";
 import { LoadingState } from "@/components/LoadingState";
 import { PathMap } from "@/components/PathMap";
 import {
   ApiError,
   getCourseMap,
+  getTrackCertificate,
   patchRestoreCourse,
   patchShelveCourse,
   type CourseMapResponse,
 } from "@/lib/api/client";
+import type { TrackCertificate } from "@/lib/certificates/types";
 import { depthLabel } from "@/lib/ui/constants";
 import { endowedPct } from "@/lib/ui/topic-swatch";
 import { Button } from "@/components/Button";
@@ -41,6 +44,9 @@ export default function LibraryCoursePage() {
   const params = useParams<{ courseId: string }>();
   const router = useRouter();
   const [course, setCourse] = useState<CourseMapResponse | null>(null);
+  const [certificate, setCertificate] = useState<TrackCertificate | null>(
+    null,
+  );
   const [error, setError] = useState(false);
   const [shelving, setShelving] = useState(false);
   const [restoring, setRestoring] = useState(false);
@@ -50,6 +56,21 @@ export default function LibraryCoursePage() {
       .then(setCourse)
       .catch(() => setError(true));
   }, [params.courseId]);
+
+  useEffect(() => {
+    if (!course) return;
+    const mastered =
+      course.status === "completed" ||
+      (course.nodes.length > 0 &&
+        course.nodes.every((n) => n.status === "read"));
+    if (!mastered) {
+      setCertificate(null);
+      return;
+    }
+    getTrackCertificate(params.courseId)
+      .then((res) => setCertificate(res.certificate))
+      .catch(() => setCertificate(null));
+  }, [course, params.courseId]);
 
   async function handleShelve() {
     if (!course || shelving) return;
@@ -200,6 +221,19 @@ export default function LibraryCoursePage() {
           nodes={course.nodes}
           readOnly={isShelved}
         />
+
+        {isMastered && certificate ? (
+          <div className="mt-10 border-t border-border pt-10" id="certificate">
+            <p className="mb-5 font-meta text-[10px] uppercase tracking-[0.28em] text-ink-muted">
+              Completion certificate
+            </p>
+            <CertificatePanel
+              certificate={certificate}
+              courseId={course.id}
+              compact
+            />
+          </div>
+        ) : null}
 
         {todayNode && !isShelved && (
           <div className="mt-8">

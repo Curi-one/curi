@@ -488,7 +488,18 @@ export const DEFAULT_MEMBER = {
 };
 
 export function createDefaultMemberPaths(today: string): MockPath[] {
+  const stoicLessons = generateLessonTitles("Stoic Philosophy", "fluent", 14);
   return [
+    {
+      id: "mock-path-mastered",
+      topic: "Stoic Philosophy",
+      depth: "fluent",
+      clarifications: [{ questionId: "focus", answer: "Daily practice" }],
+      lessonTitles: stoicLessons,
+      progress: stoicLessons.length,
+      status: "mastered",
+      createdAt: today,
+    },
     {
       id: "mock-path-1",
       topic: "The Fermi paradox",
