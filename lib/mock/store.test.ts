@@ -68,6 +68,33 @@ describe("MockStore", () => {
     });
   });
 
+  describe("restorePath", () => {
+    it("restores a shelved path to active", () => {
+      const store = getMockStore();
+      store.shelvePath(MEMBER_SESSION, "mock-path-1");
+      const result = store.restorePath(MEMBER_SESSION, "mock-path-1");
+      expect(result.ok).toBe(true);
+      const map = store.getCourseMap(MEMBER_SESSION, "mock-path-1");
+      expect(map.ok && map.data.status).toBe("active");
+    });
+
+    it("returns path_limit when free member is at active cap", () => {
+      const store = getMockStore();
+      store.shelvePath(MEMBER_SESSION, "mock-path-1");
+      const created = store.createCourse(MEMBER_SESSION, {
+        topic: "Fills the free slot",
+        depth: "essentials",
+        clarifications: [],
+      });
+      expect(created.ok).toBe(true);
+      const result = store.restorePath(MEMBER_SESSION, "mock-path-1");
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.code).toBe("path_limit");
+      }
+    });
+  });
+
   describe("submitQuiz", () => {
     it("marks path done today and increments progress on first completion", () => {
       const store = getMockStore();

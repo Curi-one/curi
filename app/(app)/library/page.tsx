@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
 import { EmptyState } from "@/components/EmptyState";
 import { LibraryPathCard } from "@/components/LibraryPathCard";
 import { LoadingState } from "@/components/LoadingState";
@@ -48,7 +49,7 @@ function LibraryContent() {
     <>
       <div className="mt-2 flex items-center justify-between gap-3">
         <p className="text-sm text-ink-muted">Your paths</p>
-        <Button href="/new" variant="secondary" size="small">
+        <Button href="/new" icon={<Sparkles className="h-3.5 w-3.5" aria-hidden />}>
           New path
         </Button>
       </div>
@@ -100,17 +101,8 @@ function LibraryContent() {
             secondaryLabel={tab === "exploring" ? "New path" : undefined}
           />
         )}
-        {paths.length > 0 && tab === "mastered" && (
+        {paths.length > 0 && (
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-            {paths.map((p) => (
-              <li key={p.id}>
-                <LibraryPathCard path={p} tab={tab} />
-              </li>
-            ))}
-          </ul>
-        )}
-        {paths.length > 0 && tab !== "mastered" && (
-          <ul className="space-y-3">
             {paths.map((p) => (
               <li key={p.id}>
                 <LibraryPathCard path={p} tab={tab} />

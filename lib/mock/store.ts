@@ -547,6 +547,37 @@ class MockStore {
     return { ok: true, data: { courseId } };
   }
 
+  restorePath(
+    sessionId: string,
+    courseId: string,
+  ): StoreResult<{ courseId: string }> {
+    const data = this.getOrCreateSession(sessionId);
+    const path = data.paths.find((p) => p.id === courseId);
+    if (!path) {
+      return { ok: false, code: "not_found", message: "Path not found" };
+    }
+    if (path.status !== "shelved") {
+      return {
+        ok: false,
+        code: "invalid_state",
+        message: "Only shelved paths can be restored",
+      };
+    }
+    if (
+      data.session.kind === "member" &&
+      data.session.plan === "free" &&
+      activePaths(data.paths).length >= FREE_ACTIVE_PATH_LIMIT
+    ) {
+      return {
+        ok: false,
+        code: "path_limit",
+        message: "Free plan allows up to 2 active paths. Upgrade to Academy.",
+      };
+    }
+    path.status = "active";
+    return { ok: true, data: { courseId } };
+  }
+
   signIn(
     sessionId: string,
     request: AuthRequest,

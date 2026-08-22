@@ -5,6 +5,7 @@ import {
   resolveSession,
 } from "@/lib/api/handler-utils";
 import { getCourseMap } from "@/lib/courses/get-course-map";
+import { restoreCourse } from "@/lib/courses/restore-course";
 import { shelveCourse } from "@/lib/courses/shelve-course";
 import { getEnv } from "@/lib/env";
 import { getMockStore } from "@/lib/mock/store";
@@ -12,8 +13,16 @@ import { getMockStore } from "@/lib/mock/store";
 type RouteParams = { params: Promise<{ courseId: string }> };
 
 const PatchBodySchema = z.object({
-  action: z.literal("shelve"),
+  action: z.enum(["shelve", "restore"]),
 });
+
+function patchStatus(
+  code: string,
+): number {
+  if (code === "not_found") return 404;
+  if (code === "path_limit") return 403;
+  return 409;
+}
 
 export async function GET(request: Request, { params }: RouteParams) {
   const { sessionId } = resolveSession(request);
@@ -29,9 +38,7 @@ export async function GET(request: Request, { params }: RouteParams) {
         { status: 404 },
       );
     }
-    const { status: _mockStatus, ...body } = result.data;
-    void _mockStatus;
-    return jsonWithSession(body, sessionId);
+    return jsonWithSession(result.data, sessionId);
   }
 
   const result = await getCourseMap(courseId);
@@ -58,13 +65,15 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
   if (getEnv().USE_MOCK_API) {
     const store = getMockStore();
-    const result = store.shelvePath(sessionId, courseId);
+    const result =
+      parsed.data.action === "restore"
+        ? store.restorePath(sessionId, courseId)
+        : store.shelvePath(sessionId, courseId);
     if (!result.ok) {
-      const status = result.code === "not_found" ? 404 : 409;
       return jsonWithSession(
         { error: result.message, code: result.code },
         sessionId,
-        { status },
+        { status: patchStatus(result.code) },
       );
     }
     return jsonWithSession(
@@ -73,13 +82,15 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     );
   }
 
-  const result = await shelveCourse(courseId);
+  const result =
+    parsed.data.action === "restore"
+      ? await restoreCourse(courseId)
+      : await shelveCourse(courseId);
   if (!result.ok) {
-    const status = result.code === "not_found" ? 404 : 409;
     return jsonWithSession(
       { error: result.message, code: result.code },
       sessionId,
-      { status },
+      { status: patchStatus(result.code) },
     );
   }
 
