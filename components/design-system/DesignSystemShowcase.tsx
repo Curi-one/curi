@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/Button";
 import { Heatmap } from "@/components/Heatmap";
+import { datesToActivityByDay } from "@/lib/progress/heatmap-grid";
 import { SettingChips } from "@/components/SettingChips";
 import { TabPills } from "@/components/TabPills";
 import { BrowseFilterChips } from "@/components/BrowseFilterChips";
@@ -146,6 +147,7 @@ function demoDates(): string[] {
 
 export function DesignSystemShowcase() {
   const heatDates = useMemo(() => demoDates(), []);
+  const heatActivity = useMemo(() => datesToActivityByDay(heatDates), [heatDates]);
   const [pace, setPace] = useState("Balanced");
   const [depth, setDepth] = useState("Applied");
   const [tone, setTone] = useState("Curious");
@@ -520,11 +522,11 @@ export function DesignSystemShowcase() {
       {/* Heatmap — muted */}
       <Panel tone="muted" eyebrow="05 · Heatmap" title="Colourful activity">
         <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
-          Intensity from neighbour density. The ramp moves warm tertiary →
-          accent mixes → full Vermilion. Hover a cell for the date label.
+          Calendar grid with vermilion intensity from lessons per day. Hover a
+          cell for the date label.
         </p>
         <div className="border border-border bg-paper p-5 transition-colors duration-medium hover:border-accent/35">
-          <Heatmap dates={heatDates} streak={12} />
+          <Heatmap activityByDay={heatActivity} streak={12} />
         </div>
       </Panel>
 

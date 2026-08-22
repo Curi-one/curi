@@ -645,12 +645,20 @@ class MockStore {
     const data = this.getOrCreateSession(sessionId);
     const today = todayInTimezone(data.timezone);
     const dates = [...new Set(activityDates(data.activity))].sort();
-    const heatmapSeed = seedActivityDates(today);
-    const heatmap = [...new Set([...dates, ...heatmapSeed])].sort();
+    const activityByDay: Record<string, number> = {};
+    for (const row of data.activity) {
+      activityByDay[row.activityDate] =
+        (activityByDay[row.activityDate] ?? 0) + 1;
+    }
+    for (const seedDate of seedActivityDates(today)) {
+      activityByDay[seedDate] = (activityByDay[seedDate] ?? 0) + 1;
+    }
+    const heatmap = Object.keys(activityByDay).sort();
 
     return {
       streak: computeStreak(dates),
       heatmap,
+      activityByDay,
       activePaths: activePaths(this.resolvePaths(data)).length,
       masteredPaths: this.resolvePaths(data).filter(
         (p) => p.status === "mastered",

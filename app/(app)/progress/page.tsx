@@ -2,18 +2,55 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { Heatmap } from "@/components/Heatmap";
 import { LoadingState } from "@/components/LoadingState";
 import { PageShell } from "@/components/PageShell";
-import { PathProgressBar } from "@/components/PathProgressBar";
+import { ProgressPathRow } from "@/components/ProgressPathRow";
 import { getLibrary, getProgress } from "@/lib/api/client";
 import type { PathSummary } from "@/lib/api/schemas";
-import { depthLabel } from "@/lib/ui/constants";
+import { topicArt, topicPatternStyle } from "@/lib/ui/topic-swatch";
+
+function StatCard({
+  label,
+  value,
+  pattern = "vitrine",
+}: {
+  label: string;
+  value: number;
+  pattern?: "vitrine" | "ledger" | "radiate";
+}) {
+  const art = topicArt(label);
+  return (
+    <div className="relative overflow-hidden border border-border bg-paper-secondary px-4 py-4">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        style={topicPatternStyle(pattern)}
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -right-2 -top-2 font-display text-5xl font-light italic leading-none text-ink/[0.04]"
+        aria-hidden
+      >
+        {art.glyph}
+      </div>
+      <p className="relative z-[1] font-meta text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+        {label}
+      </p>
+      <p className="relative z-[1] mt-2 font-display text-4xl tabular-nums leading-none tracking-tight text-ink">
+        {value}
+      </p>
+    </div>
+  );
+}
 
 export default function ProgressPage() {
   const [streak, setStreak] = useState(0);
-  const [dates, setDates] = useState<string[]>([]);
-  const [paths, setPaths] = useState<PathSummary[]>([]);
+  const [activityByDay, setActivityByDay] = useState<Record<string, number>>(
+    {},
+  );
+  const [exploring, setExploring] = useState<PathSummary[]>([]);
+  const [mastered, setMastered] = useState<PathSummary[]>([]);
   const [stats, setStats] = useState({ active: 0, mastered: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -21,8 +58,12 @@ export default function ProgressPage() {
     Promise.all([getProgress(), getLibrary()])
       .then(([p, lib]) => {
         setStreak(p.streak);
-        setDates(p.heatmap);
-        setPaths([...lib.exploring, ...lib.mastered]);
+        setActivityByDay(
+          p.activityByDay ??
+            Object.fromEntries(p.heatmap.map((date) => [date, 1])),
+        );
+        setExploring(lib.exploring);
+        setMastered(lib.mastered);
         setStats({
           active: p.activePaths ?? lib.exploring.length,
           mastered: p.masteredPaths ?? lib.mastered.length,
@@ -39,6 +80,8 @@ export default function ProgressPage() {
     );
   }
 
+  const hasPaths = exploring.length > 0 || mastered.length > 0;
+
   return (
     <PageShell
       back={{ href: "/today", label: "Today" }}
@@ -47,26 +90,39 @@ export default function ProgressPage() {
       withTabPad={false}
       className="pt-4"
     >
-      <div className="mt-6 grid grid-cols-2 gap-3">
-        <div className="surface-card px-4 py-3">
-          <p className="font-meta">Active</p>
-          <p className="mt-1 font-display text-2xl text-ink">{stats.active}</p>
-        </div>
-        <div className="surface-card px-4 py-3">
-          <p className="font-meta">Mastered</p>
-          <p className="mt-1 font-display text-2xl text-ink">
-            {stats.mastered}
-          </p>
-        </div>
+      <div className="animate-fade-in mt-6 grid grid-cols-2 gap-3">
+        <StatCard label="Active paths" value={stats.active} pattern="ledger" />
+        <StatCard label="Mastered" value={stats.mastered} pattern="radiate" />
       </div>
-      <div className="mt-8">
-        <Heatmap dates={dates} streak={streak} />
-      </div>
-      <section className="mt-10">
-        <h2 className="type-kicker">Your paths</h2>
-        {paths.length === 0 ? (
+
+      <section className="animate-fade-in relative mt-8 overflow-hidden border border-border bg-paper-secondary p-5 sm:p-6">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          style={topicPatternStyle("columns")}
+          aria-hidden
+        />
+        <div className="relative z-[1]">
+          <Heatmap activityByDay={activityByDay} streak={streak} />
+        </div>
+      </section>
+
+      <section className="animate-fade-in mt-10">
+        <div className="flex items-end justify-between gap-3">
+          <h2 className="type-kicker-mark">Your paths</h2>
+          {hasPaths && (
+            <Link
+              href="/library"
+              className="focus-ring inline-flex items-center gap-1 font-meta text-[10px] uppercase tracking-[0.18em] text-ink-muted transition-colors hover:text-ink"
+            >
+              Library
+              <ArrowRight className="h-3 w-3" aria-hidden />
+            </Link>
+          )}
+        </div>
+
+        {!hasPaths ? (
           <p className="mt-4 text-ink-muted">
-            No paths yet.{""}
+            No paths yet.{" "}
             <Link
               href="/explore"
               className="link-subtle focus-ring inline-block rounded-none"
@@ -76,24 +132,14 @@ export default function ProgressPage() {
           </p>
         ) : (
           <ul className="mt-4 space-y-3">
-            {paths.map((p) => (
-              <li key={p.id}>
-                <Link
-                  href={`/library/${p.id}`}
-                  className="surface-card surface-card-interactive interactive-card focus-ring group block px-4 py-3"
-                >
-                  <p className="font-medium text-ink transition-colors group-hover:text-ink">
-                    {p.topic}
-                  </p>
-                  <p className="mt-1 font-meta">
-                    {p.progress} / {p.totalLessons} · {depthLabel(p.depth)}
-                  </p>
-                  <PathProgressBar
-                    progress={p.progress}
-                    total={p.totalLessons}
-                    className="mt-2"
-                  />
-                </Link>
+            {exploring.map((path) => (
+              <li key={path.id}>
+                <ProgressPathRow path={path} />
+              </li>
+            ))}
+            {mastered.map((path) => (
+              <li key={path.id}>
+                <ProgressPathRow path={path} mastered />
               </li>
             ))}
           </ul>
