@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { BRAND_PALETTE } from "@/lib/brand/palette";
 import type { TrackCertificate } from "@/lib/certificates/types";
 import {
   buildTrackInfoLine,
@@ -78,7 +79,7 @@ export async function renderTrackCertificateImage(
           height: 900,
           display: "flex",
           position: "relative",
-          background: "#faf9f5",
+          background: BRAND_PALETTE.white,
           overflow: "hidden",
         }}
       >
@@ -86,7 +87,7 @@ export async function renderTrackCertificateImage(
           style={{
             position: "absolute",
             inset: 12,
-            border: "1px solid #d4d0c8",
+            border: `1px solid ${BRAND_PALETTE.light}`,
           }}
         />
         <div
@@ -122,7 +123,7 @@ export async function renderTrackCertificateImage(
               fontFamily: "Fraunces",
               fontSize: 28,
               fontWeight: 300,
-              color: "#0a0908",
+              color: BRAND_PALETTE.ink,
               marginBottom: 4,
             }}
           >
@@ -132,7 +133,7 @@ export async function renderTrackCertificateImage(
             style={{
               width: 72,
               height: 3,
-              background: "#c1121f",
+              background: BRAND_PALETTE.accent,
               marginBottom: 48,
             }}
           />
@@ -142,7 +143,7 @@ export async function renderTrackCertificateImage(
               fontSize: 9,
               letterSpacing: "0.28em",
               textTransform: "uppercase",
-              color: "#9e9b94",
+              color: BRAND_PALETTE.silver,
               marginBottom: 16,
             }}
           >
@@ -154,7 +155,7 @@ export async function renderTrackCertificateImage(
               fontStyle: "italic",
               fontWeight: 300,
               fontSize: 64,
-              color: "#0a0908",
+              color: BRAND_PALETTE.ink,
               marginBottom: 40,
               lineHeight: 1,
             }}
@@ -165,7 +166,7 @@ export async function renderTrackCertificateImage(
             style={{
               width: "100%",
               height: 1,
-              background: "#d4d0c8",
+              background: BRAND_PALETTE.light,
               marginBottom: 40,
             }}
           />
@@ -175,7 +176,7 @@ export async function renderTrackCertificateImage(
               fontSize: 9,
               letterSpacing: "0.28em",
               textTransform: "uppercase",
-              color: "#9e9b94",
+              color: BRAND_PALETTE.silver,
               marginBottom: 12,
             }}
           >
@@ -186,7 +187,7 @@ export async function renderTrackCertificateImage(
               fontFamily: "Fraunces",
               fontWeight: 400,
               fontSize: 42,
-              color: "#0a0908",
+              color: BRAND_PALETTE.ink,
               marginBottom: 8,
               lineHeight: 1.05,
             }}
@@ -197,7 +198,7 @@ export async function renderTrackCertificateImage(
             style={{
               width: 200,
               height: 3,
-              background: "#c1121f",
+              background: BRAND_PALETTE.accent,
               margin: "24px auto",
             }}
           />
@@ -206,7 +207,7 @@ export async function renderTrackCertificateImage(
               fontFamily: "Plus Jakarta Sans",
               fontWeight: 300,
               fontSize: 13,
-              color: "#6b6760",
+              color: BRAND_PALETTE.mid,
               lineHeight: 1.6,
               marginBottom: 52,
               maxWidth: 640,
@@ -218,7 +219,7 @@ export async function renderTrackCertificateImage(
             style={{
               width: "100%",
               display: "flex",
-              borderTop: "1px solid #d4d0c8",
+              borderTop: `1px solid ${BRAND_PALETTE.light}`,
               paddingTop: 32,
             }}
           >
@@ -251,7 +252,7 @@ export async function renderTrackCertificateImage(
                   alignItems: "center",
                   gap: 6,
                   borderRight:
-                    index < arr.length - 1 ? "1px solid #d4d0c8" : "none",
+                    index < arr.length - 1 ? `1px solid ${BRAND_PALETTE.light}` : "none",
                   padding: "0 24px",
                 }}
               >
@@ -261,7 +262,7 @@ export async function renderTrackCertificateImage(
                     fontSize: 8,
                     letterSpacing: "0.2em",
                     textTransform: "uppercase",
-                    color: "#9e9b94",
+                    color: BRAND_PALETTE.silver,
                   }}
                 >
                   {item.label}
@@ -273,7 +274,7 @@ export async function renderTrackCertificateImage(
                     fontWeight: item.mono ? 400 : 300,
                     fontSize: item.mono ? 11 : 18,
                     letterSpacing: item.mono ? "0.08em" : undefined,
-                    color: "#0a0908",
+                    color: BRAND_PALETTE.ink,
                   }}
                 >
                   {item.value}
@@ -283,7 +284,7 @@ export async function renderTrackCertificateImage(
                     fontFamily: "Plus Jakarta Sans",
                     fontWeight: 300,
                     fontSize: 11,
-                    color: "#9e9b94",
+                    color: BRAND_PALETTE.silver,
                   }}
                 >
                   {item.sub}

@@ -1,3 +1,5 @@
+import { BRAND_PALETTE } from "@/lib/brand/palette";
+
 export type ReaderSize = "s" | "m" | "l" | "xl";
 export type ReaderFont = "sans" | "serif" | "mono";
 export type ReaderTheme = "light" | "paper" | "soft" | "dark";
@@ -52,51 +54,51 @@ export const READER_THEMES: {
   border: string;
   card: string;
 }[] = [
-  // Reader themes — warm tonal ladder matching globals.css tokens.
+  // Reader themes — neutral tonal ladder matching globals.css tokens.
   // Never pure black or white; Vermilion is not used in reader chrome.
   {
     id: "light",
     label: "Light",
-    swatch: "#FAF9F5",
-    swatchBorder: "#D4D0C8",
-    bg: "#FAF9F5",
-    fg: "#0A0908",
-    muted: "#6B6760",
-    border: "#D4D0C8",
-    card: "#F4F1E8",
+    swatch: BRAND_PALETTE.white,
+    swatchBorder: BRAND_PALETTE.light,
+    bg: BRAND_PALETTE.white,
+    fg: BRAND_PALETTE.ink,
+    muted: BRAND_PALETTE.mid,
+    border: BRAND_PALETTE.light,
+    card: BRAND_PALETTE.paper,
   },
   {
     id: "paper",
     label: "Paper",
-    swatch: "#F4F1E8",
-    swatchBorder: "#D4D0C8",
-    bg: "#F4F1E8",
-    fg: "#0A0908",
-    muted: "#6B6760",
-    border: "#D4D0C8",
-    card: "#E8E5DC",
+    swatch: BRAND_PALETTE.paper,
+    swatchBorder: BRAND_PALETTE.light,
+    bg: BRAND_PALETTE.paper,
+    fg: BRAND_PALETTE.ink,
+    muted: BRAND_PALETTE.mid,
+    border: BRAND_PALETTE.light,
+    card: BRAND_PALETTE.pale,
   },
   {
     id: "soft",
     label: "Soft",
-    swatch: "#E8E5DC",
-    swatchBorder: "#D4D0C8",
-    bg: "#E8E5DC",
-    fg: "#2E2C28",
-    muted: "#6B6760",
-    border: "#D4D0C8",
-    card: "#D4D0C8",
+    swatch: BRAND_PALETTE.pale,
+    swatchBorder: BRAND_PALETTE.light,
+    bg: BRAND_PALETTE.pale,
+    fg: BRAND_PALETTE.ink3,
+    muted: BRAND_PALETTE.mid,
+    border: BRAND_PALETTE.light,
+    card: BRAND_PALETTE.light,
   },
   {
     id: "dark",
     label: "Dark",
-    swatch: "#0A0908",
-    swatchBorder: "#2E2C28",
-    bg: "#0A0908",
-    fg: "#FAF9F5",
-    muted: "#9E9B94",
-    border: "#2E2C28",
-    card: "#1C1A18",
+    swatch: BRAND_PALETTE.ink,
+    swatchBorder: BRAND_PALETTE.ink3,
+    bg: BRAND_PALETTE.ink,
+    fg: BRAND_PALETTE.white,
+    muted: BRAND_PALETTE.silver,
+    border: BRAND_PALETTE.ink3,
+    card: BRAND_PALETTE.ink2,
   },
 ];
 export const DEFAULT_READER_SETTINGS: ReaderSettings = {

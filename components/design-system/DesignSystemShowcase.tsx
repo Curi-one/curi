@@ -172,7 +172,7 @@ export function DesignSystemShowcase() {
             Curi
           </p>
           <p className="mt-4 max-w-md font-sans text-ui-md leading-relaxed text-ink-muted">
-            Design system — warm greyscale tokens, type rules, and live
+            Design system — neutral greyscale tokens, type rules, and live
             components. Under{" "}
             <span className="font-meta text-mono-md text-accent">18px</span> we
             use sans or mono only. Vermilion once per screen.
@@ -211,7 +211,7 @@ export function DesignSystemShowcase() {
       <Panel
         tone="muted"
         eyebrow="01 · Colour"
-        title="Warm greyscale + Vermilion"
+        title="Neutral greyscale + Vermilion"
       >
         <div className="flex flex-wrap gap-4">
           <Swatch name="Ink" token="--color-ink" />
@@ -223,7 +223,7 @@ export function DesignSystemShowcase() {
           <Swatch name="Vermilion" token="--color-accent" />
         </div>
         <p className="max-w-xl font-sans text-ui-sm leading-relaxed text-ink-muted">
-          Near-white surfaces (Paper #F4F1E8, White #FAF9F5, Pale #E8E5DC).
+          Near-white surfaces (Paper #F5F5F5, White #FAFAFA, Pale #EEEEEE).
           Vermilion is the only chromatic colour — one beat per screen. Hover the
           swatches.
         </p>

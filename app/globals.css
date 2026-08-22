@@ -10,19 +10,19 @@
 
 :root {
   /* ── Colour · §8.1 ───────────────────────────────────────────────────────
-     Warm greyscale is intentional — every tone carries a slight warm cast.
-     Never pure black or pure white. Vermilion is the only chromatic colour. */
+     Neutral cold greyscale — equal RGB channels, no warm cast.
+     Never pure black (#000) or pure white (#fff). Vermilion only chromatic. */
 
-  /* Greyscale — eight warm tones (§4.2) */
-  --color-ink: #0a0908;
-  --color-ink-2: #1c1a18;
-  --color-ink-3: #2e2c28;
-  --color-mid: #6b6760;
-  --color-silver: #9e9b94;
-  --color-light: #d4d0c8;
-  --color-paper-tone: #f4f1e8; /* paper — secondary surfaces (library --paper) */
-  --color-white-tone: #faf9f5; /* white — primary page bg */
-  --color-pale: #e8e5dc; /* pale — tertiary / hover (library --pale) */
+  /* Greyscale — eight neutral tones */
+  --color-ink: #0a0a0a;
+  --color-ink-2: #171717;
+  --color-ink-3: #262626;
+  --color-mid: #737373;
+  --color-silver: #a3a3a3;
+  --color-light: #e5e5e5;
+  --color-paper-tone: #f5f5f5; /* secondary surfaces — sidebar, cards */
+  --color-white-tone: #fafafa; /* primary page background */
+  --color-pale: #eeeeee; /* tertiary / hover */
 
   /* Background */
   --color-bg-primary: var(--color-white-tone);
@@ -212,9 +212,7 @@
   ); /* default streak tone; multi-day heat uses .streak-heat-* → accent */
 }
 
-/* Dark chrome — remapped onto the brand Ink tones, not cool grey.
-   BRAND.md defines no dark theme; these are the Ink surfaces of §4.2 used
-   as page chrome, keeping the warm palette intact. */
+/* Dark chrome — remapped onto neutral Ink tones. */
 html.dark {
   --color-bg-primary: var(--color-ink);
   --color-bg-secondary: var(--color-ink-2);
@@ -1448,7 +1446,7 @@ body {
     font-weight: 300;
     font-size: clamp(12rem, 42vw, 32.5rem);
     line-height: 1;
-    color: rgba(10, 9, 8, 0.028);
+    color: rgba(10, 10, 10, 0.028);
     top: 50%;
     left: 50%;
     transform: translate(-52%, -50%);

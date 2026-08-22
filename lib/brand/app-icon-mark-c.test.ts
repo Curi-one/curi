@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { BRAND_PALETTE } from "@/lib/brand/palette";
 import {
   APP_ICON_ACCENT,
   APP_ICON_INK,
@@ -8,9 +9,9 @@ import {
 
 describe("markCMetrics", () => {
   it("uses brand colours from the icon exploration", () => {
-    expect(APP_ICON_INK).toBe("#0a0908");
-    expect(APP_ICON_PAPER).toBe("#faf9f5");
-    expect(APP_ICON_ACCENT).toBe("#c1121f");
+    expect(APP_ICON_INK).toBe(BRAND_PALETTE.ink);
+    expect(APP_ICON_PAPER).toBe(BRAND_PALETTE.white);
+    expect(APP_ICON_ACCENT).toBe(BRAND_PALETTE.accent);
   });
 
   it("scales glyph and accent dot from the 256px reference", () => {

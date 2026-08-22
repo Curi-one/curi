@@ -154,8 +154,8 @@ describe("topicArt", () => {
     // Theme-independent mark tokens, with the literal tone as fallback. A
     // track mark is a dark Ink field in BOTH themes, so it must not resolve
     // through a token that html.dark remaps.
-    expect(art.field).toBe("var(--mark-field, #0A0908)");
-    expect(art.glyphColor).toBe("var(--mark-fg, #FAF9F5)");
+    expect(art.field).toBe("var(--mark-field, #0A0A0A)");
+    expect(art.glyphColor).toBe("var(--mark-fg, #FAFAFA)");
   });
 
   it("never resolves the field through a theme-flipping token", () => {
@@ -176,7 +176,7 @@ describe("topicSwatch", () => {
     const art = topicArt("Constitutional Law");
     expect(field).toBe(art.field);
     expect(glyphColor).toBe(art.glyphColor);
-    expect(glyphColor).toBe("var(--mark-fg, #FAF9F5)");
+    expect(glyphColor).toBe("var(--mark-fg, #FAFAFA)");
   });
 
   it("is deterministic", () => {

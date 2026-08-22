@@ -1,9 +1,10 @@
 import { ImageResponse } from "next/og";
+import { BRAND_PALETTE } from "@/lib/brand/palette";
 
 /** Mark C — ink field, Fraunces §, vermilion accent dot (brand icon exploration). */
-export const APP_ICON_INK = "#0a0908";
-export const APP_ICON_PAPER = "#faf9f5";
-export const APP_ICON_ACCENT = "#c1121f";
+export const APP_ICON_INK = BRAND_PALETTE.ink;
+export const APP_ICON_PAPER = BRAND_PALETTE.white;
+export const APP_ICON_ACCENT = BRAND_PALETTE.accent;
 
 const FRAUNCES_ITALIC_300_URL =
   "https://fonts.gstatic.com/s/fraunces/v38/6NVf8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9sPEKsxx664UJf1gVTf7W.ttf";

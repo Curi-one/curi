@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { emailPage, escapeHtml } from "@/lib/email/brand-theme";
+import { emailPage, EMAIL_COLORS, escapeHtml } from "@/lib/email/brand-theme";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -27,7 +27,7 @@ function page(title: string, body: string, form?: string): NextResponse {
 
 function unsubscribeButton(token: string): string {
   const escaped = escapeHtml(token);
-  return `<form method="post" action="/api/email/unsubscribe"><input type="hidden" name="token" value="${escaped}"><button type="submit" style="display:inline-block;background:#0A0908;color:#FAF9F5;font-family:'Plus Jakarta Sans','Helvetica Neue',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.04em;padding:14px 28px;border:none;border-bottom:3px solid #C1121F;cursor:pointer;">Unsubscribe</button></form>`;
+  return `<form method="post" action="/api/email/unsubscribe"><input type="hidden" name="token" value="${escaped}"><button type="submit" style="display:inline-block;background:${EMAIL_COLORS.ink};color:${EMAIL_COLORS.white};font-family:'Plus Jakarta Sans','Helvetica Neue',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.04em;padding:14px 28px;border:none;border-bottom:3px solid ${EMAIL_COLORS.accent};cursor:pointer;">Unsubscribe</button></form>`;
 }
 
 function tokenFrom(url: string): string | null {
