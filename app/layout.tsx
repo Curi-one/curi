@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Fraunces, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { DevPersonaToggle } from "@/components/DevPersonaToggle";
 import { ScrollDamping } from "@/components/ScrollDamping";
+import { ThemeInit } from "@/components/ThemeInit";
+import { APP_THEME_BOOT_SCRIPT } from "@/lib/ui/app-theme";
 import "./globals.css";
 /** KaTeX styles for lesson math — must load globally; client-only imports were dropped from the CSS bundle. */
 import "katex/dist/katex.min.css";
@@ -47,8 +49,12 @@ export default function RootLayout({
   const fontVars = `${fraunces.variable} ${plusJakarta.variable} ${jetbrains.variable}`;
 
   return (
-    <html lang="en" className={fontVars}>
+    <html lang="en" className={fontVars} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: APP_THEME_BOOT_SCRIPT }} />
+      </head>
       <body className="min-h-screen font-ui antialiased">
+        <ThemeInit />
         <ScrollDamping />
         <DevPersonaToggle />
         {children}

@@ -100,7 +100,7 @@ export function TodayView({
           </div>
           <Link
             href="/progress"
-            className="focus-ring inline-flex min-h-11 shrink-0 items-center gap-1 rounded-none px-2 font-meta transition-colors hover:bg-ink/[0.04]"
+            className="focus-ring inline-flex min-h-11 shrink-0 items-center gap-1 rounded-none px-2 font-meta transition-colors hover:bg-highlight"
           >
             <StreakLabel streak={streak} atRisk={streakAtRisk} />
             <ArrowRight className="h-3 w-3 text-ink-muted" aria-hidden />

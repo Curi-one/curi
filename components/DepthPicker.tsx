@@ -38,7 +38,7 @@ export function DepthPicker({
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-none px-1 text-sm text-ink-muted transition-colors hover:bg-ink/[0.04] hover:text-ink focus-ring"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-none px-1 text-sm text-ink-muted transition-colors hover:bg-highlight hover:text-ink focus-ring"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
             Back

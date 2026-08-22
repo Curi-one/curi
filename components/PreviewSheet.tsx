@@ -69,7 +69,7 @@ export function PreviewSheet({
     >
       <button
         type="button"
-        className="absolute inset-0 bg-ink/40 backdrop-blur-[3px]"
+        className="absolute inset-0 bg-scrim-heavy backdrop-blur-[3px]"
         aria-label="Close preview"
         onClick={onClose}
       />

@@ -93,7 +93,7 @@ export default function UpgradePage() {
       <ul className="mt-8 space-y-4">
         {FEATURES.map(({ label, sub }) => (
           <li key={label} className="flex items-start gap-3.5">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border bg-ink/10">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border bg-highlight-strong">
               <Check
                 className="h-2.5 w-2.5 text-ink/70"
                 strokeWidth={2.5}

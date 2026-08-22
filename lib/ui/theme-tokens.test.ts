@@ -41,10 +41,21 @@ describe("theme token contract", () => {
       "--color-text-secondary",
       "--color-text-tertiary",
       "--color-bg-primary",
+      "--color-bg-secondary",
+      "--color-bg-tertiary",
       "--color-border-subtle",
+      "--color-dark-bg",
+      "--color-dark-fg",
     ]) {
       expect(block).toContain(token);
     }
+  });
+
+  it("uses dull gray chrome in dark mode, not near-black ink", () => {
+    const block = darkBlock();
+    expect(block).toContain("--color-bg-primary: var(--color-dark-bg)");
+    expect(block).not.toContain("--color-bg-primary: var(--color-ink)");
+    expect(css).toContain("--color-dark-bg: #1e1e1e");
   });
 
   it("never remaps the track-mark tones", () => {
@@ -63,6 +74,11 @@ describe("theme token contract", () => {
       // Raw tones are safe; anything semantic would flip underneath the mark.
       expect(value).not.toMatch(/--color-(bg|text|border)-/);
     }
+  });
+
+  it("defines theme-aware scrim and highlight overlays", () => {
+    expect(css).toContain("--color-scrim:");
+    expect(css).toContain("--color-highlight:");
   });
 
   it("uses a vermilion intensity ramp with accent on today", () => {
