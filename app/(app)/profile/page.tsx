@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, LogOut, Minus } from "lucide-react";
 import { LearningProfilePreview } from "@/components/LearningProfilePreview";
+import { StreakLabel } from "@/components/StreakIndicator";
 import { PageShell } from "@/components/PageShell";
 import { LoadingState } from "@/components/LoadingState";
 import { SettingChips } from "@/components/SettingChips";
@@ -534,9 +535,11 @@ export default function ProfilePage() {
           </div>
 
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm text-ink-muted">
-            <span>
-              <span className="font-medium text-ink">{streak}</span> day streak
-            </span>
+            {streak > 0 ? (
+              <StreakLabel streak={streak} className="text-sm" />
+            ) : (
+              <span>Build your streak on Today</span>
+            )}
             <span>
               <span className="font-medium text-ink">{activePaths}</span> active
               path{activePaths === 1 ? "" : "s"}

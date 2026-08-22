@@ -209,7 +209,7 @@
   --color-border: var(--color-border-subtle);
   --color-streak: var(
     --color-text-primary
-  ); /* streak is never Vermilion (§11.3) */
+  ); /* default streak tone; multi-day heat uses .streak-heat-* → accent */
 }
 
 /* Dark chrome — remapped onto the brand Ink tones, not cool grey.
@@ -1064,7 +1064,7 @@ body {
     padding-top: var(--space-1);
   }
 
-  /* ── Streak · §11.3 — display element, never a badge, never Vermilion ──── */
+  /* ── Streak · §11.3 — display element; heats to vermilion at multi-day peak ─ */
 
   .streak-number {
     font-family: var(--font-display-stack);
@@ -1083,6 +1083,39 @@ body {
     font-style: italic;
     font-weight: var(--weight-light);
     color: var(--color-text-tertiary);
+  }
+
+  /* Streak heat — ink → vermilion over STREAK_PEAK_DAYS, then burns at peak */
+  .streak-heat-ember .streak-heat-flame,
+  .streak-heat-ember .streak-heat-count {
+    color: var(--color-text-primary);
+  }
+
+  .streak-heat-warming .streak-heat-flame,
+  .streak-heat-warming .streak-heat-count {
+    color: color-mix(in srgb, var(--color-text-primary) 42%, var(--color-accent));
+  }
+
+  .streak-heat-burning .streak-heat-flame,
+  .streak-heat-burning .streak-heat-count {
+    color: var(--color-accent);
+  }
+
+  .streak-heat-flame,
+  .streak-heat-count {
+    transition: color var(--duration-medium) var(--ease-out);
+  }
+
+  .streak-heat-burn .streak-heat-flame {
+    animation: streak-burn 2.4s var(--ease-standard) infinite;
+  }
+
+  .streak-heat-at-risk .streak-heat-flame {
+    animation: streak-at-risk 1.6s var(--ease-standard) infinite;
+  }
+
+  .streak-heat-burn.streak-heat-at-risk .streak-heat-flame {
+    animation: streak-burn-at-risk 1.8s var(--ease-standard) infinite;
   }
 
   /* ── Layout · §8.9, §10.1 ──────────────────────────────────────────────── */
@@ -1745,6 +1778,48 @@ body {
 }
 
 /* Streak toast — settles, does not overshoot (§7.1 gravity) */
+@keyframes streak-burn {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  45% {
+    opacity: 0.88;
+    transform: scale(1.05);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes streak-at-risk {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}
+
+@keyframes streak-burn-at-risk {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  40% {
+    opacity: 0.82;
+    transform: scale(1.06);
+  }
+  65% {
+    opacity: 0.95;
+    transform: scale(0.97);
+  }
+}
+
 @keyframes streak-settle {
   from {
     opacity: 0;

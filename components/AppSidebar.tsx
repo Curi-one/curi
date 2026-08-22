@@ -8,12 +8,12 @@ import {
   BarChart3,
   BookOpen,
   Compass,
-  Flame,
   Library,
   Sparkles,
   type LucideProps,
 } from "lucide-react";
 import { Wordmark } from "@/components/Wordmark";
+import { StreakIndicator } from "@/components/StreakIndicator";
 import { UserAvatar } from "@/components/UserAvatar";
 import {
   getFeed,
@@ -154,26 +154,15 @@ export function AppSidebar() {
       <div className="mt-auto flex flex-col gap-1 px-2 pb-5">
         {streak > 0 && (
           <Link
-            href="/today"
-            title={
-              streakAtRisk
-                ? `${streak}-day streak — get curious today to keep it`
-                : `${streak}-day streak`
-            }
-            className={`flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 transition-colors ${
-              streakAtRisk
-                ? "font-medium text-ink hover:bg-ink/[0.04]"
-                : "text-ink-muted hover:bg-ink/[0.04] hover:text-ink"
-            }`}
+            href="/progress"
+            className="flex w-full flex-col items-center gap-1.5 rounded-none px-1.5 py-2.5 transition-colors hover:bg-ink/[0.04]"
           >
-            <Flame
-              size={18}
-              strokeWidth={streakAtRisk ? 2.2 : 1.8}
-              aria-hidden
+            <StreakIndicator
+              streak={streak}
+              atRisk={streakAtRisk}
+              size="md"
+              countClassName="text-mono-sm"
             />
-            <span className="font-meta text-mono-sm tabular-nums leading-none">
-              {streak}
-            </span>
           </Link>
         )}
 
