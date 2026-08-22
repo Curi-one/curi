@@ -1064,6 +1064,38 @@ body {
     padding-top: var(--space-1);
   }
 
+  /* Lesson takeaways accordion — height + opacity, brand motion tokens (§7) */
+  .lesson-accordion {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--duration-medium) var(--ease-in);
+  }
+
+  .lesson-accordion.is-open {
+    grid-template-rows: 1fr;
+    transition: grid-template-rows var(--duration-medium) var(--ease-out);
+  }
+
+  .lesson-accordion-panel {
+    overflow: hidden;
+  }
+
+  .lesson-accordion-content {
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      opacity var(--duration-small) var(--ease-in),
+      transform var(--duration-small) var(--ease-in);
+  }
+
+  .lesson-accordion.is-open .lesson-accordion-content {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--duration-small) var(--ease-out),
+      transform var(--duration-small) var(--ease-out);
+  }
+
   /* ── Streak · §11.3 — display element, never a badge, never Vermilion ──── */
 
   .streak-number {

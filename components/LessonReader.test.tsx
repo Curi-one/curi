@@ -185,6 +185,34 @@ describe("LessonReader", () => {
     expect(otherLink).not.toHaveClass("border-ink");
   });
 
+  it("toggles takeaways accordion with brand motion panel", () => {
+    render(
+      <LessonReader
+        lesson={{
+          ...lesson,
+          takeaways: ["Takeaway alpha", "Takeaway beta", "Takeaway gamma"],
+        }}
+        lessonIndex={0}
+        topic="Unit Economics"
+        onStartQuiz={vi.fn()}
+      />,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: /3 things from this lesson/i,
+    });
+    const panel = screen.getByTestId("lesson-takeaways-accordion");
+
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(panel).toHaveClass("is-open");
+    expect(screen.getByText("Takeaway alpha")).toBeInTheDocument();
+
+    fireEvent.click(trigger);
+
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(panel).not.toHaveClass("is-open");
+  });
+
   it("shows API-provided takeaways, shareable fact, and visuals when present in the payload", () => {
     render(
       <LessonReader

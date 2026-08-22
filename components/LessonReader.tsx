@@ -570,34 +570,44 @@ export function LessonReader({
           {takeaways.length > 0 && (
             <div className="mt-6 border-t border-border">
               <button
+                id="lesson-takeaways-trigger"
                 type="button"
                 onClick={() => setTakeawaysOpen((o) => !o)}
-                className="flex w-full items-center justify-between py-3.5 text-left"
+                className="flex w-full items-center justify-between py-3.5 text-left text-ink-muted transition-colors duration-small ease-out hover:text-ink"
                 aria-expanded={takeawaysOpen}
+                aria-controls="lesson-takeaways-panel"
               >
-                <span className="text-xs uppercase tracking-widest text-ink-muted">
+                <span className="text-xs uppercase tracking-widest">
                   {takeaways.length} things from this lesson
                 </span>
                 <ChevronDown
-                  className={`h-4 w-4 shrink-0 text-ink-muted/60 transition-transform duration-200 ${
+                  className={`h-4 w-4 shrink-0 opacity-60 transition-transform duration-small ease-standard ${
                     takeawaysOpen ? "rotate-180" : ""
                   }`}
                   aria-hidden
                 />
               </button>
-              {takeawaysOpen && (
-                <ul className="space-y-4 pb-5">
-                  {takeaways.map((t, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-4 text-sm leading-loose text-ink/80"
-                    >
-                      <span className="takeaway-number">{i + 1}</span>
-                      {t}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <div
+                id="lesson-takeaways-panel"
+                role="region"
+                aria-labelledby="lesson-takeaways-trigger"
+                className={`lesson-accordion${takeawaysOpen ? " is-open" : ""}`}
+                data-testid="lesson-takeaways-accordion"
+              >
+                <div className="lesson-accordion-panel">
+                  <ul className="lesson-accordion-content space-y-4 pb-5">
+                    {takeaways.map((t, i) => (
+                      <li
+                        key={i}
+                        className="flex items-start gap-4 text-sm leading-loose text-ink/80"
+                      >
+                        <span className="takeaway-number">{i + 1}</span>
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
 
