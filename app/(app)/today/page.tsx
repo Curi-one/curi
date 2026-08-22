@@ -8,6 +8,8 @@ import { TodayView } from "@/components/TodayView";
 import {
   getFeed,
   getMe,
+  getNotes,
+  getPreferences,
   getProgress,
   invalidateClientCache,
 } from "@/lib/api/client";
@@ -19,6 +21,8 @@ function TodayContent() {
   const searchParams = useSearchParams();
   const [feed, setFeed] = useState<FeedResponse | null>(null);
   const [streak, setStreak] = useState(0);
+  const [notesDueCount, setNotesDueCount] = useState(0);
+  const [notesShowDueOnToday, setNotesShowDueOnToday] = useState(true);
   const [ready, setReady] = useState(false);
   const [upgradeConfirmed, setUpgradeConfirmed] = useState(false);
 
@@ -41,10 +45,17 @@ function TodayContent() {
           return;
         }
 
-        const [f, p] = await Promise.all([getFeed(), getProgress()]);
+        const [f, p, notes, prefRes] = await Promise.all([
+          getFeed(),
+          getProgress(),
+          getNotes(),
+          getPreferences(),
+        ]);
         if (cancelled) return;
         setFeed(f);
         setStreak(p.streak);
+        setNotesDueCount(notes.stats.dueCount);
+        setNotesShowDueOnToday(prefRes.preferences.notesShowDueOnToday);
         setReady(true);
       } catch {
         if (cancelled) return;
@@ -74,6 +85,8 @@ function TodayContent() {
           streak={streak}
           streakAtRisk={streak > 0 && feed.due.length > 0}
           upgradeConfirmed={upgradeConfirmed}
+          notesDueCount={notesDueCount}
+          notesShowDueOnToday={notesShowDueOnToday}
         />
       )}
     </>

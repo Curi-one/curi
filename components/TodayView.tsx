@@ -16,6 +16,9 @@ type Props = FeedResponse & {
   streakAtRisk?: boolean;
   /** Shown after Stripe Checkout success (`/today?upgraded=1`). */
   upgradeConfirmed?: boolean;
+  /** Due review cards — shown when notesShowDueOnToday is enabled. */
+  notesDueCount?: number;
+  notesShowDueOnToday?: boolean;
 };
 
 export function TodayView({
@@ -25,6 +28,8 @@ export function TodayView({
   streak = 0,
   streakAtRisk,
   upgradeConfirmed = false,
+  notesDueCount = 0,
+  notesShowDueOnToday = true,
 }: Props) {
   const total = due.length + done.length;
   const empty = total === 0;
@@ -108,6 +113,28 @@ export function TodayView({
         </div>
         <div className="editorial-rule mt-8" aria-hidden />
       </header>
+
+      {notesShowDueOnToday && notesDueCount > 0 && (
+        <div className="notes-today-cta mb-10 border-y border-border py-4">
+          <Link
+            href="/notes?review=1"
+            className="focus-ring flex items-center justify-between gap-3 transition-colors hover:bg-highlight"
+          >
+            <div>
+              <p className="type-kicker-mark normal-case tracking-wider text-ink-muted">
+                Review
+              </p>
+              <p className="mt-1 text-sm text-ink">
+                {notesDueCount} card{notesDueCount === 1 ? "" : "s"} ready to
+                review
+              </p>
+            </div>
+            <span className="notes-due-badge shrink-0 font-meta text-ui-3xs uppercase tracking-wider">
+              Review
+            </span>
+          </Link>
+        </div>
+      )}
 
       {groups.map((group) => (
         <section key={group.daysAgo} className="mb-10 last:mb-6">

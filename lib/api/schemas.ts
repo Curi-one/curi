@@ -272,3 +272,21 @@ export const ApiErrorSchema = z.object({
   code: z.string().optional(),
 });
 export type ApiError = z.infer<typeof ApiErrorSchema>;
+
+export {
+  CreateCardRequestSchema,
+  CreateDeckRequestSchema,
+  NoteCardSchema,
+  NoteDeckSchema,
+  NotesResponseSchema,
+  NotesStatsSchema,
+  ReviewCardRequestSchema,
+  ReviewRatingSchema,
+  UpdateCardRequestSchema,
+  UpdateDeckRequestSchema,
+} from "@/lib/notes/schemas";
+
+export type NotesResponse = import("@/lib/notes/types").NotesResponse;
+export type NoteDeck = import("@/lib/notes/types").NoteDeck;
+export type NoteCard = import("@/lib/notes/types").NoteCard;
+export type ReviewRating = import("@/lib/notes/types").ReviewRating;

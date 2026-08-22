@@ -316,4 +316,82 @@ export function postDevPersona(persona: "guest" | "member") {
   });
 }
 
+export function getNotes() {
+  return apiFetch<import("@/lib/api/schemas").NotesResponse>("/api/notes");
+}
+
+export function postNoteDeck(name: string) {
+  return apiFetch<{ deck: import("@/lib/api/schemas").NoteDeck }>(
+    "/api/notes/decks",
+    {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    },
+  );
+}
+
+export function patchNoteDeck(deckId: string, name: string) {
+  return apiFetch<{ deck: import("@/lib/api/schemas").NoteDeck }>(
+    `/api/notes/decks/${deckId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ name }),
+    },
+  );
+}
+
+export function deleteNoteDeck(deckId: string) {
+  return apiFetch<{ deckId: string }>(`/api/notes/decks/${deckId}`, {
+    method: "DELETE",
+  });
+}
+
+export function postNoteCard(
+  deckId: string,
+  body: { front: string; back: string },
+) {
+  return apiFetch<{ card: import("@/lib/api/schemas").NoteCard }>(
+    `/api/notes/decks/${deckId}/cards`,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export function patchNoteCard(
+  cardId: string,
+  body: { front?: string; back?: string },
+) {
+  return apiFetch<{ card: import("@/lib/api/schemas").NoteCard }>(
+    `/api/notes/cards/${cardId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export function deleteNoteCard(cardId: string) {
+  return apiFetch<{ cardId: string }>(`/api/notes/cards/${cardId}`, {
+    method: "DELETE",
+  });
+}
+
+export function postNoteReview(cardId: string, rating: 1 | 2 | 3 | 4) {
+  return apiFetch<{ card: import("@/lib/api/schemas").NoteCard }>(
+    "/api/notes/review",
+    {
+      method: "POST",
+      body: JSON.stringify({ cardId, rating }),
+    },
+  );
+}
+
 export type { LessonFeel, PathSummary, UserSession };
+export type {
+  NoteCard,
+  NoteDeck,
+  NotesResponse,
+  ReviewRating,
+} from "@/lib/api/schemas";

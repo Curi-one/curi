@@ -469,6 +469,29 @@ export default function ProfilePage() {
               </div>
             </section>
 
+            <section className="profile-section p-4 sm:p-5">
+              <h2 className="profile-section-title">Review cards</h2>
+              <p className="profile-section-lede">
+                Spaced repetition from your lessons — SM-2 scheduling, one
+                accent on due counts.
+              </p>
+              <div className="mt-6 space-y-5">
+                <SettingToggle
+                  label="Save cards after each quiz"
+                  hint="Builds a deck from quiz answers and takeaways — due tomorrow."
+                  checked={prefs.notesAutoSave}
+                  onChange={(v) => patchPrefs("notesAutoSave", v)}
+                />
+                <div className="h-px bg-border" aria-hidden />
+                <SettingToggle
+                  label="Show due count on Today"
+                  hint="A quiet prompt when review cards are ready."
+                  checked={prefs.notesShowDueOnToday}
+                  onChange={(v) => patchPrefs("notesShowDueOnToday", v)}
+                />
+              </div>
+            </section>
+
             <LearningProfilePreview profile={prefs} />
           </div>
         </div>

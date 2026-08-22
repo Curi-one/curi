@@ -45,6 +45,8 @@ function rowToPreferences(row: PreferencesRow): UserPreferences {
     emailFormat: row.email_format,
     emailWeekends: row.email_weekends,
     emailWeeklyDigest: row.email_weekly_digest,
+    notesAutoSave: DEFAULT_USER_PREFERENCES.notesAutoSave,
+    notesShowDueOnToday: DEFAULT_USER_PREFERENCES.notesShowDueOnToday,
   };
 }
 

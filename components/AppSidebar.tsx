@@ -7,6 +7,7 @@ import {
   BarChart3,
   BookOpen,
   Compass,
+  Layers2,
   Library,
   Sparkles,
   type LucideProps,
@@ -27,6 +28,7 @@ const NAV_ITEMS: {
   { href: "/today", label: "Home", key: "today", icon: BookOpen },
   { href: "/explore", label: "Paths", key: "explore", icon: Compass },
   { href: "/library", label: "Library", key: "library", icon: Library },
+  { href: "/notes", label: "Notes", key: "notes", icon: Layers2 },
   { href: "/progress", label: "Progress", key: "progress", icon: BarChart3 },
   { href: "/new", label: "New", key: "create", icon: Sparkles },
 ];
@@ -62,6 +64,7 @@ function pathActive(pathname: string, key: string): boolean {
     today: ["/today", "/courses"],
     explore: ["/explore"],
     library: ["/library"],
+    notes: ["/notes"],
     progress: ["/progress"],
     create: ["/new", "/clarify", "/generating"],
   };
