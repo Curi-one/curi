@@ -14,26 +14,31 @@ const WORDMARK_SIZE: Record<NonNullable<Props["size"]>, "sm" | "md"> = {
   lg: "md",
 };
 
-/** Branded loader — Curi wordmark with a sweeping vermilion rule beneath. */
+const LINE_WIDTH: Record<NonNullable<Props["size"]>, string> = {
+  sm: "w-14",
+  md: "w-16",
+  lg: "w-[4.75rem]",
+};
+
+/** Branded loader — clean wordmark with a sweeping vermilion rule beneath. */
 export function Loader({ size = "md", label, className = "" }: Props) {
+  const statusLabel = label ?? "Loading";
+
   return (
     <div
       className={`flex flex-col items-center gap-4 ${className}`}
       role="status"
       aria-live="polite"
       aria-busy="true"
+      aria-label={statusLabel}
     >
-      <div className="relative inline-block">
-        <Wordmark href={undefined} size={WORDMARK_SIZE[size]} underline={false} />
-        <span className="loader-wordmark-track" aria-hidden>
-          <span className="loader-wordmark-line" />
-        </span>
-      </div>
-      {label ? (
-        <p className="text-sm font-light text-ink-muted">{label}</p>
-      ) : (
-        <span className="sr-only">Loading</span>
-      )}
+      <Wordmark href={undefined} size={WORDMARK_SIZE[size]} underline={false} />
+      <span
+        className={`loader-line-track ${LINE_WIDTH[size]}`}
+        aria-hidden
+      >
+        <span className="loader-line-sweep" />
+      </span>
     </div>
   );
 }
