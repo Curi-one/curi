@@ -46,8 +46,8 @@ describe("LibraryPathCard", () => {
     expect(link).toHaveAttribute("href", "/library/course-shelved");
     expect(link.className).toMatch(/aspect-square/);
     expect(screen.getByText("Constitutional Law")).toBeInTheDocument();
-    const progressBar = container.querySelector(".absolute.inset-x-0.bottom-0");
-    expect(progressBar).toBeTruthy();
+    const progressFill = container.querySelector(".bg-accent");
+    expect(progressFill).toBeTruthy();
   });
 
   it("shows Shelved chip and Continue restores then navigates", async () => {

@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { TodayView } from "@/components/TodayView";
 import type {
   FeedDayGroup,
@@ -43,10 +43,6 @@ function lessonItem(overrides: Partial<FeedLessonItem>): FeedLessonItem {
 }
 
 describe("TodayView", () => {
-  beforeEach(() => {
-    sessionStorage.clear();
-  });
-
   it("renders day groups with available and completed lesson cards", () => {
     const groups: FeedDayGroup[] = [
       {
@@ -130,7 +126,7 @@ describe("TodayView", () => {
     expect(screen.getByText("Completed")).toBeInTheDocument();
   });
 
-  it("collapses upcoming by default and expands on toggle", () => {
+  it("shows tomorrow lessons without collapse", () => {
     const groups: FeedDayGroup[] = [
       {
         daysAgo: -1,
@@ -168,57 +164,16 @@ describe("TodayView", () => {
       />,
     );
 
-    const toggle = screen.getByRole("button", { name: "Tomorrow" });
-    expect(toggle).toHaveAttribute("aria-expanded", "false");
-    expect(
-      screen.queryByText("Unlocks after today's lesson"),
-    ).not.toBeInTheDocument();
-
-    fireEvent.click(toggle);
-    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText("Tomorrow")).toBeInTheDocument();
     expect(
       screen.getByText("Unlocks after today's lesson"),
     ).toBeInTheDocument();
-    expect(sessionStorage.getItem("curi:today-upcoming-open")).toBe("1");
+    expect(
+      screen.queryByRole("button", { name: "Tomorrow" }),
+    ).not.toBeInTheDocument();
   });
 
-  it("restores upcoming open state from sessionStorage", async () => {
-    sessionStorage.setItem("curi:today-upcoming-open", "1");
-    const groups: FeedDayGroup[] = [
-      {
-        daysAgo: -1,
-        label: "Tomorrow",
-        items: [
-          lessonItem({
-            id: "a-tomorrow",
-            courseId: "a",
-            status: "locked",
-          }),
-        ],
-      },
-    ];
-
-    render(
-      <TodayView
-        due={[]}
-        done={done}
-        groups={groups}
-        streak={3}
-        streakAtRisk={false}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Tomorrow" })).toHaveAttribute(
-        "aria-expanded",
-        "true",
-      );
-    });
-    expect(screen.getByText("Unlocks tomorrow")).toBeInTheDocument();
-  });
-
-  it("does not show an all-caught-up card when nothing is due", async () => {
-    sessionStorage.setItem("curi:today-upcoming-open", "1");
+  it("shows locked tomorrow copy when nothing is due today", () => {
     const groups: FeedDayGroup[] = [
       {
         daysAgo: -1,
@@ -244,9 +199,7 @@ describe("TodayView", () => {
     );
 
     expect(screen.queryByText(/all caught up/i)).not.toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.getByText("Unlocks tomorrow")).toBeInTheDocument();
-    });
+    expect(screen.getByText("Unlocks tomorrow")).toBeInTheDocument();
   });
 
   it("shows welcome headline and full-width action rows when empty", () => {

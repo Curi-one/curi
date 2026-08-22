@@ -4,10 +4,12 @@ import { Loader } from "@/components/Loader";
 import { LoadingState } from "@/components/LoadingState";
 
 describe("Loader", () => {
-  it("renders status role and optional label", () => {
-    render(<Loader label="Loading feed…" />);
+  it("renders branded wordmark loader with sweeping line", () => {
+    const { container } = render(<Loader label="Loading feed…" />);
     expect(screen.getByRole("status")).toBeInTheDocument();
     expect(screen.getByText("Loading feed…")).toBeInTheDocument();
+    expect(container.querySelector(".loader-wordmark-line")).toBeTruthy();
+    expect(container.querySelector(".font-display")).toBeTruthy();
   });
 });
 

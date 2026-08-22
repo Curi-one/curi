@@ -1249,16 +1249,40 @@ body {
    Restraint: one motion at a time. No spring, no bounce, no elastic (§7.1).
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.loader-ring {
-  border-style: solid;
-  border-color: var(--color-border-subtle);
-  border-top-color: var(--color-text-primary);
-  animation: loader-spin 0.8s linear infinite;
+/* Branded loader — wordmark + sweeping vermilion rule (BRAND.md §3.2) */
+.loader-wordmark-track {
+  position: absolute;
+  inset-inline: 2px;
+  bottom: 0;
+  height: 2.5px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
 
-@keyframes loader-spin {
-  to {
-    transform: rotate(360deg);
+.loader-wordmark-line {
+  position: absolute;
+  inset-block: 0;
+  width: 38%;
+  background: var(--color-accent);
+  animation: loader-line-sweep var(--duration-slow) var(--ease-standard) infinite;
+}
+
+@keyframes loader-line-sweep {
+  0% {
+    left: 0;
+  }
+  50% {
+    left: 62%;
+  }
+  100% {
+    left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-wordmark-line {
+    animation-duration: 0.01ms;
+    left: 31%;
   }
 }
 
