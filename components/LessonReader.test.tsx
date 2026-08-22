@@ -349,7 +349,9 @@ describe("LessonReader", () => {
 
     const bar = screen.getByTestId("lesson-read-progress");
     expect(bar).toHaveAttribute("role", "progressbar");
+    expect(bar).toHaveClass("lesson-read-progress");
     expect(bar.querySelector(".bg-accent")).toBeTruthy();
+    expect(document.querySelector(".lesson-quiz-dock")).toBeTruthy();
   });
 
   it("clears the citation highlight when the sources drawer is closed", () => {

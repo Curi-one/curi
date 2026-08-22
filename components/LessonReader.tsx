@@ -231,7 +231,7 @@ export function LessonReader({
     <>
       <div
         ref={wrapperRef}
-        className="mx-auto w-full max-w-content animate-fade-in"
+        className="lesson-reader-root mx-auto w-full max-w-content animate-fade-in"
       >
         {/* Top nav: back (optional) · Aa settings · counter */}
         <div className="mb-8 flex items-center justify-between gap-3">
@@ -620,32 +620,30 @@ export function LessonReader({
             )}
           </div>
         </article>
+      </div>
 
-        <div className="fixed bottom-0 left-0 right-0 z-30 md:left-[84px]">
-          <div
-            role="progressbar"
-            aria-label="Reading progress"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(readProgress * 100)}
-            className="pointer-events-none h-[3px] bg-paper-tertiary"
-            data-testid="lesson-read-progress"
-          >
-            <div
-              className="h-full bg-accent transition-[width] duration-200 ease-out"
-              style={{ width: `${readProgress * 100}%` }}
-            />
-          </div>
-          <div className="border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md">
-            <div className="mx-auto w-full max-w-content">
-              <p className="mb-2.5 text-center font-ui text-ui-3xs leading-snug text-ink-muted">
-                {quizCta.hint}
-              </p>
-              <Button onClick={onStartQuiz} className="w-full">
-                {quizCta.label}
-              </Button>
-            </div>
-          </div>
+      <div
+        role="progressbar"
+        aria-label="Reading progress"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(readProgress * 100)}
+        className="lesson-read-progress"
+        data-testid="lesson-read-progress"
+      >
+        <div
+          className="h-full bg-accent transition-[width] duration-200 ease-out"
+          style={{ width: `${readProgress * 100}%` }}
+        />
+      </div>
+      <div className="lesson-quiz-dock border-t border-border bg-paper/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md">
+        <div className="mx-auto w-full max-w-content">
+          <p className="mb-2.5 text-center font-ui text-ui-3xs leading-snug text-ink-muted">
+            {quizCta.hint}
+          </p>
+          <Button onClick={onStartQuiz} className="w-full">
+            {quizCta.label}
+          </Button>
         </div>
       </div>
 
