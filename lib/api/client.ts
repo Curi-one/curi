@@ -186,6 +186,8 @@ export type ExploreResponse = {
   books: CatalogueBook[];
   pathCategories: string[];
   bookCategories: string[];
+  pathTaxonomy: { category: string; subcategories: string[] }[];
+  bookTaxonomy: { category: string; subcategories: string[] }[];
 };
 
 export function getExplore() {

@@ -18,7 +18,14 @@ export function useStaggerReveal(trigger: unknown = true) {
 }
 
 export const FEED_STAGGER_MS = 90;
+export const EXPLORE_STAGGER_MS = 40;
 
 export function feedStaggerDelay(index: number): CSSProperties {
   return { ["--feed-stagger-delay" as string]: `${index * FEED_STAGGER_MS}ms` };
+}
+
+export function exploreStaggerDelay(index: number): CSSProperties {
+  return {
+    ["--explore-stagger-delay" as string]: `${index * EXPLORE_STAGGER_MS}ms`,
+  };
 }
