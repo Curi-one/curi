@@ -54,4 +54,27 @@ describe("QuizFlow", () => {
     const link = screen.getByRole("link", { name: "NASA — Astrobiology" });
     expect(link).toHaveAttribute("href", "https://astrobiology.nasa.gov/");
   });
+
+  it("renders option letter and text together for each choice", () => {
+    render(
+      <QuizFlow
+        questions={[
+          {
+            id: "q1",
+            prompt: "Pick one",
+            options: ["Alpha choice", "Beta choice", "Gamma choice"],
+            correctIndex: 2,
+          },
+        ]}
+        onComplete={vi.fn()}
+      />,
+    );
+
+    const alpha = screen.getByRole("button", { name: /Alpha choice/ });
+    expect(alpha.querySelector(".letter")).toHaveTextContent("A");
+    expect(alpha.querySelector(".text")).toHaveTextContent("Alpha choice");
+    const gamma = screen.getByRole("button", { name: /Gamma choice/ });
+    expect(gamma.querySelector(".letter")).toHaveTextContent("C");
+    expect(gamma.querySelector(".text")).toHaveTextContent("Gamma choice");
+  });
 });

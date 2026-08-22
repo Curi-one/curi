@@ -534,6 +534,39 @@ describe("getLessonBody", () => {
     expect(user).not.toContain("- learner_details:");
   });
 
+  it("requires ## Summary and path progression in lesson body prompts", async () => {
+    const manyLessons = Array.from({ length: 9 }, (_, i) => ({
+      index: i,
+      title: `Lesson ${i}`,
+    }));
+    loadCourse.mockResolvedValueOnce({
+      kind: "pending",
+      topic: TOPIC,
+      depth: DEPTH,
+      clarifications: CLARIFICATIONS,
+      lessons: manyLessons,
+    });
+    lookup.mockResolvedValueOnce(null);
+    vi.mocked(chatCompletion).mockResolvedValueOnce(
+      completion(sampleLessonJson()),
+    );
+
+    await getLessonBody(
+      { courseId: "c1", lessonIndex: 8, sessionId: "anon-1" },
+      baseDeps,
+    );
+
+    const messages = vi.mocked(chatCompletion).mock.calls[0]?.[0]?.messages;
+    const system = messages?.find((m) => m.role === "system")?.content ?? "";
+    const user = messages?.find((m) => m.role === "user")?.content ?? "";
+    expect(system).toMatch(/## Summary/);
+    expect(user).toMatch(/## Summary/);
+    expect(user).toContain("Lesson 9 of 9");
+    expect(user).toMatch(/Late path|mastery/i);
+    expect(system).toMatch(/Prefer 1–2 visuals|diagram|imageUrl/i);
+    expect(system).toMatch(/caption-only|empty visual/i);
+  });
+
   it("changes lesson_body fingerprint when learner_details change", () => {
     const base = {
       topicNormalized: normalizeTopic(TOPIC),

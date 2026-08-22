@@ -2,7 +2,7 @@ import type { LessonVisualBlock } from "@/lib/api/schemas";
 import { topicArt, topicPatternStyle } from "@/lib/ui/topic-swatch";
 
 type Props = {
-  /** Visual returned by the lesson API / Perplexity. */
+  /** Visual returned by the lesson API / Perplexity. Prefer calling with imageUrl. */
   visual: LessonVisualBlock;
 };
 
@@ -52,8 +52,7 @@ export function LessonImage({ visual }: Props) {
           )}
         </div>
         <figcaption className="flex flex-col justify-end border-l-0 pl-0 pt-4 lg:border-l lg:border-border lg:pl-6 lg:pt-0">
-          <div className="wall-label">Visual note</div>
-          <div className="mt-3 font-display text-display-2xs leading-tight text-ink sm:text-display-xs">
+          <div className="font-display text-display-2xs leading-tight text-ink sm:text-display-xs">
             {title}
           </div>
           <p className="caption mt-4">{caption}</p>

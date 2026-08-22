@@ -211,10 +211,18 @@ export function LessonReader({
     const nodes: ReactNode[] = [];
     if (useApiVisuals) {
       apiVisuals.forEach((visual, vi) => {
-        nodes.push(
-          <LessonImage key={`lesson-image-${vi}`} visual={visual} />,
-        );
-        if (visual.equation) {
+        const hasImage =
+          typeof visual.imageUrl === "string" && visual.imageUrl.length > 0;
+        const hasEquation =
+          typeof visual.equation === "string" && visual.equation.length > 0;
+        // Skip caption-only visuals (no image, no equation) — empty "visual notes".
+        if (!hasImage && !hasEquation) return;
+        if (hasImage) {
+          nodes.push(
+            <LessonImage key={`lesson-image-${vi}`} visual={visual} />,
+          );
+        }
+        if (hasEquation) {
           nodes.push(
             <EquationBlock key={`equation-block-${vi}`} visual={visual} />,
           );
