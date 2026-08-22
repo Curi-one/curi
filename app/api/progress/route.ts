@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     return jsonWithSession(progress, sessionId);
   } catch {
     return jsonWithSession(
-      { streak: 0, heatmap: [], activePaths: 0, masteredPaths: 0 },
+      { streak: 0, heatmap: [], activityByDay: {}, activePaths: 0, masteredPaths: 0 },
       sessionId,
     );
   }

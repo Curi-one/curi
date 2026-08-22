@@ -292,6 +292,7 @@ export function postBillingPortal() {
 export type ProgressResponse = {
   streak: number;
   heatmap: string[];
+  activityByDay?: Record<string, number>;
   activePaths: number;
   masteredPaths: number;
 };

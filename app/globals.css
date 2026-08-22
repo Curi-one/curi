@@ -901,6 +901,11 @@ body {
     z-index: 1;
   }
 
+  .heatmap-cell-today {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 1px;
+  }
+
   /* Colourful intensity on warm paper — tertiary → accent mixes → full accent.
      Mixes use warm greys / ink only (never cool grey). */
   .heatmap-cell-0 {

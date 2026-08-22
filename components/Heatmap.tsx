@@ -1,119 +1,167 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import {
+  CONTRIBUTION_ROWS,
+  buildHeatmapGrid,
+  datesToActivityByDay,
+  type HeatmapCell,
+} from "@/lib/progress/heatmap-grid";
 
 type Props = {
-  dates: string[];
+  /** Lesson counts keyed by ISO date (YYYY-MM-DD). */
+  activityByDay?: Record<string, number>;
+  /** @deprecated Prefer activityByDay — unique activity dates (count = 1 each). */
+  dates?: string[];
   streak: number;
   atRisk?: boolean;
 };
 
-type Cell = {
-  key: string;
-  level: 0 | 1 | 2 | 3 | 4;
-  date?: string;
-};
+const WEEKDAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
-function intensityFor(
-  date: string | undefined,
-  active: Set<string>,
-): 0 | 1 | 2 | 3 | 4 {
-  if (!date || !active.has(date)) return 0;
-  let neighbours = 0;
-  const base = Date.parse(`${date}T12:00:00Z`);
-  for (const offset of [-2, -1, 1, 2]) {
-    const d = new Date(base + offset * 86400000).toISOString().slice(0, 10);
-    if (active.has(d)) neighbours++;
-  }
-  if (neighbours >= 3) return 4;
-  if (neighbours === 2) return 3;
-  if (neighbours === 1) return 2;
-  return 1;
+function rowLabel(row: number, startDayOfWeek: number): string | null {
+  if (row !== 1 && row !== 3 && row !== 5) return null;
+  const dow = (startDayOfWeek + row) % 7;
+  return WEEKDAY_LABELS[dow];
 }
 
-/** 26-week activity grid — intensity from local density; peak days use accent. */
-export function Heatmap({ dates, streak, atRisk }: Props) {
-  const weeks = 26;
-  const days = 7;
+function cellLabel(cell: HeatmapCell): string {
+  if (cell.count === 0) return `${cell.key}: no lessons`;
+  return `${cell.key}: ${cell.count} lesson${cell.count === 1 ? "" : "s"}`;
+}
+
+/** 26-week activity calendar — vermilion intensity from lesson count per day. */
+export function Heatmap({ activityByDay, dates, streak, atRisk }: Props) {
   const [hover, setHover] = useState<string | null>(null);
 
-  const { grid, activeDays } = useMemo(() => {
-    const active = new Set(dates);
-    const sorted = [...dates].sort();
-    const cells: Cell[][] = Array.from({ length: weeks }, (_, wi) =>
-      Array.from({ length: days }, (_, di) => ({
-        key: `${wi}-${di}`,
-        level: 0 as const,
-      })),
-    );
-
-    for (let i = 0; i < Math.min(sorted.length, weeks * days); i++) {
-      const date = sorted[sorted.length - 1 - i];
-      const wi = weeks - 1 - Math.floor(i / days);
-      const di = days - 1 - (i % days);
-      if (wi < 0) continue;
-      cells[wi][di] = {
-        key: `${wi}-${di}`,
-        date,
-        level: intensityFor(date, active),
-      };
+  const normalized = useMemo(() => {
+    if (activityByDay && Object.keys(activityByDay).length > 0) {
+      return activityByDay;
     }
+    if (dates?.length) {
+      return datesToActivityByDay(dates);
+    }
+    return {};
+  }, [activityByDay, dates]);
 
-    return { grid: cells, activeDays: dates.length };
-  }, [dates]);
+  const { columns, activeDays, totalLessons, startDayOfWeek } = useMemo(
+    () => buildHeatmapGrid(normalized),
+    [normalized],
+  );
 
   return (
     <div>
-      <div className="flex items-baseline gap-2">
-        <span
-          className={`font-display text-3xl transition-colors duration-300 ${
-            atRisk ? "text-streak" : "text-ink"
-          }`}
-        >
-          {streak}
-        </span>
-        <span className="font-ui text-sm text-ink-muted">day streak</span>
-        {atRisk && (
-          <span className="ml-auto font-meta text-streak">At risk</span>
-        )}
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="type-kicker-mark">Lesson rhythm</p>
+          <p className="mt-1 font-ui text-sm text-ink-muted">
+            26 weeks · each cell is one day
+          </p>
+        </div>
+        <div className="flex items-baseline gap-5 text-right">
+          <div>
+            <span
+              className={`font-display text-3xl tabular-nums transition-colors duration-300 ${
+                atRisk ? "text-streak" : "text-ink"
+              }`}
+            >
+              {streak}
+            </span>
+            <span className="ml-1.5 font-ui text-sm text-ink-muted">
+              day streak
+            </span>
+          </div>
+          <div>
+            <span className="font-display text-2xl tabular-nums text-ink">
+              {activeDays}
+            </span>
+            <span className="ml-1.5 font-ui text-sm text-ink-muted">
+              active days
+            </span>
+          </div>
+          <div>
+            <span className="font-display text-2xl tabular-nums text-ink">
+              {totalLessons}
+            </span>
+            <span className="ml-1.5 font-ui text-sm text-ink-muted">
+              lessons
+            </span>
+          </div>
+        </div>
       </div>
-      <p className="mt-1 font-ui text-sm text-ink-muted">
-        <span className="font-display text-lg tabular-nums text-ink">
-          {activeDays}
-        </span>
-        <span className="ml-1.5">active days</span>
-      </p>
-      <div className="mt-4 overflow-x-auto">
+
+      {atRisk && (
+        <p className="mt-3 font-meta text-streak">Streak at risk today</p>
+      )}
+
+      <div className="mt-5 overflow-x-auto pb-1">
         <div
-          className="inline-flex gap-1"
+          className="inline-flex gap-[3px]"
           role="img"
           aria-label="Activity heatmap"
         >
-          {grid.map((week, wi) => (
-            <div key={wi} className="flex flex-col gap-1">
-              {week.map((cell) => (
-                <button
-                  key={cell.key}
-                  type="button"
-                  className={`heatmap-cell heatmap-cell-${cell.level} focus-ring`}
-                  aria-label={
-                    cell.date
-                      ? `${cell.date}, intensity ${cell.level}`
-                      : "No activity"
-                  }
-                  onMouseEnter={() => setHover(cell.date ?? null)}
-                  onMouseLeave={() => setHover(null)}
-                  onFocus={() => setHover(cell.date ?? null)}
-                  onBlur={() => setHover(null)}
-                />
-              ))}
-            </div>
-          ))}
+          <div className="flex shrink-0 flex-col gap-[3px]">
+            <div className="h-4" aria-hidden />
+            {Array.from({ length: CONTRIBUTION_ROWS }, (_, row) => (
+              <div
+                key={`row-${row}`}
+                className="flex h-3 w-5 items-center justify-end pr-1 font-meta text-[10px] normal-case tracking-normal text-ink-faint"
+              >
+                {rowLabel(row, startDayOfWeek)}
+              </div>
+            ))}
+          </div>
+
+          {columns.map((week, weekIndex) => {
+            const first = week[0];
+            const prevFirst =
+              weekIndex > 0 ? columns[weekIndex - 1][0] : undefined;
+            const showMonth =
+              first &&
+              (!prevFirst ||
+                first.date.getMonth() !== prevFirst.date.getMonth());
+
+            return (
+              <div key={`week-${weekIndex}`} className="flex flex-col gap-[3px]">
+                <div className="flex h-4 items-center font-meta text-[10px] normal-case tracking-normal text-ink-muted">
+                  {showMonth
+                    ? first.date.toLocaleString(undefined, { month: "short" })
+                    : null}
+                </div>
+                <div className="grid grid-rows-7 gap-[3px]">
+                  {week.map((cell) => (
+                    <button
+                      key={cell.key}
+                      type="button"
+                      className={`heatmap-cell heatmap-cell-${cell.level} focus-ring ${
+                        cell.isToday ? "heatmap-cell-today" : ""
+                      }`}
+                      aria-label={cellLabel(cell)}
+                      onMouseEnter={() => setHover(cellLabel(cell))}
+                      onMouseLeave={() => setHover(null)}
+                      onFocus={() => setHover(cellLabel(cell))}
+                      onBlur={() => setHover(null)}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-      <div className="mt-3 flex items-center justify-between gap-3">
+
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5">
+          <span
+            className="heatmap-cell heatmap-cell-0 heatmap-cell-today"
+            aria-hidden
+          />
+          <span className="font-meta normal-case tracking-normal text-mono-xs text-ink-muted">
+            Today
+          </span>
+        </div>
         <div className="flex items-center gap-1">
-          <span className="font-meta normal-case tracking-normal text-mono-xs">
+          <span className="font-meta normal-case tracking-normal text-mono-xs text-ink-muted">
             Less
           </span>
           {[0, 1, 2, 3, 4].map((level) => (
@@ -123,7 +171,7 @@ export function Heatmap({ dates, streak, atRisk }: Props) {
               aria-hidden
             />
           ))}
-          <span className="font-meta normal-case tracking-normal text-mono-xs">
+          <span className="font-meta normal-case tracking-normal text-mono-xs text-ink-muted">
             More
           </span>
         </div>
