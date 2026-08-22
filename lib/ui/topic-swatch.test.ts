@@ -3,6 +3,13 @@ import {
   buildTrackMark,
   classifyTopicDomain,
   hashTopicString,
+  MARK_GLYPH_OPACITY,
+  MARK_GLYPH_OPACITY_WITH_TEXT,
+  MARK_PATTERN_OPACITY,
+  MARK_PATTERN_OPACITY_WITH_TEXT,
+  MARK_SURFACE_PATTERN_OPACITY,
+  markGlyphOpacity,
+  markPatternOpacity,
   topicArt,
   topicPatternStyle,
   topicSwatch,
@@ -174,6 +181,28 @@ describe("topicSwatch", () => {
 
   it("is deterministic", () => {
     expect(topicSwatch("Baking")).toEqual(topicSwatch("Baking"));
+  });
+});
+
+describe("mark imagery opacity", () => {
+  it("uses full field opacity when no readable copy shares the Ink field", () => {
+    expect(markPatternOpacity("field")).toBe(MARK_PATTERN_OPACITY);
+    expect(markGlyphOpacity("field")).toBe(MARK_GLYPH_OPACITY);
+    expect(MARK_PATTERN_OPACITY).toBe(0.16);
+    expect(MARK_GLYPH_OPACITY).toBe(0.5);
+  });
+
+  it("recedes pattern and glyph when readable copy shares the Ink field", () => {
+    expect(markPatternOpacity("withText")).toBe(MARK_PATTERN_OPACITY_WITH_TEXT);
+    expect(markGlyphOpacity("withText")).toBe(MARK_GLYPH_OPACITY_WITH_TEXT);
+    expect(MARK_PATTERN_OPACITY_WITH_TEXT).toBeLessThan(MARK_PATTERN_OPACITY);
+    expect(MARK_GLYPH_OPACITY_WITH_TEXT).toBeLessThan(MARK_GLYPH_OPACITY);
+  });
+
+  it("keeps surface patterns lighter than ink-field patterns", () => {
+    expect(MARK_SURFACE_PATTERN_OPACITY).toBeLessThan(
+      MARK_PATTERN_OPACITY_WITH_TEXT,
+    );
   });
 });
 

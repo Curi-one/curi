@@ -11,6 +11,8 @@ import {
   buildTrackMark,
   endowedPct,
   MARK_GLYPH_FONT_SIZE,
+  markGlyphOpacity,
+  markPatternOpacity,
   topicArt,
   topicPatternStyle,
 } from "@/lib/ui/topic-swatch";
@@ -57,15 +59,18 @@ export function LibraryPathCard({ path, tab }: Props) {
       style={{ background: art.field, containerType: "size" }}
     >
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.16]"
-        style={topicPatternStyle(art.pattern)}
+        className="pointer-events-none absolute inset-0"
+        style={{
+          ...topicPatternStyle(art.pattern),
+          opacity: markPatternOpacity("withText"),
+        }}
         aria-hidden
       />
       <div
         className="pointer-events-none absolute inset-0 flex select-none items-end justify-end overflow-hidden font-display"
         style={{
           color: art.glyphColor,
-          opacity: 0.9,
+          opacity: markGlyphOpacity("withText"),
           // Container-relative, so the glyph tracks the card's own size as the
           // grid reflows. `vw` ignored the card entirely.
           fontSize: MARK_GLYPH_FONT_SIZE,

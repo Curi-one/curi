@@ -1,9 +1,12 @@
 import {
   buildTrackMark,
   MARK_GLYPH_FONT_SIZE,
+  markGlyphOpacity,
+  markPatternOpacity,
   topicArt,
   topicPatternStyle,
   trackMarkTier,
+  type MarkImageryMode,
 } from "@/lib/ui/topic-swatch";
 
 type Props = {
@@ -36,6 +39,7 @@ export function CourseCover({
     showMeta && tier === "large" && height >= 80
       ? { domain: mark.domainName, call: mark.call }
       : null;
+  const imageryMode: MarkImageryMode = meta ? "withText" : "field";
 
   const rounded = width ? "rounded-none" : "w-full";
 
@@ -53,8 +57,11 @@ export function CourseCover({
     >
       {showPattern ? (
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.16]"
-          style={topicPatternStyle(art.pattern)}
+          className="pointer-events-none absolute inset-0"
+          style={{
+            ...topicPatternStyle(art.pattern),
+            opacity: markPatternOpacity(imageryMode),
+          }}
         />
       ) : null}
       {/* Positioned, not padded: the reference mark sets bottom:-6% so the
@@ -64,7 +71,7 @@ export function CourseCover({
         className="pointer-events-none absolute select-none font-display"
         style={{
           color: art.glyphColor,
-          opacity: 0.9,
+          opacity: markGlyphOpacity(imageryMode),
           fontSize: MARK_GLYPH_FONT_SIZE,
           fontWeight: 300,
           lineHeight: 0.78,
