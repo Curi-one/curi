@@ -29,6 +29,18 @@ export type ApiFetchOptions = RequestInit & {
   skipCache?: boolean;
 };
 
+export class ApiError extends Error {
+  status: number;
+  code?: string;
+
+  constructor(message: string, status: number, code?: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 async function rawFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
     ...init,
@@ -41,20 +53,21 @@ async function rawFetch<T>(path: string, init?: RequestInit): Promise<T> {
   if (!res.ok) {
     const body = await res.text();
     let message = body || `Request failed (${res.status})`;
+    let code: string | undefined;
     try {
       const parsed: unknown = JSON.parse(body);
-      if (
-        parsed &&
-        typeof parsed === "object" &&
-        "error" in parsed &&
-        typeof parsed.error === "string"
-      ) {
-        message = parsed.error;
+      if (parsed && typeof parsed === "object") {
+        if ("error" in parsed && typeof parsed.error === "string") {
+          message = parsed.error;
+        }
+        if ("code" in parsed && typeof parsed.code === "string") {
+          code = parsed.code;
+        }
       }
     } catch {
       // Keep raw body when it is not JSON.
     }
-    throw new Error(message);
+    throw new ApiError(message, res.status, code);
   }
   return res.json() as Promise<T>;
 }
@@ -139,10 +152,18 @@ export function patchShelveCourse(courseId: string) {
   });
 }
 
+export function patchRestoreCourse(courseId: string) {
+  return apiFetch<{ ok: true; courseId: string }>(`/api/courses/${courseId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ action: "restore" }),
+  });
+}
+
 export type CourseMapResponse = {
   id: string;
   topic: string;
   depth: PathSummary["depth"];
+  status: "active" | "completed" | "shelved";
   nodes: {
     index: number;
     title: string;

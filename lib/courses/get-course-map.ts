@@ -10,6 +10,7 @@ export type CourseMapResponse = {
   id: string;
   topic: string;
   depth: DepthSlug;
+  status: "active" | "completed" | "shelved";
   nodes: ReturnType<typeof buildPathMapNodes>;
 };
 
@@ -117,6 +118,7 @@ export async function getCourseMap(
       id: String(course.id),
       topic: String(course.topic),
       depth: parseDepth(course.depth),
+      status,
       nodes: buildPathMapNodes({
         progress,
         status,

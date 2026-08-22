@@ -146,7 +146,7 @@ Paths and books each carry a `category` (see [DATA.md](./DATA.md#browse-taxonomy
 |---|---|
 | Exploring | Open path map; continue due lesson |
 | Mastered | View completion (no certificate PDF in v1) |
-| Shelved | View-only path map; restore deferred to v1.1 |
+| Shelved | Restore + continue (subject to free active-path cap); path map review of completed lessons |
 
 Path map nodes: **read** · **today** (current) · **locked**.
 

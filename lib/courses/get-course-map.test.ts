@@ -105,9 +105,41 @@ describe("getCourseMap", () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
+      expect(result.data.status).toBe("active");
       expect(result.data.nodes.map((n) => n.status)).toEqual([
         "read",
         "today",
+        "locked",
+      ]);
+    }
+  });
+
+  it("returns shelved status for shelved courses", async () => {
+    const admin = mockAdmin({
+      course: {
+        id: COURSE_ID,
+        topic: "Cap tables",
+        depth: "fluent",
+        progress: 1,
+        total: 12,
+        status: "shelved",
+      },
+      lessons: [
+        { index: 0, title: "Intro" },
+        { index: 1, title: "Dilution" },
+      ],
+    });
+
+    const result = await getCourseMap(COURSE_ID, {
+      admin: admin as never,
+      getUserId: async () => USER_ID,
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.status).toBe("shelved");
+      expect(result.data.nodes.map((n) => n.status)).toEqual([
+        "read",
         "locked",
       ]);
     }
