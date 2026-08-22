@@ -13,6 +13,8 @@ vi.mock("@/lib/api/client", () => ({
   getMe: vi.fn(),
   getFeed: vi.fn(),
   getProgress: vi.fn(),
+  getNotes: vi.fn(),
+  getPreferences: vi.fn(),
   invalidateClientCache: vi.fn(),
 }));
 
@@ -32,6 +34,8 @@ vi.mock("@/components/TodayView", () => ({
 import {
   getFeed,
   getMe,
+  getNotes,
+  getPreferences,
   getProgress,
   invalidateClientCache,
 } from "@/lib/api/client";
@@ -42,6 +46,26 @@ describe("TodayPage auth gate", () => {
     replace.mockReset();
     searchGet.mockReturnValue(null);
     vi.mocked(invalidateClientCache).mockReset();
+    vi.mocked(getNotes).mockResolvedValue({
+      decks: [],
+      stats: { deckCount: 0, cardCount: 0, dueCount: 0, reviewedCount: 0 },
+    });
+    vi.mocked(getPreferences).mockResolvedValue({
+      preferences: {
+        seq: "straight",
+        anchor: "example",
+        length: "medium",
+        rigor: "clean",
+        jargon: "always",
+        emailEnabled: false,
+        emailTime: "morning",
+        emailFormat: "Curiosity",
+        emailWeekends: true,
+        emailWeeklyDigest: false,
+        notesAutoSave: true,
+        notesShowDueOnToday: true,
+      },
+    });
   });
 
   it("redirects guests to sign in", async () => {

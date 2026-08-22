@@ -64,6 +64,14 @@ function mergeWithDefaults(raw: unknown): UserPreferences {
       typeof raw.emailWeeklyDigest === "boolean"
         ? raw.emailWeeklyDigest
         : DEFAULT_USER_PREFERENCES.emailWeeklyDigest,
+    notesAutoSave:
+      typeof raw.notesAutoSave === "boolean"
+        ? raw.notesAutoSave
+        : DEFAULT_USER_PREFERENCES.notesAutoSave,
+    notesShowDueOnToday:
+      typeof raw.notesShowDueOnToday === "boolean"
+        ? raw.notesShowDueOnToday
+        : DEFAULT_USER_PREFERENCES.notesShowDueOnToday,
   };
 }
 

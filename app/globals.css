@@ -3224,6 +3224,111 @@ body {
   animation: skeleton-pulse 1600ms ease-in-out infinite;
 }
 
+/* ─── Notes / spaced repetition ─────────────────────────────────────────── */
+
+.notes-deck-row,
+.notes-card-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  padding: var(--space-4);
+  transition: background var(--duration-micro) var(--ease-standard);
+}
+
+.notes-deck-row:hover {
+  background: var(--color-highlight);
+}
+
+.notes-deck-row-kicker {
+  letter-spacing: var(--tracking-wider);
+}
+
+.notes-deck-row-title {
+  font-family: var(--font-display-stack);
+  font-size: var(--text-display-2xs);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+}
+
+.notes-due-badge {
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  padding: var(--space-1) var(--space-2);
+}
+
+.notes-flashcard {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  padding: var(--space-8) var(--space-6);
+  min-height: 12rem;
+  transition: background var(--duration-micro) var(--ease-standard);
+}
+
+.notes-flashcard:hover {
+  background: var(--color-highlight);
+}
+
+.notes-flashcard-hint {
+  opacity: 0.7;
+}
+
+.notes-rating-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.notes-rating-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  padding: var(--space-3) var(--space-2);
+  min-height: 2.75rem;
+  transition: background var(--duration-micro) var(--ease-standard);
+}
+
+.notes-rating-btn:hover:not(:disabled) {
+  background: var(--color-highlight);
+}
+
+.notes-rating-label {
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-mono-2xs);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+
+.notes-rating-days {
+  font-size: var(--text-ui-3xs);
+  color: var(--color-text-secondary);
+}
+
+.notes-input {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-ui-sm);
+  color: var(--color-text-primary);
+}
+
+.notes-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.notes-today-cta a {
+  padding: var(--space-2) var(--space-1);
+}
+
+.notes-modal {
+  background: var(--color-bg-secondary);
+}
+
 /* ─── Reduced motion · §7.5 / INTERACTIONS.md ───────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {

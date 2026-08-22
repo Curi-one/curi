@@ -11,7 +11,14 @@ export type EmailPreferences = {
   emailWeeklyDigest: boolean;
 };
 
-export type UserPreferences = LearningProfile & EmailPreferences;
+export type NotesPreferences = {
+  /** Save quiz cards to Review after each lesson (SM-2, due tomorrow). */
+  notesAutoSave: boolean;
+  /** Show due review count on Today when cards are ready. */
+  notesShowDueOnToday: boolean;
+};
+
+export type UserPreferences = LearningProfile & EmailPreferences & NotesPreferences;
 
 /**
  * Opt-in email defaults; learning profile matches prototype starters.
@@ -27,9 +34,15 @@ export const DEFAULT_EMAIL_PREFERENCES: EmailPreferences = {
   emailWeeklyDigest: false,
 };
 
+export const DEFAULT_NOTES_PREFERENCES: NotesPreferences = {
+  notesAutoSave: true,
+  notesShowDueOnToday: true,
+};
+
 export const DEFAULT_USER_PREFERENCES: UserPreferences = {
   ...DEFAULT_LEARNING_PROFILE,
   ...DEFAULT_EMAIL_PREFERENCES,
+  ...DEFAULT_NOTES_PREFERENCES,
 };
 
 /** Alias used by Profile UI. */

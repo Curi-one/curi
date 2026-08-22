@@ -51,6 +51,24 @@ import {
 } from "@/lib/profile/user-preferences";
 import { normalizeLearningProfile } from "@/lib/profile/learning-profile";
 import { DEFAULT_TIMEZONE, todayInTimezone } from "@/lib/timezone";
+import {
+  addCardToDeck,
+  computeNotesStats,
+  createNoteDeck,
+  deleteCardFromDeck,
+  deleteDeck,
+  findCardLocation,
+  mergeLessonDeck,
+  updateCardInDeck,
+  updateDeckName,
+} from "@/lib/notes/deck";
+import {
+  buildLessonNoteCards,
+  lessonDeckName,
+  lessonDeckSourceId,
+} from "@/lib/notes/lesson-cards";
+import { rateCard } from "@/lib/notes/sm2";
+import type { NoteCard, NoteDeck, NotesResponse, ReviewRating } from "@/lib/notes/types";
 
 export const SESSION_COOKIE = "curi_session";
 export { FREE_ACTIVE_PATH_LIMIT };
@@ -69,6 +87,7 @@ type SessionData = {
   timezone: string;
   preferences: UserPreferences;
   certificates: Record<string, TrackCertificate>;
+  noteDecks: NoteDeck[];
 };
 
 type StoreResult<T> =
@@ -170,6 +189,7 @@ function seedDefaultMember(today: string): SessionData {
     timezone: DEFAULT_TIMEZONE,
     preferences: { ...DEFAULT_USER_PREFERENCES },
     certificates,
+    noteDecks: [],
   };
 }
 
@@ -204,6 +224,7 @@ class MockStore {
       timezone: DEFAULT_TIMEZONE,
       preferences: { ...DEFAULT_USER_PREFERENCES },
       certificates: {},
+      noteDecks: [],
     };
     this.sessions.set(sessionId, created);
     return created;
@@ -476,6 +497,31 @@ class MockStore {
       if (path.progress >= path.lessonTitles.length) {
         path.status = "mastered";
       }
+
+      if (data.preferences.notesAutoSave) {
+        const lessonTitle =
+          path.lessonTitles[index] ?? `Lesson ${index + 1}`;
+        const cards = buildLessonNoteCards({
+          topic: path.topic,
+          lessonTitle,
+          quiz: content.quiz.map((q) => ({
+            prompt: q.prompt,
+            options: q.options,
+            correctIndex: q.correctIndex,
+            explanation: q.explanation ?? "",
+          })),
+          takeaways: content.takeaways ?? [],
+        });
+        const merged = mergeLessonDeck(data.noteDecks, {
+          sourceId: lessonDeckSourceId(courseId, index),
+          name: lessonDeckName(path.topic, index),
+          courseId,
+          lessonIndex: index,
+          cards,
+          dueInDays: 1,
+        });
+        data.noteDecks = merged.decks;
+      }
     }
 
     const dates = activityDates(data.activity);
@@ -696,6 +742,7 @@ class MockStore {
       timezone: DEFAULT_TIMEZONE,
       preferences: { ...DEFAULT_USER_PREFERENCES },
       certificates: {},
+      noteDecks: [],
     });
     return guest;
   }
@@ -750,7 +797,145 @@ class MockStore {
       timezone: DEFAULT_TIMEZONE,
       preferences: { ...DEFAULT_USER_PREFERENCES },
       certificates: {},
+      noteDecks: [],
     });
+  }
+
+  getNotes(sessionId: string): NotesResponse {
+    const data = this.getOrCreateSession(sessionId);
+    const now = Date.now();
+    return {
+      decks: data.noteDecks.map((d) => ({ ...d, cards: [...d.cards] })),
+      stats: computeNotesStats(data.noteDecks, now),
+    };
+  }
+
+  createNoteDeck(
+    sessionId: string,
+    name: string,
+  ): StoreResult<NoteDeck> {
+    const data = this.getOrCreateSession(sessionId);
+    const deck = createNoteDeck(name);
+    data.noteDecks = [...data.noteDecks, deck];
+    return { ok: true, data: deck };
+  }
+
+  updateNoteDeck(
+    sessionId: string,
+    deckId: string,
+    name: string,
+  ): StoreResult<NoteDeck> {
+    const data = this.getOrCreateSession(sessionId);
+    const index = data.noteDecks.findIndex((d) => d.id === deckId);
+    if (index < 0) {
+      return { ok: false, code: "not_found", message: "Deck not found" };
+    }
+    const updated = updateDeckName(data.noteDecks[index]!, name);
+    const next = [...data.noteDecks];
+    next[index] = updated;
+    data.noteDecks = next;
+    return { ok: true, data: updated };
+  }
+
+  deleteNoteDeck(
+    sessionId: string,
+    deckId: string,
+  ): StoreResult<{ deckId: string }> {
+    const data = this.getOrCreateSession(sessionId);
+    if (!data.noteDecks.some((d) => d.id === deckId)) {
+      return { ok: false, code: "not_found", message: "Deck not found" };
+    }
+    data.noteDecks = deleteDeck(data.noteDecks, deckId);
+    return { ok: true, data: { deckId } };
+  }
+
+  addNoteCard(
+    sessionId: string,
+    deckId: string,
+    front: string,
+    back: string,
+  ): StoreResult<NoteCard> {
+    const data = this.getOrCreateSession(sessionId);
+    const index = data.noteDecks.findIndex((d) => d.id === deckId);
+    if (index < 0) {
+      return { ok: false, code: "not_found", message: "Deck not found" };
+    }
+    const updated = addCardToDeck(data.noteDecks[index]!, front, back);
+    const next = [...data.noteDecks];
+    next[index] = updated;
+    data.noteDecks = next;
+    const card = updated.cards[updated.cards.length - 1];
+    if (!card) {
+      return { ok: false, code: "error", message: "Could not add card" };
+    }
+    return { ok: true, data: card };
+  }
+
+  updateNoteCard(
+    sessionId: string,
+    cardId: string,
+    patch: { front?: string; back?: string },
+  ): StoreResult<NoteCard> {
+    const data = this.getOrCreateSession(sessionId);
+    const location = findCardLocation(data.noteDecks, cardId);
+    if (!location) {
+      return { ok: false, code: "not_found", message: "Card not found" };
+    }
+    const updatedDeck = updateCardInDeck(
+      data.noteDecks[location.deckIndex]!,
+      cardId,
+      patch,
+    );
+    const next = [...data.noteDecks];
+    next[location.deckIndex] = updatedDeck;
+    data.noteDecks = next;
+    const card = updatedDeck.cards.find((c) => c.id === cardId);
+    if (!card) {
+      return { ok: false, code: "error", message: "Could not update card" };
+    }
+    return { ok: true, data: card };
+  }
+
+  deleteNoteCard(
+    sessionId: string,
+    cardId: string,
+  ): StoreResult<{ cardId: string }> {
+    const data = this.getOrCreateSession(sessionId);
+    const location = findCardLocation(data.noteDecks, cardId);
+    if (!location) {
+      return { ok: false, code: "not_found", message: "Card not found" };
+    }
+    const updatedDeck = deleteCardFromDeck(
+      data.noteDecks[location.deckIndex]!,
+      cardId,
+    );
+    const next = [...data.noteDecks];
+    next[location.deckIndex] = updatedDeck;
+    data.noteDecks = next;
+    return { ok: true, data: { cardId } };
+  }
+
+  reviewNoteCard(
+    sessionId: string,
+    cardId: string,
+    rating: ReviewRating,
+  ): StoreResult<NoteCard> {
+    const data = this.getOrCreateSession(sessionId);
+    const location = findCardLocation(data.noteDecks, cardId);
+    if (!location) {
+      return { ok: false, code: "not_found", message: "Card not found" };
+    }
+    const rated = rateCard(location.card, rating);
+    const deck = data.noteDecks[location.deckIndex]!;
+    const updatedDeck: NoteDeck = {
+      ...deck,
+      cards: deck.cards.map((c) => (c.id === cardId ? rated : c)),
+      updatedAt: Date.now(),
+    };
+    const next = [...data.noteDecks];
+    next[location.deckIndex] = updatedDeck;
+    data.noteDecks = next;
+    return { ok: true, data: rated };
   }
 
   getPreferences(sessionId: string): UserPreferences {
@@ -772,6 +957,9 @@ class MockStore {
       emailWeekends: patch.emailWeekends ?? data.preferences.emailWeekends,
       emailWeeklyDigest:
         patch.emailWeeklyDigest ?? data.preferences.emailWeeklyDigest,
+      notesAutoSave: patch.notesAutoSave ?? data.preferences.notesAutoSave,
+      notesShowDueOnToday:
+        patch.notesShowDueOnToday ?? data.preferences.notesShowDueOnToday,
     };
     data.preferences = merged;
     return { ...merged };
