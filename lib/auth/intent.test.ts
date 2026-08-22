@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   authEmailHeadline,
+  authEmailKicker,
   resolveAuthIntent,
   sanitizeReturnTo,
 } from "@/lib/auth/intent";
@@ -59,6 +60,16 @@ describe("authEmailHeadline", () => {
 
   it("shows Save your progress only for save intent", () => {
     expect(authEmailHeadline("save", "email")).toBe("Save your progress");
+  });
+});
+
+describe("authEmailKicker", () => {
+  it("maps steps and intents to mono kickers", () => {
+    expect(authEmailKicker("signin", "email")).toBe("Sign in");
+    expect(authEmailKicker("signup", "email")).toBe("Create account");
+    expect(authEmailKicker("save", "email")).toBe("Save progress");
+    expect(authEmailKicker("signin", "link")).toBe("Check email");
+    expect(authEmailKicker("signin", "code")).toBe("Enter code");
   });
 });
 

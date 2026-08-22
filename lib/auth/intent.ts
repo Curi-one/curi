@@ -50,6 +50,21 @@ export function authEmailHeadline(intent: AuthIntent, step: string): string {
   }
 }
 
+/** Mono kicker for branded auth screens. */
+export function authEmailKicker(intent: AuthIntent, step: string): string {
+  if (step === "link") return "Check email";
+  if (step === "code") return "Enter code";
+  if (step === "name") return "Almost there";
+  switch (intent) {
+    case "signin":
+      return "Sign in";
+    case "signup":
+      return "Create account";
+    case "save":
+      return "Save progress";
+  }
+}
+
 export function authEmailSubcopy(
   intent: AuthIntent,
   step: string,

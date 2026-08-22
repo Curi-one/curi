@@ -109,8 +109,13 @@ ${linkRow}
 </td></tr>`;
 }
 
-export function emailCtaButton(href: string, label: string): string {
-  return `<a href="${escapeHtml(href)}" style="display:block;text-align:center;background:${EMAIL_COLORS.ink};color:${EMAIL_COLORS.white};font-family:${EMAIL_FONTS.ui};font-size:13px;font-weight:600;letter-spacing:0.04em;padding:14px 28px;text-decoration:none;border-bottom:3px solid ${EMAIL_COLORS.accent};">${escapeHtml(label)}</a>`;
+export function emailCtaButton(
+  href: string,
+  label: string,
+  options?: { rawHref?: boolean },
+): string {
+  const safeHref = options?.rawHref ? href : escapeHtml(href);
+  return `<a href="${safeHref}" style="display:block;text-align:center;background:${EMAIL_COLORS.ink};color:${EMAIL_COLORS.white};font-family:${EMAIL_FONTS.ui};font-size:13px;font-weight:600;letter-spacing:0.04em;padding:14px 28px;text-decoration:none;border-bottom:3px solid ${EMAIL_COLORS.accent};">${escapeHtml(label)}</a>`;
 }
 
 export function emailKicker(text: string): string {
