@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { TodayView } from "@/components/TodayView";
 import type {
@@ -43,7 +43,7 @@ function lessonItem(overrides: Partial<FeedLessonItem>): FeedLessonItem {
 }
 
 describe("TodayView", () => {
-  it("renders day groups with available and completed lesson cards", () => {
+  it("renders day groups with available and completed lesson cards", async () => {
     const groups: FeedDayGroup[] = [
       {
         daysAgo: 0,
@@ -87,6 +87,11 @@ describe("TodayView", () => {
     expect(screen.getByText("1 of 2 still to read")).toBeInTheDocument();
     expect(screen.getByText("Read now")).toBeInTheDocument();
     expect(screen.getByText("Completed")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        document.querySelectorAll(".feed-stagger-item.is-visible").length,
+      ).toBeGreaterThan(0);
+    });
   });
 
   it("links a completed lesson item back to that exact lesson index for re-reading", () => {

@@ -41,7 +41,7 @@ export function LessonFeedCard({
 
   if (item.status === "locked") {
     return (
-      <div className="flex w-full gap-3.5 rounded-none border border-border bg-paper-secondary p-4 opacity-55 sm:gap-4 sm:p-5">
+      <div className="feed-card flex w-full gap-3.5 rounded-none border border-border bg-paper-secondary p-4 opacity-55 sm:gap-4 sm:p-5">
         <div className="opacity-40">
           <TopicThumbnail topic={item.topic} size={48} />
         </div>
@@ -49,7 +49,7 @@ export function LessonFeedCard({
           <h3 className="font-display text-ui-xl font-light leading-tight tracking-tight text-ink/50 sm:text-display-2xs">
             {item.title}
           </h3>
-          <p className="mt-1 font-meta text-ink-muted/60">{item.topic}</p>
+          <p className="wall-label mt-2 text-ink-muted/60">{item.topic}</p>
           <p className="mt-1.5 line-clamp-2 text-ui-2xs leading-relaxed text-ink-muted/70 sm:text-ui-xs">
             {preview}
           </p>
@@ -73,16 +73,11 @@ export function LessonFeedCard({
   return (
     <Link
       href={href}
-      className={`group interactive-card focus-ring relative flex w-full gap-3.5 overflow-hidden rounded-none border border-border bg-paper-secondary p-4 shadow-none sm:gap-4 sm:p-5 ${
+      className={`feed-card group interactive-card focus-ring relative flex w-full gap-3.5 overflow-hidden rounded-none border border-border bg-paper-secondary p-4 shadow-none sm:gap-4 sm:p-5 ${
         dimmed ? "opacity-55 hover:opacity-70" : ""
       }`}
     >
-      {!dimmed && (
-        <span
-          className="absolute bottom-4 left-0 top-4 w-0.5 rounded-none bg-ink/30"
-          aria-hidden
-        />
-      )}
+      {!dimmed && <span className="feed-card-accent" aria-hidden />}
       <TopicThumbnail topic={item.topic} size={48} />
 
       <div className="min-w-0 flex-1">
@@ -93,7 +88,9 @@ export function LessonFeedCard({
         >
           {item.title}
         </h3>
-        <p className="mt-1 font-meta">{item.topic}</p>
+        <p className={`wall-label mt-2 ${dimmed ? "text-ink-muted/50" : ""}`}>
+          {item.topic}
+        </p>
         <p className="mt-1.5 line-clamp-2 text-ui-2xs leading-relaxed text-ink-muted sm:text-ui-xs">
           {preview}
         </p>

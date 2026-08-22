@@ -601,6 +601,46 @@ body {
     background: var(--color-bg-tertiary);
   }
 
+  /* Feed cards — lesson rows on Today (F2) */
+  .feed-card {
+    border-radius: var(--radius-none);
+    transition: background-color 300ms var(--ease-out);
+  }
+
+  .feed-card-accent {
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    top: 1rem;
+    width: 2px;
+    background: var(--color-ink);
+    opacity: 0.3;
+    transition: opacity 300ms var(--ease-out);
+  }
+
+  .feed-card:hover .feed-card-accent,
+  .feed-card:focus-visible .feed-card-accent {
+    opacity: 0.55;
+  }
+
+  .feed-stagger-item {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 650ms var(--ease-out),
+      transform 650ms var(--ease-out);
+    transition-delay: var(--feed-stagger-delay, 0ms);
+  }
+
+  .feed-stagger-item.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .feed-enter {
+    animation: fade-in var(--duration-large) var(--ease-out) both;
+  }
+
   /* Clickable rows and cards — Paper→Pale bg only, no lift (§16.3 / INTERACTIONS) */
   .interactive-card {
     border-radius: var(--radius-none);
@@ -2258,5 +2298,10 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .feed-stagger-item {
+    opacity: 1;
+    transform: none;
   }
 }
